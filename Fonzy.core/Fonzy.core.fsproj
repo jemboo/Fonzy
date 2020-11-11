@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Utils.fs" />
+    <Compile Include="Result.fs" />
+    <Compile Include="ConstrainedType.fs" />
+    <Compile Include="CommonTypes.fs" />
+    <Compile Include="ElRando.fs" />
+    <Compile Include="Combinatorics.fs" />
+    <Compile Include="CombinatoricsTypes.fs" />
+    <Compile Include="CommonTypesDto.fs" />
+    <Compile Include="SorterParts.fs" />
+    <Compile Include="SorterPartsDto.fs" />
+    <Compile Include="GpParts.fs" />
+    <Compile Include="Gp.fs" />
+    <Compile Include="GpOps.fs" />
+    <Compile Include="World.fs" />
+    <Compile Include="WorldDto.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+</Project>

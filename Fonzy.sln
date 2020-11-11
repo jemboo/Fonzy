@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Fonzy.core", "Fonzy.core\Fonzy.core.fsproj", "{AB5631FC-E52B-47D2-8780-1B0E14B52750}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fonzy.core.test", "Fonzy.core.test\Fonzy.core.test.fsproj", "{B86D0F62-9B02-4D8A-B98E-CC33C369D33A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AB5631FC-E52B-47D2-8780-1B0E14B52750}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB5631FC-E52B-47D2-8780-1B0E14B52750}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB5631FC-E52B-47D2-8780-1B0E14B52750}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB5631FC-E52B-47D2-8780-1B0E14B52750}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B86D0F62-9B02-4D8A-B98E-CC33C369D33A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B86D0F62-9B02-4D8A-B98E-CC33C369D33A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B86D0F62-9B02-4D8A-B98E-CC33C369D33A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B86D0F62-9B02-4D8A-B98E-CC33C369D33A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {284B37AA-3936-4E89-87A3-5AEE83D9D320}
+	EndGlobalSection
+EndGlobal
