@@ -14,8 +14,13 @@ type TestResults =
 
 type PhenotypeEval = private PhenotypeEval of float
 
+type SorterPoolEnvironment = 
+    | Bag of int
+    | Torus of int
+
 type Enviroment = 
     | Empty
+    | S of SorterPoolEnvironment
     | A of int
     | B of float
 
@@ -43,5 +48,6 @@ module Enviroment =
         match e with
         | Enviroment.A i -> None
         | Enviroment.B i -> None
+        | Enviroment.S s -> None
 
 
