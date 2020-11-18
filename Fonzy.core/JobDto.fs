@@ -1,60 +1,60 @@
 ﻿namespace global
 open System
 
-type SorterPoolEnviromentDto = {cat:string; value:string}
-module SorterPoolEnviromentDto =
-    let toDto (env:SorterPoolEnvironment) =
+type SorterPoolEnviroDto = {cat:string; value:string}
+module SorterPoolEnviroDto =
+    let toDto (env:SorterPoolEnviro) =
          match env with
-         | SorterPoolEnvironment.Bag n -> {cat="Bag"; value = Json.serialize n}
-         | SorterPoolEnvironment.Torus n -> {cat="Torus"; value = Json.serialize n}
+         | SorterPoolEnviro.Bag n -> {cat="Bag"; value = Json.serialize n}
+         | SorterPoolEnviro.Torus n -> {cat="Torus"; value = Json.serialize n}
 
 
-    let fromDto (eDto:SorterPoolEnviromentDto) =
+    let fromDto (eDto:SorterPoolEnviroDto) =
         if eDto.cat = "Bag" then
             result {
                 let! b = Json.deserialize<int> eDto.value
-                return SorterPoolEnvironment.Bag b
+                return SorterPoolEnviro.Bag b
             }
         else if eDto.cat = "Torus" then
             result {
                 let! b = Json.deserialize<int> eDto.value
-                return SorterPoolEnvironment.Torus b
+                return SorterPoolEnviro.Torus b
             }
-        else sprintf "cat: %s for SorterPoolEnviromentDto not found"
+        else sprintf "cat: %s for SorterPoolEnviroDto not found"
                       eDto.cat |> Error
 
 
-type EnvironmentDto = {cat:string; value:string}
-module EnvironmentDto =
-    let toDto (env:Enviroment) =
+type EnviroDto = {cat:string; value:string}
+module EnviroDto =
+    let toDto (env:Enviro) =
         match env with
-        | Enviroment.A n -> {cat="A"; value = Json.serialize n}
-        | Enviroment.B n -> {cat="B"; value = Json.serialize n}
-        | Enviroment.S n -> {cat="S"; value = n |> SorterPoolEnviromentDto.toDto |> Json.serialize}
-        | Enviroment.Empty -> {cat="Empty"; value = Json.serialize None}
+        | Enviro.A n -> {cat="A"; value = Json.serialize n}
+        | Enviro.B n -> {cat="B"; value = Json.serialize n}
+        | Enviro.S n -> {cat="S"; value = n |> SorterPoolEnviroDto.toDto |> Json.serialize}
+        | Enviro.Empty -> {cat="Empty"; value = Json.serialize None}
 
-    let fromDto (eDto:EnvironmentDto) =
+    let fromDto (eDto:EnviroDto) =
         if eDto.cat = "Empty" then
             result {
-                return Enviroment.Empty
+                return Enviro.Empty
             }
         else if eDto.cat = "S" then
             result {
-                let! b = Json.deserialize<SorterPoolEnviromentDto> eDto.value
-                let! q = b |> SorterPoolEnviromentDto.fromDto
-                return Enviroment.S q
+                let! b = Json.deserialize<SorterPoolEnviroDto> eDto.value
+                let! q = b |> SorterPoolEnviroDto.fromDto
+                return Enviro.S q
             }
         else if eDto.cat = "A" then
             result {
                 let! b = Json.deserialize<int> eDto.value
-                return Enviroment.A b
+                return Enviro.A b
             }
         else if eDto.cat = "B" then
             result {
                 let! b = Json.deserialize<float> eDto.value
-                return Enviroment.B b
+                return Enviro.B b
             }
-        else sprintf "cat: %s for EnvironmentDto not found"
+        else sprintf "cat: %s for EnviroDto not found"
                       eDto.cat |> Error
 
 
@@ -123,9 +123,9 @@ module CauseTypeDto =
 
 
 
-type WorldDto = {id:Guid; parentId:Guid option; causeTypeDto:CauseTypeDto; environmentDto:EnvironmentDto}
+type WorldDto = {id:Guid; parentId:Guid option; causeTypeDto:CauseTypeDto; environmentDto:EnviroDto}
 module WorldDto = 
-    let create (id:Guid) (parentId:Guid option) (causeTypeDto:CauseTypeDto) (environmentDto:EnvironmentDto) =
+    let create (id:Guid) (parentId:Guid option) (causeTypeDto:CauseTypeDto) (environmentDto:EnviroDto) =
                {
                     id=id; 
                     parentId=parentId; 
@@ -138,12 +138,12 @@ module WorldDto =
              id=w.id; 
              parentId=w.parentId; 
              causeTypeDto=w.cause.causeType |> CauseTypeDto.toDto; 
-             environmentDto=w.enviroment |> EnvironmentDto.toDto; 
+             environmentDto=w.enviroment |> EnviroDto.toDto; 
          }
 
     let fromDto (worldDto:WorldDto) =
             result {
-                let! enviroment =  EnvironmentDto.fromDto worldDto.environmentDto
+                let! enviroment =  EnviroDto.fromDto worldDto.environmentDto
                 let! causeType =  CauseTypeDto.fromDto worldDto.causeTypeDto
                 let cause = Cause.fromCauseType causeType
                 return World.create worldDto.id worldDto.parentId cause enviroment
@@ -151,7 +151,7 @@ module WorldDto =
             
             
             
-type WorldActionDto = {parentWorldDto:WorldDto; childId:Guid; causeTypeDto:CauseTypeDto;}
+type WorldActionDto = {childId:Guid; parentWorldDto:WorldDto;  causeTypeDto:CauseTypeDto;}
 module WorldActionDto = 
     let create (childId:Guid) (parentWorldDto:WorldDto) (causeTypeDto:CauseTypeDto) =
                 {
@@ -160,11 +160,11 @@ module WorldActionDto =
                     causeTypeDto=causeTypeDto;
                 }
             
-    let toDto (parentWorld:World) (causeType:CauseType) (childId:Guid) =
+    let toDto (worldAction:WorldAction) =
             {
-                childId = childId; 
-                parentWorldDto = parentWorld |> WorldDto.toDto; 
-                causeTypeDto=causeType |> CauseTypeDto.toDto;
+                childId = worldAction.childId; 
+                parentWorldDto = worldAction.parentWorld |> WorldDto.toDto; 
+                causeTypeDto = worldAction.cause.causeType |> CauseTypeDto.toDto;
             }
             
     let fromDto (worldActionDto:WorldActionDto) =
@@ -172,25 +172,50 @@ module WorldActionDto =
                 let! parentWorld =  WorldDto.fromDto worldActionDto.parentWorldDto
                 let! causeType =  CauseTypeDto.fromDto worldActionDto.causeTypeDto
                 let cause = Cause.fromCauseType causeType
-                return! World.createFromParent worldActionDto.childId parentWorld cause
+                return WorldAction.create (worldActionDto.childId) parentWorld cause
              }
 
+
+type JobDto = {cat:string; value:string}
+module JobDto =
+    let toDto (j:Job) =
+         match j with
+         | Job.GetWorld n -> {cat="GetWorld"; value = n |> WorldDto.toDto |> Json.serialize}
+         | Job.MakeWorld n -> {cat="MakeWorld"; value = n |> WorldActionDto.toDto |> Json.serialize}
+
+
+    let fromDto (eDto:JobDto) =
+        if eDto.cat = "GetWorld" then
+            result {
+                let! dto = eDto.value |> Json.deserialize<WorldDto>
+                let! w = WorldDto.fromDto dto
+                return Job.GetWorld w
+            }
+        else if eDto.cat = "MakeWorld" then
+            result {
+                let! dto = eDto.value |> Json.deserialize<WorldActionDto>
+                let! wa = WorldActionDto.fromDto dto
+                return Job.MakeWorld wa
+            }
+        else sprintf "cat: %s for JobFileDto not found"
+                      eDto.cat |> Error
+
+
 type JobFile =
-    | ReadWorld of string
-    | MakeWorld of string
+    | ReadWorld of WorldDto
+    | MakeWorld of WorldActionDto
 
 module JobFile =
     let toWorld (jobFile:JobFile) = 
         match jobFile with
-        | ReadWorld json -> 
+        | ReadWorld dto -> 
             result {
-                let! dto = json |> Json.deserialize<WorldDto>
                 return! dto |> WorldDto.fromDto
             }
-        | MakeWorld json -> 
+        | MakeWorld dto -> 
             result {
-                let! dto = json |> Json.deserialize<WorldActionDto>
-                return! dto |> WorldActionDto.fromDto
+                let! wact = dto |> WorldActionDto.fromDto
+                return! wact |> WorldAction.createWorld
             }
 
 
@@ -198,18 +223,20 @@ type JobFileDto = {cat:string; value:string}
 module JobFileDto =
     let toDto (jf:JobFile) =
          match jf with
-         | JobFile.ReadWorld n -> {cat="ReadWorld"; value = n}
-         | JobFile.MakeWorld n -> {cat="MakeWorld"; value = n}
+         | JobFile.ReadWorld n -> {cat="ReadWorld"; value = Json.serialize n}
+         | JobFile.MakeWorld n -> {cat="MakeWorld"; value = Json.serialize n}
 
 
     let fromDto (eDto:JobFileDto) =
         if eDto.cat = "ReadWorld" then
             result {
-                return JobFile.ReadWorld eDto.value
+                let! dto = eDto.value |> Json.deserialize<WorldDto>
+                return JobFile.ReadWorld dto
             }
         else if eDto.cat = "MakeWorld" then
             result {
-                return JobFile.MakeWorld eDto.value
+                let! dto = eDto.value |> Json.deserialize<WorldActionDto>
+                return JobFile.MakeWorld dto
             }
         else sprintf "cat: %s for JobFileDto not found"
                       eDto.cat |> Error

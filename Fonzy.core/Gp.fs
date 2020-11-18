@@ -14,15 +14,10 @@ type TestResults =
 
 type PhenotypeEval = private PhenotypeEval of float
 
-type SorterPoolEnvironment = 
+type SorterPoolEnviro = 
     | Bag of int
     | Torus of int
 
-type Enviroment = 
-    | Empty
-    | S of SorterPoolEnvironment
-    | A of int
-    | B of float
 
 type OrgType =
     | A of int
@@ -33,7 +28,7 @@ type Org =
     {
         id:OrgId
         orgType:OrgType
-        enviroment:Enviroment
+        enviroment:SorterPoolEnviro
         parentId:OrgId option
         generation:GenerationNumber;
         genome:Genome;
@@ -42,12 +37,11 @@ type Org =
         phenotypeEval:PhenotypeEval
     }
 
-module Enviroment =
+module SorterPoolEnviro =
 
-    let getOrg (e:Enviroment) = 
+    let getOrg (e:SorterPoolEnviro) = 
         match e with
-        | Enviroment.A i -> None
-        | Enviroment.B i -> None
-        | Enviroment.S s -> None
+        | SorterPoolEnviro.Bag i -> None
+        | SorterPoolEnviro.Torus i -> None
 
 

@@ -1,6 +1,6 @@
 ﻿namespace global
 
-type OWSel = private OWSel of (Enviroment-> seq<Org>)
+type OWSel = private OWSel of (SorterPoolEnviro-> seq<Org>)
 module OWSel =
     let create ff = (OWSel ff)
     let value (OWSel ff) = ff
@@ -16,7 +16,7 @@ module OrgWinnerSelector =
     let q = None
 
 
-type OBSel = private OBSel of (Enviroment-> seq<Org>)
+type OBSel = private OBSel of (SorterPoolEnviro-> seq<Org>)
 module OBSel =
     let create ff = (OBSel ff)
     let value (OBSel ff) = ff
@@ -32,7 +32,7 @@ module OrgBreederSelector =
     let q = None
 
 
-type OEv = private OEv of (Enviroment->Org->Org)
+type OEv = private OEv of (SorterPoolEnviro->Org->Org)
 module OEv =
     let create ff = (OEv ff)
     let value (OEv ff) = ff
@@ -48,7 +48,7 @@ module OrgEvaluator =
     let q = None
 
 
-type OMut = private OMut of (Enviroment->Org->Org)
+type OMut = private OMut of (SorterPoolEnviro->Org->Org)
 module OMut =
     let create ff = (OMut ff)
     let value (OMut ff) = ff
@@ -88,9 +88,9 @@ type OrgUpdateParams =
   }
 
 
-type EnviromentUpdateParams = 
+type EnviroUpdateParams = 
   {
-      id: EnviromentUpdateParamsId;
+      id: EnviroUpdateParamsId;
       //breederSelector: PoolSelector2;
       //fitnessFunc: FitnessFunc;
       //sorterMutator: SorterMutation;

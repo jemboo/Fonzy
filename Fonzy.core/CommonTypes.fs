@@ -4,14 +4,14 @@ open System
 type String50 = private String50 of string
 type Degree = private Degree of int
 type EntityId = private EntityId of Guid
-type EnviromentId = private EnviromentId of Guid
+type EnviroId = private EnviroId of Guid
 type OrgUpdateParamsId = private OrgUpdateParamsId of Guid
 type GenerationNumber = private GenerationNumber of int
 type InitialConditionCount = private InitialConditionCount of int
 type JsonString = private JsonString of string
 type MutationRate = private MutationRate of float
 type OrgId = private OrgId of Guid
-type EnviromentUpdateParamsId = private EnviromentUpdateParamsId of Guid
+type EnviroUpdateParamsId = private EnviroUpdateParamsId of Guid
 type PoolFraction = private PoolFraction of float
 type PoolCount = private PoolCount of int
 type PoolGenCount = private PoolGenCount of int
@@ -70,14 +70,14 @@ module EntityId =
     let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
 
 
-module EnviromentUpdateParamsId =
-    let value (EnviromentUpdateParamsId v) = v
-    let create id = Ok (EnviromentUpdateParamsId id)
+module EnviroUpdateParamsId =
+    let value (EnviroUpdateParamsId v) = v
+    let create id = Ok (EnviroUpdateParamsId id)
     let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
 
-module EnviromentId =
-    let value (EnviromentId v) = v
-    let create id = Ok (EnviromentId id)
+module EnviroId =
+    let value (EnviroId v) = v
+    let create id = Ok (EnviroId id)
     let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
 
 module InitialConditionCount =

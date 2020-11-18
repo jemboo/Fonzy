@@ -19,8 +19,10 @@
     <Compile Include="GpParts.fs" />
     <Compile Include="Gp.fs" />
     <Compile Include="GpOps.fs" />
+    <Compile Include="Enviros.fs" />
+    <Compile Include="Causes.fs" />
     <Compile Include="World.fs" />
-    <Compile Include="GDto.fs" />
+    <Compile Include="JobDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

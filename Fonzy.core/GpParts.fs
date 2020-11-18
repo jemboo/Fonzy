@@ -25,7 +25,7 @@ open System
 
 //type SorterPool =
 //  {
-//        id: EnviromentId;
+//        id: EnviroId;
 //        degree:Degree;
 //        sorterPoolMembers: SorterPoolMember list;
 //        sorterPoolState: SorterPoolState;

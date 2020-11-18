@@ -25,4 +25,3 @@ C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\obj\Debug\netcoreapp3.1\Fonzy.core.
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\obj\Debug\netcoreapp3.1\Fonzy.core.pdb
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\obj\Debug\netcoreapp3.1\Fonzy.core.genruntimeconfig.cache
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
-C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\obj\Debug\netcoreapp3.1\Fonzy.core.fsprojAssemblyReference.cache
