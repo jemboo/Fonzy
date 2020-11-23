@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "CSZ3XZsSYAD3b9XYxFHQZRp6hsJD88ZChKLv7TTXu/Cljsal+SK7mejnEsnsCjhGxc+Jy/GUOT/z/FqOX86D8Q==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.dto\\Fonzy.dto.fsproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\tpnsc\\.nuget\\packages\\fsharp.core\\4.7.2\\fsharp.core.4.7.2.nupkg.sha512",
+    "C:\\Users\\tpnsc\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

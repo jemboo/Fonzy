@@ -8,14 +8,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="GpPartsFixture.fs" />
-    <Compile Include="GpFixture.fs" />
-    <Compile Include="GpOpsFixture.fs" />
+    <Compile Include="CombinatoricsFixture.fs" />
+    <Compile Include="CombinatoricsTypesFixture.fs" />
+    <Compile Include="CommonTypesDtoFixture.fs" />
+    <Compile Include="CommonTypesFixture.fs" />
+    <Compile Include="RandoFixture.fs" />
+    <Compile Include="SorterGaFixture.fs" />
+    <Compile Include="SorterGaOpsFixture.fs" />
+    <Compile Include="OrgsFixture.fs" />
+    <Compile Include="GaPartsFixture.fs" />
+    <Compile Include="EnvirosFixture.fs" />
     <Compile Include="EnvirosDtoFixture.fs" />
     <Compile Include="CausesDtoFixture.fs" />
+    <Compile Include="UtilsFixture.fs" />
     <Compile Include="WorldFixture.fs" />
     <Compile Include="WorldDtoFixture.fs" />
-    <Compile Include="JobDtoFixture.fs" />
+    <Compile Include="JobsDtoFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
@@ -29,6 +37,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Fonzy.core\Fonzy.core.fsproj" />
+    <ProjectReference Include="..\Fonzy.dto\Fonzy.dto.fsproj" />
   </ItemGroup>
 
 </Project>

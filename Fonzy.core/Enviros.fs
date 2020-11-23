@@ -2,16 +2,18 @@
 
 type Enviro = 
     | Empty
-    | S of SorterPoolEnviro
-    | A of int
+    | SorterPoolEnviro of SorterPoolEnviro
+    | FloatPoolEnviro of NumberPoolEnviro
     | B of float
+
 
 module Enviro =
 
     let getOrg (e:Enviro) = 
         match e with
-        | Enviro.A i -> None
+        | Enviro.FloatPoolEnviro i -> None
         | Enviro.B i -> None
-        | Enviro.S s -> None
+        | Enviro.SorterPoolEnviro s -> None
+        | Enviro.Empty  -> None
 
 

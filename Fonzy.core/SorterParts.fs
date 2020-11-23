@@ -318,8 +318,8 @@ module SwitchUses =
         else Error (sprintf "switchCount: %d is not equal to weights length: %d" 
                              (SwitchCount.value switchCount) weights.Length) 
 
-    let getWeights tracker = tracker.weights
-    let switchCount tracker = (SwitchCount.value tracker.switchCount)
+    let getWeights switchUses = switchUses.weights
+    let switchCount switchUses = (SwitchCount.value switchUses.switchCount)
 
     let Add (trackerA:SwitchUses) (trackerB:SwitchUses) =
         if ((switchCount trackerA) <> (switchCount trackerB))  then

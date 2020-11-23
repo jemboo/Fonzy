@@ -13,16 +13,16 @@
     <Compile Include="ElRando.fs" />
     <Compile Include="Combinatorics.fs" />
     <Compile Include="CombinatoricsTypes.fs" />
-    <Compile Include="CommonTypesDto.fs" />
     <Compile Include="SorterParts.fs" />
-    <Compile Include="SorterPartsDto.fs" />
-    <Compile Include="GpParts.fs" />
-    <Compile Include="Gp.fs" />
-    <Compile Include="GpOps.fs" />
+    <Compile Include="GaParts.fs" />
+    <Compile Include="NumberGa.fs" />
+    <Compile Include="SorterGa.fs" />
+    <Compile Include="SorterGaOps.fs" />
+    <Compile Include="Orgs.fs" />
     <Compile Include="Enviros.fs" />
     <Compile Include="Causes.fs" />
-    <Compile Include="World.fs" />
-    <Compile Include="JobDto.fs" />
+    <Compile Include="Worlds.fs" />
+    <Compile Include="Jobs.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

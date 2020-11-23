@@ -1608,6 +1608,20 @@
         "runtime": {
           "bin/placeholder/Fonzy.core.dll": {}
         }
+      },
+      "Fonzy.dto/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v3.1",
+        "dependencies": {
+          "FSharp.Core": "4.7.2",
+          "Fonzy.core": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Fonzy.dto.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Fonzy.dto.dll": {}
+        }
       }
     }
   },
@@ -5525,12 +5539,18 @@
       "type": "project",
       "path": "../Fonzy.core/Fonzy.core.fsproj",
       "msbuildProject": "../Fonzy.core/Fonzy.core.fsproj"
+    },
+    "Fonzy.dto/1.0.0": {
+      "type": "project",
+      "path": "../Fonzy.dto/Fonzy.dto.fsproj",
+      "msbuildProject": "../Fonzy.dto/Fonzy.dto.fsproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
       "FSharp.Core >= 4.7.2",
       "Fonzy.core >= 1.0.0",
+      "Fonzy.dto >= 1.0.0",
       "MSTest.TestAdapter >= 2.1.0",
       "MSTest.TestFramework >= 2.1.0",
       "Microsoft.NET.Test.Sdk >= 16.5.0",
@@ -5570,6 +5590,9 @@
           "projectReferences": {
             "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.core\\Fonzy.core.fsproj": {
               "projectPath": "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.core\\Fonzy.core.fsproj"
+            },
+            "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.dto\\Fonzy.dto.fsproj": {
+              "projectPath": "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.dto\\Fonzy.dto.fsproj"
             }
           }
         }

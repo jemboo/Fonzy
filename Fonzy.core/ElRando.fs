@@ -120,6 +120,48 @@ module Rando =
                 i <- i + 1
         successCount
 
+    let normalDistRandomPair mean stdDev (rnd:IRando) = 
+        let rec getRands () =
+            let u = (2.0 * rnd.NextFloat) - 1.0
+            let v = (2.0 * rnd.NextFloat) - 1.0
+            let w = u * u + v * v
+            if w >= 1.0 then
+                getRands()
+            else
+                u, v, w
+        let u, v, w = getRands()
+                
+        let scale = System.Math.Sqrt(-2.0 * System.Math.Log(w) / w)
+        let x = scale * u
+        let y = scale * v
+        (mean + (x * stdDev), mean + (y * stdDev))
+ 
+    let normalDistIntPair mean stdDev (rnd:IRando) = 
+        let fpr = normalDistRandomPair mean stdDev rnd
+        (int (fst fpr), int (snd fpr))
+
+
+    let normalDistRandomSeq mean stdDev (rnd:IRando) = 
+        let rec polarBoxMullerDist () = seq {
+                let rec getRands () =
+                    let u = (2.0 * rnd.NextFloat) - 1.0
+                    let v = (2.0 * rnd.NextFloat) - 1.0
+                    let w = u * u + v * v
+                    if w >= 1.0 then
+                        getRands()
+                    else
+                        u, v, w
+                let u, v, w = getRands()
+                    
+                let scale = System.Math.Sqrt(-2.0 * System.Math.Log(w) / w)
+                let x = scale * u
+                let y = scale * v
+                yield mean + (x * stdDev); yield mean + (y * stdDev); yield! polarBoxMullerDist ()
+            }
+        polarBoxMullerDist ()
+
+
+
 
 module RandoCollections =
 

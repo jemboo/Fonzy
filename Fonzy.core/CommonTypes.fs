@@ -10,7 +10,8 @@ type GenerationNumber = private GenerationNumber of int
 type InitialConditionCount = private InitialConditionCount of int
 type JsonString = private JsonString of string
 type MutationRate = private MutationRate of float
-type OrgId = private OrgId of Guid
+type NumberOrgId = private NumberOrgId of Guid
+type SorterOrgId = private SorterOrgId of Guid
 type EnviroUpdateParamsId = private EnviroUpdateParamsId of Guid
 type PoolFraction = private PoolFraction of float
 type PoolCount = private PoolCount of int
@@ -121,9 +122,14 @@ module MutationRate =
             return! create "" (gv:?>float)
         }
 
-module OrgId =
-    let value (OrgId v) = v
-    let create id = Ok (OrgId id)
+module NumberOrgId =
+    let value (NumberOrgId v) = v
+    let create id = Ok (NumberOrgId id)
+    let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
+
+module SorterOrgId =
+    let value (SorterOrgId v) = v
+    let create id = Ok (SorterOrgId id)
     let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
     
 module OrgUpdateParamsId =
