@@ -90,6 +90,7 @@ module Combinatorics =
         Array.fold2 (fun acc elem1 elem2 ->
         acc + (elem1 - elem2) * (elem1 - elem2)) 0 a b
 
+
     // Measured in bits (log base 2)
     let entropyBits (a:array<int>) =
         let f = 1.0 / Math.Log(2.0)

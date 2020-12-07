@@ -18,11 +18,9 @@ type SorterPoolEnviro =
     | Bag of int
     | Torus of int
 
-
 type SorterOrgType =
     | A of int
     | B of int
-
 
 type SorterOrg = 
     {

@@ -14,7 +14,7 @@
     <Compile Include="Combinatorics.fs" />
     <Compile Include="CombinatoricsTypes.fs" />
     <Compile Include="SorterParts.fs" />
-    <Compile Include="GaParts.fs" />
+    <Compile Include="GridLocation.fs" />
     <Compile Include="NumberGa.fs" />
     <Compile Include="SorterGa.fs" />
     <Compile Include="SorterGaOps.fs" />

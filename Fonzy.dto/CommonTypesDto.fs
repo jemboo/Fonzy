@@ -19,11 +19,6 @@ module Json =
         | None -> Result.Error  "option was none"
 
 
-
-module Dto =
-    let toOption (v:'a option) =
-        None
-
 type LogFileDto = {cat:string; descr:string; header:string; records:string[]}
 
 type CustomParamsDto = {parseKey:string; prams:Map<string, string>}
@@ -103,6 +98,31 @@ module SorterMutationTypeDto =
             let! dto = Json.deserialize<SorterMutationTypeDto> json
             return! dto |> fromDto
         }
+
+
+
+type PermutationDto = private {degree:int; values:int[] }
+module PermutationDto =
+    let fromDto (dto:PermutationDto) =
+        result {
+            let! degree = Degree.create "" dto.degree
+            return! Permutation.create degree dto.values
+        }
+    let toDto (perm:Permutation) =
+        {degree= (Degree.value (Permutation.degree perm)); 
+        values = Permutation.arrayValues perm}
+
+
+type TwoCyclePermDto = private {degree:int; values:int[] }
+module TwoCyclePermDto =
+    let fromDto (dto:TwoCyclePermDto) =
+        result {
+            let! degree = Degree.create "" dto.degree
+            return! TwoCyclePerm.create degree dto.values
+        }
+    let toDto (tcp:TwoCyclePerm) =
+        {degree= (Degree.value (TwoCyclePerm.degree tcp)); 
+        values=TwoCyclePerm.arrayValues tcp;}
 
 
 type SorterLengthDto = {wOrT:string; value:int;}

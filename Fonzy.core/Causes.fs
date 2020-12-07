@@ -24,12 +24,12 @@ open System
 //            | CreateInt v -> createInt v
 
 
-
 type SorterPoolCauseType =
     | AddInt
     | AddFloat
     | CreateFloat
     | CreateInt
+
 
 module SorterPoolCauseType = 
     let addFloat  = 
@@ -70,4 +70,4 @@ module SorterPoolCauseType =
 //        match causeType with
 //            | Test tct -> testCause tct
 //            | Destroy -> destroy
-            //| NoOp -> noOp
+//            | NoOp -> noOp

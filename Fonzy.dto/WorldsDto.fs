@@ -1,6 +1,7 @@
-﻿module WorldDto
+﻿namespace global
+type WorldsDto = {name:string}
 
-module rdr = 
+module WorldsDto = 
     let q = None
 
 

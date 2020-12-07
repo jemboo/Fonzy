@@ -5,14 +5,14 @@ type String50 = private String50 of string
 type Degree = private Degree of int
 type EntityId = private EntityId of Guid
 type EnviroId = private EnviroId of Guid
-type OrgUpdateParamsId = private OrgUpdateParamsId of Guid
 type GenerationNumber = private GenerationNumber of int
 type InitialConditionCount = private InitialConditionCount of int
 type JsonString = private JsonString of string
 type MutationRate = private MutationRate of float
-type NumberOrgId = private NumberOrgId of Guid
 type SorterOrgId = private SorterOrgId of Guid
 type EnviroUpdateParamsId = private EnviroUpdateParamsId of Guid
+type OrgId = private OrgId of Guid
+type OrgUpdateParamsId = private OrgUpdateParamsId of Guid
 type PoolFraction = private PoolFraction of float
 type PoolCount = private PoolCount of int
 type PoolGenCount = private PoolGenCount of int
@@ -122,26 +122,16 @@ module MutationRate =
             return! create "" (gv:?>float)
         }
 
-module NumberOrgId =
-    let value (NumberOrgId v) = v
-    let create id = Ok (NumberOrgId id)
-    let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
-
-module SorterOrgId =
-    let value (SorterOrgId v) = v
-    let create id = Ok (SorterOrgId id)
-    let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
-    
 module OrgUpdateParamsId =
     let value (OrgUpdateParamsId v) = v
     let create id = Ok (OrgUpdateParamsId id)
     let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
 
-module SorterMutationType =
-    let StrF (mt:SorterMutationType) =
-        match mt with
-        | SorterMutationType.Switch mr -> sprintf "w%.3f" (MutationRate.value mr)
-        | SorterMutationType.Stage mr -> sprintf "t%.3f" (MutationRate.value mr)
+
+module OrgId =
+    let value (OrgId v) = v
+    let create id = Ok (OrgId id)
+    let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
 
 module PoolFraction =
     let value (PoolFraction v) = v
@@ -258,6 +248,16 @@ module RunCount =
             return! create "" (gv:?>int)
         }
 
+module SorterOrgId =
+    let value (SorterOrgId v) = v
+    let create id = Ok (SorterOrgId id)
+    let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
+    
+module SorterMutationType =
+    let StrF (mt:SorterMutationType) =
+        match mt with
+        | SorterMutationType.Switch mr -> sprintf "w%.3f" (MutationRate.value mr)
+        | SorterMutationType.Stage mr -> sprintf "t%.3f" (MutationRate.value mr)
 
 module String50 =
     let value (String50 str) = str

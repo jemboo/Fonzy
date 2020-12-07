@@ -8,6 +8,14 @@ type PoolOfGridLocations = {id:Guid; locPool:Map<Guid, GridLocation>}
 
 module PoolOfGridLocations =
 
+    let create (poolId:Guid) (ids:seq<Guid>) (locs: GridLocation[]) =
+        let locPool = locs |> Seq.map(fun loc-> (loc.id, loc))
+                          |> Map.ofSeq
+        {
+            PoolOfGridLocations.id=poolId;
+            PoolOfGridLocations.locPool=locPool;
+        }
+
     let makePoolOfGridLocations (poolId:Guid) (ids:seq<Guid>) 
                                 (locator:Guid->GridLocation) = 
         let locPool = ids |> Seq.map(fun gu-> (gu, locator gu))

@@ -23,3 +23,37 @@ module rr =
 //        match job with
 //        | GetWorld w -> w.cause
 //        | MakeWorld wa -> wa.cause
+
+
+
+
+
+
+
+//type SorterPoolState =
+//    | Initiated
+//    | Measured
+//    | Evaluated
+//    | Selected
+
+//module SorterPoolState =
+//    let IsCompatable (sorterPoolState:SorterPoolState) 
+//                     (poolMemberState:PoolMemberState) =
+//        match sorterPoolState with
+//        | Initiated -> (poolMemberState = PoolMemberState.Root) || 
+//                        (poolMemberState = PoolMemberState.Initiate) || 
+//                        (poolMemberState = PoolMemberState.Legacy)
+//        | Measured -> (poolMemberState = PoolMemberState.Measured)
+//        | Evaluated -> (poolMemberState = PoolMemberState.Evaluated)
+//        | Selected -> (poolMemberState = PoolMemberState.Evaluated)
+
+
+//type SorterPool =
+//  {
+//        id: EnviroId;
+//        degree:Degree;
+//        sorterPoolMembers: SorterPoolMember list;
+//        sorterPoolState: SorterPoolState;
+//        generation:GenerationNumber
+//  }
+

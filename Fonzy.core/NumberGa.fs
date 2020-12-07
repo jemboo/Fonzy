@@ -1,6 +1,12 @@
 ﻿namespace global
 open System
 
+type NumberOrgId = private NumberOrgId of Guid
+module NumberOrgId =
+    let value (NumberOrgId v) = v
+    let create id = Ok (NumberOrgId id)
+    let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
+
 type NumberGenome = 
     | Float of float
     | Other
@@ -30,15 +36,34 @@ type NumberOrg =
 type NumberOrgs =
     {
         id:Guid;
-        numberOrgs:Map<NumberOrgId, NumberOrg>;
+        orgMap:Map<NumberOrgId, NumberOrg>;
     }
+
+module NumberOrgs =
+    let create (id:Guid) (orgs: NumberOrg[]) =
+        {
+            NumberOrgs.id = id;
+            orgMap = orgs |> Array.map(fun o-> (o.numberOrgId, o))
+                              |> Map.ofArray
+        }
 
 type NumberOrgsWithGridLocs =
     {
         id:Guid;
-        numberOrgs:Map<NumberOrgId, NumberOrg>;
+        orgMap:Map<NumberOrgId, NumberOrg>;
         poolOfGridLocations: PoolOfGridLocations
     }
+
+module NumberOrgsWithGridLocs =
+    let create (id:Guid) (orgs: NumberOrg[]) 
+               (poolOfGridLocations:PoolOfGridLocations) =
+        {
+            NumberOrgsWithGridLocs.id = id;
+            orgMap = orgs |> Array.map(fun o-> (o.numberOrgId, o))
+                              |> Map.ofArray;
+            poolOfGridLocations = poolOfGridLocations;
+        }
+
 
 type NumberPoolEnviro =
     | Bag of NumberOrgs
@@ -46,54 +71,8 @@ type NumberPoolEnviro =
 
 
 module NumberPoolEnviro = 
-    let createBag (kvps: (NumberOrgId*NumberOrg)[]) =
-        //NumberPoolEnviro.Bag (kvps |> Map.ofArray)
-        None
+    let createBag (numberOrgs: NumberOrgs) =
+        NumberPoolEnviro.Bag numberOrgs
 
-    let createGrid (kvps: (NumberOrgId*NumberOrg)[]) =
-        //NumberPoolEnviro.Grid (kvps |> Map.ofArray)
-        None 
-
-    let createBag2 (orgs: (NumberOrg)[]) =
-        //orgs |> Array.map(fun o-> (o.numberOrgId, o))
-        //     |> Map.ofArray |> NumberPoolEnviro.Bag
-        None
-
-    let createGrid2 (orgs: NumberOrg[]) 
-                    (gridLocations:GridLocation[]) =
-        //let orgMap = orgs |> Array.map(fun o-> (o.numberOrgId, o))
-        //                  |> Map.ofArray |> NumberPoolEnviro.Grid
-        None 
-
-
-
-
-
-
-//type SorterPoolState =
-//    | Initiated
-//    | Measured
-//    | Evaluated
-//    | Selected
-
-//module SorterPoolState =
-//    let IsCompatable (sorterPoolState:SorterPoolState) 
-//                     (poolMemberState:PoolMemberState) =
-//        match sorterPoolState with
-//        | Initiated -> (poolMemberState = PoolMemberState.Root) || 
-//                        (poolMemberState = PoolMemberState.Initiate) || 
-//                        (poolMemberState = PoolMemberState.Legacy)
-//        | Measured -> (poolMemberState = PoolMemberState.Measured)
-//        | Evaluated -> (poolMemberState = PoolMemberState.Evaluated)
-//        | Selected -> (poolMemberState = PoolMemberState.Evaluated)
-
-
-//type SorterPool =
-//  {
-//        id: EnviroId;
-//        degree:Degree;
-//        sorterPoolMembers: SorterPoolMember list;
-//        sorterPoolState: SorterPoolState;
-//        generation:GenerationNumber
-//  }
-
+    let createGrid (numberOrgsWithGridLocs: NumberOrgsWithGridLocs) =
+        NumberPoolEnviro.Grid numberOrgsWithGridLocs

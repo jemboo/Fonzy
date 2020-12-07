@@ -1,46 +1,67 @@
 ﻿namespace global
-
 open System
 
+type Ancestry = 
+        | NoAncestry
+        | SingleParent of OrgId
+        | SingleDistantParent of OrgId * GenerationNumber
+
+
+type Genome = 
+        | NoGeneome
+        | Floater of float
+
+
+type Phenotype = 
+        | NoPhenotype
+        | Floater of float
+
+
+type PhenotypeEval = 
+        | NoPhenotypeEval
+        | Floater of float
+
+
 type Org =
-    | FloatOrgOld of NumberOrg
-    | SorterOrg of SorterOrg
+    {
+        orgId:OrgId
+        ancestry:Ancestry
+        genome:Genome
+        generation:GenerationNumber
+        phenotype:Phenotype
+        phenotypeEval:PhenotypeEval
+    }
+
 
 module Org = 
-    let isFloatOrg (org:Org) =
-        match org with
-        | FloatOrgOld f -> true
-        | _ -> false
+    let create (orgId:OrgId) (ancestry:Ancestry)
+               (genome:Genome) (generation:GenerationNumber) 
+               (phenotype:Phenotype) (phenotypeEval:PhenotypeEval) =
+        {
+            Org.orgId = orgId;
+            Org.ancestry = ancestry;
+            Org.genome = genome;
+            Org.generation = generation;
+            Org.phenotype = phenotype;
+            Org.phenotypeEval = phenotypeEval;
+        }
 
-    let isSorterOrg (org:Org) =
-        match org with
-        | SorterOrg s -> true
-        | _ -> false
+    let budWithNewGenome (org:Org) (newId:OrgId) (newGenome:Genome) =
+        {
+            Org.orgId = newId;
+            Org.ancestry = Ancestry.SingleParent org.orgId;
+            Org.genome = newGenome;
+            Org.generation = org.generation |> GenerationNumber.increment;
+            Org.phenotype = Phenotype.NoPhenotype;
+            Org.phenotypeEval = PhenotypeEval.NoPhenotypeEval;
+        }
 
-//type SorterPoolState =
-//    | Initiated
-//    | Measured
-//    | Evaluated
-//    | Selected
-
-//module SorterPoolState =
-//    let IsCompatable (sorterPoolState:SorterPoolState) 
-//                     (poolMemberState:PoolMemberState) =
-//        match sorterPoolState with
-//        | Initiated -> (poolMemberState = PoolMemberState.Root) || 
-//                        (poolMemberState = PoolMemberState.Initiate) || 
-//                        (poolMemberState = PoolMemberState.Legacy)
-//        | Measured -> (poolMemberState = PoolMemberState.Measured)
-//        | Evaluated -> (poolMemberState = PoolMemberState.Evaluated)
-//        | Selected -> (poolMemberState = PoolMemberState.Evaluated)
-
-
-//type SorterPool =
-//  {
-//        id: EnviroId;
-//        degree:Degree;
-//        sorterPoolMembers: SorterPoolMember list;
-//        sorterPoolState: SorterPoolState;
-//        generation:GenerationNumber
-//  }
-
+    let assignPhenotype (org:Org) (newPhenotype:Phenotype) =
+        {
+            Org.orgId = org.orgId;
+            Org.ancestry = Ancestry.SingleParent org.orgId;
+            Org.genome = org.genome;
+            Org.generation = org.generation |> GenerationNumber.increment;
+            Org.phenotype = newPhenotype;
+            Org.phenotypeEval = PhenotypeEval.NoPhenotypeEval;
+        }
