@@ -61,7 +61,17 @@ module Org =
             Org.orgId = org.orgId;
             Org.ancestry = Ancestry.SingleParent org.orgId;
             Org.genome = org.genome;
-            Org.generation = org.generation |> GenerationNumber.increment;
+            Org.generation = org.generation;
             Org.phenotype = newPhenotype;
             Org.phenotypeEval = PhenotypeEval.NoPhenotypeEval;
+        }
+
+    let assignPhenotypeEval (org:Org) (newPhenotypeEval:PhenotypeEval) =
+        {
+            Org.orgId = org.orgId;
+            Org.ancestry = Ancestry.SingleParent org.orgId;
+            Org.genome = org.genome;
+            Org.generation = org.generation;
+            Org.phenotype = org.phenotype;
+            Org.phenotypeEval = newPhenotypeEval;
         }
