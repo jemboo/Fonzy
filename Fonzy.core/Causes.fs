@@ -24,35 +24,35 @@ open System
 //            | CreateInt v -> createInt v
 
 
-type SorterPoolCauseType =
-    | AddInt
-    | AddFloat
-    | CreateFloat
-    | CreateInt
+//type SorterPoolCauseType =
+//    | AddInt
+//    | AddFloat
+//    | CreateFloat
+//    | CreateInt
 
 
-module SorterPoolCauseType = 
-    let addFloat  = 
-        fun e-> 
-                match e with 
-                 | Enviro.B l -> Enviro.B (l) |> Ok
-                 | _ -> "wrong Enviro for addFloat" |> Error
+//module SorterPoolCauseType = 
+//    let addFloat  = 
+//        fun e-> 
+//                match e with 
+//                 | Enviro.B l -> Enviro.B (l) |> Ok
+//                 | _ -> "wrong Enviro for addFloat" |> Error
 
-    let addInt  = 
-         fun e-> 
-                match e with 
-                 | Enviro.FloatPoolEnviro _  -> "wrong Enviro for addInt" |> Error
-                 | _ -> "wrong Enviro for addInt" |> Error
+//    let addInt  = 
+//         fun e-> 
+//                match e with 
+//                 | Enviro.FloatPoolEnviro _  -> "wrong Enviro for addInt" |> Error
+//                 | _ -> "wrong Enviro for addInt" |> Error
 
-    let createFloat  = fun e -> Enviro.B 2.0 |>Ok
-    let createInt  =  fun e -> Enviro.B 2.0 |> Ok
+//    let createFloat  = fun e -> Enviro.B 2.0 |>Ok
+//    let createInt  =  fun e -> Enviro.B 2.0 |> Ok
 
-    let fromTestCauseType (causeType:SorterPoolCauseType) = 
-        match causeType with
-            | SorterPoolCauseType.AddInt  -> addInt 
-            | SorterPoolCauseType.AddFloat  -> addFloat
-            | SorterPoolCauseType.CreateFloat  -> createFloat 
-            | SorterPoolCauseType.CreateInt  -> createInt 
+//    let fromTestCauseType (causeType:SorterPoolCauseType) = 
+//        match causeType with
+//            | SorterPoolCauseType.AddInt  -> addInt 
+//            | SorterPoolCauseType.AddFloat  -> addFloat
+//            | SorterPoolCauseType.CreateFloat  -> createFloat 
+//            | SorterPoolCauseType.CreateInt  -> createInt 
 
 
 //type CauseType =

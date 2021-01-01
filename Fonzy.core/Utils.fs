@@ -99,9 +99,10 @@ module CollectionUtils =
     // returns a list of the items that were added
     let addDictionary (dBase:Dictionary<'a, 'b>) (dAdd:Dictionary<'a, 'b>) =
         let mutable lstRet = []
-        dAdd.Keys |> Seq.iter(fun k-> if (not (dBase.ContainsKey(k))) then  
-                                         dBase.Add(k, dAdd.[k])                       
-                                         lstRet <- dAdd.[k]::lstRet)
+        dAdd.Keys |> Seq.iter(fun k-> 
+            if (not (dBase.ContainsKey(k))) then  
+               dBase.Add(k, dAdd.[k])                       
+               lstRet <- dAdd.[k]::lstRet)
         lstRet
 
     // returns a sequence of items that occur more than once 

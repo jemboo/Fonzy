@@ -16,9 +16,9 @@
     <Compile Include="SorterGaFixture.fs" />
     <Compile Include="SorterGaOpsFixture.fs" />
     <Compile Include="OrgsFixture.fs" />
-    <Compile Include="GaPartsFixture.fs" />
+    <Compile Include="MapOfOrgAttributesFixture.fs" />
     <Compile Include="EnvirosFixture.fs" />
-    <Compile Include="EnvirosDtoFixture.fs" />
+    <Compile Include="OrgsDtoFixture.fs" />
     <Compile Include="CausesDtoFixture.fs" />
     <Compile Include="UtilsFixture.fs" />
     <Compile Include="WorldFixture.fs" />

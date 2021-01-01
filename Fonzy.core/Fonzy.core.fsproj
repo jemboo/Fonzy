@@ -11,14 +11,15 @@
     <Compile Include="ConstrainedType.fs" />
     <Compile Include="CommonTypes.fs" />
     <Compile Include="ElRando.fs" />
+    <Compile Include="MathData.fs" />
     <Compile Include="Combinatorics.fs" />
     <Compile Include="CombinatoricsTypes.fs" />
     <Compile Include="SorterParts.fs" />
-    <Compile Include="GridLocation.fs" />
-    <Compile Include="NumberGa.fs" />
+    <Compile Include="MapOfOrgAttributes.fs" />
     <Compile Include="SorterGa.fs" />
     <Compile Include="SorterGaOps.fs" />
     <Compile Include="Orgs.fs" />
+    <Compile Include="NumberOrg.fs" />
     <Compile Include="Enviros.fs" />
     <Compile Include="Causes.fs" />
     <Compile Include="Worlds.fs" />

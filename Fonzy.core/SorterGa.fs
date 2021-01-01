@@ -24,10 +24,10 @@ type SorterOrgType =
 
 type SorterOrg = 
     {
-        id:SorterOrgId
+        id:OrgId
         sorterOrgType:SorterOrgType
         enviroment:SorterPoolEnviro
-        parentId:SorterOrgId option
+        parentId:OrgId option
         generation:GenerationNumber
         sorterGenome:SorterGenome
         sorterPhenotype:SorterPhenotype

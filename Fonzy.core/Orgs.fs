@@ -7,27 +7,28 @@ type Ancestry =
         | SingleDistantParent of OrgId * GenerationNumber
 
 
+
 type Genome = 
-        | NoGeneome
+        | NoGenome
         | Floater of float
 
 
 type Phenotype = 
         | NoPhenotype
-        | Floater of float
+        | FloaterP of float
 
 
 type PhenotypeEval = 
         | NoPhenotypeEval
-        | Floater of float
+        | FloaterE of float
 
 
 type Org =
     {
         orgId:OrgId
         ancestry:Ancestry
-        genome:Genome
         generation:GenerationNumber
+        genome:Genome
         phenotype:Phenotype
         phenotypeEval:PhenotypeEval
     }
@@ -75,3 +76,97 @@ module Org =
             Org.phenotype = org.phenotype;
             Org.phenotypeEval = newPhenotypeEval;
         }
+
+
+type Orgs =
+    {
+        id:Guid;
+        orgMap:Map<OrgId, Org>;
+    }
+
+module Orgs =
+    let create (id:Guid) (orgs: Org[]) =
+        {
+            Orgs.id = id;
+            orgMap = orgs |> Array.map(fun o-> (o.orgId, o))
+                          |> Map.ofArray
+        }
+
+    let getMembers (orgs:Orgs) =
+        orgs.orgMap |> Map.toSeq
+                    |> Seq.map(snd)
+
+
+
+//type OrgsWithGridLocs =
+//    {
+//        id:Guid;
+//        orgMap:Map<OrgId, Org>;
+//        poolOfGridLocations: PoolOfGridLocations
+//    }
+
+//module OrgsWithGridLocs =
+//    let create (id:Guid) (orgs: Org[]) 
+//               (poolOfGridLocations:PoolOfGridLocations) =
+//        {
+//            OrgsWithGridLocs.id = id;
+//            orgMap = orgs |> Array.map(fun o-> (o.orgId, o))
+//                              |> Map.ofArray;
+//            poolOfGridLocations = poolOfGridLocations;
+//        }
+
+
+//type OrgPoolEnviro =
+//    | Bag of Orgs
+//    | Grid of OrgsWithGridLocs
+
+
+//module OrgPoolEnviro = 
+//    let createBag (numberOrgs: Orgs) =
+//        OrgPoolEnviro.Bag numberOrgs
+
+//    let createGrid (numberOrgsWithGridLocs: OrgsWithGridLocs) =
+//        OrgPoolEnviro.Grid numberOrgsWithGridLocs
+
+
+
+
+
+module Ancestry = 
+    let makeSingleParent (parentOrg:Org) =
+        match parentOrg.ancestry  with
+        | NoAncestry -> Ancestry.SingleParent parentOrg.orgId
+        | SingleParent p -> parentOrg.ancestry
+        | SingleDistantParent (p,g) ->  Ancestry.SingleParent parentOrg.orgId
+
+    let makeSingleDistantParent (parentOrg:Org) =
+        match parentOrg.ancestry  with
+        | NoAncestry -> Ancestry.SingleDistantParent (parentOrg.orgId, parentOrg.generation)
+        | SingleParent p -> Ancestry.SingleDistantParent (parentOrg.orgId, parentOrg.generation)
+        | SingleDistantParent (p,g) -> parentOrg.ancestry
+        
+
+module Genome =
+
+    let getFloatValue (genome:Genome) =
+        match genome with
+        | Floater v -> v |> Ok
+        | _ -> Error "wrong genome type for Genome.getFloatValue"
+
+//type Genome = 
+//        | NoGenome
+//        | Floater of float
+
+
+module Phenotype = 
+    let passThroughEval (org:Org) =
+        match org.genome with
+        | Floater f -> Phenotype.FloaterP f |> Ok
+        | _ -> Error "Invalid genome in Phenotype.passThroughEval"
+
+
+module PhenotypeEval = 
+    let passThroughEval (org:Org) =
+        match org.phenotype with
+        | FloaterP f -> PhenotypeEval.FloaterE f|> Ok
+        | _ -> Error "Invalid genome in PhenotypeEval.passThroughEval"

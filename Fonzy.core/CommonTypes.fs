@@ -9,10 +9,11 @@ type GenerationNumber = private GenerationNumber of int
 type InitialConditionCount = private InitialConditionCount of int
 type JsonString = private JsonString of string
 type MutationRate = private MutationRate of float
-type SorterOrgId = private SorterOrgId of Guid
 type EnviroUpdateParamsId = private EnviroUpdateParamsId of Guid
 type OrgId = private OrgId of Guid
 type OrgUpdateParamsId = private OrgUpdateParamsId of Guid
+type OrgAttributeName = private OrgAttributeName of string
+type OrgAttributeType = Int | GridLoc2d | GridLoc3d
 type PoolFraction = private PoolFraction of float
 type PoolCount = private PoolCount of int
 type PoolGenCount = private PoolGenCount of int
@@ -31,7 +32,6 @@ type SwitchCount = private SwitchCount of int
 type SwitchFrequency = private SwitchFrequency of float
 type UseEagerProc = private UseEagerProc of bool
 type UseParallel = private UseParallel of bool
-
 
 type IRando =
     abstract member Count: int
@@ -122,11 +122,17 @@ module MutationRate =
             return! create "" (gv:?>float)
         }
 
+module OrgAttributeName =
+    let value (OrgAttributeName str) = str
+    let create fieldName str = 
+        ConstrainedType.createString fieldName OrgAttributeName 20 str
+    let createOption fieldName str = 
+        ConstrainedType.createStringOption fieldName OrgAttributeName 20 str
+
 module OrgUpdateParamsId =
     let value (OrgUpdateParamsId v) = v
     let create id = Ok (OrgUpdateParamsId id)
     let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
-
 
 module OrgId =
     let value (OrgId v) = v
@@ -248,10 +254,6 @@ module RunCount =
             return! create "" (gv:?>int)
         }
 
-module SorterOrgId =
-    let value (SorterOrgId v) = v
-    let create id = Ok (SorterOrgId id)
-    let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
     
 module SorterMutationType =
     let StrF (mt:SorterMutationType) =

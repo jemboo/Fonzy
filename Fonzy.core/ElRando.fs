@@ -121,7 +121,7 @@ module Rando =
         successCount
 
 
-    let normalDistRandomPair mean stdDev (rnd:IRando) = 
+    let normalDistRandomPair stdDevX stdDevY (rnd:IRando) = 
         let rec getRands () =
             let u = (2.0 * rnd.NextFloat) - 1.0
             let v = (2.0 * rnd.NextFloat) - 1.0
@@ -135,11 +135,16 @@ module Rando =
         let scale = System.Math.Sqrt(-2.0 * System.Math.Log(w) / w)
         let x = scale * u
         let y = scale * v
-        (mean + (x * stdDev), mean + (y * stdDev))
+        (x * stdDevX, y * stdDevY)
  
-    let normalDistIntPair mean stdDev (rnd:IRando) = 
-        let fpr = normalDistRandomPair mean stdDev rnd
+    let normalDistInt2d stdDevX stdDevY (rnd:IRando) = 
+        let fpr = normalDistRandomPair stdDevX stdDevY rnd
         (int (fst fpr), int (snd fpr))
+
+    let normalDistInt3d stdDevX stdDevY stdDevZ (rnd:IRando) = 
+        let fpr = normalDistRandomPair stdDevX stdDevY rnd
+        let spr = normalDistRandomPair stdDevZ 0.0 rnd
+        (int (fst fpr), int (snd fpr), int (fst spr))
 
 
     let normalDistRandomSeq mean stdDev (rnd:IRando) = 
