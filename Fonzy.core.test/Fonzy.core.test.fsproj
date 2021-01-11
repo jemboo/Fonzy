@@ -19,6 +19,7 @@
     <Compile Include="MapOfOrgAttributesFixture.fs" />
     <Compile Include="EnvirosFixture.fs" />
     <Compile Include="OrgsDtoFixture.fs" />
+    <Compile Include="CausesFixture.fs" />
     <Compile Include="CausesDtoFixture.fs" />
     <Compile Include="UtilsFixture.fs" />
     <Compile Include="WorldFixture.fs" />

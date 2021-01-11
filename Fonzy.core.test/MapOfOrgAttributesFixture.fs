@@ -10,7 +10,6 @@ type GuidMapOfAttributesFixture () =
     member this.TestMakeMapOfIntAttributes() =
         let poolId = Guid.NewGuid()
         let poolSz = 8
-        let attrType = OrgAttributeType.Int
         let mutable curVal = -1
         let getMemVal g =
             curVal <- curVal + 1
@@ -27,7 +26,6 @@ type GuidMapOfAttributesFixture () =
         let qua = MapOfOrgAttributes.makeMapOfAttributes
                        poolId 
                        orgids
-                       attrType
                        getMemVal
 
         let quaDto = MapOfOrgAttributesDto.toDto<int> (AttributesDto.fromIntToDto) qua
@@ -43,7 +41,6 @@ type GuidMapOfAttributesFixture () =
     member this.TestMakeMapOfLatticeLoc2dAttributes() =
         let poolId = Guid.NewGuid()
         let poolSz = 8
-        let attrType = OrgAttributeType.GridLoc2d
         let mutable curVal = -1
         let getMemVal g =
             curVal <- curVal + 1
@@ -60,7 +57,6 @@ type GuidMapOfAttributesFixture () =
         let qua = MapOfOrgAttributes.makeMapOfAttributes
                        poolId 
                        orgids
-                       attrType
                        getMemVal
 
         let quaDto = MapOfOrgAttributesDto.toDto<LatticeLoc2d> 
@@ -77,7 +73,6 @@ type GuidMapOfAttributesFixture () =
     member this.TestCreateUniform() =
         let poolId = Guid.NewGuid()
         let poolSz = 8
-        let attrType = OrgAttributeType.GridLoc2d
         let mutable curVal = -1
         let getMemVal() =
             {LatticeLoc2d.x=1;y=2}
@@ -93,7 +88,6 @@ type GuidMapOfAttributesFixture () =
         let qua = MapOfOrgAttributes.createUniform
                        poolId 
                        orgids
-                       attrType
                        getMemVal
 
         let items = qua.attrMap |> Map.toArray

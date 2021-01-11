@@ -1,45 +1,17 @@
 ﻿namespace global
 
 type SorterGenome = 
-    | A of int
+    | Empty
     | B of int
 
 type SorterPhenotype = 
-    | A of int
+    | Empty
     | B of int
 
 type SorterTestResults = 
-    | A of int
+    | Empty
     | B of int
 
-type SorterPhenotypeEval = private PhenotypeEval of float
-
-type SorterPoolEnviro = 
-    | Bag of int
-    | Torus of int
-
-type SorterOrgType =
-    | A of int
+type SorterPhenotypeEval = 
+    | Empty
     | B of int
-
-type SorterOrg = 
-    {
-        id:OrgId
-        sorterOrgType:SorterOrgType
-        enviroment:SorterPoolEnviro
-        parentId:OrgId option
-        generation:GenerationNumber
-        sorterGenome:SorterGenome
-        sorterPhenotype:SorterPhenotype
-        testResults:SorterTestResults
-        phenotypeEval:SorterPhenotypeEval
-    }
-
-module SorterPoolEnviro =
-
-    let getOrg (e:SorterPoolEnviro) = 
-        match e with
-        | SorterPoolEnviro.Bag i -> None
-        | SorterPoolEnviro.Torus i -> None
-
-

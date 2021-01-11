@@ -72,6 +72,11 @@ module ParseUtils =
 
 
 module CollectionUtils =
+    // Generates an n-dimenstional cartesian product, with n = LL.Length
+    let rec cart1 LL = 
+        match LL with
+        | [] -> Seq.singleton []
+        | L::Ls -> seq {for x in L do for xs in cart1 Ls -> x::xs}
 
     let listToTuples (ltt:'a list) =
         let rec yucko (last:'a) (tail:'a list) (tupes: ('a*'a) list) =
@@ -82,12 +87,14 @@ module CollectionUtils =
         | [] -> []
         | head::tail -> yucko head tail [] |> List.rev
 
-    let Repeater f (items:'a[]) (count:int) =
-        let tt = seq {for i=0 to (items.Length-1) do yield! Seq.replicate count (f items.[i]) }
+    let repeater f (items:'a[]) (count:int) =
+        let tt = seq {for i=0 to (items.Length-1) 
+                        do yield! Seq.replicate count (f items.[i]) }
         seq { while true do yield! tt }
 
     let IterateCircular (count:int) (ofWhat:'a[]) =
-        seq { for i in 0..(count-1) do yield ofWhat.[i%ofWhat.Length] }
+        seq { for i in 0..(count-1) 
+                    do yield ofWhat.[i%ofWhat.Length] }
 
     // Converts seq of key - value pairs to mutable Dictionary
     let dictFromSeqOfTuples(src:seq<'a * 'b>) = 
@@ -111,9 +118,9 @@ module CollectionUtils =
             let d = System.Collections.Generic.Dictionary()
             for i in items do
                 match d.TryGetValue(i) with
-                | false,_    -> d.[i] <- false         // first observance
-                | true,false -> d.[i] <- true; yield i // second observance
-                | true,true  -> ()                     // already seen at least twice
+                | false, _    -> d.[i] <- false         // first observance
+                | true, false -> d.[i] <- true; yield i // second observance
+                | true, true  -> ()                     // already seen at least twice
         }
 
     // returns a list of the new items added
@@ -126,6 +133,7 @@ module CollectionUtils =
             newDict.Add(group, item)
             cumer.Add(key, newDict)
             [item]
+
 
     let cumerBackFill (cumer:Dictionary<int, Dictionary<'a,'b>>) =
         let backFill (dPrev:Dictionary<'a,'b>) (dNext:Dictionary<'a,'b>)
@@ -142,9 +150,11 @@ module CollectionUtils =
             map |> Ok
         else "key duplicates" |> Error
 
+
     let readMap (m:Map<'a,'b>) (key:'a) =
         if (m.ContainsKey key) then m.[key] |> Ok
         else (sprintf "key %A missing" key) |> Error
+
 
     let getTypeFromMap<'a> (key:string) (m:Map<string,obj>) : Result<'a, string> =
         match m.TryFind key with

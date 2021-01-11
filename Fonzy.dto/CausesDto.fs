@@ -1,10 +1,6 @@
 ﻿namespace global
 open System
 
-type CausesDto = {name:string}
-module CausesDto = 
-    let q = None
-
 
 
 //type TestCauseTypeDto = {cat:string; value:string}
@@ -42,29 +38,27 @@ module CausesDto =
 //                    eDto.cat |> Error
 
 
-//type CauseTypeDto = {cat:string; value:string}
-//module CauseTypeDto =
+type CauseTypeDto = {cat:string; value:string}
+module CauseTypeDto =
 
-//    let toDto (ct:CauseType) =
-//        match ct with
-//        | CauseType.Test tc -> {cat="Test"; value = tc |> TestCauseTypeDto.toDto |> Json.serialize}
-//        | CauseType.Destroy -> {cat="Destroy"; value = Json.serialize None}
-//        | CauseType.NoOp -> {cat="NoOp"; value = Json.serialize None}
+    let toDto (ct:CauseType) =
+        match ct with
+        | CauseType.Destroy -> {cat="Destroy"; value = Json.serialize None}
+        | CauseType.NoOp -> {cat="NoOp"; value = Json.serialize None}
 
-//    let fromDto (eDto:CauseTypeDto) =
-//        if eDto.cat = "Test" then
-//            result {
-//                let! dto = Json.deserialize<TestCauseTypeDto> eDto.value
-//                let! tct = TestCauseTypeDto.fromDto dto
-//                return CauseType.Test tct
-//            }
-//        else if eDto.cat = "Destroy" then
-//            result {
-//                return CauseType.Destroy
-//            }
-//        else if eDto.cat = "NoOp" then
-//            result {
-//                return CauseType.NoOp
-//            }
-//        else sprintf "cat: %s for CauseTypeDto not found"
-//                      eDto.cat |> Error
+    let fromDto (eDto:CauseTypeDto) =
+        if eDto.cat = "Destroy" then
+            result {
+                return CauseType.Destroy
+            }
+        else if eDto.cat = "NoOp" then
+            result {
+                return CauseType.NoOp
+            }
+        else sprintf "cat: %s for CauseTypeDto not found"
+                      eDto.cat |> Error
+
+
+//type CauseDto = {name:string}
+//module CauseDto = 
+//    let q = None

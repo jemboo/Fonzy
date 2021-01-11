@@ -40,6 +40,14 @@ module LatticeLoc2d =
             Rando.normalDistInt2d stdDevX stdDevY randy
 
         latticeLocations |> Seq.map(fun ll-> perturb xRadius yRadius gaussianDiffuser ll rando)
+
+    let makeLattice2d (xMin:int) (yMin:int) (xMax:int) (yMax:int) =
+        let xVals = seq {xMin..xMax} 
+        let yVals = seq {yMin..yMax} 
+        seq {for x in xVals do for y in yVals -> {LatticeLoc2d.x=x; y=y}}
+
+
+
         
 
 type LatticeLoc3d = {x:int; y:int; z:int}
@@ -87,3 +95,14 @@ module LatticeLoc3d =
         {LatticeLoc3d.x = int (rando.NextUInt % (uint32 xMax)); 
                       y = int (rando.NextUInt % (uint32 yMax));
                       z = int (rando.NextUInt % (uint32 zMax))}
+
+    let makeLattice3d (xMin:int) (yMin:int) 
+                      (zMin:int) (xMax:int) 
+                      (yMax:int) (zMax:int) =
+            let xVals = seq {xMin..xMax} 
+            let yVals = seq {yMin..yMax}
+            let zVals = seq {zMin..zMax} 
+            seq {for x in xVals do 
+                        for y in yVals do 
+                            for z in zVals  -> 
+                                {LatticeLoc3d.x=x; y=y; z=z} }

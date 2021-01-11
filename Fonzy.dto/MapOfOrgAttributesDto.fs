@@ -25,7 +25,6 @@ module AttributesDto =
 type MapOfOrgAttributesDto = 
     {
         id:Guid
-        orgAttributeType:OrgAttributeType
         attributeMap:Map<Guid, string>
     }
 
@@ -33,7 +32,6 @@ module MapOfOrgAttributesDto =
 
     let fromDto<'attr> (attrConverter:string->Result<'attr, string>) (dto:MapOfOrgAttributesDto) =
         result {
-            let orgAttributeType = dto.orgAttributeType
             let! mapTuples = dto.attributeMap 
                             |> Map.toSeq 
                             |> Seq.map(fun tup -> (tup |> fst |> OrgId.fromGuid, 
@@ -45,7 +43,6 @@ module MapOfOrgAttributesDto =
 
             return {
                 MapOfOrgAttributes.id = dto.id
-                orgAttributeType = orgAttributeType
                 attrMap = mapRet
             }
         }
@@ -59,7 +56,6 @@ module MapOfOrgAttributesDto =
                     |> Map.ofSeq
         {
             MapOfOrgAttributesDto.id = mapOfOrgAttributes.id
-            orgAttributeType = mapOfOrgAttributes.orgAttributeType
             attributeMap = attrM
         }
 

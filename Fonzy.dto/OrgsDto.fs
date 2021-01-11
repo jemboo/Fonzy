@@ -32,7 +32,7 @@ module AncestryDto =
                 let! gen = (vals.[1]) |> int |> GenerationNumber.create ""
                 return Ancestry.SingleDistantParent (gu,gen)
             }
-        else sprintf "cat: %s for JobFileDto not found"
+        else sprintf "cat: %s for AncestryDto not found"
                       eDto.cat |> Error
 
 
@@ -42,23 +42,22 @@ module GenomeDto =
     let toDto (genome:Genome) =
          match genome with
          | NoGenome -> {cat="NoGenome"; value = ""}
-         | Genome.Floater floatVal -> 
-             {
-                 cat="Floater"; 
-                 value = floatVal.ToString(System.Globalization.CultureInfo.InvariantCulture) 
-             }
+         | Genome.Sorter sorterGenome -> 
+                {
+                    GenomeDto.cat = "Sorter"; 
+                    value = "" // sorterGenome |> SorterGenomeDto.toDto |> Json.serialize 
+                }
 
     let fromDto (eDto:GenomeDto) =
         if eDto.cat = "NoGenome" then
             result {
                 return Genome.NoGenome
             }
-        else if eDto.cat = "SingleParent" then
+        else if eDto.cat = "Sorter" then
             result {
-                let floaterVal = (eDto.value) |> float
-                return Genome.Floater floaterVal
+                return Genome.Sorter SorterGenome.Empty
             }
-        else sprintf "cat: %s for JobFileDto not found"
+        else sprintf "cat: %s for GenomeDto not found"
                       eDto.cat |> Error
 
 
@@ -68,10 +67,10 @@ module PhenotypeDto =
     let toDto (phenotype:Phenotype) =
          match phenotype with
          | NoPhenotype -> {cat="NoPhenotype"; value = ""}
-         | FloaterP floatVal -> 
+         | Phenotype.Sorter sorterPhenotype -> 
              {
-                 cat="Floater"; 
-                 value = floatVal.ToString(System.Globalization.CultureInfo.InvariantCulture) 
+                 cat="Sorter"; 
+                 value = "" // sorterPhenotype |> SorterPhenotypeDto.toDto |> Json.serialize
              }
 
     let fromDto (eDto:PhenotypeDto) =
@@ -79,14 +78,34 @@ module PhenotypeDto =
             result {
                 return Phenotype.NoPhenotype
             }
-        else if eDto.cat = "SingleParent" then
+        else if eDto.cat = "Sorter" then
             result {
-                let floaterVal = (eDto.value) |> float
-                return Phenotype.FloaterP floaterVal
+                return Phenotype.Sorter SorterPhenotype.Empty
             }
         else sprintf "cat: %s for PhenotypeDto not found"
                       eDto.cat |> Error
 
+
+type OrgPerformanceDto = {cat:string; value:string}
+module OrgPerformanceDto =
+    let toDto (orgPerformance:OrgPerformance) =
+         match orgPerformance with
+         | NoPerformance -> {cat="NoPerformance"; value = ""}
+         | OrgPerformance.Sorter sorterTestResults -> 
+             {
+                 OrgPerformanceDto.cat = "Sorter";
+                 value = ""
+             }
+
+    let fromDto (eDto:OrgPerformanceDto) =
+        if eDto.cat = "NoPerformance" then
+                OrgPerformance.NoPerformance |> Ok
+        else if eDto.cat = "Sorter" then
+            result {
+                return OrgPerformance.Sorter SorterTestResults.Empty
+            }
+        else sprintf "cat: %s for PhenotypeEvalDto not found"
+                      eDto.cat |> Error
 
 
 type PhenotypeEvalDto = {cat:string; value:string}
@@ -94,10 +113,10 @@ module PhenotypeEvalDto =
     let toDto (phenotypeEval:PhenotypeEval) =
          match phenotypeEval with
          | NoPhenotypeEval -> {cat="NoPhenotype"; value = ""}
-         | FloaterE floatVal -> 
+         | Sorter sorterPhenotypeEval -> 
              {
-                 cat="Floater"; 
-                 value = floatVal.ToString(System.Globalization.CultureInfo.InvariantCulture) 
+                 cat="Sorter"; 
+                 value = "" //sorterPhenotypeEval |> SorterPhenotypeEvalDto.
              }
 
     let fromDto (eDto:PhenotypeEvalDto) =
@@ -105,10 +124,10 @@ module PhenotypeEvalDto =
             result {
                 return PhenotypeEval.NoPhenotypeEval
             }
-        else if eDto.cat = "SingleParent" then
+        else if eDto.cat = "Sorter" then
             result {
                 let floaterVal = (eDto.value) |> float
-                return PhenotypeEval.FloaterE floaterVal
+                return PhenotypeEval.Sorter SorterPhenotypeEval.Empty
             }
         else sprintf "cat: %s for PhenotypeEvalDto not found"
                       eDto.cat |> Error
@@ -121,6 +140,7 @@ type OrgDto =
         genomeDto:GenomeDto
         generation:int
         phenotypeDto:PhenotypeDto
+        orgPerformanceDto:OrgPerformanceDto
         phenotypeEvalDto:PhenotypeEvalDto
     }
 
@@ -134,6 +154,7 @@ module OrgDto =
                 let! genome = dto.genomeDto |> GenomeDto.fromDto
                 let! generation = GenerationNumber.create "" dto.generation
                 let! phenotype = dto.phenotypeDto |> PhenotypeDto.fromDto
+                let! orgPerformance = dto.orgPerformanceDto |> OrgPerformanceDto.fromDto
                 let! phenotypeEval = dto.phenotypeEvalDto |> PhenotypeEvalDto.fromDto
 
                 return {
@@ -142,6 +163,7 @@ module OrgDto =
                     genome = genome
                     generation = generation
                     phenotype = phenotype
+                    orgPerformance = orgPerformance
                     phenotypeEval = phenotypeEval
                 }
             }
@@ -154,6 +176,7 @@ module OrgDto =
             genomeDto = org.genome  |> GenomeDto.toDto
             generation = GenerationNumber.value org.generation
             phenotypeDto = org.phenotype  |> PhenotypeDto.toDto
+            orgPerformanceDto = org.orgPerformance |> OrgPerformanceDto.toDto
             phenotypeEvalDto = org.phenotypeEval |> PhenotypeEvalDto.toDto
         }
 
@@ -162,6 +185,7 @@ type OrgsDto =
     {
         id:Guid
         orgs:OrgDto[]
+        mapOfOrgAttributeMaps:Map<string, MapOfOrgAttributes<string>> option
     }
     
 module OrgsDto =
@@ -174,65 +198,80 @@ module OrgsDto =
                                 |> Array.toList |> Result.sequence
     
                 let orgMap = orgList |> List.map(fun gl-> (gl.orgId, gl))
-                                        |> Map.ofList
+                                     |> Map.ofList
     
                 return {
-                    Orgs.id = dto.id
-                    Orgs.orgMap = orgMap
+                    Orgs.id = OrgsId.fromGuid dto.id
+                    orgMap = orgMap
+                    mapOfOrgAttributeMaps = dto.mapOfOrgAttributeMaps
                 }
             }
     
     let toDto (orgs:Orgs) =
         {
-            OrgsDto.id = orgs.id
+            OrgsDto.id = OrgsId.value orgs.id
             OrgsDto.orgs = orgs.orgMap
                             |> Map.toArray
                             |> Array.map(fun tup-> snd tup)
                             |> Array.map(OrgDto.toDto)
+
+            OrgsDto.mapOfOrgAttributeMaps = None
         }
             
-    type OrgsDto = 
-        {
-            id:Guid
-            orgs:OrgDto[]
-        }
-            
-    module OrgsDto =
-            
-        let fromDto (dto:OrgsDto) =
-            result 
-                {
-                    let! orgList = dto.orgs
-                                    |> Array.map(OrgDto.fromDto)
-                                    |> Array.toList |> Result.sequence
-            
-                    let orgMap = orgList |> List.map(fun gl-> (gl.orgId, gl))
-                                            |> Map.ofList
-            
-                    return {
-                        Orgs.id = dto.id
-                        Orgs.orgMap = orgMap
-                    }
-                }
-            
-        let toDto (orgs:Orgs) =
-            {
-                OrgsDto.id = orgs.id
-                OrgsDto.orgs = orgs.orgMap
-                                |> Map.toArray
-                                |> Array.map(fun tup-> snd tup)
-                                |> Array.map(OrgDto.toDto)
-            }
-
-
-//type OrgsWithGridLocsDto = 
+         
+//type OrgsEnviromentTypeDto = 
 //    {
-//        id:Guid
-//        orgs:OrgDto[]
-//        poolOfGridLocationsDto:PoolOfGridLocationsDto
+//        category:string;
+//        details:string
 //    }
 
-//module OrgsWithGridLocsDto =
+
+//module OrgsEnviromentTypeDto =
+//    let toDto (orgsEnviromentType:OrgsEnvirotType) =
+//        match orgsEnviromentType with
+//        | GenerationSnapshot str -> 
+//                {
+//                    OrgsEnviromentTypeDto.category = "GenerationSnapshot";
+//                    details = str
+//                }
+
+//    let fromDto (orgsEnviromentTypeDto:OrgsEnviromentTypeDto) =
+//        match orgsEnviromentTypeDto.category with
+//        | "GenerationSnapshot" -> OrgsEnvirotType.GenerationSnapshot 
+//                                    orgsEnviromentTypeDto.details |> Ok
+//        | cat -> sprintf "category %s not handled" cat |> Error
+
+
+
+//type OrgsEnviromentDto = 
+//    {
+//        id:Guid
+//        orgsDto:OrgsDto
+//        mapOfOrgAttributeMaps:Map<string, MapOfOrgAttributes<string>> option
+//    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//module OrgsEnviromentDto =
 
 //    let fromDto (dto:OrgsWithGridLocsDto) =
 //        result 

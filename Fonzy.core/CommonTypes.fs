@@ -11,9 +11,9 @@ type JsonString = private JsonString of string
 type MutationRate = private MutationRate of float
 type EnviroUpdateParamsId = private EnviroUpdateParamsId of Guid
 type OrgId = private OrgId of Guid
+type OrgsId = private OrgsId of Guid
 type OrgUpdateParamsId = private OrgUpdateParamsId of Guid
 type OrgAttributeName = private OrgAttributeName of string
-type OrgAttributeType = Int | GridLoc2d | GridLoc3d
 type PoolFraction = private PoolFraction of float
 type PoolCount = private PoolCount of int
 type PoolGenCount = private PoolGenCount of int
@@ -137,6 +137,11 @@ module OrgUpdateParamsId =
 module OrgId =
     let value (OrgId v) = v
     let create id = Ok (OrgId id)
+    let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
+
+module OrgsId =
+    let value (OrgsId v) = v
+    let create id = Ok (OrgsId id)
     let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
 
 module PoolFraction =
