@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="EnvirosDto.fs" />
+    <Compile Include="CausesDto.fs" />
+    <Compile Include="WorldsDto.fs" />
+    <Compile Include="JobsDto.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fonzy.core\Fonzy.core.fsproj" />
+    <ProjectReference Include="..\Fonzy.world\Fonzy.world.fsproj" />
+  </ItemGroup>
+
+</Project>

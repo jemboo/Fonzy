@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "sTAVoffpoOS9jEl1LEqMBtxD0NRX1QCTA7DpC2XoYivfHM1Qc5/6Wz7J08dI0v8iveP8/N+wb3pHeUSiPjvrDQ==",
+  "dgSpecHash": "4Uy1GkE9JBia6D9fzxsr48dTx/ty4i/B22dxw9Q9cjwLOO+4gqnuIlhPkBs+DPhioba531HLwajHx6azRMFrGQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.core.test\\Fonzy.core.test.fsproj",
   "expectedPackageFiles": [
     "C:\\Users\\tpnsc\\.nuget\\packages\\coverlet.collector\\1.2.0\\coverlet.collector.1.2.0.nupkg.sha512",
-    "C:\\Users\\tpnsc\\.nuget\\packages\\fsharp.core\\4.7.2\\fsharp.core.4.7.2.nupkg.sha512",
+    "C:\\Users\\tpnsc\\.nuget\\packages\\fsharp.core\\5.0.0\\fsharp.core.5.0.0.nupkg.sha512",
     "C:\\Users\\tpnsc\\.nuget\\packages\\microsoft.codecoverage\\16.5.0\\microsoft.codecoverage.16.5.0.nupkg.sha512",
     "C:\\Users\\tpnsc\\.nuget\\packages\\microsoft.net.test.sdk\\16.5.0\\microsoft.net.test.sdk.16.5.0.nupkg.sha512",
     "C:\\Users\\tpnsc\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",

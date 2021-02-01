@@ -33,12 +33,12 @@ type RandoFixture () =
         Assert.IsTrue(true);
 
 
-    [<TestMethod>]
-    member this.RngGenDto() =
-        let rngGen = {RngGen.rngType=RngType.Lcg; seed = RandomSeed.create "" 123|>Result.ExtractOrThrow}
-        let dto = RngGenDto.toDto rngGen
-        let rngGenBack = RngGenDto.fromDto dto |> Result.ExtractOrThrow
-        Assert.IsTrue((rngGen=rngGenBack))
+    //[<TestMethod>]
+    //member this.RngGenDto() =
+    //    let rngGen = {RngGen.rngType=RngType.Lcg; seed = RandomSeed.create "" 123|>Result.ExtractOrThrow}
+    //    let dto = RngGenDto.toDto rngGen
+    //    let rngGenBack = RngGenDto.fromDto dto |> Result.ExtractOrThrow
+    //    Assert.IsTrue((rngGen=rngGenBack))
         
 
     [<TestMethod>]

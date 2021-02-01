@@ -46,10 +46,6 @@ module LatticeLoc2d =
         let yVals = seq {yMin..yMax} 
         seq {for x in xVals do for y in yVals -> {LatticeLoc2d.x=x; y=y}}
 
-
-
-        
-
 type LatticeLoc3d = {x:int; y:int; z:int}
 
 module LatticeLoc3d = 

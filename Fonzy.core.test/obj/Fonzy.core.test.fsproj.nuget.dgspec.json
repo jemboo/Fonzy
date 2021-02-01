@@ -30,12 +30,10 @@
         },
         "frameworks": {
           "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
             "projectReferences": {
               "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.core\\Fonzy.core.fsproj": {
                 "projectPath": "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.core\\Fonzy.core.fsproj"
-              },
-              "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.dto\\Fonzy.dto.fsproj": {
-                "projectPath": "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.dto\\Fonzy.dto.fsproj"
               }
             }
           }
@@ -43,10 +41,11 @@
       },
       "frameworks": {
         "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
           "dependencies": {
             "FSharp.Core": {
               "target": "Package",
-              "version": "[4.7.2, )",
+              "version": "[5.0.0, )",
               "generatePathProperty": true
             },
             "MSTest.TestAdapter": {
@@ -85,7 +84,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -115,16 +114,18 @@
         },
         "frameworks": {
           "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
             "projectReferences": {}
           }
         }
       },
       "frameworks": {
         "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
           "dependencies": {
             "FSharp.Core": {
               "target": "Package",
-              "version": "[4.7.2, )",
+              "version": "[5.0.0, )",
               "generatePathProperty": true
             },
             "Newtonsoft.Json": {
@@ -148,69 +149,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.403\\RuntimeIdentifierGraph.json"
-        }
-      }
-    },
-    "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.dto\\Fonzy.dto.fsproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.dto\\Fonzy.dto.fsproj",
-        "projectName": "Fonzy.dto",
-        "projectPath": "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.dto\\Fonzy.dto.fsproj",
-        "packagesPath": "C:\\Users\\tpnsc\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.dto\\obj\\",
-        "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
-        "configFilePaths": [
-          "C:\\Users\\tpnsc\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
-        ],
-        "originalTargetFrameworks": [
-          "netcoreapp3.1"
-        ],
-        "sources": {
-          "C:\\Zeiss\\Trunk\\XradiApps\\packages": {},
-          "http://xrmtfs.zeiss.org:8080/tfs/Zeiss/_packaging/XrmPython/nuget/v3/index.json": {},
-          "https://api.nuget.org/v3/index.json": {}
-        },
-        "frameworks": {
-          "netcoreapp3.1": {
-            "projectReferences": {
-              "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.core\\Fonzy.core.fsproj": {
-                "projectPath": "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.core\\Fonzy.core.fsproj"
-              }
-            }
-          }
-        }
-      },
-      "frameworks": {
-        "netcoreapp3.1": {
-          "dependencies": {
-            "FSharp.Core": {
-              "target": "Package",
-              "version": "[4.7.2, )",
-              "generatePathProperty": true
-            }
-          },
-          "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48"
-          ],
-          "assetTargetFallback": true,
-          "warn": true,
-          "frameworkReferences": {
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
         }
       }
     }

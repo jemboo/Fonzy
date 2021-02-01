@@ -108,6 +108,3 @@ C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.test\obj\Debug\netcoreapp3.1\Fonzy.
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.test\obj\Debug\netcoreapp3.1\Fonzy.core.test.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.test\obj\Debug\netcoreapp3.1\Fonzy.core.test.pdb
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.test\obj\Debug\netcoreapp3.1\Fonzy.core.test.genruntimeconfig.cache
-C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.test\bin\Debug\netcoreapp3.1\Fonzy.dto.exe
-C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.test\bin\Debug\netcoreapp3.1\Fonzy.dto.dll
-C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.test\bin\Debug\netcoreapp3.1\Fonzy.dto.pdb
