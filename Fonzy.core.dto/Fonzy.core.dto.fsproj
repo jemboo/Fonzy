@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <Compile Include="CommonTypesDto.fs" />
+    <Compile Include="RandoDto.fs" />
+    <Compile Include="MathDataDto.fs" />
     <Compile Include="SorterPartsDto.fs" />
     <Compile Include="SorterGaDto.fs" />
     <Compile Include="GridLocationDto.fs" />

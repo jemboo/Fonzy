@@ -31,14 +31,6 @@ type RandoFixture () =
                     |> Seq.take sortableCount
 
         Assert.IsTrue(true);
-
-
-    //[<TestMethod>]
-    //member this.RngGenDto() =
-    //    let rngGen = {RngGen.rngType=RngType.Lcg; seed = RandomSeed.create "" 123|>Result.ExtractOrThrow}
-    //    let dto = RngGenDto.toDto rngGen
-    //    let rngGenBack = RngGenDto.fromDto dto |> Result.ExtractOrThrow
-    //    Assert.IsTrue((rngGen=rngGenBack))
         
 
     [<TestMethod>]
@@ -63,7 +55,7 @@ type RandoFixture () =
     member this.normalDistRandomInts() =
         let randy = Rando.fromRngGen (RngGen.createLcg 123)
         let normInt() = 
-            float (fst (Rando.normalDistInt2d 1.0 100.0 randy))
+            float (fst (Rando.normalDistInt2d 0.0 1.0 0.0 100.0 randy))
         let lst = seq {0 .. 1000} |> Seq.map(fun _ -> normInt())
                         |> Seq.toList
         let ave = lst |> List.average

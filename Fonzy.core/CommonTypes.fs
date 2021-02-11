@@ -522,5 +522,36 @@ module SorterLength =
         | SorterLength.Switch wCt -> (toRecordSorterLength degree SwitchOrStage.Switch) |> Add extraLength |> Result.ExtractOrThrow
         | SorterLength.Stage wCt -> (toRecordSorterLength degree SwitchOrStage.Stage) |> Add extraLength |> Result.ExtractOrThrow
 
-       
+type UniformIntegerDistParams = {min:int; max:int}
+type NormalIntegerDistParams = {mean:float; stdDev:float}
+
+type IntDistType =
+        | Uniform of UniformIntegerDistParams
+        | Normal of NormalIntegerDistParams
+
+
+type UniformLattice2dDistParams = {minX:int; maxX:int; minY:int; maxY:int}
+
+module UniformLattice2dDistParams = 
+    let square (side:int) =
+        {
+            UniformLattice2dDistParams.minX = 0;
+            UniformLattice2dDistParams.maxX = side;
+            UniformLattice2dDistParams.minY = 0;
+            UniformLattice2dDistParams.maxY = side;
+        }
+
+type NormalLattice2dDistParams = {meanX:float; meanY:float; stdDevX:float; stdDevY:float}
+module NormalLattice2dDistParams = 
+    let round (dev:float) =
+        {
+            NormalLattice2dDistParams.meanX = 0.0;
+            NormalLattice2dDistParams.meanY = 0.0;
+            NormalLattice2dDistParams.stdDevX = dev;
+            NormalLattice2dDistParams.stdDevY = dev;
+        }
+
+type Lattice2dDistType =
+    | Uniform of UniformLattice2dDistParams
+    | Normal of NormalLattice2dDistParams
 

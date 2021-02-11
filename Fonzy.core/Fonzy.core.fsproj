@@ -10,7 +10,7 @@
     <Compile Include="Result.fs" />
     <Compile Include="ConstrainedType.fs" />
     <Compile Include="CommonTypes.fs" />
-    <Compile Include="ElRando.fs" />
+    <Compile Include="Rando.fs" />
     <Compile Include="MathData.fs" />
     <Compile Include="Combinatorics.fs" />
     <Compile Include="CombinatoricsTypes.fs" />
@@ -19,7 +19,7 @@
     <Compile Include="SorterGa.fs" />
     <Compile Include="SorterGaOps.fs" />
     <Compile Include="Orgs.fs" />
-    <Compile Include="NumberOrg.fs" />
+    <Compile Include="ParamSets.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

@@ -11,20 +11,26 @@ type Cause = {causeType:CauseType; op:Enviro -> Result<Enviro, string>}
 
 module KeyedCauses = 
     
-    //let addRandomInts (id:Guid) (objectMap:Map<string,string>) =
-    //    let addEm (name:string) (ints:int[]) =
-    //        fun e ->
-    //        match e with
-    //            | Empty -> Enviro.ObjectMap ([(name, ints |> Json.serialize)] |> Map.ofList ) |> Ok
-    //            | ObjectMap m -> Enviro.ObjectMap (m |> Map.add name (ints |> Json.serialize)) |> Ok
-    //    let r = objectMap.["a"]
-    //    result {
-    //        let r = objectMap.["a"]
-        
-    //    }
+    let addRandomInts (id:Guid) (objectMap:Map<string,string>) =
+        let addEm (name:string) (ints:int[]) =
+            fun e ->
+            match e with
+                | Empty -> Enviro.ObjectMap ([(name, ints |> Json.serialize)] |> Map.ofList ) |> Ok
+                | ObjectMap m -> Enviro.ObjectMap (m |> Map.add name (ints |> Json.serialize)) |> Ok
 
-    //    { causeType = CauseType.Keyed (id, objectMap);
-    //      op = addEm "nameo" [|1;2|] }
+        //let r = objectMap.["a"]
+        //result {
+        //    let r = objectMap.["a"]
+    
+        //}
+
+        //{ causeType = CauseType.Keyed (id, objectMap);
+        //  op = addEm "nameo" [|1;2|] }
+
+
+        None
+
+
 
 
     let goo (id:Guid) (objectMap:Map<string,string>) =

@@ -18,17 +18,22 @@ module LatticeLoc2d =
         | None, None -> {LatticeLoc2d.x = ll2d.x + dx; 
                                y = ll2d.y + dy}
 
+    let fromFltTuple (tup:float*float) =
+        {LatticeLoc2d.x = int (fst tup); LatticeLoc2d.y = int (snd tup)}
+
     let perturb (xMax:int option) (yMax:int option)
                 (perturber:IRando->int*int)
-                (ll2d:LatticeLoc2d) 
+                (ll2d:LatticeLoc2d)
                 (rando:IRando) = 
         let delta = perturber rando
         add xMax yMax ll2d (fst delta) (snd delta)
 
-    let makeUniformRandom (xMax:int) (yMax:int)
-                   (rando:IRando) = 
-        {LatticeLoc2d.x = int (rando.NextUInt % (uint32 xMax)); 
-                      y = int (rando.NextUInt % (uint32 yMax))}
+    let makeUniformRandom (xMin:int) (xMax:int) (yMin:int) (yMax:int)
+                          (rando:IRando) = 
+        let xSpan = xMax - xMin
+        let ySpan = yMax - yMin
+        {LatticeLoc2d.x = xMin + int (rando.NextUInt % (uint32 xSpan)); 
+                      y = yMin + int (rando.NextUInt % (uint32 ySpan))}
 
     let gaussianDiffuse (xRadius:int option) 
                         (yRadius:int option)
@@ -37,7 +42,7 @@ module LatticeLoc2d =
                         (rando:IRando)
                         (latticeLocations:seq<LatticeLoc2d>) =
         let gaussianDiffuser (randy:IRando) = 
-            Rando.normalDistInt2d stdDevX stdDevY randy
+            Rando.normalDistInt2d 0.0 stdDevX 0.0 stdDevY randy
 
         latticeLocations |> Seq.map(fun ll-> perturb xRadius yRadius gaussianDiffuser ll rando)
 
@@ -102,3 +107,33 @@ module LatticeLoc3d =
                         for y in yVals do 
                             for z in zVals  -> 
                                 {LatticeLoc3d.x=x; y=y; z=z} }
+
+
+type IntDist = {intDistType:IntDistType; vals:int[]; }
+
+module IntDist = 
+    let makeRandom (idt:IntDistType) (r:IRando) (count:int) =
+        let ma dt =
+            match dt with
+            | IntDistType.Uniform uidp -> Array.init count (fun _ -> r.NextPositiveInt)
+            | IntDistType.Normal nidp -> Rando.normalDistRandomSeq nidp.mean nidp.stdDev r
+                                            |> Seq.map(fun v -> (int v))
+                                            |> Seq.take count
+                                            |> Seq.toArray
+
+        {IntDist.intDistType=idt; vals = ma idt}
+
+type Lattice2dDist = {lattice2dDistType:Lattice2dDistType; vals:LatticeLoc2d[]; }
+
+module Lattice2dDist =
+    let makeRandom (l2dt:Lattice2dDistType) (r:IRando) (count:int) =
+        let ma dt =
+            match dt with
+            | Lattice2dDistType.Uniform uldp -> Array.init count (fun _ -> 
+                            LatticeLoc2d.makeUniformRandom uldp.minX uldp.maxX uldp.minY uldp.maxY r)
+            | Lattice2dDistType.Normal nldp -> Array.init count (fun _ -> 
+                            Rando.normalDistRandomPair 
+                                     nldp.meanX nldp.stdDevX nldp.meanY nldp.stdDevY r
+                            |> LatticeLoc2d.fromFltTuple)
+
+        {Lattice2dDist.lattice2dDistType=l2dt; vals = ma l2dt}

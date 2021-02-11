@@ -16,22 +16,6 @@ module PermutationDto =
         values = Permutation.arrayValues perm}
 
 
-type RngGenDto = {rngType:string; seed:int}
-module RngGenDto =
-    let fromDto (dto:RngGenDto) =
-        result {
-            let! typ = RngType.create dto.rngType
-            let! rs = RandomSeed.create "" dto.seed
-            return {RngGen.rngType=typ; seed=rs}
-        }
-    let toDto (rngGen:RngGen) =
-        {rngType=(RngType.toDto rngGen.rngType); 
-         seed=RandomSeed.value rngGen.seed}
-
-    let toJson (rngGen:RngGen) =
-        rngGen |> toDto |> Json.serialize
-
-
 type SorterLengthDto = {wOrT:string; value:int;}
 module SorterLengthDto =
     
@@ -83,7 +67,6 @@ module SorterMutationTypeDto =
         }
 
 
-
     type TwoCyclePermDto = private {degree:int; values:int[] }
     module TwoCyclePermDto =
         let fromDto (dto:TwoCyclePermDto) =
@@ -94,3 +77,51 @@ module SorterMutationTypeDto =
         let toDto (tcp:TwoCyclePerm) =
             {degree= (Degree.value (TwoCyclePerm.degree tcp)); 
             values=TwoCyclePerm.arrayValues tcp;}
+
+
+type IntDistTypeDto = {cat:string; value:string}
+module IntDistTypeDto =
+    let fromDto (dto:IntDistTypeDto) =
+        if dto.cat = "Uniform" then
+            result {
+                let! b = Json.deserialize<UniformIntegerDistParams> dto.value
+                return IntDistType.Uniform b
+            }
+        else if dto.cat = "Normal" then
+            result {
+                let! b = Json.deserialize<NormalIntegerDistParams> dto.value
+                return IntDistType.Normal b
+            }
+        else sprintf "cat: %s for IntDistTypeDto not found"
+                        dto.cat |> Error
+
+    let toDto (idt:IntDistType) =
+        match idt with
+        | IntDistType.Uniform up -> {IntDistTypeDto.cat="Uniform"; 
+                                    value=Json.serialize up}
+        | IntDistType.Normal np -> {IntDistTypeDto.cat="Normal"; 
+                                    value=Json.serialize np}
+
+            
+type Lattice2dDistTypeDto = {cat:string; value:string}
+module Lattice2dDistTypeDto =
+    let fromDto (dto:Lattice2dDistTypeDto) =
+        if dto.cat = "Uniform" then
+            result {
+                let! b = Json.deserialize<UniformLattice2dDistParams> dto.value
+                return Lattice2dDistType.Uniform b
+            }
+        else if dto.cat = "Normal" then
+            result {
+                let! b = Json.deserialize<NormalLattice2dDistParams> dto.value
+                return Lattice2dDistType.Normal b
+            }
+        else sprintf "cat: %s for Lattice2dDistTypeDto not found"
+                        dto.cat |> Error
+
+    let toDto (idt:Lattice2dDistType) =
+        match idt with
+        | Lattice2dDistType.Uniform up -> {Lattice2dDistTypeDto.cat="Uniform"; 
+                                            value = Json.serialize up}
+        | Lattice2dDistType.Normal np -> {Lattice2dDistTypeDto.cat="Normal";
+                                            value = Json.serialize np}

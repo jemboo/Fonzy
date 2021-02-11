@@ -5,8 +5,7 @@ open Newtonsoft.Json
 [<TestClass>]
 type CommonTypesDtoFixture () =
 
-    [<TestMethod>]
-    member this.TestParseRandGenMode() =
+    member this.SerializeLogFileDto() =
         let lfDto = {LogFileDto.cat="cat"; descr="descr"; header="header"; records=[|"a"; "b"|]}
         let dto = JsonConvert.SerializeObject lfDto
         let lfDtoRet = JsonConvert.DeserializeObject<LogFileDto> dto
@@ -25,7 +24,7 @@ type CommonTypesDtoFixture () =
         Assert.AreEqual(1, 1)
 
     [<TestMethod>]
-    member this.MapSer() =
+    member this.SerializeMap() =
         let kvps = [|("a","a"); ("b", "b"); ("c", "c"); ("d", "d") |]
                     |> Map.ofArray
         let json = JsonConvert.SerializeObject(kvps)
@@ -34,8 +33,8 @@ type CommonTypesDtoFixture () =
 
 
     [<TestMethod>]
-    member this.MutationTypeSer() =
+    member this.SerializeMutationType() =
         let mt = SorterMutationType.Stage (MutationRate.fromFloat 0.1)
         let json = SorterMutationTypeDto.toJson mt
         let mtBack = SorterMutationTypeDto.fromJson json |> Result.ExtractOrThrow
-        Assert.AreEqual(mt,mtBack)
+        Assert.AreEqual(mt, mtBack)

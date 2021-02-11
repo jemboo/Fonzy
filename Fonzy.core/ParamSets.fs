@@ -2,8 +2,9 @@
 open System
 
 
+type RandIntParams = {gen:RngGen}
 
-module NumberOrgs = 
+module ParamSets = 
 
     let makeFloat =
                    None

@@ -121,7 +121,7 @@ module Rando =
         successCount
 
 
-    let normalDistRandomPair stdDevX stdDevY (rnd:IRando) = 
+    let normalDistRandomPair meanX stdDevX meanY stdDevY (rnd:IRando) = 
         let rec getRands () =
             let u = (2.0 * rnd.NextFloat) - 1.0
             let v = (2.0 * rnd.NextFloat) - 1.0
@@ -135,15 +135,15 @@ module Rando =
         let scale = System.Math.Sqrt(-2.0 * System.Math.Log(w) / w)
         let x = scale * u
         let y = scale * v
-        (x * stdDevX, y * stdDevY)
+        (meanX + x * stdDevX, meanY + y * stdDevY)
  
-    let normalDistInt2d stdDevX stdDevY (rnd:IRando) = 
-        let fpr = normalDistRandomPair stdDevX stdDevY rnd
+    let normalDistInt2d meanX stdDevX meanY stdDevY (rnd:IRando) = 
+        let fpr = normalDistRandomPair meanX stdDevX meanY stdDevY rnd
         (int (fst fpr), int (snd fpr))
 
-    let normalDistInt3d stdDevX stdDevY stdDevZ (rnd:IRando) = 
-        let fpr = normalDistRandomPair stdDevX stdDevY rnd
-        let spr = normalDistRandomPair stdDevZ 0.0 rnd
+    let normalDistInt3d meanX stdDevX meanY stdDevY stdDevZ (rnd:IRando) = 
+        let fpr = normalDistRandomPair meanX stdDevX meanY stdDevY rnd
+        let spr = normalDistRandomPair meanX stdDevZ meanY 0.0 rnd
         (int (fst fpr), int (snd fpr), int (fst spr))
 
 
@@ -162,10 +162,9 @@ module Rando =
                 let scale = System.Math.Sqrt(-2.0 * System.Math.Log(w) / w)
                 let x = scale * u
                 let y = scale * v
-                yield mean + (x * stdDev); yield mean + (y * stdDev); yield! polarBoxMullerDist ()
+                yield mean + (x * stdDev); yield mean + (y * stdDev); yield! polarBoxMullerDist()
             }
         polarBoxMullerDist ()
-
 
 
 
@@ -198,9 +197,9 @@ module RandoCollections =
             rngGen rngGen2
             (fun rando rando2 -> Rando.NextGuid rando rando2)
 
+
     let IndexedGuidGen (rngGen:RngGen) = 
         IndexedRandomData
             rngGen
             (fun rando -> Rando.NextGuid rando None)
-
 
