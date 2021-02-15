@@ -1609,12 +1609,27 @@
           "bin/placeholder/Fonzy.core.dll": {}
         }
       },
+      "Fonzy.core.dto/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v3.1",
+        "dependencies": {
+          "FSharp.Core": "5.0.0",
+          "Fonzy.core": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Fonzy.core.dto.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Fonzy.core.dto.dll": {}
+        }
+      },
       "Fonzy.world/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.1",
         "dependencies": {
           "FSharp.Core": "5.0.0",
           "Fonzy.core": "1.0.0",
+          "Fonzy.core.dto": "1.0.0",
           "Newtonsoft.Json": "12.0.3"
         },
         "compile": {
@@ -2417,6 +2432,7 @@
       "path": "runtime.osx.10.10-x64.runtime.native.system.security.cryptography.apple/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "runtime.osx.10.10-x64.runtime.native.system.security.cryptography.apple.4.3.0.nupkg.sha512",
@@ -5543,6 +5559,11 @@
       "path": "../Fonzy.core/Fonzy.core.fsproj",
       "msbuildProject": "../Fonzy.core/Fonzy.core.fsproj"
     },
+    "Fonzy.core.dto/1.0.0": {
+      "type": "project",
+      "path": "../Fonzy.core.dto/Fonzy.core.dto.fsproj",
+      "msbuildProject": "../Fonzy.core.dto/Fonzy.core.dto.fsproj"
+    },
     "Fonzy.world/1.0.0": {
       "type": "project",
       "path": "../Fonzy.world/Fonzy.world.fsproj",
@@ -5656,7 +5677,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
       }
     }
   }

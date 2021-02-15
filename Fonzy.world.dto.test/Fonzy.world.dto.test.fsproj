@@ -11,7 +11,7 @@
     <Compile Include="EnvirosDtoFixture.fs" />
     <Compile Include="JobsDtoFixture.fs" />
     <Compile Include="CausesDtoFixture.fs" />
-    <Compile Include="WorldDtoFixture.fs" />
+    <Compile Include="WorldsDtoFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

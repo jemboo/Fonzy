@@ -1,10 +1,10 @@
+C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.dto.test\bin\Debug\netcoreapp3.1\testhost.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.dto.test\bin\Debug\netcoreapp3.1\Fonzy.core.exe
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.dto.test\bin\Debug\netcoreapp3.1\Fonzy.core.dto.exe
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.dto.test\bin\Debug\netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.dto.test\bin\Debug\netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.dto.test\bin\Debug\netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.dto.test\bin\Debug\netcoreapp3.1\testhost.exe
-C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.dto.test\bin\Debug\netcoreapp3.1\testhost.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.dto.test\bin\Debug\netcoreapp3.1\Fonzy.core.dto.test.deps.json
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.dto.test\bin\Debug\netcoreapp3.1\Fonzy.core.dto.test.runtimeconfig.json
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core.dto.test\bin\Debug\netcoreapp3.1\Fonzy.core.dto.test.runtimeconfig.dev.json

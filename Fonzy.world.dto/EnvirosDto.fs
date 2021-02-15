@@ -11,6 +11,9 @@ module EnviroDto =
                         value = Json.serialize objectMap}
         | Enviro.Empty -> {cat = "Empty"; value = Json.serialize None}
 
+    let toJson (idt:Enviro) =
+        idt |> toDto |> Json.serialize
+
     let fromDto (eDto:EnviroDto) =
         if eDto.cat = "Empty" then
             result {
@@ -24,3 +27,8 @@ module EnviroDto =
         else sprintf "cat: %s for EnviroDto not found"
                       eDto.cat |> Error
 
+    let fromJson (js:string) =
+        result {
+            let! dto = Json.deserialize<EnviroDto> js
+            return! fromDto dto
+        }

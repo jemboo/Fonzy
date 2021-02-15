@@ -3,55 +3,65 @@ open System
 
 
 
-type WorldDto = {id:Guid; parentId:Guid option; causeTypeDto:CauseTypeDto; environmentDto:EnviroDto}
+type WorldDto = {id:Guid; parentId:Guid option; causeSpecDto:CauseSpecDto; 
+                 enviroDto:EnviroDto}
 module WorldDto = 
-    let create (id:Guid) (parentId:Guid option) (causeTypeDto:CauseTypeDto) (environmentDto:EnviroDto) =
-               {
-                    id=id; 
-                    parentId=parentId; 
-                    causeTypeDto=causeTypeDto; 
-                    environmentDto=environmentDto
-                }
-
     let toDto (w:World) =
-         {
-             id=w.id; 
-             parentId=w.parentId; 
-             causeTypeDto=w.cause.causeType |> CauseTypeDto.toDto; 
-             environmentDto=w.enviroment |> EnviroDto.toDto; 
-         }
+        {WorldDto.id = w.id;
+         WorldDto.parentId = w.parentId;
+         WorldDto.causeSpecDto = w.cause.causeSpec |> CauseSpecDto.toDto;
+         WorldDto.enviroDto = w.enviroment |> EnviroDto.toDto}
 
-    let fromDto (worldDto:WorldDto) =
-            result {
-                let! enviroment =  EnviroDto.fromDto worldDto.environmentDto
-                let! causeType =  CauseTypeDto.fromDto worldDto.causeTypeDto
-                let cause = Cause.fromCauseType causeType
-                return World.create worldDto.id worldDto.parentId cause enviroment
+    let toJson (w:World) =
+        w |> toDto |> Json.serialize
+
+    let fromDto (wDto:WorldDto) =
+           result {
+             let! e = wDto.enviroDto |> EnviroDto.fromDto
+             let! cs = wDto.causeSpecDto |> CauseSpecDto.fromDto;
+             let! c = cs |> Causes.fromCauseSpec
+             return  {
+                 World.id = wDto.id;
+                 World.parentId = wDto.parentId
+                 World.cause = c
+                 World.enviroment = e
+                } 
             }
+
+    let fromJson (js:string) =
+        result {
+            let! dto = Json.deserialize<WorldDto> js
+            return! fromDto dto
+        }
             
             
             
-type WorldActionDto = {childId:Guid; parentWorldDto:WorldDto;  causeTypeDto:CauseTypeDto;}
+type WorldActionDto = {childId:Guid; parentWorldDto:WorldDto; causeSpecDto:CauseSpecDto;}
 module WorldActionDto = 
-    let create (childId:Guid) (parentWorldDto:WorldDto) (causeTypeDto:CauseTypeDto) =
-                {
-                    childId=childId; 
-                    parentWorldDto=parentWorldDto; 
-                    causeTypeDto=causeTypeDto;
-                }
-            
-    let toDto (worldAction:WorldAction) =
-            {
-                childId = worldAction.childId; 
-                parentWorldDto = worldAction.parentWorld |> WorldDto.toDto; 
-                causeTypeDto = worldAction.cause.causeType |> CauseTypeDto.toDto;
-            }
-            
-    let fromDto (worldActionDto:WorldActionDto) =
-            result {
-                let! parentWorld =  WorldDto.fromDto worldActionDto.parentWorldDto
-                let! causeType =  CauseTypeDto.fromDto worldActionDto.causeTypeDto
-                let cause = Cause.fromCauseType causeType
-                return WorldAction.create (worldActionDto.childId) parentWorld cause
-             }
+    let toDto (w:WorldAction) =
+        {
+          WorldActionDto.childId = w.childId;
+          WorldActionDto.parentWorldDto = w.parentWorld |> WorldDto.toDto;
+          WorldActionDto.causeSpecDto = w.cause.causeSpec |> CauseSpecDto.toDto;
+        }
 
+    let toJson (w:WorldAction) =
+        w |> toDto |> Json.serialize
+
+    let fromDto (waDto:WorldActionDto) =
+           result {
+             let! pw = waDto.parentWorldDto |> WorldDto.fromDto
+             let! cs = waDto.causeSpecDto |> CauseSpecDto.fromDto;
+             let! c = cs |> Causes.fromCauseSpec
+             return  {
+                 WorldAction.childId = waDto.childId;
+                 WorldAction.parentWorld = pw
+                 WorldAction.cause = c
+                } 
+            }
+
+    let fromJson (js:string) =
+        result {
+            let! dto = Json.deserialize<WorldActionDto> js
+            return! fromDto dto
+        }

@@ -8,19 +8,18 @@ type WorldDtoFixture () =
 
     [<TestMethod>]
     member this.WorldDto () =
-        //let worldId = Guid.NewGuid()
-        //let world = World.create worldId None Cause.noOp Enviro.Empty
-        //let worldDto = WorldDto.toDto world
-        //let jsonWorld = Json.serialize worldDto
-        //let worldDtoBack = Json.deserialize<WorldDto> jsonWorld
-        //                    |> Result.ExtractOrThrow
-        //let worldBack = WorldDto.fromDto worldDtoBack
-        //                    |> Result.ExtractOrThrow
-        //Assert.AreEqual(world.id, worldBack.id);
-        //Assert.AreEqual(world.enviroment, worldBack.enviroment);
-        //Assert.AreEqual(world.parentId, worldBack.parentId);
-        //Assert.AreEqual(world.cause, worldBack.cause);
-        Assert.IsTrue(true);
+        let genArrayName = "genA"
+        let arrayCount = 103
+        let randy = RngGen.createLcg 22
+        let causeId = Guid.NewGuid()
+        let worldId = Guid.NewGuid()
+        let intDistType = IntDistType.Uniform (UniformIntegerDistParams.zeroCentered 5)
+        let csIntGen = CauseSpecRandGen.intArray intDistType arrayCount randy genArrayName causeId
+        let cause = Causes.fromCauseSpec csIntGen |> Result.ExtractOrThrow
+        let w = World.create worldId None cause Enviro.Empty
+        let dto = w |> WorldDto.toDto
+        let dtoBack = dto |> Json.serialize |> Json.deserialize<WorldDto> |> Result.ExtractOrThrow
+        Assert.AreEqual(dto, dtoBack);
 
 
     [<TestMethod>]

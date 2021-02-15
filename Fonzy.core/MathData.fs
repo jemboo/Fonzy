@@ -115,7 +115,8 @@ module IntDist =
     let makeRandom (idt:IntDistType) (r:IRando) (count:int) =
         let ma dt =
             match dt with
-            | IntDistType.Uniform uidp -> Array.init count (fun _ -> r.NextPositiveInt)
+            | IntDistType.Uniform uidp -> Array.init count (fun _ -> 
+                    uidp.min + r.NextPositiveInt % (uidp.max - uidp.min))
             | IntDistType.Normal nidp -> Rando.normalDistRandomSeq nidp.mean nidp.stdDev r
                                             |> Seq.map(fun v -> (int v))
                                             |> Seq.take count

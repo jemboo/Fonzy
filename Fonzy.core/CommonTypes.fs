@@ -60,7 +60,7 @@ module Degree =
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -88,7 +88,7 @@ module InitialConditionCount =
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -100,7 +100,7 @@ module GenerationNumber =
     let increment gen = fromInt ((value gen) + 1)
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -118,7 +118,7 @@ module MutationRate =
     let fromFloat v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>float)
         }
 
@@ -153,7 +153,7 @@ module PoolFraction =
     let fromFloat v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>float)
         }
 
@@ -164,7 +164,7 @@ module PoolCount =
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -175,7 +175,7 @@ module PoolGenCount =
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -190,7 +190,7 @@ module PoolMemberRank =
                     |None -> ""
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -202,7 +202,7 @@ module RandomSeed =
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m 
             return! create "" (gv:?>int)
         }
 
@@ -213,7 +213,7 @@ module ReplicaCount =
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -224,7 +224,7 @@ module ReportingFrequency =
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -255,7 +255,7 @@ module RunCount =
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -280,7 +280,7 @@ module SorterCount =
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -294,7 +294,7 @@ module SortableCount =
                           |None -> ""
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -308,7 +308,7 @@ module SorterFitness =
                           |None -> ""
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>float)
         }
 
@@ -319,7 +319,7 @@ module SwitchCount =
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -330,7 +330,7 @@ module SwitchFrequency =
     let fromFloat v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv :?> float)
         }
 
@@ -344,7 +344,7 @@ module StageCount =
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
 
@@ -354,7 +354,7 @@ module UseParallel =
     let value (UseParallel v) = v
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return create (gv:?>bool)
         }
 
@@ -364,7 +364,7 @@ module UseEagerProc =
     let value (UseEagerProc v) = v
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
-            let! gv = CollectionUtils.readMap m key
+            let! gv = ResultMap.read key m
             return create (gv:?>bool)
         }
 
@@ -523,11 +523,34 @@ module SorterLength =
         | SorterLength.Stage wCt -> (toRecordSorterLength degree SwitchOrStage.Stage) |> Add extraLength |> Result.ExtractOrThrow
 
 type UniformIntegerDistParams = {min:int; max:int}
+module UniformIntegerDistParams =
+
+    let zeroCentered (side:int) =
+        {
+            UniformIntegerDistParams.min = -side + 1;
+            UniformIntegerDistParams.max = side;
+        }
+
+    let positiveSeg (side:int) =
+        {
+            UniformIntegerDistParams.min = 0;
+            UniformIntegerDistParams.max = side;
+        }
+
 type NormalIntegerDistParams = {mean:float; stdDev:float}
+module NormalIntegerDistParams = 
+    let zeroCentered (stdev:float) =
+        {
+            NormalIntegerDistParams.mean = 0.0;
+            NormalIntegerDistParams.stdDev = stdev;
+        }
 
 type IntDistType =
         | Uniform of UniformIntegerDistParams
         | Normal of NormalIntegerDistParams
+
+
+
 
 
 type UniformLattice2dDistParams = {minX:int; maxX:int; minY:int; maxY:int}

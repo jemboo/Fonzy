@@ -95,12 +95,22 @@ module IntDistTypeDto =
         else sprintf "cat: %s for IntDistTypeDto not found"
                         dto.cat |> Error
 
+    let fromJson (jstr:string) =
+        result {
+            let! dto = Json.deserialize<IntDistTypeDto> jstr
+            return! fromDto dto
+        }
+
     let toDto (idt:IntDistType) =
         match idt with
         | IntDistType.Uniform up -> {IntDistTypeDto.cat="Uniform"; 
                                     value=Json.serialize up}
         | IntDistType.Normal np -> {IntDistTypeDto.cat="Normal"; 
                                     value=Json.serialize np}
+
+    let toJson (idt:IntDistType) =
+        idt |> toDto |> Json.serialize
+
 
             
 type Lattice2dDistTypeDto = {cat:string; value:string}
@@ -119,9 +129,18 @@ module Lattice2dDistTypeDto =
         else sprintf "cat: %s for Lattice2dDistTypeDto not found"
                         dto.cat |> Error
 
+    let fromJson (jstr:string) =
+        result {
+            let! dto = Json.deserialize<Lattice2dDistTypeDto> jstr
+            return! fromDto dto
+        }
+
     let toDto (idt:Lattice2dDistType) =
         match idt with
         | Lattice2dDistType.Uniform up -> {Lattice2dDistTypeDto.cat="Uniform"; 
                                             value = Json.serialize up}
         | Lattice2dDistType.Normal np -> {Lattice2dDistTypeDto.cat="Normal";
                                             value = Json.serialize np}
+
+    let toJson (idt:Lattice2dDistType) =
+        idt |> toDto |> Json.serialize

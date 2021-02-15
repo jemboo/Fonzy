@@ -60,21 +60,40 @@ type UtilsFixture () =
 
         Assert.IsTrue(true)
 
+    [<TestMethod>]
+    member this.addNewKey() =
+        let kvps = seq { ("a", 1); ("b", 2); ("c", 3); ("d", 5) } |> Seq.toArray
+        let ma = ResultMap.fromTuples kvps |> Result.ExtractOrThrow
+        let mp = ma |> ResultMap.add "bb" 5
+        let result = match mp with
+                     | Ok m -> "success"
+                     | Error m -> m
+        Assert.IsTrue((result = "success"))
 
     [<TestMethod>]
-    member this.MapWithKeyDupes() =
+    member this.addExistingKey() =
+        let kvps = seq { ("a", 1); ("b", 2); ("c", 3); ("d", 5) } |> Seq.toArray
+        let ma = ResultMap.fromTuples kvps |> Result.ExtractOrThrow
+        let mp = ma |> ResultMap.add "b" 5
+        let result = match mp with
+                     | Ok m -> "success"
+                     | Error m -> m
+        Assert.IsTrue((result <> "success"))
+
+    [<TestMethod>]
+    member this.fromTuplesWithKeyDupes() =
         let kvps = seq { ("a", 1); ("b", 2); ("c", 3); ("b", 5) } |> Seq.toArray
-        let ma = CollectionUtils.tuplesToMap kvps
+        let ma = ResultMap.fromTuples kvps
         let result = match ma with
                      | Ok m -> "success"
                      | Error m -> m
-        Assert.IsTrue((result = "key duplicates"))
+        Assert.IsTrue((result <> "success"))
 
 
     [<TestMethod>]
-    member this.MapWithoutKeyDupes() =
+    member this.fromTuplesWithoutKeyDupes() =
         let kvps = seq { ("a", 1); ("b", 2); ("c", 3); } |> Seq.toArray
-        let ma = CollectionUtils.tuplesToMap kvps
+        let ma = ResultMap.fromTuples kvps
         let result = match ma with
                         | Ok m -> "success"
                         | Error m -> m

@@ -2,47 +2,29 @@
 open System
 
 
+type CauseSpecDto = {id:Guid; genus:string[]; prams:Map<string,string>; keyMap:Map<string,string>}
+module CauseSpecDto =
+    let toDto (cs:CauseSpec) =
+        {CauseSpecDto.id = cs.id;
+         CauseSpecDto.genus = cs.genus|> List.toArray;
+         CauseSpecDto.prams = cs.prams;
+         CauseSpecDto.keyMap = cs.keyMap}
 
-type KeyedCauseDto = {id:Guid; map:Map<string, string>}
-module KeyedCauseDto =
-                      
-    let toDto (tup:Guid * Map<string, string>) =
-        {KeyedCauseDto.id= fst tup;
-        KeyedCauseDto.map= snd tup;}
+    let toJson (cs:CauseSpec) =
+        cs |> toDto |> Json.serialize
 
-    let fromDto (eDto:KeyedCauseDto) =
-            result {
-                let id = eDto.id
-                let map = eDto.map
-                return KeyedCauses.ofKeyed eDto.id eDto.map
-            }
+    let fromDto (csDto:CauseSpecDto) =
+            {CauseSpec.id = csDto.id;
+             CauseSpec.genus = csDto.genus |> Array.toList;
+             CauseSpec.prams = csDto.prams;
+             CauseSpec.keyMap = csDto.keyMap
+            } |> Ok
 
-
-type CauseTypeDto = {cat:string; value:string}
-module CauseTypeDto =
-
-    let toDto (ct:CauseType) =
-        match ct with
-        | CauseType.Destroy -> {cat="Destroy"; value = Json.serialize None}
-        | CauseType.NoOp -> {cat="NoOp"; value = Json.serialize None}
-        | CauseType.Keyed (id, map) ->  {cat="Keyed"; value = Json.serialize(id, map)}
-
-    let fromDto (eDto:CauseTypeDto) =
-        if eDto.cat = "Destroy" then
-            result {
-                return CauseType.Destroy
-            }
-        else if eDto.cat = "NoOp" then
-            result {
-                return CauseType.NoOp
-            }
-        else if eDto.cat = "Keyed" then
-            result {
-                let! tup = Json.deserialize<Tuple<Guid,Map<string,string>>> eDto.value
-                return CauseType.Keyed tup
-            }
-        else sprintf "cat: %s for CauseTypeDto not found"
-                      eDto.cat |> Error
+    let fromJson (js:string) =
+        result {
+            let! dto = Json.deserialize<CauseSpecDto> js
+            return! fromDto dto
+        }
 
 
 // no serialization of CauseDto

@@ -1,5 +1,6 @@
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\testhost.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\Fonzy.core.exe
+C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\Fonzy.core.dto.exe
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\Fonzy.world.exe
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
@@ -102,13 +103,15 @@ C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\zh-Ha
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\Fonzy.core.dll
+C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\Fonzy.core.dto.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\Fonzy.world.dll
+C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\Fonzy.core.dto.pdb
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\Fonzy.core.pdb
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\bin\Debug\netcoreapp3.1\Fonzy.world.pdb
+C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\obj\Debug\netcoreapp3.1\Fonzy.world.test.fsprojAssemblyReference.cache
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\obj\Debug\netcoreapp3.1\Fonzy.world.test.AssemblyInfoInputs.cache
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\obj\Debug\netcoreapp3.1\Fonzy.world.test.AssemblyInfo.fs
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\obj\Debug\netcoreapp3.1\Fonzy.world.test.fsproj.CopyComplete
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\obj\Debug\netcoreapp3.1\Fonzy.world.test.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\obj\Debug\netcoreapp3.1\Fonzy.world.test.pdb
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\obj\Debug\netcoreapp3.1\Fonzy.world.test.genruntimeconfig.cache
-C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.test\obj\Debug\netcoreapp3.1\Fonzy.world.test.fsprojAssemblyReference.cache

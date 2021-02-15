@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="CausesFixture.fs" />
     <Compile Include="WorldFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
@@ -21,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Fonzy.core.dto\Fonzy.core.dto.fsproj" />
     <ProjectReference Include="..\Fonzy.core\Fonzy.core.fsproj" />
     <ProjectReference Include="..\Fonzy.world\Fonzy.world.fsproj" />
   </ItemGroup>

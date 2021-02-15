@@ -8,6 +8,13 @@ module RngGenDto =
             let! rs = RandomSeed.create "" dto.seed
             return {RngGen.rngType=typ; seed=rs}
         }
+
+    let fromJson (jstr:string) =
+        result {
+            let! dto = Json.deserialize<RngGenDto> jstr
+            return! fromDto dto
+        }
+
     let toDto (rngGen:RngGen) =
         {rngType=(RngType.toDto rngGen.rngType); 
          seed=RandomSeed.value rngGen.seed}

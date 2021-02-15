@@ -1,5 +1,6 @@
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\testhost.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Fonzy.core.exe
+C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Fonzy.core.dto.exe
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Fonzy.world.exe
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Fonzy.world.dto.exe
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
@@ -103,11 +104,13 @@ C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\z
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Fonzy.core.dll
+C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Fonzy.core.dto.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Fonzy.world.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Fonzy.world.dto.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Fonzy.core.pdb
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Fonzy.world.dto.pdb
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Fonzy.world.pdb
+C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\bin\Debug\netcoreapp3.1\Fonzy.core.dto.pdb
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\obj\Debug\netcoreapp3.1\Fonzy.world.dto.test.fsprojAssemblyReference.cache
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\obj\Debug\netcoreapp3.1\Fonzy.world.dto.test.AssemblyInfoInputs.cache
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.world.dto.test\obj\Debug\netcoreapp3.1\Fonzy.world.dto.test.AssemblyInfo.fs

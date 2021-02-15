@@ -5,6 +5,7 @@ C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\Fonzy.core.
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\Fonzy.core.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\Fonzy.core.pdb
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\FSharp.Core.dll
+C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\cs\FSharp.Core.resources.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\de\FSharp.Core.resources.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\es\FSharp.Core.resources.dll
@@ -18,11 +19,10 @@ C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\ru\FSharp.C
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\tr\FSharp.Core.resources.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\zh-Hans\FSharp.Core.resources.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\zh-Hant\FSharp.Core.resources.dll
+C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\obj\Debug\netcoreapp3.1\Fonzy.core.fsprojAssemblyReference.cache
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\obj\Debug\netcoreapp3.1\Fonzy.core.AssemblyInfoInputs.cache
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\obj\Debug\netcoreapp3.1\Fonzy.core.AssemblyInfo.fs
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\obj\Debug\netcoreapp3.1\Fonzy.core.fsproj.CopyComplete
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\obj\Debug\netcoreapp3.1\Fonzy.core.dll
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\obj\Debug\netcoreapp3.1\Fonzy.core.pdb
 C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\obj\Debug\netcoreapp3.1\Fonzy.core.genruntimeconfig.cache
-C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
-C:\Users\tpnsc\source\repos\Fonzy\Fonzy.core\obj\Debug\netcoreapp3.1\Fonzy.core.fsprojAssemblyReference.cache

@@ -74,6 +74,20 @@
         "runtime": {
           "bin/placeholder/Fonzy.core.dll": {}
         }
+      },
+      "Fonzy.core.dto/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v3.1",
+        "dependencies": {
+          "FSharp.Core": "5.0.0",
+          "Fonzy.core": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Fonzy.core.dto.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Fonzy.core.dto.dll": {}
+        }
       }
     }
   },
@@ -140,12 +154,18 @@
       "type": "project",
       "path": "../Fonzy.core/Fonzy.core.fsproj",
       "msbuildProject": "../Fonzy.core/Fonzy.core.fsproj"
+    },
+    "Fonzy.core.dto/1.0.0": {
+      "type": "project",
+      "path": "../Fonzy.core.dto/Fonzy.core.dto.fsproj",
+      "msbuildProject": "../Fonzy.core.dto/Fonzy.core.dto.fsproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
       "FSharp.Core >= 5.0.0",
       "Fonzy.core >= 1.0.0",
+      "Fonzy.core.dto >= 1.0.0",
       "Newtonsoft.Json >= 12.0.3"
     ]
   },
@@ -181,6 +201,9 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
+            "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.core.dto\\Fonzy.core.dto.fsproj": {
+              "projectPath": "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.core.dto\\Fonzy.core.dto.fsproj"
+            },
             "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.core\\Fonzy.core.fsproj": {
               "projectPath": "C:\\Users\\tpnsc\\source\\repos\\Fonzy\\Fonzy.core\\Fonzy.core.fsproj"
             }
@@ -218,7 +241,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
       }
     }
   }

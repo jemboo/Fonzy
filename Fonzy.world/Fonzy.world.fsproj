@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Fonzy.core.dto\Fonzy.core.dto.fsproj" />
     <ProjectReference Include="..\Fonzy.core\Fonzy.core.fsproj" />
   </ItemGroup>
 

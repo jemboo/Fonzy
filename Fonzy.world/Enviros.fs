@@ -15,5 +15,23 @@ type Enviro =
     | ObjectMap of Map<string, string>
 
 module Enviro =
-    let fromMap map =
-        Enviro.ObjectMap map
+    let toMap (e:Enviro) =
+        match e with
+        | Empty -> Map.empty
+        | ObjectMap m -> m
+
+    let addKvpToEnviro (key:string) (dto) (e:Enviro) =
+         match e with
+         | Empty -> (Enviro.ObjectMap ([(key, dto|>Json.serialize)] |> Map.ofList)) |> Ok
+         | ObjectMap m -> result {
+                     let! mN = m |> ResultMap.add key (dto|>Json.serialize)
+                     return Enviro.ObjectMap mN
+                 }
+
+    let replaceKvpToEnviro (key:string) (dto) (e:Enviro) =
+         match e with
+         | Empty -> (Enviro.ObjectMap ([(key, dto|>Json.serialize)] |> Map.ofList)) |> Ok
+         | ObjectMap m -> result {
+                     let mN = m |> Map.add key (dto|>Json.serialize)
+                     return Enviro.ObjectMap mN
+                 }

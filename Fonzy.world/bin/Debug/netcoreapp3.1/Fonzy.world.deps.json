@@ -10,6 +10,7 @@
         "dependencies": {
           "FSharp.Core": "5.0.0",
           "Fonzy.core": "1.0.0",
+          "Fonzy.core.dto": "1.0.0",
           "Newtonsoft.Json": "12.0.3"
         },
         "runtime": {
@@ -81,6 +82,15 @@
         "runtime": {
           "Fonzy.core.dll": {}
         }
+      },
+      "Fonzy.core.dto/1.0.0": {
+        "dependencies": {
+          "FSharp.Core": "5.0.0",
+          "Fonzy.core": "1.0.0"
+        },
+        "runtime": {
+          "Fonzy.core.dto.dll": {}
+        }
       }
     }
   },
@@ -105,6 +115,11 @@
       "hashPath": "newtonsoft.json.12.0.3.nupkg.sha512"
     },
     "Fonzy.core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Fonzy.core.dto/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

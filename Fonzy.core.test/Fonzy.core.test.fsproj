@@ -17,7 +17,6 @@
     <Compile Include="SorterGaOpsFixture.fs" />
     <Compile Include="OrgsFixture.fs" />
     <Compile Include="MapOfOrgAttributesFixture.fs" />
-    <Compile Include="CausesFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

@@ -143,33 +143,7 @@ module CollectionUtils =
         let hops = cumer.Keys |> Seq.sort |> Seq.toList |> listToTuples
         let ssts = hops |> List.map(fun (p,s) -> backFill cumer.[p] cumer.[s] s)
         ssts |> List.concat
-            
-
-    let tuplesToMap (tupes:('a*'b)[]) =
-        let map = tupes |> Map.ofSeq
-        if (map.Count = tupes.Length) then
-            map |> Ok
-        else "key duplicates" |> Error
-
-
-    let readMap (m:Map<'a,'b>) (key:'a) =
-        if (m.ContainsKey key) then m.[key] |> Ok
-        else (sprintf "key %A missing" key) |> Error
-
-
-    let getTypeFromMap<'a> (key:string) (m:Map<string,obj>) : Result<'a, string> =
-        match m.TryFind key with
-        | Some value -> 
-          try
-            (value :?> 'a) |> Ok
-          with
-          | :? InvalidCastException ->
-            let typeName = typeof<'a>.Name
-            sprintf "value could not be cast to %s" typeName |> Error
-        
-        | None -> sprintf "key not found: %s" key|> Error
-
-
+         
     let mapSubset (m:Map<'a,'v>) (keys:seq<'a>) = 
         keys |> Seq.map(fun k-> k, (m.[k]))
              |> Map.ofSeq
@@ -200,6 +174,38 @@ module CollectionUtils =
                 then Map.add kk (acc.[kk] + 1) acc
                 else Map.add kk 1 acc
             ) Map.empty
+
+module ResultMap =
+
+    let fromTuples (tupes:('a*'b)[]) =
+        let map = tupes |> Map.ofSeq
+        if (map.Count = tupes.Length) then
+            map |> Ok
+        else "key duplicates" |> Error
+
+
+    let read (key:'a) (m:Map<'a,'b>) =
+        if (m.ContainsKey key) then m.[key] |> Ok
+        else (sprintf "key %A missing" key) |> Error
+
+
+    let readType<'a> (key:string) (m:Map<string,obj>) : Result<'a, string> =
+        match m.TryFind key with
+        | Some value -> 
+          try
+            (value :?> 'a) |> Ok
+          with
+          | :? InvalidCastException ->
+            let typeName = typeof<'a>.Name
+            sprintf "value could not be cast to %s" typeName |> Error
+    
+        | None -> sprintf "key not found: %s" key|> Error
+
+
+    let add (key:'a) (vl:'v) (m:Map<'a,'v>) =
+            match m.TryFind key with
+            | Some value -> sprintf "key already present: %A" key |> Error
+            | None -> m |> Map.add key vl |> Ok
 
 
 module StringUtils =

@@ -10,6 +10,7 @@
         "dependencies": {
           "FSharp.Core": "5.0.0",
           "Fonzy.core": "1.0.0",
+          "Fonzy.core.dto": "1.0.0",
           "Fonzy.world": "1.0.0",
           "MSTest.TestAdapter": "2.1.1",
           "MSTest.TestFramework": "2.1.1",
@@ -1062,10 +1063,20 @@
           "Fonzy.core.dll": {}
         }
       },
+      "Fonzy.core.dto/1.0.0": {
+        "dependencies": {
+          "FSharp.Core": "5.0.0",
+          "Fonzy.core": "1.0.0"
+        },
+        "runtime": {
+          "Fonzy.core.dto.dll": {}
+        }
+      },
       "Fonzy.world/1.0.0": {
         "dependencies": {
           "FSharp.Core": "5.0.0",
           "Fonzy.core": "1.0.0",
+          "Fonzy.core.dto": "1.0.0",
           "Newtonsoft.Json": "12.0.3"
         },
         "runtime": {
@@ -1676,6 +1687,11 @@
       "hashPath": "system.xml.xdocument.4.3.0.nupkg.sha512"
     },
     "Fonzy.core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Fonzy.core.dto/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
