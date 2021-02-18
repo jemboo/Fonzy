@@ -16,7 +16,7 @@ type WorldDtoFixture () =
         let intDistType = IntDistType.Uniform (UniformIntegerDistParams.zeroCentered 5)
         let csIntGen = CauseSpecRandGen.intArray intDistType arrayCount randy genArrayName causeId
         let cause = Causes.fromCauseSpec csIntGen |> Result.ExtractOrThrow
-        let w = World.create worldId None cause Enviro.Empty
+        let w = World.create None cause Enviro.Empty
         let dto = w |> WorldDto.toDto
         let dtoBack = dto |> Json.serialize |> Json.deserialize<WorldDto> |> Result.ExtractOrThrow
         Assert.AreEqual(dto, dtoBack);

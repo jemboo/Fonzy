@@ -6,18 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="EnvirosDto.fs" />
-    <Compile Include="CausesDto.fs" />
-    <Compile Include="WorldsDto.fs" />
+    <Compile Include="DataStoreItem.fs" />
+    <Compile Include="DataSource.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\Fonzy.core.dto\Fonzy.core.dto.fsproj" />
     <ProjectReference Include="..\Fonzy.core\Fonzy.core.fsproj" />
+    <ProjectReference Include="..\Fonzy.world.dto\Fonzy.world.dto.fsproj" />
     <ProjectReference Include="..\Fonzy.world\Fonzy.world.fsproj" />
   </ItemGroup>
 

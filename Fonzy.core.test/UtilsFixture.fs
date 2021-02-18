@@ -24,7 +24,7 @@ type UtilsFixture () =
 
     [<TestMethod>]
     member this.guidFromObjs() =
-        let objs = seq { Guid.NewGuid():>obj; Guid.NewGuid():>obj;}
+        let objs = seq { Guid.NewGuid():>obj; Guid.NewGuid() :> obj;}
         let g2 = objs |> GuidUtils.guidFromObjs
         Assert.IsTrue(true)
 

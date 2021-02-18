@@ -51,6 +51,31 @@ module CauseSpec =
     let noOpCauseSpec = { CauseSpec.id = noOpCauseSpecId; 
                           genus=["NoOp"]; prams=Map.empty; keyMap=Map.empty;}
 
+    let testCauseSpec1Id = Guid.Parse "00000000-0000-0000-0000-000000000001"
+    let testCauseSpec1 = { CauseSpec.id = testCauseSpec1Id; 
+                           genus=["Test"; "1"]; prams=Map.empty; keyMap=Map.empty;}
+
+    let testCauseSpec2Id = Guid.Parse "00000000-0000-0000-0000-000000000002"
+    let testCauseSpec2 = { CauseSpec.id = testCauseSpec2Id; 
+                           genus=["Test"; "2"]; prams=Map.empty; keyMap=Map.empty;}
+
+    let testCauseSpec3Id = Guid.Parse "00000000-0000-0000-0000-000000000003"
+    let testCauseSpec3 = { CauseSpec.id = testCauseSpec3Id; 
+                           genus=["Test"; "3"]; prams=Map.empty; keyMap=Map.empty;}
+
+module CauseTest = 
+    let testOp (causeSpec:CauseSpec) =
+        {Cause.causeSpec=causeSpec; op=fun (e:Enviro) -> e|>Ok}
+
+    let fromCauseSpec (genus:string list) = 
+        match genus with
+        | [] -> "No CauseTest genus" |> Error
+        | ["1"] -> testOp CauseSpec.testCauseSpec1 |> Ok
+        | ["2"] -> testOp CauseSpec.testCauseSpec2 |> Ok
+        | ["3"] -> testOp CauseSpec.testCauseSpec3 |> Ok
+        | a::b -> sprintf "CauseTest: %s not handled" a |> Error
+
+
 module CauseRandGen = 
     let intArrayCauseSpecId = Guid.Parse "00000000-0000-0000-0000-000000000001"
     let intArray (causeSpec:CauseSpec) = 
@@ -89,13 +114,14 @@ module CauseRandGen =
 
 
 module Causes =
-    let noOp (causeSpec:CauseSpec) =
-        {Cause.causeSpec=causeSpec; op=fun (e:Enviro) -> e|>Ok} |> Ok
+    let noOp =
+        {Cause.causeSpec=CauseSpec.noOpCauseSpec; op=fun (e:Enviro) -> e|>Ok}
 
     let fromCauseSpec (causeSpec:CauseSpec) = 
      match causeSpec.genus with
      | [] -> "No CauseSpec genus" |> Error
-     | ["NoOp"] -> noOp causeSpec
+     | ["NoOp"] -> noOp |> Ok
+     | "Test"::b -> (CauseTest.fromCauseSpec b)
      | "RandGen"::b -> CauseRandGen.fromCauseSpec b causeSpec
      | a::b -> sprintf "Causes: %s not handled" a |> Error
      

@@ -6,7 +6,8 @@ type Job =
      | GetWorld of World
      | MakeWorld of WorldAction
 
-module Job = 
+module Job =
+
     let getId (job:Job) = 
         match job with
         | GetWorld w -> w.id

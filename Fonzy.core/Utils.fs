@@ -37,7 +37,19 @@ module GuidUtils =
         let laz = objs |> Seq.map(fun o -> md5.ComputeHash(BitConverter.GetBytes(o.GetHashCode())))
                        |> Seq.fold(fun a b -> folder a b) acc
         System.Guid(laz)
+
+
+    let guidFromStringR (gstr:string) =
+        let mutable gv = Guid.NewGuid()
+        match Guid.TryParse(gstr, &gv) with
+        | true -> gv |> Ok
+        | false -> "not a guid: " + gstr |> Result.Error
         
+    let guidFromStringO (gstr:string) =
+        let mutable gv = Guid.NewGuid()
+        match Guid.TryParse(gstr, &gv) with
+        | true -> gv |> Some
+        | false -> None
 
 module ParseUtils =
 
@@ -248,7 +260,24 @@ module StringUtils =
        sb.ToString()
 
 
-module LogUtils =
+module FileUtils =
+
+    let getFilesInDirectory path ext =
+        try
+            Directory.GetFiles(path, ext) 
+            |> Array.map Path.GetFileName  |> Ok
+        with
+            | ex -> ("error in getFilesInDirectory: " + ex.Message ) |> Result.Error
+
+    let readFile (path:string) =
+        try
+            use sr =
+                new System.IO.StreamReader(path)
+            sr.ReadToEnd() |> Ok
+        with
+            | ex -> ("error in readFile: " + ex.Message ) |> Result.Error
+
+
     let logFile path item (append:bool) =
         use sw =
             new StreamWriter(path, append)
