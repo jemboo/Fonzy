@@ -109,6 +109,35 @@ module LatticeLoc3d =
                                 {LatticeLoc3d.x=x; y=y; z=z} }
 
 
+
+type UniformIntegerDistParams = {min:int; max:int}
+module UniformIntegerDistParams =
+
+    let zeroCentered (side:int) =
+        {
+            UniformIntegerDistParams.min = -side + 1;
+            UniformIntegerDistParams.max = side;
+        }
+
+    let positiveSeg (side:int) =
+        {
+            UniformIntegerDistParams.min = 0;
+            UniformIntegerDistParams.max = side;
+        }
+
+type NormalIntegerDistParams = {mean:float; stdDev:float}
+module NormalIntegerDistParams = 
+    let zeroCentered (stdev:float) =
+        {
+            NormalIntegerDistParams.mean = 0.0;
+            NormalIntegerDistParams.stdDev = stdev;
+        }
+
+type IntDistType =
+        | Uniform of UniformIntegerDistParams
+        | Normal of NormalIntegerDistParams
+
+
 type IntDist = {intDistType:IntDistType; vals:int[]; }
 
 module IntDist = 
@@ -123,6 +152,38 @@ module IntDist =
                                             |> Seq.toArray
 
         {IntDist.intDistType=idt; vals = ma idt}
+
+
+
+
+
+type UniformLattice2dDistParams = {minX:int; maxX:int; minY:int; maxY:int}
+
+module UniformLattice2dDistParams = 
+    let square (side:int) =
+        {
+            UniformLattice2dDistParams.minX = 0;
+            UniformLattice2dDistParams.maxX = side;
+            UniformLattice2dDistParams.minY = 0;
+            UniformLattice2dDistParams.maxY = side;
+        }
+
+type NormalLattice2dDistParams = {meanX:float; meanY:float; stdDevX:float; stdDevY:float}
+module NormalLattice2dDistParams = 
+    let round (dev:float) =
+        {
+            NormalLattice2dDistParams.meanX = 0.0;
+            NormalLattice2dDistParams.meanY = 0.0;
+            NormalLattice2dDistParams.stdDevX = dev;
+            NormalLattice2dDistParams.stdDevY = dev;
+        }
+
+type Lattice2dDistType =
+    | Uniform of UniformLattice2dDistParams
+    | Normal of NormalLattice2dDistParams
+
+
+
 
 type Lattice2dDist = {lattice2dDistType:Lattice2dDistType; vals:LatticeLoc2d[]; }
 

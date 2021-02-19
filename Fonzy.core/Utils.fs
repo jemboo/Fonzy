@@ -51,6 +51,7 @@ module GuidUtils =
         | true -> gv |> Some
         | false -> None
 
+
 module ParseUtils =
 
     let MakeInt32 (str:string) =
@@ -187,6 +188,7 @@ module CollectionUtils =
                 else Map.add kk 1 acc
             ) Map.empty
 
+
 module ResultMap =
 
     let fromTuples (tupes:('a*'b)[]) =
@@ -271,32 +273,39 @@ module FileUtils =
 
     let readFile (path:string) =
         try
-            use sr =
-                new System.IO.StreamReader(path)
-            sr.ReadToEnd() |> Ok
+            use sr = new System.IO.StreamReader(path)
+            let res = sr.ReadToEnd()
+            sr.Dispose()
+            res |> Ok
         with
             | ex -> ("error in readFile: " + ex.Message ) |> Result.Error
 
 
-    let logFile path item (append:bool) =
-        use sw =
-            new StreamWriter(path, append)
-        fprintfn sw "%s" item
+    let writeFile path item (append:bool) =
+        try
+            use sw = new StreamWriter(path, append)
+            fprintfn sw "%s" item
+            sw.Dispose()
+            path |> Ok
+        with
+            | ex -> ("error in writeFile: " + ex.Message ) |> Result.Error
 
         //returns a cumer
-    let logFileKeyHeader path item =
-        logFile path (sprintf "%skey" item ) true
-        new Dictionary<int, Dictionary<Guid, string>>()
+    //let logFileKeyHeader path item =
+    //    writeFile path (sprintf "%skey" item ) true
+    //    new Dictionary<int, Dictionary<Guid, string>>()
 
 
     let logFileKey path (cumer:Dictionary<int, Dictionary<Guid, string>>) (key:int) (group:Guid) item  =
         let newItems = CollectionUtils.cumulate cumer key group item
-        newItems |> List.iter(fun item->logFile path (sprintf "%s%d" item key) true)
+        newItems |> List.map(fun item->writeFile path (sprintf "%s%d" item key) true)
+                 |> Result.sequence
 
 
     let logFileBackfill path (cumer:Dictionary<int, Dictionary<Guid, string>>) =
         let newItems = CollectionUtils.cumerBackFill cumer
-        newItems |> List.iter(fun item->logFile path (sprintf "%s%d" (snd item) (fst item)) true)
+        newItems |> List.map(fun item->writeFile path (sprintf "%s%d" (snd item) (fst item)) true)
+                 |> Result.sequence
         
 
 module Json = 

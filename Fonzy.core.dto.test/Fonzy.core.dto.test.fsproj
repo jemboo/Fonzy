@@ -10,7 +10,7 @@
   <ItemGroup>
     <Compile Include="MathDataDtoFixture.fs" />
     <Compile Include="CommonTypesDtoFixture.fs" />
-    <Compile Include="RandoDtoFixture.fs" />
+    <Compile Include="RngGenDtoFixture.fs" />
     <Compile Include="OrgsDtoFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />

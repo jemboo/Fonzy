@@ -37,7 +37,9 @@ module Switch =
                     let p = (int (rnd.NextUInt % mDex))
                     yield switchMap.[p] }
 
-    let mutateSwitches (order:Degree) (mutationRate:MutationRate) (rnd:IRando) (switches:seq<Switch>) =
+    let mutateSwitches (order:Degree) (mutationRate:MutationRate) 
+                       (rnd:IRando) 
+                       (switches:seq<Switch>) =
         let mDex = uint32 ((Degree.value order)*(Degree.value order + 1) / 2) 
         let mutateSwitch (switch:Switch) =
             match rnd.NextFloat with
@@ -290,21 +292,6 @@ module SorterSet =
             (seq {1 .. (SorterCount.value sorterCount)} 
                     |> Seq.map(fun _ -> (Sorter.createRandom degree sorterLength switchFreq rnd))
                     |> Seq.toArray)
-
-
-//type SorterSetE = {degree:Degree; sorterCount:SorterCount;
-//                    sorters:Map<EntityId, Entity<Sorter>> }
-//module SorterSetE =
-//    let fromSorterSet (rando1:IRando) (rando2:IRando) (sorterSet:SorterSet) =
-//            {
-//            degree = sorterSet.degree; 
-//            sorterCount= sorterSet.sorterCount;
-//            sorters = sorterSet.sorters |> Entity.createMany rando1 (Some rando2)
-//                                        |> Seq.map(fun e-> (Entity.id e), e)
-//                                        |> Map.ofSeq
-//            }
-
-
  
 type SwitchUses = private {switchCount:SwitchCount; weights:int[]}
 module SwitchUses =
@@ -405,16 +392,25 @@ module SwitchUses =
         StringUtils.printArrayf 
             (fun res ->
             match res with
-            | Ok (s,a,b,c,d) -> sprintf "%f %d %d %d" a b (SwitchCount.value c) (StageCount.value d)
+            | Ok (s,a,b,c,d) -> sprintf "%f %d %d %d" 
+                                            a b 
+                                            (SwitchCount.value c) 
+                                            (StageCount.value d)
             | Error msg -> sprintf "%s" msg ) 
             stats
 
     let reportStats stats =
         StringUtils.printArrayf 
-            (fun (s,a,b,c,d) -> sprintf "%f %d %d %d" a b (SwitchCount.value c) (StageCount.value d))
+            (fun (s,a,b,c,d) -> sprintf "%f %d %d %d" 
+                                            a b 
+                                            (SwitchCount.value c) 
+                                            (StageCount.value d))
             stats
 
     let reportEvals stats gen =
         StringUtils.printArrayf 
-            (fun ((s,w,t),f) -> sprintf "%d %d %d %f" gen (SwitchCount.value w) (StageCount.value t) (SorterFitness.value f)) 
+            (fun ((s,w,t),f) -> sprintf "%d %d %d %f" 
+                                    gen (SwitchCount.value w) 
+                                    (StageCount.value t) 
+                                    (SorterFitness.value f)) 
             stats

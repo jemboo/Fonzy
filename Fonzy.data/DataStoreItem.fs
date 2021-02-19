@@ -45,14 +45,14 @@ module DataStoreItemDto =
 
 
     let storeWorld (w:World) = 
-            w |> WorldDto.toDto 
-              |> DataStoreItem.WorldDto 
-              |> toJson
+            let dto = w |> WorldDto.toDto 
+            DataStoreItem.WorldDto dto |> toDto
+
 
     let storeWorldAction (wa:WorldAction) = 
             wa |> WorldActionDto.toDto 
-              |> DataStoreItem.WorldActionDto 
-              |> toJson
+               |> DataStoreItem.WorldActionDto 
+
 
     let fromDto (eDto:DataStoreItemDto) =
         if eDto.cat = "WorldDto" then

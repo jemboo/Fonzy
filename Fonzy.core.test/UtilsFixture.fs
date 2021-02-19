@@ -6,12 +6,7 @@ open System.Collections.Generic
 [<TestClass>]
 type UtilsFixture () =
 
-    [<TestMethod>]
-    member this.iterateCircular() =
-        let ts = [|1; 2; 3|]
-        let reppy = CollectionUtils.IterateCircular 10 ts  |> Seq.toArray
-        Assert.IsTrue(reppy.Length = 10)
-
+// GuidUtils
 
     [<TestMethod>]
     member this.addGuid() =
@@ -20,13 +15,23 @@ type UtilsFixture () =
         let g3 = g1 |> GuidUtils.addGuids g2
         let hc = g3.GetHashCode()
         Assert.IsTrue(true)
-
+        
 
     [<TestMethod>]
     member this.guidFromObjs() =
         let objs = seq { Guid.NewGuid():>obj; Guid.NewGuid() :> obj;}
         let g2 = objs |> GuidUtils.guidFromObjs
         Assert.IsTrue(true)
+
+
+// CollectionUtils
+
+
+    [<TestMethod>]
+    member this.iterateCircular() =
+        let ts = [|1; 2; 3|]
+        let reppy = CollectionUtils.IterateCircular 10 ts  |> Seq.toArray
+        Assert.IsTrue(reppy.Length = 10)
 
 
     [<TestMethod>]
@@ -57,8 +62,12 @@ type UtilsFixture () =
     member this.cumerBackFill() =
         let wab = [1;2;3;4;5]
         let res = CollectionUtils.listToTuples wab
-
         Assert.IsTrue(true)
+
+
+        
+    // ResultMap
+
 
     [<TestMethod>]
     member this.addNewKey() =
