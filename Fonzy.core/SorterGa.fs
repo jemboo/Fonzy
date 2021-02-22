@@ -1,16 +1,16 @@
 ﻿namespace global
 
 type SorterGenome = 
-    | Empty
-    | B of int
+    | Permutaions of List<TwoCyclePerm>
+    | Switches of List<Switch>
 
 type SorterPhenotype = 
-    | Empty
-    | B of int
+    | Singleton of Sorter
+    | Multiple of List<Sorter>
 
 type SorterTestResults = 
-    | Empty
-    | B of int
+    | Singleton of SwitchUses
+    | Multiple of List<SwitchUses>
 
 type SorterPhenotypeEval = 
     | Empty

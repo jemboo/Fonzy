@@ -31,15 +31,6 @@ type RandoFixture () =
                     |> Seq.take sortableCount
 
         Assert.IsTrue(true);
-        
-
-    [<TestMethod>]
-    member this.IndexedRandomData() =
-        let rg = RngGen.createLcg 123
-        let seeds = RandoCollections.IndexedSeedGen rg
-                    |> Seq.take(10) |> Seq.toArray
-
-        Assert.IsTrue(seeds.Length = 10)
 
 
     [<TestMethod>]

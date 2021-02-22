@@ -2,9 +2,8 @@
 open System.Collections.Generic
 open Microsoft.FSharp.Core
 open System
-open System.IO
 open System.Security.Cryptography
-open Newtonsoft.Json
+
 
 module GuidUtils = 
 
@@ -87,16 +86,16 @@ module ParseUtils =
 
 module CollectionUtils =
     // Generates an n-dimenstional cartesian product, with n = LL.Length
-    let rec cart1 LL = 
-        match LL with
-        | [] -> Seq.singleton []
-        | L::Ls -> seq {for x in L do for xs in cart1 Ls -> x::xs}
+    //let rec cart1 LL = 
+    //    match LL with
+    //    | [] -> Seq.singleton []
+    //    | L::Ls -> seq {for x in L do for xs in cart1 Ls -> x::xs}
 
-    let listToTuples (ltt:'a list) =
+    let listToTransitionTuples (ltt:'a list) =
         let rec yucko (last:'a) (tail:'a list) (tupes: ('a*'a) list) =
             match tail with
             | [] -> tupes
-            | head::rest -> yucko head rest ((last,head )::tupes)
+            | head::rest -> yucko head rest ((last,head)::tupes)
         match ltt with
         | [] -> []
         | head::tail -> yucko head tail [] |> List.rev
@@ -127,7 +126,7 @@ module CollectionUtils =
         lstRet
 
     // returns a sequence of items that occur more than once 
-    let duplicates items =
+    let itemsOccuringAtLeastOnce items =
         seq {
             let d = System.Collections.Generic.Dictionary()
             for i in items do
@@ -153,7 +152,7 @@ module CollectionUtils =
         let backFill (dPrev:Dictionary<'a,'b>) (dNext:Dictionary<'a,'b>)
                      (nextKey:int) =
             addDictionary dNext dPrev  |> List.map(fun a->(nextKey, a))
-        let hops = cumer.Keys |> Seq.sort |> Seq.toList |> listToTuples
+        let hops = cumer.Keys |> Seq.sort |> Seq.toList |> listToTransitionTuples
         let ssts = hops |> List.map(fun (p,s) -> backFill cumer.[p] cumer.[s] s)
         ssts |> List.concat
          
@@ -165,7 +164,6 @@ module CollectionUtils =
         seq { for kv in j do
                 if (m.ContainsKey (fst kv)) then
                         yield (fst kv, (m.[fst kv], snd kv)) }
-
 
     let flatten (arr:'a[]) (iron:'a->'b[]) =
         arr |> Seq.map(fun a-> iron a |> Array.toSeq)
@@ -260,66 +258,3 @@ module StringUtils =
          |> Seq.toArray
          |> ignore
        sb.ToString()
-
-
-module FileUtils =
-
-    let getFilesInDirectory path ext =
-        try
-            Directory.GetFiles(path, ext) 
-            |> Array.map Path.GetFileName  |> Ok
-        with
-            | ex -> ("error in getFilesInDirectory: " + ex.Message ) |> Result.Error
-
-    let readFile (path:string) =
-        try
-            use sr = new System.IO.StreamReader(path)
-            let res = sr.ReadToEnd()
-            sr.Dispose()
-            res |> Ok
-        with
-            | ex -> ("error in readFile: " + ex.Message ) |> Result.Error
-
-
-    let writeFile path item (append:bool) =
-        try
-            use sw = new StreamWriter(path, append)
-            fprintfn sw "%s" item
-            sw.Dispose()
-            path |> Ok
-        with
-            | ex -> ("error in writeFile: " + ex.Message ) |> Result.Error
-
-        //returns a cumer
-    //let logFileKeyHeader path item =
-    //    writeFile path (sprintf "%skey" item ) true
-    //    new Dictionary<int, Dictionary<Guid, string>>()
-
-
-    let logFileKey path (cumer:Dictionary<int, Dictionary<Guid, string>>) (key:int) (group:Guid) item  =
-        let newItems = CollectionUtils.cumulate cumer key group item
-        newItems |> List.map(fun item->writeFile path (sprintf "%s%d" item key) true)
-                 |> Result.sequence
-
-
-    let logFileBackfill path (cumer:Dictionary<int, Dictionary<Guid, string>>) =
-        let newItems = CollectionUtils.cumerBackFill cumer
-        newItems |> List.map(fun item->writeFile path (sprintf "%s%d" (snd item) (fst item)) true)
-                 |> Result.sequence
-        
-
-module Json = 
-    type Marker = interface end
-        
-    let serialize obj = JsonConvert.SerializeObject obj
-        
-    let deserialize<'a> str :Result<'a, string> =
-        try
-            JsonConvert.DeserializeObject<'a> str |> Ok
-        with
-        | ex -> Result.Error ex.Message
-        
-    let deserializeOption<'a> str =
-        match str with
-        | Some s -> (deserialize<'a> s)
-        | None -> Result.Error  "option was none"

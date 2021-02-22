@@ -7,6 +7,22 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 type OrgsDtoFixture () =
 
     [<TestMethod>]
+    member this.AncestryDto() =
+        let gu = Guid.NewGuid()
+        let orgId = OrgId.fromGuid gu
+        let ancestry = Ancestry.SingleParent orgId
+        let ancDto = ancestry |> AncestryDto.toDto
+        let ancestryBack = ancDto |> AncestryDto.fromDto
+                                  |> Result.ExtractOrThrow
+        Assert.AreEqual(ancestry, ancestryBack);
+        let gn = GenerationNumber.fromInt 5
+        let ancestryDp = Ancestry.SingleDistantParent (orgId, gn)
+        let ancDtoDp = ancestryDp |> AncestryDto.toDto
+        let ancestryBackDp = ancDtoDp |> AncestryDto.fromDto
+                                      |> Result.ExtractOrThrow
+        Assert.AreEqual(ancestryDp, ancestryBackDp);
+
+    [<TestMethod>]
     member this.EnviroDto () =
         //let env = Enviro.A 1
         //let envDto = EnviroDto.toDto env

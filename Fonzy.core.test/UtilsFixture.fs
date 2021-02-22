@@ -26,6 +26,13 @@ type UtilsFixture () =
 
 // CollectionUtils
 
+    [<TestMethod>]
+    member this.listToTuples() =
+        let ts = [1; 2; 1; 4; 5; 6]
+        let carty = CollectionUtils.listToTransitionTuples ts  |> Seq.toArray
+
+
+        Assert.IsTrue(true)
 
     [<TestMethod>]
     member this.iterateCircular() =
@@ -61,7 +68,7 @@ type UtilsFixture () =
     [<TestMethod>]
     member this.cumerBackFill() =
         let wab = [1;2;3;4;5]
-        let res = CollectionUtils.listToTuples wab
+        let res = CollectionUtils.listToTransitionTuples wab
         Assert.IsTrue(true)
 
 

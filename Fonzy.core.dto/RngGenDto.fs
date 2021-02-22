@@ -21,4 +21,3 @@ module RngGenDto =
 
     let toJson (rngGen:RngGen) =
         rngGen |> toDto |> Json.serialize
-

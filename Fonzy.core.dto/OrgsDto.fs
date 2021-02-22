@@ -7,12 +7,12 @@ module AncestryDto =
     let toDto (ancestry:Ancestry) =
          match ancestry with
          | NoAncestry -> {cat="NoAncestry"; value = ""}
-         | SingleParent id -> {cat="SingleParent"; value = Json.serialize id}
+         | SingleParent id -> {cat="SingleParent"; value = (string (OrgId.value id))}
          | SingleDistantParent (id, gen) -> 
                     let genDto = (GenerationNumber.value gen).ToString()
                     {
                         cat="SingleDistantParent"; 
-                        value = Json.serialize [id.ToString(), genDto]
+                        value = Json.serialize [(string (OrgId.value id)); genDto]
                     }
 
     let fromDto (eDto:AncestryDto) =
@@ -22,20 +22,20 @@ module AncestryDto =
             }
         else if eDto.cat = "SingleParent" then
             result {
-                let! gu = new Guid(eDto.value) |> OrgId.create
-                return Ancestry.SingleParent gu
+                let! gu = eDto.value |> GuidUtils.guidFromStringR
+                let! orgId = gu |> OrgId.create
+                return Ancestry.SingleParent orgId
             }
         else if eDto.cat = "SingleDistantParent" then
             result {
                 let! vals = eDto.value |> Json.deserialize<string[]>
-                let! gu = new Guid(vals.[0]) |> OrgId.create
+                let! gu = vals.[0] |> GuidUtils.guidFromStringR
+                let! orgId = gu |> OrgId.create
                 let! gen = (vals.[1]) |> int |> GenerationNumber.create ""
-                return Ancestry.SingleDistantParent (gu,gen)
+                return Ancestry.SingleDistantParent (orgId, gen)
             }
         else sprintf "cat: %s for AncestryDto not found"
                       eDto.cat |> Error
-
-
 
 type GenomeDto = {cat:string; value:string}
 module GenomeDto =
@@ -45,7 +45,7 @@ module GenomeDto =
          | Genome.Sorter sorterGenome -> 
                 {
                     GenomeDto.cat = "Sorter"; 
-                    value = "" // sorterGenome |> SorterGenomeDto.toDto |> Json.serialize 
+                    value = sorterGenome |> SorterGenomeDto.toDto |> Json.serialize 
                 }
 
     let fromDto (eDto:GenomeDto) =
@@ -55,7 +55,9 @@ module GenomeDto =
             }
         else if eDto.cat = "Sorter" then
             result {
-                return Genome.Sorter SorterGenome.Empty
+                let! sgDto = eDto.value |> Json.deserialize<SorterGenomeDto>
+                let! sg = sgDto |> SorterGenomeDto.fromDto
+                return Genome.Sorter sg
             }
         else sprintf "cat: %s for GenomeDto not found"
                       eDto.cat |> Error
@@ -69,8 +71,8 @@ module PhenotypeDto =
          | NoPhenotype -> {cat="NoPhenotype"; value = ""}
          | Phenotype.Sorter sorterPhenotype -> 
              {
-                 cat="Sorter"; 
-                 value = "" // sorterPhenotype |> SorterPhenotypeDto.toDto |> Json.serialize
+                 PhenotypeDto.cat="Sorter"; 
+                 value = sorterPhenotype |> SorterPhenotypeDto.toDto |> Json.serialize
              }
 
     let fromDto (eDto:PhenotypeDto) =
@@ -80,7 +82,8 @@ module PhenotypeDto =
             }
         else if eDto.cat = "Sorter" then
             result {
-                return Phenotype.Sorter SorterPhenotype.Empty
+                let! sp = eDto.value |> SorterPhenotypeDto.fromJson
+                return Phenotype.Sorter sp
             }
         else sprintf "cat: %s for PhenotypeDto not found"
                       eDto.cat |> Error
@@ -102,7 +105,8 @@ module OrgPerformanceDto =
                 OrgPerformance.NoPerformance |> Ok
         else if eDto.cat = "Sorter" then
             result {
-                return OrgPerformance.Sorter SorterTestResults.Empty
+                let! sorterTestResults = SorterTestResultsDto.fromJson eDto.value
+                return OrgPerformance.Sorter sorterTestResults
             }
         else sprintf "cat: %s for PhenotypeEvalDto not found"
                       eDto.cat |> Error
@@ -185,7 +189,6 @@ type OrgsDto =
     {
         id:Guid
         orgs:OrgDto[]
-        mapOfOrgAttributeMaps:Map<string, MapOfOrgAttributes<string>> option
     }
     
 module OrgsDto =
@@ -203,7 +206,6 @@ module OrgsDto =
                 return {
                     Orgs.id = OrgsId.fromGuid dto.id
                     orgMap = orgMap
-                    mapOfOrgAttributeMaps = dto.mapOfOrgAttributeMaps
                 }
             }
     
@@ -214,7 +216,5 @@ module OrgsDto =
                             |> Map.toArray
                             |> Array.map(fun tup-> snd tup)
                             |> Array.map(OrgDto.toDto)
-
-            OrgsDto.mapOfOrgAttributeMaps = None
         }
             

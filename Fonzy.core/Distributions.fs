@@ -155,8 +155,6 @@ module IntDist =
 
 
 
-
-
 type UniformLattice2dDistParams = {minX:int; maxX:int; minY:int; maxY:int}
 
 module UniformLattice2dDistParams = 

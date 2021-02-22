@@ -31,32 +31,6 @@ module Combinatorics =
     let conjugateIntArrays (a:array<int>) (conj:array<int>) =
         composeMapIntArrays conj (composeMapIntArrays a (inverseMapArray conj) )
 
-    // returns a sequence of draws from initialList without replacement. 
-    // Does not change initialList
-    let fisherYatesShuffle (rnd:IRando) (initialList:array<'a>) =
-        let rndmx max = rnd.NextUInt % max
-        let availableFlags = Array.init initialList.Length (fun i -> (i, true))
-        let nextItem nLeft =
-            let nItem = (rndmx nLeft)                     // Index out of available items
-            let index =                                   // Index in original deck
-                availableFlags                            // Go through available array
-                |> Seq.filter (fun (ndx,f) -> f)          // and pick out only the available tuples
-                |> Seq.item (int nItem)                   // Get the one at our chosen index
-                |> fst                                    // and retrieve it's index into the original array
-            availableFlags.[index] <- (index, false)      // Mark that index as unavailable
-            initialList.[index]                           // and return the original item
-        seq {(initialList.Length) .. -1 .. 1}             // Going from the length of the list down to 1
-        |> Seq.map (fun i -> nextItem (uint32 i))         // yield the next item
-
-
-    let randomPermutation (rnd:IRando) (degree:int) =
-         (fisherYatesShuffle rnd)  [|0 .. degree-1|] |> Seq.toArray
-
-
-    let randomPermutations (rnd:IRando) (degree:int) =
-         Seq.initInfinite (fun n -> randomPermutation rnd degree)
-
-
     let isSorted (values:int[]) =
         let mutable i=1
         let mutable looP = true
@@ -128,6 +102,37 @@ module Combinatorics =
             elif (i = bDex) then aDex
             else i)
 
+    let makeAllMonoTwoCycles (degree:Degree) =
+        seq {for i = 0 to (Degree.value(degree) - 1) do
+                for j = 0 to i - 1 do
+                    yield makeMonoTwoCycle degree i j}
+
+
+    // bins is an increasing set of positive numbers.
+    // returns the index of the first member e>value.
+    let findBin (bins:float[]) (value:float) =
+        bins |> Array.findIndex(fun b -> b>value)
+
+
+    let makeBins (weights:float[]) =
+        let mutable tot = 0.0
+        let cumo w =
+            tot<-tot + w
+            tot
+        weights |> Array.map(fun w -> cumo w)
+        
+
+
+    let makeHull (seqX:seq<'a>) (seqY:seq<'a>) (x:int) (y:int) =
+        let xa = seqX |> Seq.take(x) |> Seq.toArray
+        let ya = seqY |> Seq.take(y) |> Seq.toArray
+        seq {for i = 0 to x - 1 do yield (xa.[i], ya.[y-1])}
+            |> Seq.append (seq {for i = 0 to y - 2 do yield (xa.[x-1], ya.[i])})
+
+
+
+
+
 
     let drawTwoWithoutRep (degree:Degree) (rnd:IRando) =
         let aBit = rnd.NextPositiveInt % Degree.value(degree)
@@ -143,10 +148,38 @@ module Combinatorics =
         makeMonoTwoCycle degree (fst tup) (snd tup)
 
 
-    let makeAllMonoTwoCycles (degree:Degree) =
-        seq {for i = 0 to (Degree.value(degree) - 1) do
-                for j = 0 to i - 1 do
-                    yield makeMonoTwoCycle degree i j}
+    let drawFromWeightedDistribution (fitnessFunc:'a->SorterFitness) (rnd:IRando) (items:'a[]) =
+        let bins = items |> Array.map(fun it-> (SorterFitness.value (fitnessFunc it)))
+                         |> makeBins
+        let maxVal = bins.[bins.Length - 1]
+        Seq.initInfinite(fun _-> items.[findBin bins (rnd.NextFloat * maxVal)])
+
+
+
+    // returns a sequence of draws from initialList without replacement. 
+    // Does not change initialList
+    let fisherYatesShuffle (rnd:IRando) (initialList:array<'a>) =
+        let rndmx max = rnd.NextUInt % max
+        let availableFlags = Array.init initialList.Length (fun i -> (i, true))
+        let nextItem nLeft =
+            let nItem = (rndmx nLeft)                     // Index out of available items
+            let index =                                   // Index in original deck
+                availableFlags                            // Go through available array
+                |> Seq.filter (fun (ndx,f) -> f)          // and pick out only the available tuples
+                |> Seq.item (int nItem)                   // Get the one at our chosen index
+                |> fst                                    // and retrieve it's index into the original array
+            availableFlags.[index] <- (index, false)      // Mark that index as unavailable
+            initialList.[index]                           // and return the original item
+        seq {(initialList.Length) .. -1 .. 1}             // Going from the length of the list down to 1
+        |> Seq.map (fun i -> nextItem (uint32 i))         // yield the next item
+
+
+    let randomPermutation (rnd:IRando) (degree:int) =
+         (fisherYatesShuffle rnd)  [|0 .. degree-1|] |> Seq.toArray
+
+
+    let randomPermutations (rnd:IRando) (degree:int) =
+         Seq.initInfinite (fun n -> randomPermutation rnd degree)
 
 
     let makeRandomTwoCycleIntArray (rnd:IRando) (arraysize:int) (cycleCount:int) =
@@ -167,29 +200,3 @@ module Combinatorics =
         seq {1 .. count} |> Seq.map (fun i -> makeRandomFullTwoCycleIntArray rnd arraysize)
 
 
-    // bins is an increasing set of positive numbers.
-    // returns the index of the first member e>value.
-    let findBin (bins:float[]) (value:float) =
-        bins |> Array.findIndex(fun b -> b>value)
-
-
-    let makeBins (weights:float[]) =
-        let mutable tot = 0.0
-        let cumo w =
-            tot<-tot + w
-            tot
-        weights |> Array.map(fun w -> cumo w)
-        
-
-    let drawFromWeightedDistribution (fitnessFunc:'a->SorterFitness) (rnd:IRando) (items:'a[]) =
-        let bins = items |> Array.map(fun it-> (SorterFitness.value (fitnessFunc it)))
-                         |> makeBins
-        let maxVal = bins.[bins.Length - 1]
-        Seq.initInfinite(fun _-> items.[findBin bins (rnd.NextFloat * maxVal)])
-
-
-    let makeHull (seqX:seq<'a>) (seqY:seq<'a>) (x:int) (y:int) =
-        let xa = seqX |> Seq.take(x) |> Seq.toArray
-        let ya = seqY |> Seq.take(y) |> Seq.toArray
-        seq {for i = 0 to x - 1 do yield (xa.[i], ya.[y-1])}
-            |> Seq.append (seq {for i = 0 to y - 2 do yield (xa.[x-1], ya.[i])})

@@ -6,9 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="CommonTypesDto.fs" />
-    <Compile Include="RandoDto.fs" />
+    <Compile Include="RngGenDto.fs" />
+    <Compile Include="CombinatoricsTypesDto.fs" />
     <Compile Include="DistributionsDto.fs" />
+    <Compile Include="SortingTypesDto.fs" />
+    <Compile Include="GaTypesDto.fs" />
+    <Compile Include="SortingGaTypesDto.fs" />
     <Compile Include="SorterPartsDto.fs" />
     <Compile Include="SorterGaDto.fs" />
     <Compile Include="GridLocationDto.fs" />

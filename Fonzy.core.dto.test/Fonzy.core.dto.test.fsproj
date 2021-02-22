@@ -8,11 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="MathDataDtoFixture.fs" />
-    <Compile Include="CommonTypesDtoFixture.fs" />
+    <Compile Include="CombinatoricsTypesDtoFixture.fs" />
     <Compile Include="RngGenDtoFixture.fs" />
+    <Compile Include="CommonTypesDtoFixture.fs" />
+    <Compile Include="DistributionsDtoFixture.fs" />
+    <Compile Include="SorterGenomeDtoFixture.fs" />
     <Compile Include="OrgsDtoFixture.fs" />
-    <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

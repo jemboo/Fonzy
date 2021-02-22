@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="Result.fs" />
     <Compile Include="Utils.fs" />
+    <Compile Include="FileUtils.fs" />
     <Compile Include="ConstrainedType.fs" />
     <Compile Include="CommonTypes.fs" />
     <Compile Include="MrTypes.fs" />

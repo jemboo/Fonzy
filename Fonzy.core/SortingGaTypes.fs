@@ -2,11 +2,8 @@
 namespace global
 open System
 
-// Ga.Sorter
-type SorterFitness = private SorterFitness of float
-type SorterMutationType = | Switch of MutationRate 
-                          | Stage of MutationRate
 
+type SorterFitness = private SorterFitness of float
 
 module SorterFitness =
     let value (SorterFitness v) = v
@@ -22,6 +19,9 @@ module SorterFitness =
             return! create "" (gv:?>float)
         }
 
+type SorterMutationType = 
+    | Switch of MutationRate 
+    | Stage of MutationRate
 
 module SorterMutationType =
     let StrF (mt:SorterMutationType) =

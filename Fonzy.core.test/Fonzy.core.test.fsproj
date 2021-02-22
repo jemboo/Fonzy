@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <Compile Include="UtilsFixture.fs" />
-    <Compile Include="CommonTypesFixture.fs" />
+    <Compile Include="FileUtilsFixture.fs" />
     <Compile Include="RandoFixture.fs" />
     <Compile Include="CombinatoricsFixture.fs" />
     <Compile Include="CombinatoricsTypesFixture.fs" />
@@ -17,7 +17,6 @@
     <Compile Include="SorterGaOpsFixture.fs" />
     <Compile Include="OrgsFixture.fs" />
     <Compile Include="MapOfOrgAttributesFixture.fs" />
-    <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

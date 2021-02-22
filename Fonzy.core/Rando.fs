@@ -146,7 +146,6 @@ module Rando =
         let spr = normalDistRandomPair meanX stdDevZ meanY 0.0 rnd
         (int (fst fpr), int (snd fpr), int (fst spr))
 
-
     let normalDistRandomSeq mean stdDev (rnd:IRando) = 
         let rec polarBoxMullerDist () = seq {
                 let rec getRands () =
@@ -165,40 +164,4 @@ module Rando =
                 yield mean + (x * stdDev); yield mean + (y * stdDev); yield! polarBoxMullerDist()
             }
         polarBoxMullerDist ()
-
-
-module RandoCollections =
-
-    let IndexedRandomData (rngGen:RngGen) (f:IRando->'a) = 
-      let rando = Rando.fromSeed rngGen.rngType (RandomSeed.value rngGen.seed)
-      Seq.initInfinite(fun i ->  (i, (f rando)) )
-
-
-    let IndexedRandomData2 (rngGen:RngGen) (rngGen2:RngGen option) 
-                           (f:IRando->IRando option->'a) = 
-        let rando = Rando.fromSeed rngGen.rngType (RandomSeed.value rngGen.seed)
-        match rngGen2 with
-        | Some rg -> let rando2 = Rando.fromSeed rngGen.rngType (RandomSeed.value rngGen.seed)
-                     Seq.initInfinite(fun i ->  (i, (f rando (Some rando2))) )
-        | None -> Seq.initInfinite(fun i ->  (i, (f rando None)) )
-
-
-    let IndexedSeedGen (rngGen:RngGen) =
-        IndexedRandomData
-          rngGen
-          (fun rando -> {
-              RngGen.rngType=rngGen.rngType; 
-              RngGen.seed = RandomSeed.fromInt rando.NextPositiveInt })
-
-
-    let IndexedGuidGen2 (rngGen:RngGen) (rngGen2:RngGen option) = 
-        IndexedRandomData2 
-            rngGen rngGen2
-            (fun rando rando2 -> Rando.NextGuid rando rando2)
-
-
-    let IndexedGuidGen (rngGen:RngGen) = 
-        IndexedRandomData
-            rngGen
-            (fun rando -> Rando.NextGuid rando None)
 

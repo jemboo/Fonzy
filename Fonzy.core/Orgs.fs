@@ -103,18 +103,15 @@ type Orgs =
     {
         id:OrgsId;
         orgMap:Map<OrgId, Org>;
-        mapOfOrgAttributeMaps: Map<string, MapOfOrgAttributes<string>> option
     }
 
 
 module Orgs =
-    let create (id:Guid) (orgs: Org[]) 
-               (mapOfOrgAttributeMaps: Map<string, MapOfOrgAttributes<string>> option) =
+    let create (id:Guid) (orgs: Org[]) =
         {
             Orgs.id = OrgsId.fromGuid id;
             orgMap = orgs |> Array.map(fun o-> (o.orgId, o))
                           |> Map.ofArray
-            mapOfOrgAttributeMaps = mapOfOrgAttributeMaps
         }
 
     let getMembers (orgs:Orgs) =
