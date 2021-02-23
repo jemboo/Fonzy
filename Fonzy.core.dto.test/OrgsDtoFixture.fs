@@ -23,37 +23,53 @@ type OrgsDtoFixture () =
         Assert.AreEqual(ancestryDp, ancestryBackDp);
 
     [<TestMethod>]
-    member this.EnviroDto () =
-        //let env = Enviro.A 1
-        //let envDto = EnviroDto.toDto env
-        //let envJson = Json.serialize envDto
-        //let envDtoBack = Json.deserialize<EnviroDto> envJson 
-        //                 |> Result.ExtractOrThrow
-        //let envBack = EnviroDto.fromDto envDtoBack
-        //                 |> Result.ExtractOrThrow
-
-        //Assert.AreEqual(env, envBack);
-        Assert.IsTrue(true);
-        
-
-    [<TestMethod>]
-    member this.EnviromentDto () =
-        //let spe = SorterPoolEnviro.Bag 5
-        //let env = Enviro.S spe
-        //let envDto = env |> EnviroDto.toDto
-        //let envJson = Json.serialize envDto
-        //let envDtoBack = Json.deserialize<EnviroDto> envJson |> Result.ExtractOrThrow
-        //let envBack = envDtoBack |> EnviroDto.fromDto |> Result.ExtractOrThrow
-        //Assert.AreEqual(env, envBack);
-        Assert.IsTrue(true);
+    member this.OrgGenomeDto() =
+        let swSorterGenome = SorterGenome.Switches TestData.SorterGa.switchList
+        let genome = Genome.Sorter swSorterGenome
+        let genomeDto = GenomeDto.toDto genome
+        let genomeBack = GenomeDto.fromDto genomeDto
+                                  |> Result.ExtractOrThrow
+        Assert.AreEqual(genome, genomeBack);
 
 
     [<TestMethod>]
-    member this.SorterPoolEnviroDto () =
-        //let spe = SorterPoolEnviro.Bag 5
-        //let speDto = spe |> SorterPoolEnviroDto.toDto
-        //let speJson = Json.serialize speDto
-        //let speDtoBack = Json.deserialize<SorterPoolEnviroDto> speJson |> Result.ExtractOrThrow
-        //let speBack = speDtoBack |> SorterPoolEnviroDto.fromDto |> Result.ExtractOrThrow
-        //Assert.AreEqual(spe,speBack);
-        Assert.IsTrue(true);
+    member this.OrgPhenotypeDto() =
+        let phenoMulti = SorterPhenotype.Multiple TestData.SorterGa.sorterList
+        let phenotype = Phenotype.Sorter phenoMulti
+        let dto = PhenotypeDto.toDto phenotype
+        let cereal = Json.serialize dto
+        let dtoBack = Json.deserialize<PhenotypeDto> cereal 
+                        |> Result.ExtractOrThrow
+        Assert.AreEqual(dto, dtoBack);
+        let phenotypeBack = PhenotypeDto.fromDto dtoBack
+                                |> Result.ExtractOrThrow
+        Assert.AreEqual(phenotype, phenotypeBack);
+
+
+    [<TestMethod>]
+    member this.OrgTestResultsDto() =
+        let testRestultMultiple = SorterTestResults.Multiple 
+                                    TestData.SorterGa.arrayOfSwitchUseArrays
+        let orgPerformance = OrgPerformance.Sorter testRestultMultiple
+        let dto = OrgPerformanceDto.toDto orgPerformance
+        let cereal = Json.serialize dto
+        let dtoBack = Json.deserialize<OrgPerformanceDto> cereal 
+                        |> Result.ExtractOrThrow
+        Assert.AreEqual(dto, dtoBack);
+        let orgPerformanceBack = OrgPerformanceDto.fromDto dtoBack
+                                        |> Result.ExtractOrThrow
+        Assert.AreEqual(orgPerformance, orgPerformanceBack);
+
+
+    [<TestMethod>]
+    member this.OrgPhenotypeEvalDto() =
+        let phenotypeEvalMultiple = SorterPhenotypeEval.Multiple [1.0; 2.0; 3.0;]
+        let phenotypeEval = PhenotypeEval.Sorter phenotypeEvalMultiple
+        let dto = PhenotypeEvalDto.toDto phenotypeEval
+        let cereal = Json.serialize dto
+        let dtoBack = Json.deserialize<PhenotypeEvalDto> cereal 
+                        |> Result.ExtractOrThrow
+        Assert.AreEqual(dto, dtoBack);
+        let phenotypeEvalBack = PhenotypeEvalDto.fromDto dtoBack
+                                        |> Result.ExtractOrThrow
+        Assert.AreEqual(phenotypeEval, phenotypeEvalBack);

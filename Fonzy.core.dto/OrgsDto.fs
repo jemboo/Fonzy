@@ -66,6 +66,7 @@ module GenomeDto =
 
 type PhenotypeDto = {cat:string; value:string}
 module PhenotypeDto =
+
     let toDto (phenotype:Phenotype) =
          match phenotype with
          | NoPhenotype -> {cat="NoPhenotype"; value = ""}
@@ -97,7 +98,7 @@ module OrgPerformanceDto =
          | OrgPerformance.Sorter sorterTestResults -> 
              {
                  OrgPerformanceDto.cat = "Sorter";
-                 value = ""
+                 value = sorterTestResults |> SorterTestResultsDto.toDto |> Json.serialize
              }
 
     let fromDto (eDto:OrgPerformanceDto) =
@@ -120,7 +121,7 @@ module PhenotypeEvalDto =
          | Sorter sorterPhenotypeEval -> 
              {
                  cat="Sorter"; 
-                 value = "" //sorterPhenotypeEval |> SorterPhenotypeEvalDto.
+                 value = sorterPhenotypeEval |> SorterPhenotypeEvalDto.toDto |> Json.serialize
              }
 
     let fromDto (eDto:PhenotypeEvalDto) =
@@ -130,8 +131,8 @@ module PhenotypeEvalDto =
             }
         else if eDto.cat = "Sorter" then
             result {
-                let floaterVal = (eDto.value) |> float
-                return PhenotypeEval.Sorter SorterPhenotypeEval.Empty
+                let! spe = eDto.value |> SorterPhenotypeEvalDto.fromJson
+                return PhenotypeEval.Sorter spe
             }
         else sprintf "cat: %s for PhenotypeEvalDto not found"
                       eDto.cat |> Error

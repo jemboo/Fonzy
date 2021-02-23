@@ -24,7 +24,7 @@
     <Compile Include="SorterGa.fs" />
     <Compile Include="SorterGaOps.fs" />
     <Compile Include="Orgs.fs" />
-    <Compile Include="ParamSets.fs" />
+    <Compile Include="TestData.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

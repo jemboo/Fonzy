@@ -13,5 +13,5 @@ type SorterTestResults =
     | Multiple of List<SwitchUses>
 
 type SorterPhenotypeEval = 
-    | Empty
-    | B of int
+    | Singleton of float
+    | Multiple of List<float>

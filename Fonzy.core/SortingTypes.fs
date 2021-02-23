@@ -29,8 +29,8 @@ module SortableCount =
         ConstrainedType.createInt fieldName SortableCount 0 100000000 v
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let repStr v = match v with
-                          |Some r -> sprintf "%d" (value r)
-                          |None -> ""
+                          | Some r -> sprintf "%d" (value r)
+                          | None -> ""
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
             let! gv = ResultMap.read key m

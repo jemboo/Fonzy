@@ -33,7 +33,7 @@ module SorterDto =
 
 
 
-type SwitchUsesDto = private {switchCount:int; weights:int[]}
+type SwitchUsesDto = {switchCount:int; weights:int[]}
 module SwitchUsesDto =
     let fromDto (dto:SwitchUsesDto) =
         result {
@@ -49,7 +49,7 @@ module SwitchUsesDto =
 
     let toDto (switchUses:SwitchUses) =
         {SwitchUsesDto.switchCount= (SwitchUses.switchCount switchUses); 
-         weights= (SwitchUses.getWeights switchUses)}
+         weights = (SwitchUses.getWeights switchUses)}
 
     let toJson (switchUses:SwitchUses) =
         switchUses |> toDto |> Json.serialize

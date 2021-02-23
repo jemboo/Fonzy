@@ -76,7 +76,7 @@ module SorterPhenotypeDto =
             }
         | SorterPhenotype.Multiple sList ->
             {
-                SorterPhenotypeDto.cat = ""; 
+                SorterPhenotypeDto.cat = "Multiple"; 
                 value = sList |> List.toArray 
                               |> Array.map(SorterDto.toJson)
                               |> Json.serialize
@@ -111,13 +111,50 @@ module SorterTestResultsDto =
         match sorterPhenotype with
         | SorterTestResults.Singleton s ->
             {
-                SorterPhenotypeDto.cat = "Singleton"; 
+                SorterTestResultsDto.cat = "Singleton";
                 value = s |> SwitchUsesDto.toDto |> Json.serialize
             }
         | SorterTestResults.Multiple sList ->
             {
-                SorterPhenotypeDto.cat = ""; 
+                SorterTestResultsDto.cat = "Multiple";
                 value = sList |> List.toArray 
                               |> Array.map(SwitchUsesDto.toJson)
+                              |> Json.serialize
+            }
+
+
+
+type SorterPhenotypeEvalDto = {cat:string; value:string}
+module SorterPhenotypeEvalDto =
+    let fromDto (dto:SorterPhenotypeEvalDto) =
+        if dto.cat = "Singleton" then
+            result {
+                let eval = float dto.value
+                return SorterPhenotypeEval.Singleton eval
+            }
+        else if dto.cat = "Multiple" then
+            result {
+                let! b = Json.deserialize<float[]> dto.value
+                return SorterPhenotypeEval.Multiple (b |> Array.toList)
+            }
+        else sprintf "cat: %s for SorterTestResultsDto not found"
+                        dto.cat |> Error
+    let fromJson (cereal:string) =
+            result {
+                let! dto = Json.deserialize<SorterPhenotypeEvalDto> cereal
+                return! fromDto dto
+            }
+
+    let toDto (sorterPhenotype:SorterPhenotypeEval) =
+        match sorterPhenotype with
+        | SorterPhenotypeEval.Singleton s ->
+            {
+                SorterPhenotypeEvalDto.cat = "Singleton";
+                value = s.ToString()
+            }
+        | SorterPhenotypeEval.Multiple sList ->
+            {
+                SorterPhenotypeEvalDto.cat = "Multiple";
+                value = sList |> List.toArray 
                               |> Json.serialize
             }
