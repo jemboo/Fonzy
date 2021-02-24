@@ -2,13 +2,14 @@
 open System
 
 
-type CauseSpecDto = {id:Guid; genus:string[]; prams:Map<string,string>; keyMap:Map<string,string>}
+
+
+type CauseSpecDto = {id:Guid; genus:string[]; prams:Map<string,string>;}
 module CauseSpecDto =
     let toDto (cs:CauseSpec) =
         {CauseSpecDto.id = cs.id;
          CauseSpecDto.genus = cs.genus|> List.toArray;
-         CauseSpecDto.prams = cs.prams;
-         CauseSpecDto.keyMap = cs.keyMap}
+         CauseSpecDto.prams = cs.prams;}
 
     let toJson (cs:CauseSpec) =
         cs |> toDto |> Json.serialize
@@ -17,7 +18,6 @@ module CauseSpecDto =
             {CauseSpec.id = csDto.id;
              CauseSpec.genus = csDto.genus |> Array.toList;
              CauseSpec.prams = csDto.prams;
-             CauseSpec.keyMap = csDto.keyMap
             } |> Ok
 
     let fromJson (js:string) =

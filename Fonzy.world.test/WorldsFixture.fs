@@ -24,5 +24,5 @@ type WorldFixture () =
 
 
     [<TestMethod>]
-    member this.TestMethodPassing () =
+    member this.RunWorldGen () =
         Assert.IsTrue(true);

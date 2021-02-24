@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <Compile Include="EnvirosDto.fs" />
-    <Compile Include="CausesDto.fs" />
+    <Compile Include="CauseSpecsDto.fs" />
     <Compile Include="WorldsDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
