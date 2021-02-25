@@ -231,7 +231,9 @@ module Sorter =
         create degree switches
 
 
-    let private createWithRandomSwitches (degree:Degree) (switchCount:SwitchCount) (rnd:IRando) =
+    let private createWithRandomSwitches (degree:Degree) 
+                                         (switchCount:SwitchCount) 
+                                         (rnd:IRando) =
         let switches = Switch.randomSwitchesOfDegree degree rnd
                     |> Seq.take (SwitchCount.value switchCount)
                     |> Seq.toArray
@@ -239,19 +241,15 @@ module Sorter =
 
 
     let createRandom (degree:Degree) (sorterLength:SorterLength) 
-                     (switchFreq:SwitchFrequency option) (rnd:IRando) =
-        let swf = match switchFreq with
-                        | Some f -> f
-                        | None -> SwitchFrequency.fromFloat 1.0
-
+                     (switchFreq:SwitchFrequency) (rnd:IRando) =
         match sorterLength with
         | SorterLength.Switch wc -> createWithRandomSwitches degree wc rnd
-        | SorterLength.Stage  tc -> createWithRandomStages degree tc swf rnd
+        | SorterLength.Stage  tc -> createWithRandomStages degree tc switchFreq rnd
 
 
     let createRandomArray (degree:Degree) (sorterLength:SorterLength) 
-                          (switchFreq:SwitchFrequency option) (rnd:IRando) 
-                          (sorterCount:SorterCount) =
+                          (switchFreq:SwitchFrequency) (sorterCount:SorterCount) 
+                          (rnd:IRando) =
         (seq {1 .. (SorterCount.value sorterCount)} 
                 |> Seq.map(fun _ -> (createRandom degree sorterLength switchFreq rnd))
                 |> Seq.toArray)
@@ -261,7 +259,8 @@ module Sorter =
         {
             Sorter.degree = sorter.degree;
             Sorter.switchCount = sorter.switchCount;
-            switches = (Switch.mutateSwitches sorter.degree mutationRate rnd sorter.switches) |> Seq.toArray
+            switches = (Switch.mutateSwitches sorter.degree mutationRate rnd sorter.switches) 
+                        |> Seq.toArray
         }
 
     let mutateByStage (mutationRate:MutationRate) (rnd:IRando) (sorter:Sorter) =
@@ -287,12 +286,13 @@ module SorterSet =
         let sorterArray = sorters |> Seq.toArray
         {
             degree=degree; 
-            sorterCount= (SorterCount.create "" sorterArray.Length) |> Result.ExtractOrThrow; 
+            sorterCount= SorterCount.fromInt sorterArray.Length; 
             sorters = sorterArray
         }
 
 
-    let createRandom (degree:Degree) (sorterLength:SorterLength) (switchFreq:SwitchFrequency option)
+    let createRandom (degree:Degree) (sorterLength:SorterLength) 
+                     (switchFreq:SwitchFrequency)
                      (sorterCount:SorterCount) (rnd:IRando) =
         fromSorters degree 
             (seq {1 .. (SorterCount.value sorterCount)} 
@@ -304,7 +304,8 @@ type SwitchUses = private {switchCount:SwitchCount; weights:int[]}
 module SwitchUses =
 
     let createEmpty (switchCount:SwitchCount) =
-        {switchCount=switchCount; weights=Array.init (SwitchCount.value switchCount) (fun i -> 0)}
+        {switchCount=switchCount; 
+         weights=Array.init (SwitchCount.value switchCount) (fun i -> 0)}
 
     let create (switchCount:SwitchCount) (weights:int[]) =
         if  (SwitchCount.value switchCount) = weights.Length then
@@ -322,7 +323,7 @@ module SwitchUses =
         else
             let weightsSum = Array.map2 (+) (getWeights trackerA) (getWeights trackerB) 
             {
-                switchCount = (SwitchCount.create "" weightsSum.Length) |> Result.ExtractOrThrow
+                switchCount = SwitchCount.fromInt weightsSum.Length
                 weights = weightsSum;
             } |> Ok
 

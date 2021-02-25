@@ -19,12 +19,19 @@ module GuidUtils =
                         pc3.[0]; pc3.[1]; pc3.[2]; pc3.[3]; } |> Seq.toArray
         new System.Guid(woof)
 
-
     let addGuids (g1:Guid) (g2:Guid) =
         let pcs1 = g1.ToByteArray()
         let pcs2 = g2.ToByteArray()
         let pcsS = Array.init 16 (fun i-> pcs1.[i] + pcs2.[i])
         new System.Guid(pcsS)
+
+
+    let addGuidsO (g1:Guid option) (g2:Guid option) =
+        match g1,g2 with
+        | Some v1, Some v2 -> addGuids v1 v2
+        | None, Some v2 -> v2
+        | Some v1, None -> v1
+        | None, None -> Guid.Empty
 
 
     let guidFromObjs (objs:seq<obj>) =

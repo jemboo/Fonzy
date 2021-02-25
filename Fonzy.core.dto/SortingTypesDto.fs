@@ -22,3 +22,9 @@ module SorterLengthDto =
         result {
             return! parseCat dto.wOrT dto.value
         }
+
+    let fromJson (cereal:string) =
+        result {
+            let! dto = cereal |> Json.deserialize<SorterLengthDto>
+            return! dto |> fromDto
+        }

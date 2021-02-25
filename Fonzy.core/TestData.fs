@@ -9,7 +9,7 @@ module TestData =
         let degree = Degree.fromInt 8
         let permutationsCount = 10
         let sorterLength = SorterLength.degreeToRecordStageCount degree
-        let sorter = Sorter.createRandom degree sorterLength None iRando
+        let sorter = Sorter.createRandom degree sorterLength SwitchFrequency.max iRando
         let sorterCount = SorterCount.fromInt 10
         let switchCount = SwitchCount.fromInt 10
         let switchUsesListLength = 5
@@ -37,6 +37,6 @@ module TestData =
 
         let sorterList =
             let _sorterF (rando:IRando) = 
-                Sorter.createRandom degree sorterLength None rando
+                Sorter.createRandom degree sorterLength SwitchFrequency.max rando
             List.init (SorterCount.value sorterCount)
                                    (fun _ -> _sorterF iRando)

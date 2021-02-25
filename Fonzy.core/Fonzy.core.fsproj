@@ -20,7 +20,6 @@
     <Compile Include="Combinatorics.fs" />
     <Compile Include="CombinatoricsTypes.fs" />
     <Compile Include="SorterParts.fs" />
-    <Compile Include="MapOfOrgAttributes.fs" />
     <Compile Include="SorterGa.fs" />
     <Compile Include="SorterGaOps.fs" />
     <Compile Include="Orgs.fs" />

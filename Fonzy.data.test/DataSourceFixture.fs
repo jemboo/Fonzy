@@ -18,7 +18,7 @@ type DataSourceFixture () =
 
 
     member this.setupWorld1() =
-        let world1 = World.create None 
+        let world1 = World.create (Guid.NewGuid())
                          ((Causes.fromCauseSpec CauseSpecSorters.testCauseSpec1)
                             |> Result.ExtractOrThrow)
                          Enviro.Empty
@@ -30,7 +30,7 @@ type DataSourceFixture () =
 
 
     member this.setupWorld2() =
-        let world2 = World.create None 
+        let world2 = World.create (Guid.NewGuid())
                             ((Causes.fromCauseSpec CauseSpecSorters.testCauseSpec2)
                             |> Result.ExtractOrThrow)
                             Enviro.Empty
@@ -42,7 +42,7 @@ type DataSourceFixture () =
 
 
     member this.setupWorld3() =
-        let world3 = World.create None
+        let world3 = World.create (Guid.NewGuid())
                          ((Causes.fromCauseSpec CauseSpecSorters.testCauseSpec3)
                          |> Result.ExtractOrThrow)
                          Enviro.Empty
@@ -92,7 +92,7 @@ type DataSourceFixture () =
         let ids = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow
         Assert.AreEqual(ids.Length, 2)
 
-        let world3 = World.create None
+        let world3 = World.create (Guid.NewGuid())
                          ((Causes.fromCauseSpec CauseSpecSorters.testCauseSpec3)
                          |> Result.ExtractOrThrow)
                          Enviro.Empty

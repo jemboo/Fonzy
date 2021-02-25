@@ -53,6 +53,7 @@ module SwitchFrequency =
     let create fieldName v = 
         ConstrainedType.createFloat fieldName SwitchFrequency 0.0 1.0 v
     let fromFloat v = create "" v |> Result.ExtractOrThrow
+    let max = fromFloat 1.0
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
             let! gv = ResultMap.read key m

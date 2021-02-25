@@ -3,7 +3,7 @@ open System
 
 
 
-type WorldDto = {id:Guid; parentId:Guid option; causeSpecDto:CauseSpecDto; 
+type WorldDto = {id:Guid; parentId:Guid; causeSpecDto:CauseSpecDto; 
                  enviroDto:EnviroDto}
 module WorldDto = 
     let toDto (w:World) =

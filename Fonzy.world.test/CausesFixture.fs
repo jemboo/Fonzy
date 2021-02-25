@@ -20,7 +20,7 @@ type CausesFixture () =
 
 
     [<TestMethod>]
-    member this.CauseFromCauseSpecLatticeLoc2dArrayRandGen () =
+    member this.CauseFromCauseSpecInt2dArrayRandGen () =
         let cause = Causes.fromCauseSpec TestData.Causes.csLl2dGen 
                                 |> Result.ExtractOrThrow
         let env = Enviro.Empty
@@ -28,5 +28,5 @@ type CausesFixture () =
         let generated = newEnv |> Enviro.toMap 
                                |> ResultMap.read TestData.Causes.genArrayName 
                                |> Result.ExtractOrThrow
-        let intDist = generated |> Lattice2dDistDto.fromJson |> Result.ExtractOrThrow
+        let intDist = generated |> Int2dDistDto.fromJson |> Result.ExtractOrThrow
         Assert.AreEqual(intDist.vals.Length, TestData.Causes.arrayCount)

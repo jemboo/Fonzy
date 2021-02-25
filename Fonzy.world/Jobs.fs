@@ -16,7 +16,7 @@ module Job =
     let getParentId (job:Job) = 
         match job with
         | GetWorld w -> w.parentId
-        | MakeWorld wa -> Some wa.parentWorld.id
+        | MakeWorld wa -> wa.parentWorld.id
 
     let getCause (job:Job) = 
         match job with
