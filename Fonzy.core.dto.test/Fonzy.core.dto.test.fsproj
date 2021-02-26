@@ -12,6 +12,7 @@
     <Compile Include="RngGenDtoFixture.fs" />
     <Compile Include="CommonTypesDtoFixture.fs" />
     <Compile Include="DistributionsDtoFixture.fs" />
+    <Compile Include="SorterPartsDtoFixture.fs" />
     <Compile Include="SorterGaDtoFixture.fs" />
     <Compile Include="OrgsDtoFixture.fs" />
     <Compile Include="Program.fs" />

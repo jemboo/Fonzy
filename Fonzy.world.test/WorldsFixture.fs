@@ -32,6 +32,6 @@ type WorldFixture () =
 
     [<TestMethod>]
     member this.worldActionGenSorterDist() =
-        let worldAction = TestData.WorldActions.worldActionRandGenSorters
+        let worldAction = TestData.WorldActions.worldActionRandGenSorters1
         let res = WorldAction.createWorld worldAction |> Result.ExtractOrThrow
-        Assert.AreEqual(res.id, TestData.WorldActions.causeSpecIntDist.id);
+        Assert.AreEqual(res.id, TestData.WorldActions.causeSpecRndSorters1.id);

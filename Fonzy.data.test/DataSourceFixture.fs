@@ -17,46 +17,41 @@ type DataSourceFixture () =
         |> ignore
 
 
-    member this.setupWorld1() =
-        let world1 = World.create (Guid.NewGuid())
-                         ((Causes.fromCauseSpec CauseSpecSorters.testCauseSpec1)
-                            |> Result.ExtractOrThrow)
-                         Enviro.Empty
+    member this.world1 =
+        World.createFromParent 
+                World.empty
+                (TestData.WorldActions.causeSpecRndSorters1
+                    |> Causes.fromCauseSpec
+                    |> Result.ExtractOrThrow)
+        |> Result.ExtractOrThrow
 
+    member this.world2 =
+        World.createFromParent 
+                World.empty
+                (TestData.WorldActions.causeSpecRndSorters2
+                    |> Causes.fromCauseSpec
+                    |> Result.ExtractOrThrow)
+        |> Result.ExtractOrThrow
+
+    member this.world3 =
+        World.createFromParent 
+                World.empty
+                (TestData.WorldActions.causeSpecRndSorters3
+                    |> Causes.fromCauseSpec
+                    |> Result.ExtractOrThrow)
+        |> Result.ExtractOrThrow
+
+    member this.setupDataStore(d:DataStoreItem) =
         this.makeTestDirectory() |> ignore
-        use sw = new StreamWriter(this.fullPath(string world1.id))
-        fprintfn sw "%s" (world1 |> DataStoreItemDto.storeWorld |> Json.serialize)
-        sw.Dispose()
-
-
-    member this.setupWorld2() =
-        let world2 = World.create (Guid.NewGuid())
-                            ((Causes.fromCauseSpec CauseSpecSorters.testCauseSpec2)
-                            |> Result.ExtractOrThrow)
-                            Enviro.Empty
-
-        this.makeTestDirectory() |> ignore
-        use sw = new StreamWriter(this.fullPath(string world2.id))
-        fprintfn sw "%s" (world2 |> DataStoreItemDto.storeWorld |> Json.serialize)
-        sw.Dispose()
-
-
-    member this.setupWorld3() =
-        let world3 = World.create (Guid.NewGuid())
-                         ((Causes.fromCauseSpec CauseSpecSorters.testCauseSpec3)
-                         |> Result.ExtractOrThrow)
-                         Enviro.Empty
-
-        this.makeTestDirectory() |> ignore
-        use sw = new StreamWriter(this.fullPath((string world3.id)))
-        fprintfn sw "%s" (world3 |> DataStoreItemDto.storeWorld |> Json.serialize)
+        use sw = new StreamWriter(this.fullPath(d |> DataStoreItem.getId |> string))
+        fprintfn sw "%s" (d |> DataStoreItemDto.toJson)
         sw.Dispose()
 
 
     member this.setupAllWorlds() =
-        this.setupWorld1()
-        this.setupWorld2()
-        this.setupWorld3()
+        this.setupDataStore (DataStoreItem.WorldDto (this.world1 |> WorldDto.toDto))
+        this.setupDataStore (DataStoreItem.WorldDto (this.world2 |> WorldDto.toDto))
+        this.setupDataStore (DataStoreItem.WorldDto (this.world3 |> WorldDto.toDto))
 
 
     member this.tearDownDataSource() =
@@ -68,11 +63,11 @@ type DataSourceFixture () =
 
     [<TestMethod>]
     member this.DirectoryDataSource_GetDs() =
-        this.setupAllWorlds() |> ignore
+        this.setupAllWorlds()
         let dirDs = new DirectoryDataSource(this.testDir) :> IDataSource
-        let ds = dirDs.GetDataSource(CauseSpecSorters.testCauseSpec1Id) |> Result.ExtractOrThrow
+        let ds = dirDs.GetDataSource(this.world1.id) |> Result.ExtractOrThrow
         this.tearDownDataSource() 
-        Assert.IsTrue(true);
+        Assert.AreEqual(ds |> DataStoreItem.getId, this.world1.id);
 
 
     [<TestMethod>]
@@ -86,17 +81,13 @@ type DataSourceFixture () =
 
     [<TestMethod>]
     member this.DirectoryDataSource_AddNewDataStoreItem() =
-        this.setupWorld1() |> ignore
-        this.setupWorld2() |> ignore
+        this.setupDataStore (DataStoreItem.WorldDto (this.world1 |> WorldDto.toDto))
+        this.setupDataStore (DataStoreItem.WorldDto (this.world2 |> WorldDto.toDto))
         let dirDs = new DirectoryDataSource(this.testDir) :> IDataSource
         let ids = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow
         Assert.AreEqual(ids.Length, 2)
 
-        let world3 = World.create (Guid.NewGuid())
-                         ((Causes.fromCauseSpec CauseSpecSorters.testCauseSpec3)
-                         |> Result.ExtractOrThrow)
-                         Enviro.Empty
-        dirDs.AddNewDataStoreItem (world3 |> WorldDto.toDto |> DataStoreItem.WorldDto) 
+        dirDs.AddNewDataStoreItem (this.world3 |> WorldDto.toDto |> DataStoreItem.WorldDto) 
                                           |> Result.ExtractOrThrow 
                                           |> ignore
        

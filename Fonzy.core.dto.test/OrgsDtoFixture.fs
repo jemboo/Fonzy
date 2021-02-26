@@ -24,7 +24,7 @@ type OrgsDtoFixture () =
 
     [<TestMethod>]
     member this.OrgGenomeDto() =
-        let swSorterGenome = SorterGenome.Switches TestData.SorterGa.switchList
+        let swSorterGenome = SorterGenome.Switches TestData.SorterParts.switchList
         let genome = Genome.Sorter swSorterGenome
         let genomeDto = GenomeDto.toDto genome
         let genomeBack = GenomeDto.fromDto genomeDto
@@ -49,7 +49,7 @@ type OrgsDtoFixture () =
     [<TestMethod>]
     member this.OrgTestResultsDto() =
         let testRestultMultiple = SorterTestResults.Multiple 
-                                    TestData.SorterGa.arrayOfSwitchUseArrays
+                                    TestData.SorterGa.listOfSwitchUses
         let orgPerformance = OrgPerformance.Sorter testRestultMultiple
         let dto = OrgPerformanceDto.toDto orgPerformance
         let cereal = Json.serialize dto
@@ -99,11 +99,11 @@ type OrgsDtoFixture () =
     member this.OrgDto_Sorter() =
         let orgId = OrgId.fromGuid (Guid.NewGuid())
         let ancestry = Ancestry.SingleParent orgId
-        let genome = Genome.Sorter (SorterGenome.Switches TestData.SorterGa.switchList)
+        let genome = Genome.Sorter (SorterGenome.Switches TestData.SorterParts.switchList)
         let generation = GenerationNumber.fromInt 0
         let phenotype = Phenotype.Sorter (SorterPhenotype.Multiple TestData.SorterGa.sorterList)
         let orgPerformance = OrgPerformance.Sorter (SorterTestResults.Multiple 
-                                                        TestData.SorterGa.arrayOfSwitchUseArrays)
+                                                        TestData.SorterGa.listOfSwitchUses)
         let phenotypeEval = PhenotypeEval.Sorter (SorterPhenotypeEval.Multiple [1.0; 2.0; 3.0;])
         let org = Org.create orgId ancestry genome generation 
                              phenotype orgPerformance phenotypeEval

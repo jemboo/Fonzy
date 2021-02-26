@@ -17,7 +17,7 @@ type SorterGaDtoFixture () =
 
     [<TestMethod>]
     member this.SorterGenomeDto_Switch() =
-        let swSorterGenome = SorterGenome.Switches TestData.SorterGa.switchList
+        let swSorterGenome = SorterGenome.Switches TestData.SorterParts.switchList
         let swSgDto = SorterGenomeDto.toDto swSorterGenome
         let swSorterGenomeBack = SorterGenomeDto.fromDto swSgDto
                                   |> Result.ExtractOrThrow
@@ -26,7 +26,8 @@ type SorterGaDtoFixture () =
 
     [<TestMethod>]
     member this.SorterPhenotypeDto_Single() =
-        let phenoSingle = SorterPhenotype.Singleton TestData.SorterGa.sorter
+        let phenoSingle = SorterPhenotype.Singleton 
+                            (TestData.SorterParts.makeSorter())
         let dto = SorterPhenotypeDto.toDto phenoSingle
         let cereal = Json.serialize dto
         let dtoBack = Json.deserialize<SorterPhenotypeDto> cereal 
@@ -52,8 +53,8 @@ type SorterGaDtoFixture () =
 
     [<TestMethod>]
     member this.SorterTestResultsDto_Single() =
-        let switchUses = SwitchUses.create TestData.SorterGa.switchCount 
-                                           TestData.SorterGa.switchUseArray
+        let switchUses = SwitchUses.create TestData.SorterParts.switchCount 
+                                           TestData.SorterParts.switchUseArray
                             |> Result.ExtractOrThrow
         let testRestultSingle = SorterTestResults.Singleton switchUses
         let dto = SorterTestResultsDto.toDto testRestultSingle
@@ -69,7 +70,7 @@ type SorterGaDtoFixture () =
     [<TestMethod>]
     member this.SorterTestResultsDto_Multiple() =
         let testRestultMultiple = SorterTestResults.Multiple 
-                                    TestData.SorterGa.arrayOfSwitchUseArrays
+                                    TestData.SorterGa.listOfSwitchUses
         let dto = SorterTestResultsDto.toDto testRestultMultiple
         let cereal = Json.serialize dto
         let dtoBack = Json.deserialize<SorterTestResultsDto> cereal 

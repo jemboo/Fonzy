@@ -300,7 +300,7 @@ module SorterSet =
                     |> Seq.toArray)
  
 
-type SwitchUses = private {switchCount:SwitchCount; weights:int[]}
+type SwitchUses = {switchCount:SwitchCount; weights:int[]}
 module SwitchUses =
 
     let createEmpty (switchCount:SwitchCount) =

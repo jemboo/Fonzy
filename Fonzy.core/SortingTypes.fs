@@ -143,14 +143,16 @@ module SorterLength =
     let degreeTo999SwitchCount (degree:Degree) =
         let d = (Degree.value degree)
         let ct = match d with
-                    | 10 -> 800
-                    | 12 -> 1000
-                    | 14 -> 1200
-                    | 16 -> 1600
-                    | 18 -> 2000
-                    | 20 -> 2200
-                    | 22 -> 2600
-                    | 24 -> 3000
+                    | 6 |7 -> 600
+                    | 8 |9 -> 700
+                    | 10 |11 -> 800
+                    | 12 |13 -> 1000
+                    | 14 |15 -> 1200
+                    | 16 |17 -> 1600
+                    | 18 |19 -> 2000
+                    | 20 |21 -> 2200
+                    | 22 |23 -> 2600
+                    | 24 |25 -> 3000
                     | _ -> 0
         let wc = SwitchCount.create "" ct |> Result.ExtractOrThrow
         SorterLength.Switch wc
@@ -159,34 +161,16 @@ module SorterLength =
         let d = (Degree.value degree)
         let ct = match d with
                     | 4 ->  3
-                    | 5 ->  5
-                    | 6 ->  5
-                    | 7 ->  6
-                    | 8 ->  6
-                    | 9 ->  7
-                    | 10 -> 7
-                    | 11 -> 8
-                    | 12 -> 8
-                    | 13 -> 9
-                    | 14 -> 9
-                    | 15 -> 9
-                    | 16 -> 9
+                    | 5 | 6 ->  5
+                    | 7 | 8 ->  6
+                    | 9 | 10 -> 7
+                    | 11 | 12 -> 8
+                    | 13 | 14 | 15 | 16 -> 9
                     | 17 -> 10
-                    | 18 -> 11
-                    | 19 -> 11
-                    | 20 -> 11
-                    | 21 -> 12
-                    | 22 -> 12
-                    | 23 -> 12
-                    | 24 -> 12
-                    | 25 -> 13
-                    | 26 -> 13
-                    | 27 -> 14
-                    | 28 -> 14
-                    | 29 -> 14
-                    | 30 -> 14
-                    | 31 -> 14
-                    | 32 -> 14
+                    | 18 | 19 | 20 -> 11
+                    | 21 | 22 | 23 | 24 -> 12
+                    | 25 | 26 -> 13
+                    | 27 | 28 | 29 | 30 | 31 | 32 -> 14
                     | _ -> 0
         let tc = StageCount.create "" ct |> Result.ExtractOrThrow
         SorterLength.Stage tc
@@ -194,14 +178,15 @@ module SorterLength =
     let degreeTo999StageCount (degree:Degree) =
         let d = (Degree.value degree)
         let ct = match d with
-                    | 10 -> 160
-                    | 12 -> 160
-                    | 14 -> 160
-                    | 16 -> 200
-                    | 18 -> 200
-                    | 20 -> 200
-                    | 22 -> 220
-                    | 24 -> 220
+                    | 8 | 9 -> 140
+                    | 10 | 11 -> 160
+                    | 12 | 13 -> 160
+                    | 14 | 15 -> 160
+                    | 16 | 17 -> 200
+                    | 18 | 19 -> 200
+                    | 20 | 21 -> 200
+                    | 22 | 23 -> 220
+                    | 24 | 25 -> 220
                     | _ -> 0
         let tc = StageCount.create "" ct |> Result.ExtractOrThrow
         SorterLength.Stage tc

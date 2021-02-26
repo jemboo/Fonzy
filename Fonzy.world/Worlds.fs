@@ -13,7 +13,7 @@ module World =
         enviroment=Enviro.Empty}
 
 
-    let create(parentId:Guid) (cause:Cause) (enviroment:Enviro) =
+    let create (parentId:Guid) (cause:Cause) (enviroment:Enviro) =
           let worldId = GuidUtils.addGuids parentId cause.causeSpec.id
           {id=worldId; parentId=parentId; cause=cause; enviroment=enviroment}
 

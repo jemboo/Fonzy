@@ -6,7 +6,13 @@ open System.Collections.Generic
 [<TestClass>]
 type UtilsFixture () =
 
-// GuidUtils
+    [<TestMethod>]
+    member this.sandbox() =
+        let g1 = true |> string
+        let db = g1 |> bool.Parse
+        let g2 = false |> string
+        let dd = g2 |> bool.Parse
+        Assert.IsTrue(true)
 
     [<TestMethod>]
     member this.addGuid() =
