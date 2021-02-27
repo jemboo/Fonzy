@@ -1,8 +1,7 @@
 ﻿namespace global
 open System
 
-
-type World = {id:Guid; parentId:Guid; cause:Cause; enviroment:Enviro}
+type World = {id:Guid; parentId:Guid; cause:Cause; enviro:Enviro}
 
 module World = 
     let emptyWorldId = Guid.Parse "00000000-0000-0000-0000-000000000000"
@@ -10,17 +9,17 @@ module World =
         {id=emptyWorldId; 
         parentId=Guid.Empty; 
         cause= (CauseSpec.noOpCauseSpec |> Causes.fromCauseSpec |> Result.ExtractOrThrow); 
-        enviroment=Enviro.Empty}
+        enviro=Enviro.Empty}
 
 
     let create (parentId:Guid) (cause:Cause) (enviroment:Enviro) =
           let worldId = GuidUtils.addGuids parentId cause.causeSpec.id
-          {id=worldId; parentId=parentId; cause=cause; enviroment=enviroment}
+          {id=worldId; parentId=parentId; cause=cause; enviro=enviroment}
 
 
     let createFromParent (parentWorld:World) (cause:Cause) =
         result {
-            let! newEnv = cause.op parentWorld.enviroment
+            let! newEnv = cause.op parentWorld.enviro
             return create (parentWorld.id) cause newEnv
         }
      
@@ -40,5 +39,8 @@ module WorldAction =
         World.createFromParent 
             worldAction.parentWorld 
             worldAction.cause
+
+
+
 
 

@@ -1,6 +1,5 @@
 namespace Fonzy.world.test
 
-open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 open System.IO
 
@@ -20,7 +19,7 @@ type DataSourceFixture () =
     member this.world1 =
         World.createFromParent 
                 World.empty
-                (TestData.WorldActions.causeSpecRndSorters1
+                (TestData.CauseSpec.Sorter.rand1
                     |> Causes.fromCauseSpec
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
@@ -28,7 +27,7 @@ type DataSourceFixture () =
     member this.world2 =
         World.createFromParent 
                 World.empty
-                (TestData.WorldActions.causeSpecRndSorters2
+                (TestData.CauseSpec.Sorter.rand2
                     |> Causes.fromCauseSpec
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
@@ -36,7 +35,7 @@ type DataSourceFixture () =
     member this.world3 =
         World.createFromParent 
                 World.empty
-                (TestData.WorldActions.causeSpecRndSorters3
+                (TestData.CauseSpec.Sorter.rand3
                     |> Causes.fromCauseSpec
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
@@ -99,5 +98,35 @@ type DataSourceFixture () =
         
     [<TestMethod>]
     member this.DirectoryDataSource_TurnWorldActionIntoWorld() =
+        this.makeTestDirectory() |> ignore
+        let dirDs = new DirectoryDataSource(this.testDir) :> IDataSource
+        let worldAction = TestData.WorldAction.SorterGen.rand1 
+        let worldActionDto = worldAction |> WorldActionDto.toDto
+        let dataStoreItem  = worldActionDto |> DataStoreItem.WorldActionDto
+        dirDs.AddNewDataStoreItem dataStoreItem
+                                          |> Result.ExtractOrThrow 
+                                          |> ignore
+        let ids = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow  
+        Assert.AreEqual(ids.Length, 1)
+        let dataStoreItemBack = dirDs.GetDataSource ids.[0]
+                                        |> Result.ExtractOrThrow
+        let worldActionDto = dataStoreItemBack 
+                                        |> DataStoreItem.getWorldActionDto
+                                        |> Result.ExtractOrThrow
 
-        Assert.AreEqual(3, 3)
+        let worldActionBack = worldActionDto
+                                        |> WorldActionDto.fromDto
+                                        |> Result.ExtractOrThrow
+        
+        Assert.AreEqual(worldAction.cause.causeSpec.id, 
+                        worldActionBack.cause.causeSpec.id)
+        let dataStoreWorldDto = WorldAction.createWorld worldActionBack 
+                                    |> Result.ExtractOrThrow
+                                    |> WorldDto.toDto
+                                    |> DataStoreItem.WorldDto
+        dirDs.AddNewDataStoreItem dataStoreWorldDto
+                                    |> Result.ExtractOrThrow
+                                    |> ignore
+        let ids = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow
+        this.tearDownDataSource()
+        Assert.AreEqual(ids.Length, 1)

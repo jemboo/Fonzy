@@ -76,70 +76,70 @@ module CauseSpecSorters =
                      ("switchFreq", switchFreq |> SwitchFrequency.value |> string);
                      ("sorterCount", sorterCount |> SorterCount.value |> string);
                      ("rngGen", rndGen |> RngGenDto.toJson);
-                     ("outName", outName)
+                     ("sorters", outName)
                      ] |> Map.ofList
         {CauseSpec.id = id; genus=["Sorters"; "rndGen"]; prams=prams;}
 
 
 module CauseSpec = 
-    let lookupKeyedInt<'a> (key:string) 
-                           (cs:CauseSpec) : Result<int, string> =
-        match cs.prams.TryFind key with
-        | Some value -> 
-          try
-            (value |> int) |> Ok
-          with
-          | :? InvalidCastException ->
-            sprintf "value: %s could not be cast to int" value |> Error
+    //let lookupKeyedInt<'a> (key:string) 
+    //                       (cs:CauseSpec) : Result<int, string> =
+    //    match cs.prams.TryFind key with
+    //    | Some value -> 
+    //      try
+    //        (value |> int) |> Ok
+    //      with
+    //      | :? InvalidCastException ->
+    //        sprintf "value: %s could not be cast to int" value |> Error
     
-        | None -> sprintf "key not found: %s" key|> Error
+    //    | None -> sprintf "key not found: %s" key|> Error
 
-    let lookupKeyedFloat<'a> (key:string) 
-                             (cs:CauseSpec) : Result<float, string> =
-        match cs.prams.TryFind key with
-        | Some value -> 
-          try
-            (value |> float) |> Ok
-          with
-          | :? InvalidCastException ->
-            sprintf "value: %s could not be cast to float" value |> Error
+    //let lookupKeyedFloat<'a> (key:string) 
+    //                         (cs:CauseSpec) : Result<float, string> =
+    //    match cs.prams.TryFind key with
+    //    | Some value -> 
+    //      try
+    //        (value |> float) |> Ok
+    //      with
+    //      | :? InvalidCastException ->
+    //        sprintf "value: %s could not be cast to float" value |> Error
 
-        | None -> sprintf "key not found: %s" key|> Error
-
-
-    let lookupKeyedBool<'a> (key:string) 
-                            (cs:CauseSpec) : Result<bool, string> =
-        match cs.prams.TryFind key with
-        | Some value -> 
-          try
-            (value |> bool.Parse) |> Ok
-          with
-          | :? InvalidCastException ->
-            sprintf "value: %s could not be cast to bool" value |> Error
-
-        | None -> sprintf "key not found: %s" key|> Error
+    //    | None -> sprintf "key not found: %s" key|> Error
 
 
-    let procKeyedInt<'a> (key:string) (proc:int->Result<'a,string>) 
-                         (cs:CauseSpec) : Result<'a, string> =
-        result {
-            let! iv = lookupKeyedInt key cs
-            return! proc iv
-        }
+    //let lookupKeyedBool<'a> (key:string) 
+    //                        (cs:CauseSpec) : Result<bool, string> =
+    //    match cs.prams.TryFind key with
+    //    | Some value -> 
+    //      try
+    //        (value |> bool.Parse) |> Ok
+    //      with
+    //      | :? InvalidCastException ->
+    //        sprintf "value: %s could not be cast to bool" value |> Error
 
-    let procKeyedFloat<'a> (key:string) (proc:float->Result<'a,string>) 
-                           (cs:CauseSpec) : Result<'a, string> =
-        result {
-            let! iv = lookupKeyedFloat key cs
-            return! proc iv
-        }
+    //    | None -> sprintf "key not found: %s" key|> Error
 
-    let procKeyedJson<'a> (key:string) (proc:string->Result<'a,string>) 
-                         (cs:CauseSpec) : Result<'a, string> =
-        result {
-            let! cereal = ResultMap.read key cs.prams
-            return! proc cereal
-        }
+
+    //let procKeyedInt<'a> (key:string) (proc:int->Result<'a,string>) 
+    //                     (cs:CauseSpec) : Result<'a, string> =
+    //    result {
+    //        let! iv = lookupKeyedInt key cs
+    //        return! proc iv
+    //    }
+
+    //let procKeyedFloat<'a> (key:string) (proc:float->Result<'a,string>) 
+    //                       (cs:CauseSpec) : Result<'a, string> =
+    //    result {
+    //        let! iv = lookupKeyedFloat key cs
+    //        return! proc iv
+    //    }
+
+    //let procKeyedJson<'a> (key:string) (proc:string->Result<'a,string>) 
+    //                     (cs:CauseSpec) : Result<'a, string> =
+    //    result {
+    //        let! cereal = ResultMap.read key cs.prams
+    //        return! proc cereal
+    //    }
 
     let noOpCauseSpecId = Guid.Parse "00000000-0000-0000-0000-000000000000"
     let noOpCauseSpec = { CauseSpec.id = noOpCauseSpecId; 

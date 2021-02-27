@@ -33,4 +33,6 @@ type DirectoryDataSource(dirPath:string) =
 
         member this.AddNewDataStoreItem (dsi:DataStoreItem) =
             let fp = dsi |> DataStoreItem.getId |> this.GuidToFilePath
-            FileUtils.writeFile fp (dsi |> Json.serialize) false
+            let cereal = dsi |> DataStoreItemDto.toDto 
+                             |> Json.serialize
+            FileUtils.writeFile fp cereal false

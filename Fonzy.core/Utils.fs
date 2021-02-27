@@ -227,6 +227,69 @@ module ResultMap =
             | None -> m |> Map.add key vl |> Ok
 
 
+    let lookupKeyedInt<'a> (key:string) 
+                           (cs:Map<string, string>) : Result<int, string> =
+        match cs.TryFind key with
+        | Some value -> 
+          try
+            (value |> int) |> Ok
+          with
+          | :? InvalidCastException ->
+            sprintf "value: %s could not be cast to int" value |> Error
+
+        | None -> sprintf "key not found: %s" key|> Error
+
+    let lookupKeyedFloat<'a> (key:string) 
+                             (cs:Map<string, string>) : Result<float, string> =
+        match cs.TryFind key with
+        | Some value -> 
+          try
+            (value |> float) |> Ok
+          with
+          | :? InvalidCastException ->
+            sprintf "value: %s could not be cast to float" value |> Error
+
+        | None -> sprintf "key not found: %s" key|> Error
+
+
+    let lookupKeyedBool<'a> (key:string) 
+                            (cs:Map<string, string>) : Result<bool, string> =
+        match cs.TryFind key with
+        | Some value -> 
+          try
+            (value |> bool.Parse) |> Ok
+          with
+          | :? InvalidCastException ->
+            sprintf "value: %s could not be cast to bool" value |> Error
+
+        | None -> sprintf "key not found: %s" key|> Error
+
+
+    let procKeyedInt<'a> (key:string) (proc:int->Result<'a,string>) 
+                         (cs:Map<string, string>) : Result<'a, string> =
+        result {
+            let! iv = lookupKeyedInt key cs
+            return! proc iv
+        }
+
+    let procKeyedFloat<'a> (key:string) (proc:float->Result<'a,string>) 
+                           (cs:Map<string, string>) : Result<'a, string> =
+        result {
+            let! iv = lookupKeyedFloat key cs
+            return! proc iv
+        }
+
+    let procKeyedJson<'a> (key:string) (proc:string->Result<'a,string>) 
+                          (cs:Map<string, string>) : Result<'a, string> =
+        result {
+            let! cereal = read key cs
+            return! proc cereal
+        }
+
+
+
+
+
 module StringUtils =
 
     let printIntArray (d:int[]) =

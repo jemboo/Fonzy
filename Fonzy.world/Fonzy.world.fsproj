@@ -10,6 +10,7 @@
     <Compile Include="CauseSpecs.fs" />
     <Compile Include="Causes.fs" />
     <Compile Include="Worlds.fs" />
+    <Compile Include="WorldMerges.fs" />
     <Compile Include="Jobs.fs" />
     <Compile Include="TestData.fs" />
     <Compile Include="Program.fs" />

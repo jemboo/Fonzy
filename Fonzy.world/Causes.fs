@@ -8,15 +8,15 @@ module CauseSorters =
     let rndGen (causeSpec:CauseSpec) =
         let causer = fun (e:Enviro) ->
             result {
-                let! degree = causeSpec |> CauseSpec.procKeyedInt "degree" 
+                let! degree = causeSpec.prams |> ResultMap.procKeyedInt "degree" 
                                                          (fun d -> Degree.create "" d)
-                let! sorterLength = causeSpec |> CauseSpec.procKeyedJson "sorterLength" 
+                let! sorterLength = causeSpec.prams |> ResultMap.procKeyedJson "sorterLength" 
                                                           (SorterLengthDto.fromJson)
-                let! switchFreq = causeSpec |> CauseSpec.procKeyedFloat "switchFreq" 
+                let! switchFreq = causeSpec.prams |> ResultMap.procKeyedFloat "switchFreq" 
                                                           (fun d -> SwitchFrequency.create "" d)
-                let! sorterCount = causeSpec |> CauseSpec.procKeyedInt "sorterCount" 
+                let! sorterCount = causeSpec.prams |> ResultMap.procKeyedInt "sorterCount" 
                                                           (fun d -> SorterCount.create "" d)
-                let! rngGen = causeSpec |> CauseSpec.procKeyedJson "rngGen" 
+                let! rngGen = causeSpec.prams |> ResultMap.procKeyedJson "rngGen" 
                                                           (RngGenDto.fromJson)
                 let! outName = ResultMap.read "outName" causeSpec.prams
 
@@ -42,11 +42,11 @@ module CauseRandGen =
     let intArray (causeSpec:CauseSpec) = 
         let causer = fun (e:Enviro) ->
             result {
-                let! count = causeSpec |> CauseSpec.lookupKeyedInt "count"
-                let! rngGen = causeSpec |> CauseSpec.procKeyedJson "rngGen" 
+                let! count = causeSpec.prams |> ResultMap.lookupKeyedInt "count"
+                let! rngGen = causeSpec.prams |> ResultMap.procKeyedJson "rngGen" 
                                                           (RngGenDto.fromJson)
-                let! intDistType = causeSpec |> CauseSpec.procKeyedJson "intDistType" 
-                                                    (IntDistTypeDto.fromJson)
+                let! intDistType = causeSpec.prams |> ResultMap.procKeyedJson "intDistType" 
+                                                      (IntDistTypeDto.fromJson)
                 let! outName = ResultMap.read "outName" causeSpec.prams
 
                 let intDist = IntDist.makeRandom intDistType 

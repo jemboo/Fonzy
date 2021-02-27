@@ -10,7 +10,7 @@ module WorldDto =
         {WorldDto.id = w.id;
          WorldDto.parentId = w.parentId;
          WorldDto.causeSpecDto = w.cause.causeSpec |> CauseSpecDto.toDto;
-         WorldDto.enviroDto = w.enviroment |> EnviroDto.toDto}
+         WorldDto.enviroDto = w.enviro |> EnviroDto.toDto}
 
     let toJson (w:World) =
         w |> toDto |> Json.serialize
@@ -24,7 +24,7 @@ module WorldDto =
                  World.id = wDto.id;
                  World.parentId = wDto.parentId
                  World.cause = c
-                 World.enviroment = e
+                 World.enviro = e
                 } 
             }
 
