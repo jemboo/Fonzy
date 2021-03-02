@@ -25,15 +25,41 @@ module Enviro =
                      let! mN = m |> ResultMap.add key (dto|>Json.serialize)
                      return Enviro.ObjectMap mN
                  }
-         | MergeSet s -> failwith "not supported"
+         | MergeSet _ -> "MergeSet not supported" |> Error
 
 
-    let replaceKvpToEnviro (key:string) (dto) (e:Enviro) =
+    let addRootDtoToEnviro<'T> (e:Enviro) (key:string) (dto:'T) 
+                               (metadata:Map<string,string>)  =
+         let cereal = RootDto.toJson<'T> dto metadata
          match e with
-         | Empty -> (Enviro.ObjectMap ([(key, dto|>Json.serialize)] 
+         | Empty -> (Enviro.ObjectMap ([(key, cereal)] 
                         |> Map.ofList)) |> Ok
          | ObjectMap m -> result {
-                     let mN = m |> Map.add key (dto|>Json.serialize)
+                     let! mN = m |> ResultMap.add key cereal
                      return Enviro.ObjectMap mN
                  }
-         | MergeSet s -> failwith "not supported"
+         | MergeSet _ -> "MergeSet not supported" |> Error
+
+
+    let getDtoAndMetaFromEnviro<'T> (e:Enviro) (key:string) =
+         match e with
+         | Empty -> "Empty not supported" |> Error
+         | ObjectMap m -> result {
+                     let! mN = m |> ResultMap.read key
+                     let! ofT, meta = mN |> RootDto.extractFromJson<'T>
+                     return ofT, meta
+                 }
+         | MergeSet _ -> "MergeSet not supported" |> Error
+
+
+    let replaceKvpToEnviro (e:Enviro) (key:string) (dto) 
+                           (metadata:Map<string,string>)  =
+         let cereal = RootDto.toJson dto metadata
+         match e with
+         | Empty -> (Enviro.ObjectMap ([(key, cereal)] 
+                        |> Map.ofList)) |> Ok
+         | ObjectMap m -> result {
+                     let mN = m |> Map.add key cereal
+                     return Enviro.ObjectMap mN
+                 }
+         | MergeSet _ -> "MergeSet not supported" |> Error

@@ -9,6 +9,8 @@ type SorterPartsDtoFixture () =
     [<TestMethod>]
     member this.SwitchDto() =
         //let switch = Switch.
+        let t = typeof<SorterDto>
+        let s = t.ToString()
         Assert.AreEqual(1, 1);
 
 

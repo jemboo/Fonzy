@@ -32,6 +32,27 @@ module SorterDto =
         sorter |> toDto |> Json.serialize
 
 
+type SorterArrayDto = {sorterDtos:SorterDto[]}
+module SorterArrayDto =
+    let fromDto (dto:SorterArrayDto) =
+        result {
+            let! sorters = dto.sorterDtos |> Array.map(SorterDto.fromDto)
+                                          |> Array.toList
+                                          |> Result.sequence
+            return sorters
+        }
+    let fromJson (cereal:string) =
+        result {
+            let! sorterDto = cereal |> Json.deserialize<SorterArrayDto>
+            return! fromDto sorterDto
+        }
+    let toDto (sorters:Sorter[]) =
+        {
+            SorterArrayDto.sorterDtos = sorters |> Array.map(SorterDto.toDto)
+        }
+    let toJson (sorters:Sorter[]) =
+        sorters |> toDto |> Json.serialize
+
 
 type SwitchUsesDto = {switchCount:int; weights:int[]}
 module SwitchUsesDto =

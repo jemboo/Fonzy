@@ -33,10 +33,10 @@ module WorldDto =
             let! dto = Json.deserialize<WorldDto> js
             return! fromDto dto
         }
+                     
             
-            
-            
-type WorldActionDto = {childId:Guid; parentWorldDto:WorldDto; causeSpecDto:CauseSpecDto;}
+type WorldActionDto = {childId:Guid; parentWorldDto:WorldDto; 
+                       causeSpecDto:CauseSpecDto;}
 module WorldActionDto = 
     let toDto (w:WorldAction) =
         {
@@ -63,5 +63,37 @@ module WorldActionDto =
     let fromJson (js:string) =
         result {
             let! dto = Json.deserialize<WorldActionDto> js
+            return! fromDto dto
+        }
+
+type WorldMergeDto = {id:Guid; sourceNameMap: Map<string,Guid>; 
+                      mergeMapItems:MergeMapItem[]; enviroDto:EnviroDto}
+module WorldMergeDto = 
+    let toDto (w:WorldMerges) =
+        {
+          WorldMergeDto.id = w.id;
+          WorldMergeDto.sourceNameMap = w.sourceNameMap;
+          WorldMergeDto.mergeMapItems = w.mergeMapItems |> List.toArray
+          WorldMergeDto.enviroDto = w.enviro |> EnviroDto.toDto
+        }
+
+    let toJson (w:WorldMerges) =
+        w |> toDto |> Json.serialize
+
+    let fromDto (waDto:WorldMergeDto) =
+           result {
+             let mergeMapItems = waDto.mergeMapItems |> Array.toList
+             let! enviro = waDto.enviroDto |> EnviroDto.fromDto
+             return  {
+                         WorldMerges.id = waDto.id;
+                         WorldMerges.sourceNameMap = waDto.sourceNameMap;
+                         WorldMerges.mergeMapItems = mergeMapItems;
+                         WorldMerges.enviro = enviro
+                } 
+            }
+
+    let fromJson (js:string) =
+        result {
+            let! dto = Json.deserialize<WorldMergeDto> js
             return! fromDto dto
         }

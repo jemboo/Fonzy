@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Include="CausesFixture.fs" />
     <Compile Include="WorldsFixture.fs" />
+    <Compile Include="WorldMergesFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

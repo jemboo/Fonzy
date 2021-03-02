@@ -53,6 +53,51 @@ module TestData =
                             |> Result.ExtractOrThrow
             let rand1 = WorldAction.create World.empty cause1
 
+    module World = 
+    
+        let world1Id = Guid.Parse "00000000-0000-0000-0000-000000000881"
+        let world2Id = Guid.Parse "00000000-0000-0000-0000-000000000882"
+        let world1ParentId = Guid.Parse "00000000-0000-0000-0000-000000000771"
+        let world2ParentId = Guid.Parse "00000000-0000-0000-0000-000000000772"
+
+        let map1 = [("key11","val11"); ("key12","val12"); ("key13","val13"); ("key14","val14")]
+                   |> Map.ofList
+
+        let map2 = [("key21","val21"); ("key22","val22"); ("key23","val23"); ("key24","val24")]
+                   |> Map.ofList
+
+        let enviro1 = Enviro.ObjectMap map1
+        let enviro2 = Enviro.ObjectMap map2
+
+        let world1 = World.create world1ParentId Causes.noOp enviro1
+        let world2 = World.create world2ParentId Causes.noOp enviro2
+
+
+    module WorldMerge =
+        let world1Name = "world1"
+        let world2Name = "world2"
+        let mergedWorldId = Guid.Parse "00000000-0000-0000-0000-000000000991"
+
+        let sourceWorldsNameMap = [(world1Name, World.world1); 
+                                   (world2Name, World.world2);]
+                                            |> Map.ofList
+
+        let mm1 = {MergeMapItem.sourceMapName="world1"; 
+                   MergeMapItem.sourceMapKey="key11"; 
+                   outputKey="key11"}
+
+        let mm2 = {MergeMapItem.sourceMapName="world2"; 
+                   MergeMapItem.sourceMapKey="key22"; 
+                   outputKey="key22"}
+
+        let mapM = [("keyM1","valM1");] |> Map.ofList
+        let enviroM = Enviro.ObjectMap mapM
+        let mergeMapItems = [mm1;mm2]
+        
+
+
+
+
 
     //let getId (job:Job) = 
     //    match job with

@@ -8,7 +8,7 @@ module World =
     let empty = 
         {id=emptyWorldId; 
         parentId=Guid.Empty; 
-        cause= (CauseSpec.noOpCauseSpec |> Causes.fromCauseSpec |> Result.ExtractOrThrow); 
+        cause= Causes.noOp; 
         enviro=Enviro.Empty}
 
 

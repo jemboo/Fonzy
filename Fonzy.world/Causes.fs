@@ -18,15 +18,15 @@ module CauseSorters =
                                                           (fun d -> SorterCount.create "" d)
                 let! rngGen = causeSpec.prams |> ResultMap.procKeyedJson "rngGen" 
                                                           (RngGenDto.fromJson)
-                let! outName = ResultMap.read "outName" causeSpec.prams
+                let! outName = ResultMap.read "sorters" causeSpec.prams
 
                 let randy = Rando.fromRngGen rngGen
                 let sorterArray = Sorter.createRandomArray degree sorterLength
                                         switchFreq sorterCount randy
 
-                let cereal = sorterArray |> Array.map(fun s -> s |> SorterDto.toJson)
-                                         |> Json.serialize
-                return! Enviro.addKvpToEnviro outName cereal e
+                let sorterArrayDto = sorterArray |> SorterArrayDto.toDto
+                return! Enviro.addRootDtoToEnviro<SorterArrayDto>
+                                    e outName sorterArrayDto Map.empty
             }
         {Cause.causeSpec=causeSpec; op=causer}
 
@@ -52,8 +52,10 @@ module CauseRandGen =
                 let intDist = IntDist.makeRandom intDistType 
                                                  (rngGen |> Rando.fromRngGen) 
                                                  count
-                let dto = intDist |> IntDistDto.toDto
-                return! Enviro.addKvpToEnviro outName dto e
+
+                let intDistDto = intDist |> IntDistDto.toDto
+                return! Enviro.addRootDtoToEnviro<IntDistDto>
+                                    e outName intDistDto Map.empty
             }
         {Cause.causeSpec=causeSpec; op=causer} |> Ok
         
@@ -65,8 +67,9 @@ module CauseRandGen =
                 let! l2dDistType = causeSpec.prams.["lattice2dDistType"] |> Int2dDistTypeDto.fromJson
                 let outName = causeSpec.prams.["outName"]
                 let l2dDist = Int2dDist.makeRandom l2dDistType (rngGen |> Rando.fromRngGen) count
-                let dto = l2dDist |> Int2dDistDto.toDto
-                return! Enviro.addKvpToEnviro outName dto e
+                let int2dDistDto = l2dDist |> Int2dDistDto.toDto
+                return! Enviro.addRootDtoToEnviro<Int2dDistDto>
+                                    e outName int2dDistDto Map.empty
             }
         {Cause.causeSpec=causeSpec; op=causer} |> Ok
 

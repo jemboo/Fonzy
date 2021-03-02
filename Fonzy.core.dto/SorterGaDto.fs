@@ -123,7 +123,6 @@ module SorterTestResultsDto =
             }
 
 
-
 type SorterPhenotypeEvalDto = {cat:string; value:string}
 module SorterPhenotypeEvalDto =
     let fromDto (dto:SorterPhenotypeEvalDto) =

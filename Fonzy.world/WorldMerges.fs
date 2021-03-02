@@ -12,27 +12,38 @@ module MergeMapItem =
               sourceMapKey = "sortables"; 
               outputKey = "sortables"};]
 
-type WorldMerge = {id:Guid; parentIds: Map<string,Guid>; 
+type WorldMerges = {id:Guid; sourceNameMap: Map<string,Guid>; 
                    mergeMapItems:MergeMapItem list; enviro:Enviro}
-module WorldMerge = 
-    let procMergeMapItem (mergeMapItem:MergeMapItem) 
-                         (parentWorlds:Map<string,World>) 
-                         (mergedEnviro:Enviro) =
+module WorldMerges = 
+
+    let mergeWorlds (mergedWorldId:Guid) (sourceWorlds:Map<string,World>) 
+                    (mergeMapItems:MergeMapItem list) (mergedEnviro:Enviro) =
+
+        let procMergeMapItem (mergeMapItem:MergeMapItem) 
+                             (sourceWorlds:Map<string,World>) 
+                             (destMapR:Result<Map<string,string>, string>) =
+            result {
+                let! sourceWorld = ResultMap.read mergeMapItem.sourceMapName 
+                                                  sourceWorlds
+                let! sourceMap = sourceWorld.enviro |> Enviro.toMap
+                let! sourceItem = ResultMap.read mergeMapItem.sourceMapKey
+                                                 sourceMap
+                let! destMap = destMapR
+                let! destMapPlus = ResultMap.add mergeMapItem.outputKey 
+                                                 sourceItem
+                                                 destMap
+                return destMapPlus
+            }
+
         result {
-            let! sourceWorld = ResultMap.read mergeMapItem.sourceMapName 
-                                              parentWorlds
-            let! sourceMap = sourceWorld.enviro |> Enviro.toMap
-            let! sourceItem = ResultMap.read mergeMapItem.sourceMapKey
-                                             sourceMap
-            let! destMap = mergedEnviro |> Enviro.toMap
-            let! destMapPlus = ResultMap.add mergeMapItem.outputKey 
-                                             sourceItem
-                                             destMap
-            return destMapPlus
+            let destMapR = mergedEnviro |> Enviro.toMap
+            let! mergedMap = mergeMapItems |> List.fold(fun mmR mi -> 
+                               procMergeMapItem mi sourceWorlds mmR) destMapR
+            let sourceIds = sourceWorlds |> Map.toSeq
+                                         |> Seq.map(fun tup -> (fst tup, (snd tup).id))
+                                         |> Map.ofSeq
+            return {WorldMerges.id = mergedWorldId;
+                    sourceNameMap=sourceIds; 
+                    mergeMapItems= mergeMapItems;
+                    enviro = Enviro.ObjectMap mergedMap}
         }
-
-        
-
-    let mergeWorlds (mergedWorldId:Guid) (parentWorlds:Map<string,World>) 
-                    (mergeMapItems:MergeMapItem list) (mergedEnviro:Enviro) = 
-        None
