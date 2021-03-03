@@ -5,7 +5,6 @@ open System
 type InitialConditionCount = private InitialConditionCount of int
 type EnviroId = private EnviroId of Guid
 type GenerationNumber = private GenerationNumber of int
-type MutationRate = private MutationRate of float
 type EnviroUpdateParamsId = private EnviroUpdateParamsId of Guid
 type OrgId = private OrgId of Guid
 type OrgsId = private OrgsId of Guid
@@ -50,17 +49,6 @@ module GenerationNumber =
         result {
             let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
-        }
-
-module MutationRate =
-    let value (MutationRate v) = v
-    let create fieldName v =
-        ConstrainedType.createFloat fieldName MutationRate 0.0 1.0 v
-    let fromFloat v = create "" v |> Result.ExtractOrThrow
-    let fromKey (m:Map<'a, obj>) (key:'a) =
-        result {
-            let! gv = ResultMap.read key m
-            return! create "" (gv:?>float)
         }
 
 module OrgAttributeName =

@@ -86,14 +86,13 @@ type DataSourceFixture () =
         let ids = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow
         Assert.AreEqual(ids.Length, 2)
 
-        dirDs.AddNewDataStoreItem (this.world3 |> WorldDto.toDto |> DataStoreItem.WorldDto) 
-                                          |> Result.ExtractOrThrow 
-                                          |> ignore
-       
-        let ids = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow
+        let res = dirDs.AddNewDataStoreItem (
+                            this.world3 |> WorldDto.toDto |> DataStoreItem.WorldDto) 
+                        |> Result.ExtractOrThrow 
+        Assert.IsTrue(res.Length > 0)
+        let ids2 = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow 
         this.tearDownDataSource()
-        Assert.AreEqual(ids.Length, 3)
-
+        Assert.AreEqual(ids2.Length, 3)
 
         
     [<TestMethod>]

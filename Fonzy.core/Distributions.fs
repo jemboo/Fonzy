@@ -3,7 +3,6 @@ open Microsoft.FSharp.Core
 
 
 type Int2d = {x:int; y:int}
-
 module Int2d = 
     let add (xMax:int option) (yMax:int option) 
             (ll2d:Int2d) 
@@ -51,49 +50,48 @@ module Int2d =
         let yVals = seq {yMin..yMax} 
         seq {for x in xVals do for y in yVals -> {Int2d.x=x; y=y}}
 
-type LatticeLoc3d = {x:int; y:int; z:int}
-
-module LatticeLoc3d = 
+type Int3d = {x:int; y:int; z:int}
+module Int3d = 
     let add (xMax:int option) (yMax:int option) (zMax:int option) 
-            (ll3d:LatticeLoc3d) 
+            (ll3d:Int3d) 
             (dx:int) (dy:int) (dz:int) = 
         match xMax, yMax, zMax with
-        | Some xm, Some ym, Some zm -> {LatticeLoc3d.x = (ll3d.x + dx) % xm; 
+        | Some xm, Some ym, Some zm -> {Int3d.x = (ll3d.x + dx) % xm; 
                                         y = (ll3d.y + dy) % ym; 
                                         z = (ll3d.z + dz) % zm}
-        | Some xm, None, Some zm -> {LatticeLoc3d.x = (ll3d.x + dx) % xm; 
+        | Some xm, None, Some zm -> {Int3d.x = (ll3d.x + dx) % xm; 
                                         y = ll3d.y + dy; 
                                         z = (ll3d.z + dz) % zm}
-        | None, Some ym, Some zm -> {LatticeLoc3d.x = ll3d.x + dx; 
+        | None, Some ym, Some zm -> {Int3d.x = ll3d.x + dx; 
                                      y = (ll3d.y + dy) % ym; 
                                      z = (ll3d.z + dz) % zm}
-        | None, None, Some zm -> {LatticeLoc3d.x = ll3d.x + dx; 
+        | None, None, Some zm -> {Int3d.x = ll3d.x + dx; 
                                   y = ll3d.y + dy; 
                                   z = (ll3d.z + dz) % zm}
-        | Some xm, Some ym, None -> {LatticeLoc3d.x = (ll3d.x + dx) % xm; 
+        | Some xm, Some ym, None -> {Int3d.x = (ll3d.x + dx) % xm; 
                                   y = (ll3d.y + dy) % ym; 
                                   z = ll3d.z + dz}
-        | Some xm, None, None -> {LatticeLoc3d.x = (ll3d.x + dx) % xm; 
+        | Some xm, None, None -> {Int3d.x = (ll3d.x + dx) % xm; 
                                   y = ll3d.y + dy; 
                                   z = ll3d.z + dz}
-        | None, Some ym, None -> {LatticeLoc3d.x = ll3d.x + dx; 
+        | None, Some ym, None -> {Int3d.x = ll3d.x + dx; 
                                   y = (ll3d.y + dy) % ym; 
                                   z = ll3d.z + dz}
-        | None, None, None -> {LatticeLoc3d.x = ll3d.x + dx; 
+        | None, None, None -> {Int3d.x = ll3d.x + dx; 
                                y = ll3d.y + dy; 
                                z = ll3d.z + dz}
 
 
     let perturb (xMax:int option) (yMax:int option) (zMax:int option)
                 (perturber:IRando->int*int*int)
-                (ll3d:LatticeLoc3d) 
+                (ll3d:Int3d) 
                 (rando:IRando) = 
         let x,y,z = perturber rando
         add xMax yMax zMax ll3d x y z
 
     let makeUniformRandom (xMax:int) (yMax:int) (zMax:int)
                    (rando:IRando) = 
-        {LatticeLoc3d.x = int (rando.NextUInt % (uint32 xMax)); 
+        {Int3d.x = int (rando.NextUInt % (uint32 xMax)); 
                       y = int (rando.NextUInt % (uint32 yMax));
                       z = int (rando.NextUInt % (uint32 zMax))}
 
@@ -106,9 +104,7 @@ module LatticeLoc3d =
             seq {for x in xVals do 
                         for y in yVals do 
                             for z in zVals  -> 
-                                {LatticeLoc3d.x=x; y=y; z=z} }
-
-
+                                {Int3d.x=x; y=y; z=z} }
 
 type UniformIntegerDistParams = {min:int; max:int}
 module UniformIntegerDistParams =
@@ -133,13 +129,13 @@ module NormalIntegerDistParams =
             NormalIntegerDistParams.stdDev = stdev;
         }
 
+
 type IntDistType =
         | Uniform of UniformIntegerDistParams
         | Normal of NormalIntegerDistParams
 
 
 type IntDist = {intDistType:IntDistType; vals:int[]; }
-
 module IntDist = 
     let makeRandom (idt:IntDistType) (r:IRando) (count:int) =
         let ma dt =
@@ -154,9 +150,7 @@ module IntDist =
         {IntDist.intDistType=idt; vals = ma idt}
 
 
-
 type UniformInt2dDistParams = {minX:int; maxX:int; minY:int; maxY:int}
-
 module UniformInt2dDistParams = 
     let square (side:int) =
         {
@@ -181,10 +175,7 @@ type Int2dDistType =
     | Normal of NormalInt2dDistParams
 
 
-
-
 type Int2dDist = {lattice2dDistType:Int2dDistType; vals:Int2d[]; }
-
 module Int2dDist =
     let makeRandom (l2dt:Int2dDistType) (r:IRando) (count:int) =
         let ma dt =

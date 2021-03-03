@@ -32,25 +32,33 @@ module SorterDto =
         sorter |> toDto |> Json.serialize
 
 
-type SorterArrayDto = {sorterDtos:SorterDto[]}
-module SorterArrayDto =
-    let fromDto (dto:SorterArrayDto) =
+type SorterSetDto = {degree:int; sorterDtos:SorterDto[]}
+module SorterSetDto =
+    let fromDto (dto:SorterSetDto) =
         result {
+            let! degree = dto.degree |> Degree.create ""
             let! sorters = dto.sorterDtos |> Array.map(SorterDto.fromDto)
                                           |> Array.toList
                                           |> Result.sequence
-            return sorters
+            let! sorterCount = sorters.Length |> SorterCount.create ""
+            return {
+                  SorterSet.degree=degree;
+                  SorterSet.sorterCount = sorterCount; 
+                  SorterSet.sorters=sorters |> List.toArray
+                }
         }
     let fromJson (cereal:string) =
         result {
-            let! sorterDto = cereal |> Json.deserialize<SorterArrayDto>
+            let! sorterDto = cereal |> Json.deserialize<SorterSetDto>
             return! fromDto sorterDto
         }
-    let toDto (sorters:Sorter[]) =
+    let toDto (sorterSet:SorterSet) =
         {
-            SorterArrayDto.sorterDtos = sorters |> Array.map(SorterDto.toDto)
+            SorterSetDto.sorterDtos = sorterSet.sorters 
+                                        |> Array.map(SorterDto.toDto)
+            SorterSetDto.degree = (Degree.value sorterSet.degree)
         }
-    let toJson (sorters:Sorter[]) =
+    let toJson (sorters:SorterSet) =
         sorters |> toDto |> Json.serialize
 
 

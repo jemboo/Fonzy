@@ -114,24 +114,19 @@ module Combinatorics =
         bins |> Array.findIndex(fun b -> b>value)
 
 
-    let makeBins (weights:float[]) =
-        let mutable tot = 0.0
+    let cumSum (startingVal:float) (weights:float[]) =
+        let mutable tot = startingVal
         let cumo w =
             tot<-tot + w
             tot
         weights |> Array.map(fun w -> cumo w)
         
 
-
     let makeHull (seqX:seq<'a>) (seqY:seq<'a>) (x:int) (y:int) =
         let xa = seqX |> Seq.take(x) |> Seq.toArray
         let ya = seqY |> Seq.take(y) |> Seq.toArray
         seq {for i = 0 to x - 1 do yield (xa.[i], ya.[y-1])}
             |> Seq.append (seq {for i = 0 to y - 2 do yield (xa.[x-1], ya.[i])})
-
-
-
-
 
 
     let drawTwoWithoutRep (degree:Degree) (rnd:IRando) =
@@ -148,9 +143,9 @@ module Combinatorics =
         makeMonoTwoCycle degree (fst tup) (snd tup)
 
 
-    let drawFromWeightedDistribution (fitnessFunc:'a->SorterFitness) (rnd:IRando) (items:'a[]) =
-        let bins = items |> Array.map(fun it-> (SorterFitness.value (fitnessFunc it)))
-                         |> makeBins
+    let drawFromWeightedDistribution (weightFunction:float->float) (rnd:IRando) (items:float[]) =
+        let bins = items |> Array.map(weightFunction)
+                         |> cumSum 0.0
         let maxVal = bins.[bins.Length - 1]
         Seq.initInfinite(fun _-> items.[findBin bins (rnd.NextFloat * maxVal)])
 

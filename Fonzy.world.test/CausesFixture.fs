@@ -12,11 +12,11 @@ type CausesFixture () =
                         |> Result.ExtractOrThrow
         let env = Enviro.Empty
         let newEnv = cause.op env |> Result.ExtractOrThrow
-        let generated = newEnv |> Enviro.toMap 
-                               |> Result.ExtractOrThrow
-                               |> ResultMap.read TestData.CauseSpec.IntDist.arrayName 
-                               |> Result.ExtractOrThrow
-        let intDist = generated |> IntDistDto.fromJson |> Result.ExtractOrThrow
+        let causedProd, causedMeta =  
+            Enviro.getDtoAndMetaFromEnviro<IntDistDto> newEnv TestData.CauseSpec.IntDist.arrayName
+            |> Result.ExtractOrThrow
+
+        let intDist = causedProd |> IntDistDto.fromDto |> Result.ExtractOrThrow
         Assert.AreEqual(intDist.vals.Length, TestData.CauseSpec.IntDist.arrayCount)
 
 
@@ -26,9 +26,8 @@ type CausesFixture () =
                                 |> Result.ExtractOrThrow
         let env = Enviro.Empty
         let newEnv = cause.op env |> Result.ExtractOrThrow
-        let generated = newEnv |> Enviro.toMap
-                               |> Result.ExtractOrThrow
-                               |> ResultMap.read TestData.CauseSpec.IntDist.arrayName 
-                               |> Result.ExtractOrThrow
-        let intDist = generated |> Int2dDistDto.fromJson |> Result.ExtractOrThrow
+        let causedProd, causedMeta =  
+            Enviro.getDtoAndMetaFromEnviro<Int2dDistDto> newEnv TestData.CauseSpec.IntDist.arrayName2d
+            |> Result.ExtractOrThrow
+        let intDist = causedProd |> Int2dDistDto.fromDto |> Result.ExtractOrThrow
         Assert.AreEqual(intDist.vals.Length, TestData.CauseSpec.IntDist.arrayCount)

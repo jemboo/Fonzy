@@ -1,7 +1,10 @@
 ﻿namespace global
 open System
 
+
+
 // Sorter
+
 type SortableCount = private SortableCount of int
 type SorterCount = private SorterCount of int
 type StageCount = private StageCount of int
@@ -10,7 +13,6 @@ type SwitchFrequency = private SwitchFrequency of float
 type SwitchOrStage = | Switch | Stage
 type SorterLength = | Switch of SwitchCount
                     | Stage of StageCount
-
 
 module SorterCount =
     let value (SorterCount v) = v

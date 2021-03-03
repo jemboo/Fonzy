@@ -23,13 +23,12 @@ module CauseSorters =
                 let randy = Rando.fromRngGen rngGen
                 let sorterArray = Sorter.createRandomArray degree sorterLength
                                         switchFreq sorterCount randy
-
-                let sorterArrayDto = sorterArray |> SorterArrayDto.toDto
-                return! Enviro.addRootDtoToEnviro<SorterArrayDto>
-                                    e outName sorterArrayDto Map.empty
+                let sorterSet = SorterSet.fromSorters degree sorterArray
+                let sorterSetDto = sorterSet |> SorterSetDto.toDto
+                return! Enviro.addRootDtoToEnviro<SorterSetDto>
+                                    e outName sorterSetDto Map.empty
             }
         {Cause.causeSpec=causeSpec; op=causer}
-
 
     let fromCauseSpec (genus:string list) (causeSpec:CauseSpec) = 
         match genus with

@@ -1,20 +1,5 @@
 ﻿namespace global
 open System
-// Math
-type Degree = private Degree of int
-module Degree =
-    let value (Degree v) = v
-    let create fieldName v = 
-        ConstrainedType.createInt fieldName Degree 1 1000 v
-    let within (b:Degree) v =
-        (v >= 0) && (v < (value b))
-    let fromInt v = create "" v |> Result.ExtractOrThrow
-    let fromKey (m:Map<'a, obj>) (key:'a) =
-        result {
-            let! gv = ResultMap.read key m
-            return! create "" (gv:?>int)
-        }
-
 
 // Rando
 type RandomSeed = private RandomSeed of int

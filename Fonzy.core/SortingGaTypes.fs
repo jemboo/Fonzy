@@ -2,7 +2,6 @@
 namespace global
 open System
 
-
 type SorterFitness = private SorterFitness of float
 
 module SorterFitness =
@@ -19,12 +18,30 @@ module SorterFitness =
             return! create "" (gv:?>float)
         }
 
+    let reportEvals stats gen =
+        StringUtils.printArrayf 
+            (fun ((s,w,t),f) -> sprintf "%d %d %d %f" 
+                                    gen (SwitchCount.value w) 
+                                    (StageCount.value t) 
+                                    (value f)) 
+            stats
+
+
+
 type SorterMutationType = 
     | Switch of MutationRate 
     | Stage of MutationRate
+
 
 module SorterMutationType =
     let StrF (mt:SorterMutationType) =
         match mt with
         | SorterMutationType.Switch mr -> sprintf "w%.3f" (MutationRate.value mr)
         | SorterMutationType.Stage mr -> sprintf "t%.3f" (MutationRate.value mr)
+
+
+    let mutate (mutationType:SorterMutationType) (rnd:IRando) (sorter:Sorter) =
+        match mutationType with
+        | SorterMutationType.Switch mr -> Sorter.mutateBySwitch mr rnd sorter
+        | SorterMutationType.Stage mr -> Sorter.mutateByStage mr rnd sorter
+         

@@ -180,23 +180,28 @@ type CombinatoricsFixture () =
         let yak = Combinatorics.breakArrayIntoSegments testArray testBreaks
         Assert.AreEqual (yak.Length, 3)
 
+    [<TestMethod>]
+    member this.cumSum() =
+        let testArray = [|2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0; 10.0|]
+        let startVal = 3.5
+        let expectedResult = [|5.5; 8.5; 12.5; 17.5; 23.5; 30.5; 38.5; 47.5; 57.5|]
+        let actualResult = Combinatorics.cumSum startVal testArray
+        Assert.AreEqual(expectedResult.[8], actualResult.[8])
 
     [<TestMethod>]
     member this.drawFromWeightedDistribution() =
-        let testArray = [|2; 3; 4; 5; 6; 7; 8; 9; 10|] 
+        let testArray = [|2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0; 10.0; |]
         let rndy = Rando.LcgFromSeed 44
         let mutable log = []
         let LogRes s =
             log <- s::log
         
-        let fitnessFunc (w:int) =
-            (SorterFitness.create "" (1.0 / (float w)))
-                |> Result.ExtractOrThrow
-        testArray |>
-        Combinatorics.drawFromWeightedDistribution fitnessFunc rndy
+        let weightFunction (w:float) =
+            1.0 / w
+        testArray |>  (Combinatorics.drawFromWeightedDistribution weightFunction rndy)
             |> Seq.take 100000 |> Seq.toArray
             |> Array.groupBy(id)
-            |> Array.iter(fun b -> LogRes (sprintf "%d %d" (fst b) (snd b).Length))
+            |> Array.iter(fun b -> LogRes (sprintf "%f %d" (fst b) (snd b).Length))
 
         Assert.IsTrue (log.Length > 1)
 

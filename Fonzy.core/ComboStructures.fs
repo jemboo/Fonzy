@@ -1,5 +1,6 @@
 ﻿namespace global
 
+
 // a permutation of the set {0, 1,.. (degree-1)}
 type Permutation = private {degree:Degree; values:int[] }
 module Permutation =
@@ -39,7 +40,6 @@ module Permutation =
                         (Degree.value pA.degree) (Degree.value pB.degree))
         else
             create pA.degree  (Combinatorics.composeMapIntArrays (pA |> arrayValues) (pB |> arrayValues))
-
 
 
  // a permutation of the set {0, 1,.. (degree-1)}, that is it's own inverse
@@ -134,7 +134,7 @@ module ZeroOneSequence =
         {1 .. len} |> Seq.iter(fun i -> bump i)
         intRet
 
-
+type IntBits = { degree:Degree; values:int[] }
 module IntBits =
 
     let Sorted_O_1_Sequence (blockLen:int) (onesCount:int) =

@@ -28,10 +28,10 @@ module FileUtils =
 
     let writeFile path item (append:bool) =
         try
-            //System.IO.File.WriteAllText(path, item)
-            use sw = new StreamWriter(path, append)
-            fprintfn sw "%s" item
-            sw.Dispose()
+            System.IO.File.WriteAllText(path, item)
+            //use sw = new StreamWriter(path, append)
+            //fprintfn sw "%s" item
+            //sw.Dispose()
             path |> Ok
         with
             | ex -> ("error in writeFile: " + ex.Message ) |> Result.Error
