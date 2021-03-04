@@ -2,12 +2,21 @@
 open System
 
 module TestData =
+    let seed = 1234
+    let degree = Degree.fromInt 8
+    let rnGen = RngGen.createLcg seed
+    let randy = Rando.fromRngGen rnGen
+    let nextRnGen() =
+        RngGen.createLcg randy.NextPositiveInt
+
+    module SortableSet =
+        let sortableCount = SortableCount.fromInt 5
+        let sortableCount2 = SortableCount.fromInt 6
+        let sorterSetRndBits = SortableSetGenerated.rndBits degree sortableCount rnGen
+        let sorterSetRndBits2 = SortableSetGenerated.rndBits degree sortableCount2 rnGen
+
     module CauseSpec =
-        let seed = 1234
-        let rnGen = RngGen.createLcg seed
-        let randy = Rando.fromRngGen rnGen
-        let nextRnGen() =
-            RngGen.createLcg randy.NextPositiveInt
+
 
         module IntDist =
             let arrayName = "arrayName"
@@ -29,7 +38,6 @@ module TestData =
             let count = 10
             let rndSortersName = "rndSortersName"
             let intDistType = IntDistType.Normal (NormalIntegerDistParams.zeroCentered 1.0)
-            let degree = Degree.fromInt 8
             let sorterLength = SorterLength.degreeTo999StageCount degree
             let switchFreq = SwitchFrequency.max
             let sorterCount = SorterCount.fromInt 10

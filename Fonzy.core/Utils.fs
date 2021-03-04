@@ -3,6 +3,23 @@ open System.Collections.Generic
 open Microsoft.FSharp.Core
 open System
 open System.Security.Cryptography
+open System.Runtime.Serialization.Formatters.Binary
+open System.IO
+
+module ByteUtils =
+    let bytesForObj (o:obj) =
+        let bf = new BinaryFormatter()
+        use ms = new MemoryStream()
+        bf.Serialize(ms, o);
+        let rv = ms.ToArray()
+        ms.Dispose()
+        rv
+
+    let structHash (o:obj) =
+        let md5 = MD5.Create();
+        let bs = bytesForObj o
+        md5.ComputeHash(bytesForObj o)
+
 
 
 module GuidUtils = 
@@ -40,10 +57,19 @@ module GuidUtils =
             a |> Array.map2(fun a b -> a+b) b
 
         let md5 = MD5.Create();
-        let laz = objs |> Seq.map(fun o -> md5.ComputeHash(BitConverter.GetBytes(o.GetHashCode())))
+        let laz = objs |> Seq.map(fun o -> md5.ComputeHash(ByteUtils.structHash o))
                        |> Seq.fold(fun a b -> folder a b) acc
         System.Guid(laz)
 
+    let guidFromObjList (objs:obj list) =
+        let acc = Array.create 16 (byte 0)
+        let folder (a:byte[]) (b:byte[]) =
+            a |> Array.map2(fun a b -> a+b) b
+
+        let md5 = MD5.Create();
+        let laz = objs |> List.map(fun o -> md5.ComputeHash(ByteUtils.structHash o))
+                       |> List.fold(fun a b -> folder a b) acc
+        System.Guid(laz)
 
     let guidFromStringR (gstr:string) =
         let mutable gv = Guid.NewGuid()
@@ -285,7 +311,6 @@ module ResultMap =
             let! cereal = read key cs
             return! proc cereal
         }
-
 
 
 module StringUtils =

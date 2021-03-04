@@ -4,25 +4,35 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type CombinatoricsTypesFixture () =
+type ComboStructuresFixture () =
 
     [<TestMethod>]
     member this.TestIdentityPermutation() =
-      let expectedLen = 9
+      let expectedLen = (Degree.value TestData.degree)
       let expectedSum = ( expectedLen * (expectedLen - 1)) / 2
-      let permutes = Permutation.identity  (Degree.create "" expectedLen |> Result.ExtractOrThrow)
+      let permutes = Permutation.identity  TestData.degree
       Assert.AreEqual(expectedLen, permutes |> Permutation.arrayValues |> Array.length)
       Assert.AreEqual(expectedSum, permutes |> Permutation.arrayValues |> Array.sum)
 
+
+    [<TestMethod>]
+    member this.powers() =
+        let maxPower = 20
+        let arA = TestData.ComboStructures.permutation |> Permutation.powers maxPower
+                    |> Seq.toArray
+        Assert.IsTrue (arA.Length > 0)
+        Assert.IsTrue (arA.Length < maxPower)
+
+
     [<TestMethod>]
     member this.TestInversePermutation() =
-       let degree = Degree.create "" 6 |> Result.ExtractOrThrow
-       let rnd = Rando.LcgFromSeed 424
-       let perm = Permutation.createRandom degree rnd
-       let inv = Permutation.inverse perm |> Result.ExtractOrThrow
-       let prod = Permutation.product perm inv |> Result.ExtractOrThrow
-       let id = Permutation.identity degree
+
+       let inv = Permutation.inverse TestData.ComboStructures.permutation
+       let prod = Permutation.productR TestData.ComboStructures.permutation inv 
+                        |> Result.ExtractOrThrow
+       let id = Permutation.identity TestData.degree
        Assert.AreEqual(id, prod)
+
 
     [<TestMethod>]
     member this.TestMakeMonoCycle() =

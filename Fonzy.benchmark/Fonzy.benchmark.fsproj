@@ -6,24 +6,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Sortables.fs" />
-    <Compile Include="Enviros.fs" />
-    <Compile Include="CauseSpecs.fs" />
-    <Compile Include="Causes.fs" />
-    <Compile Include="Worlds.fs" />
-    <Compile Include="WorldMerges.fs" />
-    <Compile Include="Jobs.fs" />
-    <Compile Include="TestData.fs" />
+    <Compile Include="SorterBenchmarks.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Fonzy.core.dto\Fonzy.core.dto.fsproj" />
     <ProjectReference Include="..\Fonzy.core\Fonzy.core.fsproj" />
+    <ProjectReference Include="..\Fonzy.data\Fonzy.data.fsproj" />
+    <ProjectReference Include="..\Fonzy.job\Fonzy.job.fsproj" />
+    <ProjectReference Include="..\Fonzy.world.dto\Fonzy.world.dto.fsproj" />
+    <ProjectReference Include="..\Fonzy.world\Fonzy.world.fsproj" />
   </ItemGroup>
 
 </Project>

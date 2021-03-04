@@ -3,13 +3,16 @@ open System
 
 
 module TestData = 
+    let seed = 1234
+    let iRando = Rando.fromRngGen (RngGen.createLcg seed)
+    let degree = Degree.fromInt 8
+
+    module ComboStructures =
+        let permutation = Permutation.createRandom degree iRando
+        let yab = None
 
     module SorterParts =
-        let seed = 1234
-        let iRando = Rando.fromRngGen (RngGen.createLcg seed)
-        let degree = Degree.fromInt 8
         let switchCount = SwitchCount.fromInt 10
-
         let permSwitchDensity = 0.5
         let sorterLength = SorterLength.degreeToRecordStageCount degree
         let makeSorter() = 

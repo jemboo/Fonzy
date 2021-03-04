@@ -5,7 +5,7 @@ module PermutationDto =
     let fromDto (dto:PermutationDto) =
         result {
             let! degree = Degree.create "" dto.degree
-            return! Permutation.create degree dto.values
+            return! Permutation.createR degree dto.values
         }
     let toDto (perm:Permutation) =
         {degree = (Degree.value (Permutation.degree perm)); 
@@ -15,7 +15,7 @@ module PermutationDto =
         result {
             let! dto = Json.deserialize<PermutationDto> cereal
             let! degree = Degree.create "" dto.degree
-            return! Permutation.create degree dto.values
+            return! Permutation.createR degree dto.values
         }
 
 

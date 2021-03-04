@@ -30,15 +30,46 @@ module SortableSetRollup =
 
     let allBinary (degree:Degree) =
         let baseArray = IntBits.AllBinaryTestCasesArray (Degree.value degree)
-                        |> Array.collect(fun a -> a)
+                        |> Array.collect(id)
         create degree baseArray
 
-type IntBitsSet = {degree:Degree; intBitsA:IntBits[]}
-type PermutationSet = {degree:Degree; intBitsA:IntBits[]}
+
+
+
+
+
+//type IntBitsSet = {degree:Degree; intBitsA:IntBits[]}
+//type PermutationSet = {degree:Degree; permutations:Permutation[]}
+
+type SortableIntArray = private SortableIntArray of int[]
+module SortableIntArray =
+    let create (intArray:int[]) = SortableIntArray intArray
+    let Identity (order: int) = create [|0 .. order-1|]
+    let value (SortableIntArray p) = p
+    let apply f (p:SortableIntArray) = f (value p)
+
+    let copy (sortableIntArray:SortableIntArray) = 
+        create (Array.copy (value sortableIntArray))
+
+//    //let fromRandomPermutation (degree:Degree) (rnd:IRando) =
+//    //    create (Combinatorics.randomPermutation rnd (Degree.value degree))
+
+//    //let fromRandomBits (degree:Degree) (rnd:IRando) =
+//    //    create (ZeroOneSequence.Random rnd (Degree.value degree) 0.5 |> Seq.toArray)
+
+
+
+type SortableSetExplicit = {id:Guid; degree:Degree; sortableIntArrays:SortableIntArray[]}
+type SortableSetGenerated = {id:Guid; cat:string; prams:Map<string, string>;}
+
+
 
 type SortableSet =
-     | IntBitsSet of IntBitsSet
-     | PermutationSet of PermutationSet
+     | Explicit of SortableSetExplicit
+     | Generated of SortableSetGenerated
 
 module SortableSet = 
-    let yab = None
+    let getId (ss:SortableSet) =
+        match ss with
+        | Explicit ess -> ess.id
+        | Generated gss -> gss.id

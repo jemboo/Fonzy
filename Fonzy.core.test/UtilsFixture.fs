@@ -6,6 +6,19 @@ open System.Collections.Generic
 [<TestClass>]
 type UtilsFixture () =
 
+    // ByteUtils
+    
+    [<TestMethod>]
+    member this.structHash() =
+        let gA = ByteUtils.structHash(1 :> obj) |> Array.toList
+        let gAd = ByteUtils.structHash(1 :> obj) |> Array.toList
+        let gB = ByteUtils.structHash(2 :> obj) |> Array.toList
+        Assert.AreEqual(gA, gAd)
+        Assert.AreNotEqual(gA, gB)
+
+
+    // GuidUtils
+
     [<TestMethod>]
     member this.sandbox() =
         let g1 = true |> string
@@ -25,9 +38,12 @@ type UtilsFixture () =
 
     [<TestMethod>]
     member this.guidFromObjs() =
-        let objs = seq { Guid.NewGuid():>obj; Guid.NewGuid() :> obj;}
-        let g2 = objs |> GuidUtils.guidFromObjs
-        Assert.IsTrue(true)
+        let objsA = seq { 1:>obj; 2:> obj;}
+        let objsB = seq { 1:>obj; 2:> obj;}
+        let gA = objsA |> GuidUtils.guidFromObjs
+        let gB = objsB |> GuidUtils.guidFromObjs
+        Assert.AreEqual(gA, gB)
+
 
 
 // CollectionUtils

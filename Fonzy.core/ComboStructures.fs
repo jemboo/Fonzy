@@ -5,11 +5,14 @@
 type Permutation = private {degree:Degree; values:int[] }
 module Permutation =
     let create (degree:Degree) (vals:int[]) =
+            {Permutation.degree=degree; values=vals }
+
+    let createR (degree:Degree) (vals:int[]) =
         if vals.Length <> (Degree.value degree) then
             (sprintf "array length %d <> degree %d:" 
                       vals.Length (Degree.value degree)) |> Error 
         else
-            {Permutation.degree=degree; values=vals } |> Ok
+            create degree vals  |> Ok
 
     let identity (degree:Degree) = 
         {degree=degree; values=[|0 .. (Degree.value degree)-1|] }
@@ -17,29 +20,50 @@ module Permutation =
     let arrayValues perm = perm.values
     let degree perm = perm.degree
 
-    let createRandom (degree:Degree) (rnd:IRando) =
-        let idArray = (identity degree) |> arrayValues  
-        { degree=degree;
-        values=(Combinatorics.fisherYatesShuffle rnd idArray |> Seq.toArray)}
+    let areEqual (permA:Permutation) (permB:Permutation) =
+        true
 
     let isTwoCycle (perm:Permutation) =
         Combinatorics.isTwoCycle perm.values
-
-    let createRandoms (degree:Degree) (rnd:IRando) =
-        Seq.initInfinite(fun _ -> createRandom degree rnd)
 
     let inRange (degree:Degree) (value:int) =
        ((value > -1) && (value < (Degree.value degree)))
 
     let inverse (p:Permutation) =
         create p.degree (Combinatorics.inverseMapArray (p |> arrayValues))
- 
+
     let product (pA:Permutation) (pB:Permutation) =
+        create pA.degree  (Combinatorics.composeMapIntArrays (pA |> arrayValues) (pB |> arrayValues))
+
+    let productR (pA:Permutation) (pB:Permutation) =
         if (Degree.value pA.degree) <> (Degree.value pB.degree) then
                 Error (sprintf "degree %d <> degree %d:" 
                         (Degree.value pA.degree) (Degree.value pB.degree))
         else
-            create pA.degree  (Combinatorics.composeMapIntArrays (pA |> arrayValues) (pB |> arrayValues))
+            product pA pB |> Ok
+
+    let powers (maxPower:int) (perm:Permutation)  =
+        let mutable loop = true
+        let mutable curPerm = perm
+        let mutable curPow = 0
+        seq { while loop do 
+                yield curPerm
+                curPerm <- product perm curPerm
+                curPow <- curPow + 1
+                if ((curPerm = perm) || (curPow > maxPower))then
+                    loop <- false}
+
+
+    // IRando dependent
+
+    let createRandom (degree:Degree) (rnd:IRando) =
+        let idArray = (identity degree) |> arrayValues  
+        { degree=degree;
+        values=(Combinatorics.fisherYatesShuffle rnd idArray |> Seq.toArray)}
+
+    let createRandoms (degree:Degree) (rnd:IRando) =
+        Seq.initInfinite(fun _ -> createRandom degree rnd)
+
 
 
  // a permutation of the set {0, 1,.. (degree-1)}, that is it's own inverse

@@ -39,6 +39,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "world.dto", "world.dto", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{B03C5352-E253-4BB3-962B-2086FF3DA05A}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fonzy.benchmark", "Fonzy.benchmark\Fonzy.benchmark.fsproj", "{576CF73E-623F-468F-A716-A6D3FB3089A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{844E745A-D752-47EF-9FBB-5C9FF46711EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{844E745A-D752-47EF-9FBB-5C9FF46711EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{844E745A-D752-47EF-9FBB-5C9FF46711EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{576CF73E-623F-468F-A716-A6D3FB3089A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{576CF73E-623F-468F-A716-A6D3FB3089A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{576CF73E-623F-468F-A716-A6D3FB3089A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{576CF73E-623F-468F-A716-A6D3FB3089A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
