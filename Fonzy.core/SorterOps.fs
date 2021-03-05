@@ -65,7 +65,6 @@ module SorterOps =
        SortTHistSection2 sorter 0 (sl - 1) testCase
 
 
-
     let SortTHistSwitches(switches:Switch list)
                       (testCase:SortableIntArray) =
         let mutable i = 0

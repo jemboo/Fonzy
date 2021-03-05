@@ -305,7 +305,7 @@ module ResultMap =
             return! proc iv
         }
 
-    let procKeyedJson<'a> (key:string) (proc:string->Result<'a,string>) 
+    let procKeyedString<'a> (key:string) (proc:string->Result<'a,string>) 
                           (cs:Map<string, string>) : Result<'a, string> =
         result {
             let! cereal = read key cs

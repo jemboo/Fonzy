@@ -10,13 +10,13 @@ module CauseSorters =
             result {
                 let! degree = causeSpec.prams |> ResultMap.procKeyedInt "degree" 
                                                          (fun d -> Degree.create "" d)
-                let! sorterLength = causeSpec.prams |> ResultMap.procKeyedJson "sorterLength" 
+                let! sorterLength = causeSpec.prams |> ResultMap.procKeyedString "sorterLength" 
                                                           (SorterLengthDto.fromJson)
                 let! switchFreq = causeSpec.prams |> ResultMap.procKeyedFloat "switchFreq" 
                                                           (fun d -> SwitchFrequency.create "" d)
                 let! sorterCount = causeSpec.prams |> ResultMap.procKeyedInt "sorterCount" 
                                                           (fun d -> SorterCount.create "" d)
-                let! rngGen = causeSpec.prams |> ResultMap.procKeyedJson "rngGen" 
+                let! rngGen = causeSpec.prams |> ResultMap.procKeyedString "rngGen" 
                                                           (RngGenDto.fromJson)
                 let! outName = ResultMap.read "sorters" causeSpec.prams
 
@@ -42,9 +42,9 @@ module CauseRandGen =
         let causer = fun (e:Enviro) ->
             result {
                 let! count = causeSpec.prams |> ResultMap.lookupKeyedInt "count"
-                let! rngGen = causeSpec.prams |> ResultMap.procKeyedJson "rngGen" 
+                let! rngGen = causeSpec.prams |> ResultMap.procKeyedString "rngGen" 
                                                           (RngGenDto.fromJson)
-                let! intDistType = causeSpec.prams |> ResultMap.procKeyedJson "intDistType" 
+                let! intDistType = causeSpec.prams |> ResultMap.procKeyedString "intDistType" 
                                                       (IntDistTypeDto.fromJson)
                 let! outName = ResultMap.read "outName" causeSpec.prams
 

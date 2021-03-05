@@ -1,6 +1,19 @@
 ﻿namespace global
 open System
 
+
+
+type SortableIntArray = private SortableIntArray of int[]
+module SortableIntArray =
+    let create (intArray:int[]) = SortableIntArray intArray
+    let Identity (order: int) = create [|0 .. order-1|]
+    let value (SortableIntArray p) = p
+    let apply f (p:SortableIntArray) = f (value p)
+
+    let copy (sortableIntArray:SortableIntArray) = 
+        create (Array.copy (value sortableIntArray))
+
+
 type SortableSetRollup = {degree:Degree; baseArray:int[]; count:int}
 module SortableSetRollup =
     let create (degree:Degree) (baseArray:int[] ) =
@@ -34,32 +47,19 @@ module SortableSetRollup =
         create degree baseArray
 
 
-
-
-
-
-//type IntBitsSet = {degree:Degree; intBitsA:IntBits[]}
-//type PermutationSet = {degree:Degree; permutations:Permutation[]}
-
-type SortableIntArray = private SortableIntArray of int[]
-module SortableIntArray =
-    let create (intArray:int[]) = SortableIntArray intArray
-    let Identity (order: int) = create [|0 .. order-1|]
-    let value (SortableIntArray p) = p
-    let apply f (p:SortableIntArray) = f (value p)
-
-    let copy (sortableIntArray:SortableIntArray) = 
-        create (Array.copy (value sortableIntArray))
-
-//    //let fromRandomPermutation (degree:Degree) (rnd:IRando) =
-//    //    create (Combinatorics.randomPermutation rnd (Degree.value degree))
-
-//    //let fromRandomBits (degree:Degree) (rnd:IRando) =
-//    //    create (ZeroOneSequence.Random rnd (Degree.value degree) 0.5 |> Seq.toArray)
-
-
-
 type SortableSetExplicit = {id:Guid; degree:Degree; sortableIntArrays:SortableIntArray[]}
+module SortableSetExplicit = 
+    let toRollup (sse:SortableSetExplicit) = 
+        let siaCount = sse.sortableIntArrays.Length
+        let sroll = sse.sortableIntArrays |> Array.map(SortableIntArray.value)
+                                          |> Array.collect(id)
+        {
+            SortableSetRollup.degree = sse.degree;
+            SortableSetRollup.count = siaCount;
+            SortableSetRollup.baseArray = sroll
+        }
+
+
 type SortableSetGenerated = {id:Guid; cat:string; prams:Map<string, string>;}
 
 
