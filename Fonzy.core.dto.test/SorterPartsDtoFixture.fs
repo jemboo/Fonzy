@@ -16,8 +16,16 @@ type SorterPartsDtoFixture () =
 
     [<TestMethod>]
     member this.SorterDto() =
-        let sorter = TestData.SorterParts.makeSorter()
+        let sorter = TestData.SorterParts.makeRandomSorter()
         let sorterDto = sorter |> SorterDto.toDto
         let sorterBack = sorterDto |> SorterDto.fromDto
                                    |> Result.ExtractOrThrow
         Assert.AreEqual(sorter, sorterBack);
+
+
+    [<TestMethod>]
+    member this.SorterSetDto() =
+        let sorterSetCereal = TestData.SorterParts.sorterSet |> SorterSetDto.toJson
+        let sorterSetBack = sorterSetCereal |> SorterSetDto.fromJson
+                                            |> Result.ExtractOrThrow
+        Assert.AreEqual(TestData.SorterParts.sorterSet, sorterSetBack);

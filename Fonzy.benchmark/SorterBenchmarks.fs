@@ -24,20 +24,20 @@ type Md5VsSha256() =
         md5.ComputeHash(data)
 
 //|    Method |     Mean |    Error |   StdDev |
-//|---------- |---------:|---------:|---------:|
-//| SortAllTR | 16.41 ms | 0.377 ms | 1.111 ms |
-//| SortAllTB | 21.59 ms | 0.431 ms | 0.989 ms |
+//|------------- |---------:|---------:|---------:|
+//| SortAllFull  | 16.41 ms | 0.377 ms | 1.111 ms |
+//| SortAllCheck | 21.59 ms | 0.431 ms | 0.989 ms |
 type BenchmarkSorterOps() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorter16 = RefSorter.CreateRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
     let sortableSet = SortableSetRollup.allBinary degree |> Result.ExtractOrThrow
 
     [<Benchmark>]
-    member this.SortAllTR() =
-        let res = SorterOps.SortAllComplete sorter16 sortableSet
+    member this.SortAllFull() =
+        let res = Eval.Sorter.fullRollup sorter16 sortableSet
         res
 
     [<Benchmark>]
-    member this.SortAllTB() =
-        let res = SorterOps.SortAllEager sorter16 sortableSet
+    member this.SortAllCheck() =
+        let res = Eval.Sorter.checkRollup sorter16 sortableSet
         res

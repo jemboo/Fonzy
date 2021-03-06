@@ -12,8 +12,8 @@ module TestData =
     module SortableSet =
         let sortableCount = SortableCount.fromInt 5
         let sortableCount2 = SortableCount.fromInt 6
-        let sorterSetRndBits = SortableSetGenerated.rndBits degree sortableCount rnGen
-        let sorterSetRndBits2 = SortableSetGenerated.rndBits degree sortableCount2 rnGen
+        let rndBits = SortableSetGenerated.rndBits degree sortableCount rnGen
+        let rndBits2 = SortableSetGenerated.rndBits degree sortableCount2 rnGen
 
     module CauseSpec =
 

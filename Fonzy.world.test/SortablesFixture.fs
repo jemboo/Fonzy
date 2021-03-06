@@ -1,4 +1,4 @@
-namespace Fonzy.core.test
+namespace Fonzy.world.test
 
 open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
@@ -8,8 +8,8 @@ type SortablesFixture () =
 
     [<TestMethod>]
     member this.rndBits() =
-        let gu = TestData.SortableSet.sorterSetRndBits.id
-        let gu2 = TestData.SortableSet.sorterSetRndBits2.id
-        Assert.AreEqual(gu, gu2)
+        let gu = TestData.SortableSet.rndBits.id
+        let gu2 = TestData.SortableSet.rndBits2.id
+        Assert.AreNotEqual(gu, gu2)
 
 

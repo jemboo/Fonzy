@@ -40,12 +40,7 @@ module SorterSetDto =
             let! sorters = dto.sorterDtos |> Array.map(SorterDto.fromDto)
                                           |> Array.toList
                                           |> Result.sequence
-            let! sorterCount = sorters.Length |> SorterCount.create ""
-            return {
-                  SorterSet.degree=degree;
-                  SorterSet.sorterCount = sorterCount; 
-                  SorterSet.sorters=sorters |> List.toArray
-                }
+            return SorterSet.fromSorters degree sorters 
         }
     let fromJson (cereal:string) =
         result {
@@ -55,7 +50,9 @@ module SorterSetDto =
     let toDto (sorterSet:SorterSet) =
         {
             SorterSetDto.sorterDtos = sorterSet.sorters 
-                                        |> Array.map(SorterDto.toDto)
+                                        |> Map.toArray
+                                        |> Array.map(fun kvp -> 
+                            (kvp |> snd |> SorterDto.toDto))
             SorterSetDto.degree = (Degree.value sorterSet.degree)
         }
     let toJson (sorters:SorterSet) =

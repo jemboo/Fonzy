@@ -15,8 +15,9 @@ module TestData =
         let switchCount = SwitchCount.fromInt 10
         let permSwitchDensity = 0.5
         let sorterLength = SorterLength.degreeToRecordStageCount degree
-        let makeSorter() = 
-            Sorter.createRandom degree sorterLength SwitchFrequency.max iRando
+        let sorterCount = SorterCount.fromInt 50
+        let makeRandomSorter() = 
+                Sorter.createRandom degree sorterLength SwitchFrequency.max iRando
         let randomSwitches = Switch.randomSwitchesOfDegree degree iRando
         let makeRandomTwoCycle = 
             TwoCyclePerm.makeRandomTwoCycle degree iRando permSwitchDensity
@@ -25,6 +26,11 @@ module TestData =
         let switchList = randomSwitches
                                 |> Seq.take (SwitchCount.value switchCount)
                                 |> Seq.toList
+
+        let listOfSorters = List.init (SorterCount.value sorterCount)
+                                      (fun _ -> makeRandomSorter())
+
+        let sorterSet = SorterSet.fromSorters degree listOfSorters
 
 
     module SorterGa =
@@ -45,4 +51,4 @@ module TestData =
                       
         let sorterList = 
             List.init (SorterCount.value sorterCount)
-                      (fun _ -> SorterParts.makeSorter())
+                      (fun _ -> SorterParts.makeRandomSorter())

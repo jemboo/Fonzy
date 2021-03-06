@@ -230,13 +230,15 @@ module Sorter =
         }
 
 
-type SorterSet = {degree:Degree; sorterCount:SorterCount; sorters:Sorter[] }
+type SorterSet = {degree:Degree; sorterCount:SorterCount; sorters:Map<Guid,Sorter> }
 module SorterSet =
     let fromSorters (degree:Degree) (sorters:seq<Sorter>) =
-        let sorterArray = sorters |> Seq.toArray
+        let sorterArray = sorters |> Seq.map(fun s-> 
+                        ([s :> obj] |> GuidUtils.guidFromObjList), s)
+                                  |> Map.ofSeq
         {
             degree=degree; 
-            sorterCount= SorterCount.fromInt sorterArray.Length; 
+            sorterCount= SorterCount.fromInt sorterArray.Count; 
             sorters = sorterArray
         }
 

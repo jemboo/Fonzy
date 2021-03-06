@@ -27,7 +27,7 @@ type SorterGaDtoFixture () =
     [<TestMethod>]
     member this.SorterPhenotypeDto_Single() =
         let phenoSingle = SorterPhenotype.Singleton 
-                            (TestData.SorterParts.makeSorter())
+                            (TestData.SorterParts.makeRandomSorter())
         let dto = SorterPhenotypeDto.toDto phenoSingle
         let cereal = Json.serialize dto
         let dtoBack = Json.deserialize<SorterPhenotypeDto> cereal 

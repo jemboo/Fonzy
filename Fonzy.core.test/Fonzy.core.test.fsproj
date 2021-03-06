@@ -13,6 +13,7 @@
     <Compile Include="RandoFixture.fs" />
     <Compile Include="CombinatoricsFixture.fs" />
     <Compile Include="ComboStructuresFixture.fs" />
+    <Compile Include="SorterPartsFixture.fs" />
     <Compile Include="SortablesFixture.fs" />
     <Compile Include="SorterGaFixture.fs" />
     <Compile Include="SorterGaOpsFixture.fs" />

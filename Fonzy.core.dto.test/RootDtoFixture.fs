@@ -8,7 +8,7 @@ type RootDtoFixture () =
 
     [<TestMethod>]
     member this.RootDtoForSorterDto() =
-        let testDto = TestData.SorterParts.makeSorter() |> SorterDto.toDto
+        let testDto = TestData.SorterParts.makeRandomSorter() |> SorterDto.toDto
         let cereal =  RootDto.toJson testDto Map.empty
         let testDataBack = cereal |> RootDto.extractFromJson<SorterDto>
                                   |> Result.ExtractOrThrow
