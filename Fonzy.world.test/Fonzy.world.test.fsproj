@@ -9,6 +9,8 @@
 
   <ItemGroup>
     <Compile Include="SortablesFixture.fs" />
+    <Compile Include="SortingResultsFixture.fs" />
+    <Compile Include="SorterOpsFixture.fs" />
     <Compile Include="CausesFixture.fs" />
     <Compile Include="WorldsFixture.fs" />
     <Compile Include="WorldMergesFixture.fs" />

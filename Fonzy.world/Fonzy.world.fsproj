@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <Compile Include="Sortables.fs" />
+    <Compile Include="SortingResults.fs" />
+    <Compile Include="SorterOps.fs" />
     <Compile Include="Enviros.fs" />
     <Compile Include="CauseSpecs.fs" />
     <Compile Include="Causes.fs" />

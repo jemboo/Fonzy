@@ -1,6 +1,19 @@
 ﻿namespace global
 open System
 
+type SortableSetExplicit = {id:Guid; degree:Degree; 
+                            sortableIntArrays:SortableIntArray[]}
+module SortableSetExplicit = 
+    let toRollup (sse:SortableSetExplicit) =
+        let sroll = sse.sortableIntArrays |> Array.map(SortableIntArray.value)
+                                          |> Array.collect(id)
+        {
+            SortableSetRollup.degree = sse.degree;
+            SortableSetRollup.count = sse.sortableIntArrays.Length;
+            SortableSetRollup.baseArray = sroll
+        }
+
+type SortableSetGenerated = {id:Guid; cat:string; prams:Map<string, string>;}
 
 module SortableSetGenerated =
 
@@ -96,3 +109,21 @@ module SortableSetGenerated =
                                 }
                     }
         | _ -> Error (sprintf "no match for SortableSetGenerated.cat: %s" ssg.cat)
+
+
+
+type SortableSet =
+        | Explicit of SortableSetExplicit
+        | Generated of SortableSetGenerated
+
+module SortableSet = 
+    let getId (ss:SortableSet) =
+        match ss with
+        | Explicit ess -> ess.id
+        | Generated gss -> gss.id
+
+    let getSortableSetExplicit (ss:SortableSet) =
+        match ss with
+        | Explicit ess -> ess |> Ok
+        | Generated gss -> gss |> SortableSetGenerated.generate
+

@@ -34,10 +34,15 @@ type BenchmarkSorterOps() =
 
     [<Benchmark>]
     member this.SortAllFull() =
-        let res = Eval.Sorter.fullRollup sorter16 sortableSet
+        let res = SorterEval.fullRollup sorter16 sortableSet
         res
 
     [<Benchmark>]
-    member this.SortAllCheck() =
-        let res = Eval.Sorter.checkRollup sorter16 sortableSet
+    member this.SortAllFullR() =
+        let res = SorterEval.fullRollupR sorter16 sortableSet
         res
+
+    //[<Benchmark>]
+    //member this.SortAllCheck() =
+    //    let res = SorterEval.checkRollup sorter16 sortableSet
+    //    res

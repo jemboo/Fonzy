@@ -17,6 +17,10 @@ module Permutation =
     let identity (degree:Degree) = 
         {degree=degree; values=[|0 .. (Degree.value degree)-1|] }
 
+    let rotate (degree:Degree) (dir:int) = 
+        let d = (Degree.value degree)
+        {degree=degree; values=Array.init d (fun i-> (i + dir) % d)}
+
     let arrayValues perm = perm.values
     let degree perm = perm.degree
 
@@ -50,8 +54,12 @@ module Permutation =
                 yield curPerm
                 curPerm <- product perm curPerm
                 curPow <- curPow + 1
-                if ((curPerm = perm) || (curPow > maxPower))then
+                if ((curPerm = perm) || (curPow > maxPower)) then
                     loop <- false}
+
+    let cyclicGroup (degree:Degree) = 
+        let r1 = rotate degree 1
+        powers ((Degree.value degree) - 1) r1 |> Seq.toList
 
 
     // IRando dependent
@@ -98,22 +106,9 @@ module TwoCyclePerm =
              values=(Combinatorics.makeMonoTwoCycle degree low hi)} |> Ok
         else Error "low or hi is out of range" 
 
-    let makeRandomMonoCycle (degree:Degree) (rnd:IRando) =
-        { degree=degree; 
-          values=Combinatorics.makeRandomMonoTwoCycle degree rnd }
-
     let makeAllMonoCycles (degree:Degree) =
         (Combinatorics.makeAllMonoTwoCycles degree) 
         |> Seq.map (fun s -> {degree=degree; values= s})
-    
-    let makeRandomTwoCycle (degree:Degree) (rnd:IRando) (switchFreq:float) =
-        let switchCount = Rando.multiDraw rnd switchFreq ((Degree.value degree) / 2)
-        { degree=degree; 
-          values=Combinatorics.makeRandomTwoCycleIntArray rnd (Degree.value degree) switchCount}
-
-    let makeRandomFullTwoCycle (degree:Degree) (rnd:IRando) =
-        { degree=degree; 
-          values=Combinatorics.makeRandomFullTwoCycleIntArray rnd (Degree.value degree)}
 
     let makeFromTupleSeq (degree:Degree) (tupes:seq<int*int>) =
         let curPa = [|0 .. (Degree.value degree)-1|]
@@ -133,10 +128,21 @@ module TwoCyclePerm =
         { degree=degree; values=curPa }
 
 
-//type BitArray = {order:int; items:array<bool>}
-//module BitArray =
-//    let Zero (order: int) =  { order=order; items=Array.init order (fun i -> false) }
-//    let Next (bits: BitArray) =  { order=bits.order; items=bits.items }
+    // IRando dependent
+    
+    let makeRandomMonoCycle (degree:Degree) (rnd:IRando) =
+        { degree=degree; 
+            values=Combinatorics.makeRandomMonoTwoCycle degree rnd }
+        
+    let makeRandomTwoCycle (degree:Degree) (rnd:IRando) (switchFreq:float) =
+        let switchCount = Rando.multiDraw rnd switchFreq ((Degree.value degree) / 2)
+        { degree=degree; 
+            values=Combinatorics.makeRandomTwoCycleIntArray rnd (Degree.value degree) switchCount}
+    
+    let makeRandomFullTwoCycle (degree:Degree) (rnd:IRando) =
+        { degree=degree; 
+            values=Combinatorics.makeRandomFullTwoCycleIntArray rnd (Degree.value degree)}
+    
 
 
 module ZeroOneSequence =
@@ -158,6 +164,7 @@ module ZeroOneSequence =
         {1 .. len} |> Seq.iter(fun i -> bump i)
         intRet
 
+
 type IntBits = { degree:Degree; values:int[] }
 module IntBits =
 
@@ -165,7 +172,8 @@ module IntBits =
         seq {for i = 1 to blockLen - onesCount do yield 0; 
              for i = 1 to onesCount do yield 1 }
 
-    //Returns a bloclLen + 1 length array of all possible sorted 0-1 sequences of length blockLen
+    //Returns a bloclLen + 1 length array 
+    // of all possible sorted 0-1 sequences of length blockLen
     let Sorted_0_1_Sequences (blockLen:int) =
         seq {for i = 0 to blockLen 
                 do yield (Sorted_O_1_Sequence blockLen i) |> Seq.toArray }

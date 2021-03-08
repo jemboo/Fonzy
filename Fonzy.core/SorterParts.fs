@@ -30,12 +30,16 @@ module Switch =
     
     let toString (sw:Switch) =
         sprintf "(%d, %d)" sw.low sw.hi
+        
+
+    // IRando dependent
 
     let randomSwitchesOfDegree (order:Degree) (rnd:IRando) =
         let mDex = uint32 ((Degree.value order)*(Degree.value order + 1) / 2) 
         seq { while true do 
                     let p = (int (rnd.NextUInt % mDex))
                     yield switchMap.[p] }
+
 
     let mutateSwitches (order:Degree) (mutationRate:MutationRate) 
                        (rnd:IRando) 
@@ -46,6 +50,7 @@ module Switch =
             | k when k < (MutationRate.value mutationRate) -> switchMap.[(int (rnd.NextUInt % mDex))] 
             | _ -> switch
         switches |> Seq.map(fun sw-> mutateSwitch sw)
+
 
 type Stage = {switches:Switch list; degree:Degree}
 module Stage =
@@ -230,7 +235,7 @@ module Sorter =
         }
 
 
-type SorterSet = {degree:Degree; sorterCount:SorterCount; sorters:Map<Guid,Sorter> }
+type SorterSet = { degree:Degree; sorterCount:SorterCount; sorters:Map<Guid,Sorter> }
 module SorterSet =
     let fromSorters (degree:Degree) (sorters:seq<Sorter>) =
         let sorterArray = sorters |> Seq.map(fun s-> 

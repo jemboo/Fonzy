@@ -8,8 +8,8 @@ module TestData =
     let degree = Degree.fromInt 8
 
     module ComboStructures =
-        let permutation = Permutation.createRandom degree iRando
-        let yab = None
+        let permutation = Permutation.rotate degree 1
+
 
     module SorterParts =
         let switchCount = SwitchCount.fromInt 10
@@ -18,19 +18,26 @@ module TestData =
         let sorterCount = SorterCount.fromInt 50
         let makeRandomSorter() = 
                 Sorter.createRandom degree sorterLength SwitchFrequency.max iRando
-        let randomSwitches = Switch.randomSwitchesOfDegree degree iRando
+
         let makeRandomTwoCycle = 
             TwoCyclePerm.makeRandomTwoCycle degree iRando permSwitchDensity
         let switchUseArray = Array.init (SwitchCount.value switchCount) 
                                         (fun _ -> iRando.NextPositiveInt)
-        let switchList = randomSwitches
-                                |> Seq.take (SwitchCount.value switchCount)
-                                |> Seq.toList
+
+        let switchList = Switch.switchMap 
+                                      |> Seq.take (SwitchCount.value switchCount)
+                                      |> Seq.toList
+
 
         let listOfSorters = List.init (SorterCount.value sorterCount)
                                       (fun _ -> makeRandomSorter())
 
         let sorterSet = SorterSet.fromSorters degree listOfSorters
+
+        let rollupOfAllBinary = SortableSetRollup.allBinary degree
+        let rollupOfAllSortedBinary = SortableSetRollup.fromSortableIntArrays 
+                                        degree 
+                                        (SortableIntArray.allSorted_0_1 degree)
 
 
     module SorterGa =
@@ -39,8 +46,8 @@ module TestData =
         let sorterCount = SorterCount.fromInt 10
         let switchUsesListLength = 5
 
-        let twoCycleList = List.init permutationsCount 
-                                     (fun _ -> SorterParts.makeRandomTwoCycle)
+        let twoCycleList = TwoCyclePerm.makeAllMonoCycles degree
+                           |> Seq.toList
 
         let listOfSwitchUses = 
             List.init switchUsesListLength (fun _ -> 
