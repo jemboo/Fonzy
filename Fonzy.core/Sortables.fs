@@ -18,9 +18,12 @@ module SortableIntArray =
         IntBits.Sorted_0_1_Sequences (Degree.value degree)
             |> Seq.map(create) |> Seq.toArray
 
-
-type SortableSetRollup = {degree:Degree; baseArray:int[]; count:int}
-module SortableSetRollup =
+type SortableSetRollout = {
+                            degree:Degree; 
+                            baseArray:int[]; 
+                            sortableCount:SortableCount
+                         }
+module SortableSetRollout =
     let create (degree:Degree) (baseArray:int[] ) =
         if baseArray.Length < 0 + (Degree.value degree) then
             Error (sprintf "baseArray length %d is not a multiple of degree: %d:" 
@@ -29,9 +32,9 @@ module SortableSetRollup =
             let baseCopy = Array.zeroCreate baseArray.Length
             Array.Copy(baseArray, baseCopy, baseArray.Length)
             {
-                SortableSetRollup.degree=degree; 
+                SortableSetRollout.degree=degree; 
                 baseArray=baseCopy; 
-                count=baseCopy.Length / (Degree.value degree) 
+                sortableCount= SortableCount.fromInt (baseCopy.Length / (Degree.value degree))
             } |> Ok
 
     let fromSortableIntArrays (degree:Degree) 
@@ -42,18 +45,18 @@ module SortableSetRollup =
             return! create degree a 
         }
 
-    let toSortableIntArrays (ssRollup:SortableSetRollup) =
-        let d = (Degree.value ssRollup.degree)
-        ssRollup.baseArray |> Array.chunkBySize d
+    let toSortableIntArrays (ssRollout:SortableSetRollout) =
+        let d = (Degree.value ssRollout.degree)
+        ssRollout.baseArray |> Array.chunkBySize d
                            |> Array.map(SortableIntArray.create)
 
-    let copy (sortableSet:SortableSetRollup) =
-        let baseCopy = Array.zeroCreate sortableSet.baseArray.Length
-        Array.Copy(sortableSet.baseArray, baseCopy, baseCopy.Length)
+    let copy (sortableSetRollout:SortableSetRollout) =
+        let baseCopy = Array.zeroCreate sortableSetRollout.baseArray.Length
+        Array.Copy(sortableSetRollout.baseArray, baseCopy, baseCopy.Length)
         {
-            SortableSetRollup.degree=sortableSet.degree; 
+            SortableSetRollout.degree=sortableSetRollout.degree; 
             baseArray=baseCopy;
-            count=baseCopy.Length / (Degree.value sortableSet.degree) 
+            sortableCount=sortableSetRollout.sortableCount
         } |> Ok
 
     let allBinary (degree:Degree) =
@@ -61,25 +64,23 @@ module SortableSetRollup =
                         |> Array.collect(id)
         create degree baseArray
 
-    let isSorted (ssRollup:SortableSetRollup) =
-        let d = (Degree.value ssRollup.degree)
-        seq {0 .. d .. ssRollup.baseArray.Length}
-            |> Seq.forall(fun dex -> Combinatorics.isSortedOffset ssRollup.baseArray dex d)
+    let isSorted (ssRollout:SortableSetRollout) =
+        let d = (Degree.value ssRollout.degree)
+        seq {0 .. d .. ssRollout.baseArray.Length}
+            |> Seq.forall(fun dex -> Combinatorics.isSortedOffset ssRollout.baseArray dex d)
         
-    let sortedCount (ssRollup:SortableSetRollup) =
-        let d = (Degree.value ssRollup.degree)
-        seq {0 .. d .. (ssRollup.baseArray.Length - 1)}
-            |> Seq.filter (fun dex -> Combinatorics.isSortedOffset ssRollup.baseArray dex d)
+    let sortedCount (ssRollout:SortableSetRollout) =
+        let d = (Degree.value ssRollout.degree)
+        seq {0 .. d .. (ssRollout.baseArray.Length - 1)}
+            |> Seq.filter (fun dex -> Combinatorics.isSortedOffset ssRollout.baseArray dex d)
             |> Seq.length
 
-    let distinctResults (ssRollup:SortableSetRollup) =
-        let d = (Degree.value ssRollup.degree)
-        let chunks = seq {0 .. d .. (ssRollup.baseArray.Length - 1)}
-                        |> Seq.chunkBySize d
-                        |> Seq.map(Array.toList)
-                        |> Seq.toArray
-        chunks
-        //seq {0 .. d .. (ssRollup.baseArray.Length - 1)}
-        //    |> Seq.chunkBySize d
-        //    |> Seq.map(Array.toList)
-        //    |> Seq.distinct
+    let distinctSortableSets (ssRollout:SortableSetRollout) =
+        ssRollout |> toSortableIntArrays
+                 |> Seq.distinct
+                 |> Seq.toArray
+
+    let histogramOfSortableSets (ssRollout:SortableSetRollout) =
+        ssRollout |> toSortableIntArrays
+                 |> Seq.countBy id
+                 |> Seq.toArray

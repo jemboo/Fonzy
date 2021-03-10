@@ -142,7 +142,9 @@ module Stage =
             | _ -> stage
 
 
-type Sorter = {degree:Degree; switches:array<Switch>; switchCount:SwitchCount}
+type Sorter = {degree:Degree; 
+               switches:array<Switch>; 
+               switchCount:SwitchCount}
 module Sorter =
         
     let create (degree:Degree) (switches:seq<Switch>) =
@@ -259,7 +261,6 @@ module SorterSet =
 
 type SwitchUses = {switchCount:SwitchCount; weights:int[]}
 module SwitchUses =
-
     let createEmpty (switchCount:SwitchCount) =
         {switchCount=switchCount; 
          weights=Array.init (SwitchCount.value switchCount) (fun i -> 0)}
@@ -372,3 +373,32 @@ module SwitchUses =
                                             (SwitchCount.value c) 
                                             (StageCount.value d))
             stats
+
+
+type SwitchUseRollout = {
+            switchCount:SwitchCount; 
+            sortableCount:SortableCount; 
+            useRoll:int[]}
+
+module SwitchUseRollout =
+    let create (switchCount:SwitchCount) (sortableCount:SortableCount) = 
+        {
+            switchCount=switchCount;
+            sortableCount=sortableCount;
+            useRoll = Array.zeroCreate ((SwitchCount.value switchCount) * 
+                            (SortableCount.value sortableCount))
+        }
+
+    let toSwitchUses (switchUseRollout:SwitchUseRollout) =
+        let swCt = (SwitchCount.value switchUseRollout.switchCount)
+        let useWeights = Array.zeroCreate swCt
+        let upDateSwU dex v =
+            let swUdex = dex % swCt
+            useWeights.[swUdex] <- useWeights.[swUdex] + v
+
+        switchUseRollout.useRoll |> Array.iteri(fun dex v -> upDateSwU dex v)
+
+        {
+            SwitchUses.switchCount = switchUseRollout.switchCount;
+            SwitchUses.weights = useWeights
+        }

@@ -30,19 +30,28 @@ type Md5VsSha256() =
 type BenchmarkSorterOps() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorter16 = RefSorter.CreateRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
-    let sortableSet = SortableSetRollup.allBinary degree |> Result.ExtractOrThrow
+    let sortableSet = SortableSetRollout.allBinary degree |> Result.ExtractOrThrow
 
     [<Benchmark>]
-    member this.SortAllFull() =
-        let res = SorterEval.fullRollup sorter16 sortableSet
+    member this.switchUseRollout() =
+        let res = SortingOps.makeSwitchUses 
+                    sorter16 sortableSet SwitchusePlan.All
         res
 
     [<Benchmark>]
-    member this.SortAllFullR() =
-        let res = SorterEval.fullRollupR sorter16 sortableSet
-        res
+    member this.Rollout() =
+        let sur, track = SortingOps.makeSwitchUsesRollout 
+                            sorter16 sortableSet SwitchusePlan.All
+        sur |> SwitchUseRollout.toSwitchUses
+
+    //[<Benchmark>]
+    //member this.SortAllFullR() =
+    //    let uses, a = SortingOps.fullRolloutR sorter16 sortableSet
+    //    a.baseArray.Length
+
+
 
     //[<Benchmark>]
     //member this.SortAllCheck() =
-    //    let res = SorterEval.checkRollup sorter16 sortableSet
+    //    let res = SorterEval.checkRollout sorter16 sortableSet
     //    res

@@ -34,8 +34,8 @@ module TestData =
 
         let sorterSet = SorterSet.fromSorters degree listOfSorters
 
-        let rollupOfAllBinary = SortableSetRollup.allBinary degree
-        let rollupOfAllSortedBinary = SortableSetRollup.fromSortableIntArrays 
+        let RolloutOfAllBinary = SortableSetRollout.allBinary degree
+        let RolloutOfAllSortedBinary = SortableSetRollout.fromSortableIntArrays 
                                         degree 
                                         (SortableIntArray.allSorted_0_1 degree)
 

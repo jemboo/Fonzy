@@ -42,14 +42,12 @@ module GuidUtils =
         let pcsS = Array.init 16 (fun i-> pcs1.[i] + pcs2.[i])
         new System.Guid(pcsS)
 
-
     let addGuidsO (g1:Guid option) (g2:Guid option) =
         match g1,g2 with
         | Some v1, Some v2 -> addGuids v1 v2
         | None, Some v2 -> v2
         | Some v1, None -> v1
         | None, None -> Guid.Empty
-
 
     let guidFromObjs (objs:seq<obj>) =
         let acc = Array.create 16 (byte 0)
@@ -138,7 +136,7 @@ module CollectionUtils =
                         do yield! Seq.replicate count (f items.[i]) }
         seq { while true do yield! tt }
 
-    let IterateCircular (count:int) (ofWhat:'a[]) =
+    let iterateCircular (count:int) (ofWhat:'a[]) =
         seq { for i in 0..(count-1) 
                     do yield ofWhat.[i%ofWhat.Length] }
 
@@ -170,7 +168,8 @@ module CollectionUtils =
         }
 
     // returns a list of the new items added
-    let cumulate (cumer:Dictionary<int, Dictionary<'a,'b>>) (key:int) (group:'a) (item:'b) =
+    let cumulate (cumer:Dictionary<int, Dictionary<'a,'b>>) 
+                 (key:int) (group:'a) (item:'b) =
         if cumer.ContainsKey(key) then
             cumer.[key].Add(group, item)
             [item]
@@ -179,7 +178,6 @@ module CollectionUtils =
             newDict.Add(group, item)
             cumer.Add(key, newDict)
             [item]
-
 
     let cumerBackFill (cumer:Dictionary<int, Dictionary<'a,'b>>) =
         let backFill (dPrev:Dictionary<'a,'b>) (dNext:Dictionary<'a,'b>)

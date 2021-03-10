@@ -4,7 +4,7 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type SortingResultsFixture () =
+type SortingEvalFixture () =
 
     [<TestMethod>]
     member this.yab() =

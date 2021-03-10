@@ -7,16 +7,36 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 type SorterOpsFixture () =
 
     [<TestMethod>]
-    member this.SortAllFull() =
+    member this.switchUseRollout() =
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
         let sorter16 = RefSorter.CreateRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
-        let sortableSet = SortableSetRollup.allBinary degree |> Result.ExtractOrThrow
-       
-        let res = SorterEval.fullRollup sorter16 sortableSet
-        let w = fst res       
+        let sortableSet = SortableSetRollout.allBinary degree |> Result.ExtractOrThrow    
 
-        let resR = SorterEval.fullRollupR sorter16 sortableSet
-        let wR = resR    
+        let resR = SortingOps.makeSwitchUses 
+                        sorter16 sortableSet SwitchusePlan.All
+        let wR = snd resR    
+        let histo = wR |> SortableSetRollout.toSortableIntArrays
+                       |> Seq.countBy id
+                       |> Seq.toArray
+        Assert.IsTrue(histo.Length > 1)
+
+    [<TestMethod>]
+    member this.Rollout() =
+        let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
+        let sorter16 = RefSorter.CreateRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
+        let sortableSet = SortableSetRollout.allBinary degree |> Result.ExtractOrThrow    
+
+        let resR = SortingOps.makeSwitchUsesRollout 
+                            sorter16 sortableSet SwitchusePlan.All
+        let Rollout = snd resR
+        let histo = Rollout |> SortableSetRollout.toSortableIntArrays
+                       |> Seq.countBy id
+                       |> Seq.toArray
+
+        let useTrack = fst resR
+
+        let rollout = SwitchUseRollout.create 
+                                sorter16.switchCount
+                                sortableSet.sortableCount
 
         Assert.IsTrue(true)
-

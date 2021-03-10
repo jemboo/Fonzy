@@ -4,13 +4,14 @@ open System
 type SortableSetExplicit = {id:Guid; degree:Degree; 
                             sortableIntArrays:SortableIntArray[]}
 module SortableSetExplicit = 
-    let toRollup (sse:SortableSetExplicit) =
+    let toRollout (sse:SortableSetExplicit) =
         let sroll = sse.sortableIntArrays |> Array.map(SortableIntArray.value)
                                           |> Array.collect(id)
         {
-            SortableSetRollup.degree = sse.degree;
-            SortableSetRollup.count = sse.sortableIntArrays.Length;
-            SortableSetRollup.baseArray = sroll
+            SortableSetRollout.degree = sse.degree;
+            SortableSetRollout.sortableCount = SortableCount.fromInt 
+                                                    sse.sortableIntArrays.Length;
+            SortableSetRollout.baseArray = sroll
         }
 
 type SortableSetGenerated = {id:Guid; cat:string; prams:Map<string, string>;}
@@ -26,7 +27,6 @@ module SortableSetGenerated =
             SortableSetGenerated.cat = "allIntBits";
             SortableSetGenerated.prams = m
         }
-
 
     let rndBits (degree:Degree) (sortableCount:SortableCount) (rngGen:RngGen) = 
         let m = [("count", (SortableCount.value sortableCount).ToString()); 
