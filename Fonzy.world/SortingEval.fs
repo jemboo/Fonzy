@@ -1,60 +1,53 @@
 ﻿namespace global
 open System
 
+module SortingEval =
 
-type SortingStrategy =
-     | RunAllSwitches
-     | QuitWhenSorted
+    type SwitchUsePlan =
+        | All 
+        | Range of int*int
 
-type SwitchusePlan =
-    | All 
-    | Range of int*int
 
-type SorterEvalParams =
-    {
-        sortingStrategy:SortingStrategy;
-        switchusePlan:SwitchusePlan;
-        sortableSet:SortableSet;
-        sorterId:Guid;
-        sorter:Sorter;
-    }
+    type ResultsNoSAG  = 
+        {
+            switchEventRollout:SwitchEventRollout; 
+            sortableSetRollout:SortableSetRollout;
+        }
 
-type SorterEvalResultsBasic = 
-    {
-        switchCount:SwitchCount; 
-        stagecount:StageCount;
-        allAreSucessful:bool;
-        sortableSetId:Guid;
-        sorterId:Guid;
-    }
+    type ResultsSAGbySwitch = 
+        {
+            switchUses:SwitchUses; 
+            sortableSetRollout:SortableSetRollout;
+        }
 
-type SorterEvalResultsHistogram = 
-    {
-        switchUses:SwitchUses;
-        switchusePlan:SwitchusePlan;
-        resultsHistogram: (SortableIntArray*int)[]
-        sortableSetId:Guid;
-        sorterId:Guid;
-    }
+    type ResultsSAGbySortable = 
+        {
+            sortableUses:SortableUses; 
+            sortableSetRollout:SortableSetRollout;
+        }
 
-type SorterEvalResultsRaw = 
-    {
-        switchUseRollout:SwitchUseRollout;
-        switchusePlan:SwitchusePlan;
-        sortableSetRollout: SortableSetRollout
-        sortableSetId:Guid;
-        sorterId:Guid;
-    }
+    type Results =
+        | NoSAG of ResultsNoSAG
+        | SAGbySwitch of ResultsSAGbySwitch
+        | SAGbySortable of ResultsSAGbySortable
 
-type SorterEvalResults =
-    | Basic of SorterEvalResultsBasic
-    | Histogram of SorterEvalResultsHistogram
-    | Raw of SorterEvalResultsRaw
+    type SwitchEventAgg =
+        | NoAgg
+        | BySwitch
+        | BySortable
 
-type SorterEvalReporting =
-    | Basic
-    | Histogram
-    | Raw
+
+    type SorterEvalParams =
+        {
+            switchusePlan:SwitchUsePlan;
+            sortableSet:SortableSet;
+            switchEventAggregation:SwitchEventAgg;
+            sorter:Sorter;
+        }
+
+
+
+
 
 
 //type SortingResultsW = 

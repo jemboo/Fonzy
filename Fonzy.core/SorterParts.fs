@@ -298,14 +298,12 @@ module SwitchUses =
                                 |> Seq.toArray
             res |> Ok
 
-
     let lastUsedIndex (st:SwitchUses) =
         let w = (getWeights st)
         w
             |> Seq.mapi(fun i x -> (i, x))
             |> Seq.filter(fun tup -> (snd tup) > 0)
             |> Seq.maxBy(fst) |> fst
-
 
     let lastUsedIndexes (switchCount:SwitchCount) (stseq:seq<SwitchUses>) =            
         let stRet = createEmpty switchCount
@@ -375,12 +373,24 @@ module SwitchUses =
             stats
 
 
-type SwitchUseRollout = {
+type SortableUses = {sortableCount:SortableCount; weights:int[]}
+module SortableUses =
+    let createEmpty (sortableCount:SortableCount) =
+        {
+            sortableCount=sortableCount; 
+            weights=Array.init (SortableCount.value sortableCount) (fun i -> 0)
+        }
+    let getWeights sortableUses = sortableUses.weights
+    let sortableCount sortableUses = (SortableCount.value sortableUses.sortableCount)
+
+
+
+type SwitchEventRollout = {
             switchCount:SwitchCount; 
             sortableCount:SortableCount; 
             useRoll:int[]}
 
-module SwitchUseRollout =
+module SwitchEventRollout =
     let create (switchCount:SwitchCount) (sortableCount:SortableCount) = 
         {
             switchCount=switchCount;
@@ -389,7 +399,7 @@ module SwitchUseRollout =
                             (SortableCount.value sortableCount))
         }
 
-    let toSwitchUses (switchUseRollout:SwitchUseRollout) =
+    let toSwitchUses (switchUseRollout:SwitchEventRollout) =
         let swCt = (SwitchCount.value switchUseRollout.switchCount)
         let useWeights = Array.zeroCreate swCt
         let upDateSwU dex v =

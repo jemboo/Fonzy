@@ -95,17 +95,13 @@ module SortableSetGenerated =
                     SortableIntArray.create 
                         (ZeroOneSequence.Random r (Degree.value d) 0.5 |> Seq.toArray)
             result {
-                        let! count = ssg.prams |> ResultMap.lookupKeyedInt "count"
                         let! degree = ssg.prams |> ResultMap.procKeyedInt "degree" 
                                                             (fun d -> Degree.create "" d)
-                        let! rngGen = ssg.prams |> ResultMap.procKeyedString "rngGen" 
-                                                                    (RngGenDto.fromJson)
-                        let rando = rngGen |> Rando.fromRngGen
-                        let sias = Array.init count (fun _ -> makeSia rando degree)
                         return {
                                 SortableSetExplicit.id = ssg.id;
                                 SortableSetExplicit.degree = degree;
-                                SortableSetExplicit.sortableIntArrays = sias
+                                SortableSetExplicit.sortableIntArrays = 
+                                    SortableIntArray.all_0_1 degree
                                 }
                     }
         | _ -> Error (sprintf "no match for SortableSetGenerated.cat: %s" ssg.cat)

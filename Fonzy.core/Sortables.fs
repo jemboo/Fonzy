@@ -18,11 +18,18 @@ module SortableIntArray =
         IntBits.Sorted_0_1_Sequences (Degree.value degree)
             |> Seq.map(create) |> Seq.toArray
 
+//Returns all 0-1 sequences of length degree
+    let all_0_1 (degree:Degree) =
+        IntBits.AllBinaryTestCasesSeq (Degree.value degree)
+            |> Seq.map(create) |> Seq.toArray
+
+
 type SortableSetRollout = {
-                            degree:Degree; 
-                            baseArray:int[]; 
-                            sortableCount:SortableCount
-                         }
+            degree:Degree; 
+            baseArray:int[]; 
+            sortableCount:SortableCount
+        }
+
 module SortableSetRollout =
     let create (degree:Degree) (baseArray:int[] ) =
         if baseArray.Length < 0 + (Degree.value degree) then
@@ -57,7 +64,7 @@ module SortableSetRollout =
             SortableSetRollout.degree=sortableSetRollout.degree; 
             baseArray=baseCopy;
             sortableCount=sortableSetRollout.sortableCount
-        } |> Ok
+        }
 
     let allBinary (degree:Degree) =
         let baseArray = IntBits.AllBinaryTestCasesArray (Degree.value degree)
