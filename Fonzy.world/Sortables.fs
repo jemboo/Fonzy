@@ -1,21 +1,6 @@
 ﻿namespace global
 open System
 
-type SortableSetExplicit = {id:Guid; degree:Degree; 
-                            sortableIntArrays:SortableIntArray[]}
-module SortableSetExplicit = 
-    let toRollout (sse:SortableSetExplicit) =
-        let sroll = sse.sortableIntArrays |> Array.map(SortableIntArray.value)
-                                          |> Array.collect(id)
-        {
-            SortableSetRollout.degree = sse.degree;
-            SortableSetRollout.sortableCount = SortableCount.fromInt 
-                                                    sse.sortableIntArrays.Length;
-            SortableSetRollout.baseArray = sroll
-        }
-
-type SortableSetGenerated = {id:Guid; cat:string; prams:Map<string, string>;}
-
 module SortableSetGenerated =
 
     let allIntBits (degree:Degree) = 
@@ -23,7 +8,7 @@ module SortableSetGenerated =
                     |> Map.ofList
         let id = ([("allIntBits" :> obj); (m :> obj)]) |> GuidUtils.guidFromObjList
         {
-            SortableSetGenerated.id = id ;
+            SortableSetGenerated.id = id |> SortableSetId.fromGuid;
             SortableSetGenerated.cat = "allIntBits";
             SortableSetGenerated.prams = m
         }
@@ -34,7 +19,7 @@ module SortableSetGenerated =
                  ("rngGen", rngGen |> RngGenDto.toJson )] |> Map.ofList
         let id = ([("rndBits" :> obj); (m :> obj)]) |> GuidUtils.guidFromObjList
         {
-            SortableSetGenerated.id = id ;
+            SortableSetGenerated.id = id |> SortableSetId.fromGuid;
             SortableSetGenerated.cat = "rndBits";
             SortableSetGenerated.prams = m
         }
@@ -45,7 +30,7 @@ module SortableSetGenerated =
                  ("rngGen", rngGen |> RngGenDto.toJson )] |> Map.ofList
         let id = ([("rndPerms" :> obj); (m :> obj)]) |> GuidUtils.guidFromObjList
         {
-            SortableSetGenerated.id = id ;
+            SortableSetGenerated.id = id |> SortableSetId.fromGuid;
             SortableSetGenerated.cat = "rndPerms";
             SortableSetGenerated.prams = m
         }
@@ -71,23 +56,13 @@ module SortableSetGenerated =
 
         | "rndPerms" -> 
             result {
-                      let! count = ssg.prams |> ResultMap.lookupKeyedInt "count"
+                      let! count = ssg.prams |> ResultMap.procKeyedInt "count" 
+                                                            (fun d -> SortableCount.create "" d)
                       let! degree = ssg.prams |> ResultMap.procKeyedInt "degree" 
                                                             (fun d -> Degree.create "" d)
                       let! rngGen = ssg.prams |> ResultMap.procKeyedString "rngGen" 
                                                                     (RngGenDto.fromJson)
-                      let rando = rngGen |> Rando.fromRngGen
-
-                      let sias = Permutation.createRandoms degree rando
-                                    |> Seq.map(fun p -> SortableIntArray.create 
-                                                         (Permutation.arrayValues p))
-                                    |> Seq.take count
-                                    |> Seq.toArray
-                      return {
-                                SortableSetExplicit.id = ssg.id;
-                                SortableSetExplicit.degree = degree;
-                                SortableSetExplicit.sortableIntArrays = sias
-                             }
+                      return SortableSetExplicit.rndPerms degree rngGen count ssg.id
                    }
 
         | "allIntBits" -> 
@@ -97,27 +72,12 @@ module SortableSetGenerated =
             result {
                         let! degree = ssg.prams |> ResultMap.procKeyedInt "degree" 
                                                             (fun d -> Degree.create "" d)
-                        return {
-                                SortableSetExplicit.id = ssg.id;
-                                SortableSetExplicit.degree = degree;
-                                SortableSetExplicit.sortableIntArrays = 
-                                    SortableIntArray.all_0_1 degree
-                                }
+
+                        return SortableSetExplicit.allIntBits degree ssg.id
                     }
         | _ -> Error (sprintf "no match for SortableSetGenerated.cat: %s" ssg.cat)
 
-
-
-type SortableSet =
-        | Explicit of SortableSetExplicit
-        | Generated of SortableSetGenerated
-
 module SortableSet = 
-    let getId (ss:SortableSet) =
-        match ss with
-        | Explicit ess -> ess.id
-        | Generated gss -> gss.id
-
     let getSortableSetExplicit (ss:SortableSet) =
         match ss with
         | Explicit ess -> ess |> Ok

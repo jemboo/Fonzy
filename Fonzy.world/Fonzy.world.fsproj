@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="WorldTypes.fs" />
     <Compile Include="Sortables.fs" />
-    <Compile Include="SortingEval.fs" />
     <Compile Include="SortingOps.fs" />
     <Compile Include="Enviros.fs" />
     <Compile Include="CauseSpecs.fs" />

@@ -20,6 +20,8 @@
     <Compile Include="SortingTypes.fs" />
     <Compile Include="SorterParts.fs" />
     <Compile Include="Sortables.fs" />
+    <Compile Include="SorterActionRecords.fs" />
+    <Compile Include="SortingEval.fs" />
     <Compile Include="GaTypes.fs" />
     <Compile Include="SortingGaTypes.fs" />
     <Compile Include="SorterGa.fs" />

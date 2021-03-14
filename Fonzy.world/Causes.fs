@@ -8,6 +8,8 @@ module CauseSorters =
     let rndGen (causeSpec:CauseSpec) =
         let causer = fun (e:Enviro) ->
             result {
+                let! sorterSetId = causeSpec.prams |> ResultMap.procKeyedGuid "sorterSetId" 
+                                                      (SorterSetId.create)
                 let! degree = causeSpec.prams |> ResultMap.procKeyedInt "degree" 
                                                          (fun d -> Degree.create "" d)
                 let! sorterLength = causeSpec.prams |> ResultMap.procKeyedString "sorterLength" 
@@ -23,7 +25,7 @@ module CauseSorters =
                 let randy = Rando.fromRngGen rngGen
                 let sorterArray = Sorter.createRandomArray degree sorterLength
                                         switchFreq sorterCount randy
-                let sorterSet = SorterSet.fromSorters degree sorterArray
+                let sorterSet = SorterSet.fromSorters sorterSetId degree sorterArray
                 let sorterSetDto = sorterSet |> SorterSetDto.toDto
                 return! Enviro.addRootDtoToEnviro<SorterSetDto>
                                     e outName sorterSetDto Map.empty

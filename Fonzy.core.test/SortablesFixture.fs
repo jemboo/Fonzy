@@ -7,25 +7,14 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 type SortablesFixture () =
 
     [<TestMethod>]
-    member this.SortableSetRollout_IsSorted() =
-      let unSortedRollout = TestData.SorterParts.RolloutOfAllBinary
-                            |> Result.ExtractOrThrow
-      Assert.IsFalse(SortableSetRollout.isSorted unSortedRollout)
+    member this.SortableSet_getId() =
+      let ss = TestData.SortableSet.sortableSet
+      let ssId = ss |> SortableSet.getId
 
-      let sortedRollout = TestData.SorterParts.RolloutOfAllSortedBinary
-                              |> Result.ExtractOrThrow
-
-      let a = unSortedRollout |> SortableSetRollout.toSortableIntArrays
-                             |> Seq.countBy id
-                             |> Seq.toArray
-
-      Assert.IsTrue(a.Length > 0)
-      Assert.IsTrue(SortableSetRollout.isSorted sortedRollout)
+      Assert.AreEqual(ssId, TestData.SortableSet.sortableSetId)
 
 
     [<TestMethod>]
-    member this.SortableSetRollout_distinctResults() =
-      let unsortedRollout = TestData.SorterParts.RolloutOfAllSortedBinary
-                            |> Result.ExtractOrThrow
-      let drs = unsortedRollout |> SortableSetRollout.distinctSortableSets
-      Assert.IsTrue(drs.Length = 9)
+    member this.terst() =
+
+      Assert.IsTrue(true)

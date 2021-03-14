@@ -24,70 +24,72 @@ module SortableIntArray =
             |> Seq.map(create) |> Seq.toArray
 
 
-type SortableSetRollout = {
-            degree:Degree; 
-            baseArray:int[]; 
-            sortableCount:SortableCount
-        }
+type SortableSetExplicit = {id:SortableSetId; degree:Degree; 
+                            sortableIntArrays:SortableIntArray[]}
 
-module SortableSetRollout =
-    let create (degree:Degree) (baseArray:int[] ) =
-        if baseArray.Length < 0 + (Degree.value degree) then
-            Error (sprintf "baseArray length %d is not a multiple of degree: %d:" 
-                    baseArray.Length (Degree.value degree))
-        else
-            let baseCopy = Array.zeroCreate baseArray.Length
-            Array.Copy(baseArray, baseCopy, baseArray.Length)
-            {
-                SortableSetRollout.degree=degree; 
-                baseArray=baseCopy; 
-                sortableCount= SortableCount.fromInt (baseCopy.Length / (Degree.value degree))
-            } |> Ok
+type SortableSetGenerated = {id:SortableSetId; cat:string; prams:Map<string, string>;}
 
-    let fromSortableIntArrays (degree:Degree) 
-                              (baseArrays:SortableIntArray[]) =
-        result {
-            let a = baseArrays |> Array.map(SortableIntArray.value)
-                               |> Array.collect(id)
-            return! create degree a 
-        }
 
-    let toSortableIntArrays (ssRollout:SortableSetRollout) =
-        let d = (Degree.value ssRollout.degree)
-        ssRollout.baseArray |> Array.chunkBySize d
-                           |> Array.map(SortableIntArray.create)
+type SortableSet =
+        | Explicit of SortableSetExplicit
+        | Generated of SortableSetGenerated
 
-    let copy (sortableSetRollout:SortableSetRollout) =
-        let baseCopy = Array.zeroCreate sortableSetRollout.baseArray.Length
-        Array.Copy(sortableSetRollout.baseArray, baseCopy, baseCopy.Length)
+module SortableSet = 
+    let getId (ss:SortableSet) =
+        match ss with
+        | Explicit ess -> ess.id
+        | Generated gss -> gss.id
+
+
+module SortableSetExplicit = 
+
+    let allIntBits (degree:Degree) (id:SortableSetId) = 
         {
-            SortableSetRollout.degree=sortableSetRollout.degree; 
-            baseArray=baseCopy;
-            sortableCount=sortableSetRollout.sortableCount
-        }
+              SortableSetExplicit.id = id;
+              SortableSetExplicit.degree = degree;
+              SortableSetExplicit.sortableIntArrays = 
+                    SortableIntArray.all_0_1 degree
+         }
 
-    let allBinary (degree:Degree) =
-        let baseArray = IntBits.AllBinaryTestCasesArray (Degree.value degree)
-                        |> Array.collect(id)
-        create degree baseArray
+    let rndBits (degree:Degree) 
+                (rngGen:RngGen) 
+                (count:int)
+                (id:SortableSetId) = 
+        let rando = rngGen |> Rando.fromRngGen
+        let sias = Permutation.createRandoms degree rando
+                    |> Seq.take count
+                    |> Seq.map(fun p -> SortableIntArray.create p.values)
+                    |> Seq.toArray
+        {
+              SortableSetExplicit.id = id;
+              SortableSetExplicit.degree = degree;
+              SortableSetExplicit.sortableIntArrays = sias
+         }
 
-    let isSorted (ssRollout:SortableSetRollout) =
-        let d = (Degree.value ssRollout.degree)
-        seq {0 .. d .. ssRollout.baseArray.Length}
-            |> Seq.forall(fun dex -> Combinatorics.isSortedOffset ssRollout.baseArray dex d)
-        
-    let sortedCount (ssRollout:SortableSetRollout) =
-        let d = (Degree.value ssRollout.degree)
-        seq {0 .. d .. (ssRollout.baseArray.Length - 1)}
-            |> Seq.filter (fun dex -> Combinatorics.isSortedOffset ssRollout.baseArray dex d)
-            |> Seq.length
+    let rndPerms (degree:Degree) 
+                 (rngGen:RngGen) 
+                 (sortableCount:SortableCount)
+                 (id:SortableSetId) = 
+        let rando = rngGen |> Rando.fromRngGen
+        let sia = Permutation.createRandoms degree rando
+                    |> Seq.map(fun p -> SortableIntArray.create 
+                                            (Permutation.arrayValues p))
+                    |> Seq.take (SortableCount.value sortableCount)
+                    |> Seq.toArray
+        {
+              SortableSetExplicit.id = id;
+              SortableSetExplicit.degree = degree;
+              SortableSetExplicit.sortableIntArrays = sia
+         }
 
-    let distinctSortableSets (ssRollout:SortableSetRollout) =
-        ssRollout |> toSortableIntArrays
-                 |> Seq.distinct
-                 |> Seq.toArray
 
-    let histogramOfSortableSets (ssRollout:SortableSetRollout) =
-        ssRollout |> toSortableIntArrays
-                 |> Seq.countBy id
-                 |> Seq.toArray
+
+    //let toRollout (sse:SortableSetExplicit) =
+    //    let sroll = sse.sortableIntArrays |> Array.map(SortableIntArray.value)
+    //                                      |> Array.collect(id)
+    //    {
+    //        SortableSetRollout.degree = sse.degree;
+    //        SortableSetRollout.sortableCount = SortableCount.fromInt 
+    //                                                sse.sortableIntArrays.Length;
+    //        SortableSetRollout.baseArray = sroll
+    //    }

@@ -60,7 +60,7 @@ type SorterOpsFixture () =
 
 
     [<TestMethod>]
-    member this.evalSorter() =
+    member this.evalRecordCorrectSorter() =
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
         let sorter16 = RefSorter.CreateRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
         let sortableSetEx = SortableSet.Generated (SortableSetGenerated.allIntBits degree)
@@ -69,9 +69,9 @@ type SorterOpsFixture () =
 
         let ssR = SortingOps.evalSorter 
                             sorter16 sortableSetEx SortingEval.SwitchUsePlan.All
-                            SortingEval.SwitchEventAgg.BySwitch
-        let ct =
+                            SortingEval.SwitchEventGrouping.BySwitch
+        let switchCount =
             match ssR with
-            | SortingEval.Results.SAGbySwitch s -> s.switchUses.switchCount
+            | SortingEval.SwitchEventRecords.GroupbySwitch s -> s.switchUses.switchCount
             | _ -> failwith "yoe"
-        Assert.IsTrue((SwitchCount.value ct) > 0)
+        Assert.IsTrue((SwitchCount.value switchCount) > 0)

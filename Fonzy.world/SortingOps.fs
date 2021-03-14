@@ -53,9 +53,9 @@ module SortingOps =
                         lastSwitchDex sortableSetRolloutCopy 
                         switchEventRollout.useRoll sortableIndex
                 sortableIndex <- sortableIndex + 1
-        SortingEval.Results.NoSAG {
-            SortingEval.ResultsNoSAG.switchEventRollout = switchEventRollout; 
-            SortingEval.ResultsNoSAG.sortableSetRollout = sortableSetRolloutCopy
+        SortingEval.SwitchEventRecords.NoGrouping {
+            SortingEval.SeNoGrouping.switchEventRollout = switchEventRollout; 
+            SortingEval.SeNoGrouping.sortableSetRollout = sortableSetRolloutCopy
         }
 
 
@@ -105,9 +105,9 @@ module SortingOps =
                     sorter firstSwitchDex lastSwitchDex 
                     switchUses sortableSetRolloutCopy sortableIndex
                 sortableIndex <- sortableIndex + 1
-        SortingEval.Results.SAGbySwitch {
-            SortingEval.ResultsSAGbySwitch.switchUses = switchUses; 
-            SortingEval.ResultsSAGbySwitch.sortableSetRollout = sortableSetRolloutCopy
+        SortingEval.SwitchEventRecords.GroupbySwitch {
+            SortingEval.SeGroupbySwitch.switchUses = switchUses; 
+            SortingEval.SeGroupbySwitch.sortableSetRollout = sortableSetRolloutCopy
         }
         
     // creates a sorter.switchcount length array to store accumulated
@@ -158,33 +158,63 @@ module SortingOps =
                     sorter firstSwitchDex lastSwitchDex sortableUses 
                     sortableSetRolloutCopy sortableIndex
                 sortableIndex <- sortableIndex + 1
-        SortingEval.Results.SAGbySortable   {
-            SortingEval.ResultsSAGbySortable.sortableUses = sortableUses; 
-            SortingEval.ResultsSAGbySortable.sortableSetRollout = sortableSetRolloutCopy
+        SortingEval.SwitchEventRecords.GroupBySortable   {
+            SortingEval.SeGroupBySortable.sortableUses = sortableUses; 
+            SortingEval.SeGroupBySortable.sortableSetRollout = sortableSetRolloutCopy
         }
 
+    let evalSorterOnSortableSetRollout (sorter:Sorter)
+                    (sortableSetRollout:SortableSetRollout)
+                    (switchusePlan:SortingEval.SwitchUsePlan) 
+                    (switchEventAgg:SortingEval.SwitchEventGrouping) =
+
+        match switchEventAgg with
+        | SortingEval.SwitchEventGrouping.NoGrouping -> 
+                EvalSorterOnSortableSetWithNoSAG 
+                    sorter sortableSetRollout switchusePlan
+        | SortingEval.SwitchEventGrouping.BySwitch -> 
+                EvalSorterOnSortableSetSAGbySwitch 
+                    sorter sortableSetRollout switchusePlan
+        | SortingEval.SwitchEventGrouping.BySortable -> 
+                EvalSorterOnSortableSetSAGbySortable 
+                    sorter sortableSetRollout switchusePlan
 
 
     let evalSorter (sorter:Sorter)
                    (sortableSet:SortableSetExplicit)
                    (switchusePlan:SortingEval.SwitchUsePlan) 
-                   (switchEventAgg:SortingEval.SwitchEventAgg) =
-        let sortableSetRollout = sortableSet.sortableIntArrays 
-                                    |> SortableSetRollout.fromSortableIntArrays
-                                            sorter.degree
-                                    |> Result.ExtractOrThrow
-        match switchEventAgg with
-        | SortingEval.SwitchEventAgg.NoAgg -> EvalSorterOnSortableSetWithNoSAG 
-                                                sorter sortableSetRollout switchusePlan
-
-        | SortingEval.SwitchEventAgg.BySwitch -> EvalSorterOnSortableSetSAGbySwitch 
-                                                   sorter sortableSetRollout switchusePlan
-
-        | SortingEval.SwitchEventAgg.BySortable -> EvalSorterOnSortableSetSAGbySortable 
-                                                     sorter sortableSetRollout switchusePlan
+                   (switchEventAgg:SortingEval.SwitchEventGrouping) =
+        let sortableSetRollout = 
+            sortableSet.sortableIntArrays
+                |> SortableSetRollout.fromSortableIntArrays
+                        sorter.degree
+                |> Result.ExtractOrThrow
+        evalSorterOnSortableSetRollout
+            sorter sortableSetRollout switchusePlan switchEventAgg
 
 
     module SorterSet =
+        let eval (sorterSet:SorterSet)
+                 (sortableSet:SortableSetExplicit)
+                 (switchusePlan:SortingEval.SwitchUsePlan) 
+                 (switchEventAgg:SortingEval.SwitchEventGrouping) 
+                 (_parallel:UseParallel) =
+            let sortableSetRollout = sortableSet.sortableIntArrays 
+                                        |> SortableSetRollout.fromSortableIntArrays
+                                                sorterSet.degree
+                                        |> Result.ExtractOrThrow
+            let rewrap (id, s) = 
+                let res = evalSorterOnSortableSetRollout 
+                            s sortableSetRollout switchusePlan switchEventAgg
+                res
+                //id, (SortingResultsW.makeStandard s sorterId sortableSetId su sc)
+
+            match UseParallel.value(_parallel) with
+            | true  -> sorterSet.sorters |> Map.toArray 
+                                         |> Array.Parallel.map(fun s-> rewrap s)
+            | false -> sorterSet.sorters |> Map.toArray 
+                                         |> Array.map(fun s-> rewrap s)
+
 
         let private makeResults (sortableSet:SortableSetRollout) (sorterSet:SorterSet) 
                                 (sorterId:Guid) (sortableSetId:Guid) (_parallel:UseParallel) 

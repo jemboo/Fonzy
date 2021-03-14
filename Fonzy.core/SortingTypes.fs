@@ -6,24 +6,15 @@ open System
 // Sorter
 
 type SortableCount = private SortableCount of int
+type SortableSetId = private SortableSetId of Guid
 type SorterCount = private SorterCount of int
+type SorterSetId = private SorterSetId of Guid
 type StageCount = private StageCount of int
 type SwitchCount = private SwitchCount of int
 type SwitchFrequency = private SwitchFrequency of float
 type SwitchOrStage = | Switch | Stage
 type SorterLength = | Switch of SwitchCount
                     | Stage of StageCount
-
-module SorterCount =
-    let value (SorterCount v) = v
-    let create fieldName v = 
-        ConstrainedType.createInt fieldName SorterCount 1 100000 v
-    let fromInt v = create "" v |> Result.ExtractOrThrow
-    let fromKey (m:Map<'a, obj>) (key:'a) =
-        result {
-            let! gv = ResultMap.read key m
-            return! create "" (gv:?>int)
-        }
 
 module SortableCount =
     let value (SortableCount v) = v
@@ -38,6 +29,30 @@ module SortableCount =
             let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
+
+
+module SorterSetId =
+    let value (SorterSetId v) = v
+    let create id = Ok (SorterSetId id)
+    let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
+
+
+module SorterCount =
+    let value (SorterCount v) = v
+    let create fieldName v = 
+        ConstrainedType.createInt fieldName SorterCount 1 100000 v
+    let fromInt v = create "" v |> Result.ExtractOrThrow
+    let fromKey (m:Map<'a, obj>) (key:'a) =
+        result {
+            let! gv = ResultMap.read key m
+            return! create "" (gv:?>int)
+        }
+
+module SortableSetId =
+    let value (SortableSetId v) = v
+    let create id = Ok (SortableSetId id)
+    let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
+
 
 module SwitchCount =
     let value (SwitchCount v) = v
@@ -76,7 +91,6 @@ module StageCount =
         }
 
 module SorterLength =
-
     let makeSwitchCountR switchCount =
         result {
             let! wc = (SwitchCount.create "" switchCount)
@@ -99,62 +113,47 @@ module SorterLength =
             match lhs with
                 | SorterLength.Switch (SwitchCount wCtL) -> 
                         match rhs with
-                        | SorterLength.Switch (SwitchCount wCtR) -> makeSwitchCount (wCtL + wCtR) |> Result.Ok
+                        | SorterLength.Switch (SwitchCount wCtR) -> 
+                                makeSwitchCount (wCtL + wCtR) |> Result.Ok
                         | SorterLength.Stage _ -> Error "cant add SwitchCount and StageCount"
                 | SorterLength.Stage (StageCount tCtL) -> 
                         match rhs with
                         | SorterLength.Switch _ -> Error "cant add SwitchCount and StageCount"
-                        | SorterLength.Stage (StageCount tCtR) -> makeStageCount (tCtL + tCtR) |> Result.Ok
+                        | SorterLength.Stage (StageCount tCtR) -> 
+                                makeStageCount (tCtL + tCtR) |> Result.Ok
+
+    let Multiply (rhs:float) (lhs:SorterLength) =
+            match lhs with
+                | SorterLength.Switch (SwitchCount wCtL) -> 
+                      ((wCtL |> float) * rhs) |> int |> SwitchCount.fromInt |> SorterLength.Switch
+                | SorterLength.Stage (StageCount tCtL) -> 
+                      ((tCtL |> float) * rhs) |> int |>  StageCount.fromInt |> SorterLength.Stage
+
 
     let degreeToRecordSwitchCount (degree:Degree) =
         let d = (Degree.value degree)
         let ct = match d with
-                    | 4 -> 5
-                    | 5 -> 9
-                    | 6 -> 12
-                    | 7 -> 16
-                    | 8 -> 19
-                    | 9 -> 25
-                    | 10 -> 29
-                    | 11 -> 35
-                    | 12 -> 39
-                    | 13 -> 45
-                    | 14 -> 51
-                    | 15 -> 56
-                    | 16 -> 60
-                    | 17 -> 71
-                    | 18 -> 77
-                    | 19 -> 85
-                    | 20 -> 91
-                    | 21 -> 100
-                    | 22 -> 107
-                    | 23 -> 115
-                    | 24 -> 120
-                    | 25 -> 132
-                    | 26 -> 139
-                    | 27 -> 150
-                    | 28 -> 155
-                    | 29 -> 165
-                    | 30 -> 172
-                    | 31 -> 180
-                    | 32 -> 185
-                    | _ -> 0
+                    | 4 -> 5    | 5 -> 9    | 6 -> 12
+                    | 7 -> 16   | 8 -> 19   | 9 -> 25
+                    | 10 -> 29  | 11 -> 35  | 12 -> 39
+                    | 13 -> 45  | 14 -> 51  | 15 -> 56
+                    | 16 -> 60  | 17 -> 71  | 18 -> 77
+                    | 19 -> 85  | 20 -> 91  | 21 -> 100
+                    | 22 -> 107 | 23 -> 115 | 24 -> 120
+                    | 25 -> 132 | 26 -> 139 | 27 -> 150
+                    | 28 -> 155 | 29 -> 165 | 30 -> 172
+                    | 31 -> 180 | 32 -> 185 | _ -> 0
         let wc = SwitchCount.create "" ct |> Result.ExtractOrThrow
         SorterLength.Switch wc
 
     let degreeTo999SwitchCount (degree:Degree) =
         let d = (Degree.value degree)
         let ct = match d with
-                    | 6 |7 -> 600
-                    | 8 |9 -> 700
-                    | 10 |11 -> 800
-                    | 12 |13 -> 1000
-                    | 14 |15 -> 1200
-                    | 16 |17 -> 1600
-                    | 18 |19 -> 2000
-                    | 20 |21 -> 2200
-                    | 22 |23 -> 2600
-                    | 24 |25 -> 3000
+                    | 6  | 7 -> 600    | 8  | 9 -> 700
+                    | 10 | 11 -> 800   | 12 | 13 -> 1000
+                    | 14 | 15 -> 1200  | 16 | 17 -> 1600
+                    | 18 | 19 -> 2000  | 20 | 21 -> 2200
+                    | 22 | 23 -> 2600  | 24 | 25 -> 3000
                     | _ -> 0
         let wc = SwitchCount.create "" ct |> Result.ExtractOrThrow
         SorterLength.Switch wc
@@ -181,14 +180,9 @@ module SorterLength =
         let d = (Degree.value degree)
         let ct = match d with
                     | 8 | 9 -> 140
-                    | 10 | 11 -> 160
-                    | 12 | 13 -> 160
-                    | 14 | 15 -> 160
-                    | 16 | 17 -> 200
-                    | 18 | 19 -> 200
-                    | 20 | 21 -> 200
-                    | 22 | 23 -> 220
-                    | 24 | 25 -> 220
+                    | 10 | 11 | 12 | 13 | 14 | 15 -> 160
+                    | 16 | 17 | 18 | 19 | 20 | 21 -> 200
+                    | 22 | 23 | 24 | 25 -> 220
                     | _ -> 0
         let tc = StageCount.create "" ct |> Result.ExtractOrThrow
         SorterLength.Stage tc
@@ -205,5 +199,14 @@ module SorterLength =
 
     let toRecordSorterLengthPlus(degree:Degree) (extraLength:SorterLength) =
         match extraLength with
-        | SorterLength.Switch wCt -> (toRecordSorterLength degree SwitchOrStage.Switch) |> Add extraLength |> Result.ExtractOrThrow
-        | SorterLength.Stage wCt -> (toRecordSorterLength degree SwitchOrStage.Stage) |> Add extraLength |> Result.ExtractOrThrow
+        | SorterLength.Switch wCt -> (toRecordSorterLength degree SwitchOrStage.Switch) 
+                                        |> Add extraLength |> Result.ExtractOrThrow
+        | SorterLength.Stage wCt -> (toRecordSorterLength degree SwitchOrStage.Stage) 
+                                        |> Add extraLength |> Result.ExtractOrThrow
+
+    let toMediocreRandomPerfLength (wOrT:SwitchOrStage) (degree:Degree) =
+        match wOrT with
+        | SwitchOrStage.Switch -> (toRecordSorterLength degree SwitchOrStage.Switch) 
+                                            |> Multiply 5.0 
+        | SwitchOrStage.Stage -> (toRecordSorterLength degree SwitchOrStage.Stage) 
+                                            |> Multiply 5.0 

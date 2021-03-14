@@ -275,6 +275,17 @@ module ResultMap =
 
         | None -> sprintf "key not found: %s" key|> Error
 
+    let lookupKeyedGuid<'a> (key:string) 
+                            (cs:Map<string, string>) : Result<Guid, string> =
+        match cs.TryFind key with
+        | Some value -> 
+          try
+            Guid.Parse(value) |> Ok
+          with
+          | :? InvalidCastException ->
+            sprintf "value: %s could not be cast to float" value |> Error
+
+        | None -> sprintf "key not found: %s" key|> Error
 
     let lookupKeyedBool<'a> (key:string) 
                             (cs:Map<string, string>) : Result<bool, string> =
@@ -307,6 +318,13 @@ module ResultMap =
                           (cs:Map<string, string>) : Result<'a, string> =
         result {
             let! cereal = read key cs
+            return! proc cereal
+        }
+
+    let procKeyedGuid<'a> (key:string) (proc:Guid->Result<'a,string>) 
+                          (cs:Map<string, string>) : Result<'a, string> =
+        result {
+            let! cereal = lookupKeyedGuid key cs
             return! proc cereal
         }
 

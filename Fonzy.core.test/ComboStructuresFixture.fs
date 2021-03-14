@@ -75,8 +75,9 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
-    member this.TestB() =
-       let aa = IntBits.AllBinaryTestCasesArray 5
+    member this.TwoCyclePerm_makeMode1() =
+       let degree = Degree.fromInt 10
+       let aa = TwoCyclePerm.makeOddMode degree
        //let b0 = Array2D.length1 aa
 
        Assert.IsTrue(true)

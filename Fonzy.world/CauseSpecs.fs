@@ -62,15 +62,20 @@ module CauseSpecRandGen =
 module CauseSpecSorters =
     let rndSortersBaseId = Guid.Parse "00000000-0000-0000-0000-000000000002"
 
-    let rndGen (degree:Degree) (sorterLength:SorterLength) 
-               (switchFreq:SwitchFrequency) (sorterCount:SorterCount)
-               (rndGen:RngGen) (outName:string) =
+    let rndGen (sorterSetId:SorterSetId) 
+               (degree:Degree) 
+               (sorterLength:SorterLength) 
+               (switchFreq:SwitchFrequency) 
+               (sorterCount:SorterCount)
+               (rndGen:RngGen) 
+               (outName:string) =
         let id = seq { rndSortersBaseId:> obj;
                        degree:> obj; sorterLength:> obj;
                        switchFreq:> obj;
                        rndGen:> obj; outName:> obj; } 
                         |> GuidUtils.guidFromObjs
         let prams = [
+                     ("sorterSetId", sorterSetId |> SorterSetId.value |> string);
                      ("degree", degree |> Degree.value |> string);
                      ("sorterLength", sorterLength |> SorterLengthDto.toJson);
                      ("switchFreq", switchFreq |> SwitchFrequency.value |> string);

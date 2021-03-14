@@ -8,31 +8,39 @@ module SortingEval =
         | Range of int*int
 
 
-    type ResultsNoSAG  = 
+    type SeNoGrouping  = 
         {
             switchEventRollout:SwitchEventRollout; 
             sortableSetRollout:SortableSetRollout;
         }
 
-    type ResultsSAGbySwitch = 
+    type SeGroupbySwitch = 
         {
             switchUses:SwitchUses; 
             sortableSetRollout:SortableSetRollout;
         }
 
-    type ResultsSAGbySortable = 
+    type SeGroupBySortable = 
         {
             sortableUses:SortableUses; 
             sortableSetRollout:SortableSetRollout;
         }
 
-    type Results =
-        | NoSAG of ResultsNoSAG
-        | SAGbySwitch of ResultsSAGbySwitch
-        | SAGbySortable of ResultsSAGbySortable
+    type SwitchEventRecords =
+        | NoGrouping of SeNoGrouping
+        | GroupbySwitch of SeGroupbySwitch
+        | GroupBySortable of SeGroupBySortable
 
-    type SwitchEventAgg =
-        | NoAgg
+
+    module SwitchEventRecords =
+        let getUsedSwitchCount (switchEventRecords:SwitchEventRecords) =
+            match switchEventRecords with
+            | NoGrouping seNg -> 1
+            | GroupbySwitch seGs -> seGs.switchUses |> SwitchUses.getSwitchActionTotal
+            | GroupBySortable seGt -> 1
+
+    type SwitchEventGrouping =
+        | NoGrouping
         | BySwitch
         | BySortable
 
@@ -41,7 +49,7 @@ module SortingEval =
         {
             switchusePlan:SwitchUsePlan;
             sortableSet:SortableSet;
-            switchEventAggregation:SwitchEventAgg;
+            switchEventAggregation:SwitchEventGrouping;
             sorter:Sorter;
         }
 

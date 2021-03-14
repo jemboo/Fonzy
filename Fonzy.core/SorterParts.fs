@@ -182,21 +182,28 @@ module Sorter =
             switches = newSwitches
         } |> Ok
 
+    let makeAltEvenOdd (degree:Degree) (stageCount:StageCount) =
+        let twoCycles = TwoCyclePerm.makeAltEvenOdd degree
+                            |> Seq.take (StageCount.value stageCount)
+                            |> Seq.toArray
+        fromTwoCycleArray twoCycles
 
 
     // IRando dependent
 
-    let private createWithRandomStages (degree:Degree) (stageCount:StageCount)
-                                       (switchFreq:SwitchFrequency) (rando:IRando) =
+    let createWithRandomStages (degree:Degree) 
+                               (stageCount:StageCount)
+                               (switchFreq:SwitchFrequency) 
+                               (rando:IRando) =
         let switches = (Stage.makeRandomStagedSwitchSeq degree switchFreq rando)
                         |> Seq.take ((StageCount.value stageCount) * (Degree.value degree) / 2)
                         |> Seq.toArray
         create degree switches
 
 
-    let private createWithRandomSwitches (degree:Degree) 
-                                         (switchCount:SwitchCount) 
-                                         (rnd:IRando) =
+    let createWithRandomSwitches (degree:Degree) 
+                                 (switchCount:SwitchCount) 
+                                 (rnd:IRando) =
         let switches = Switch.randomSwitchesOfDegree degree rnd
                     |> Seq.take (SwitchCount.value switchCount)
                     |> Seq.toArray
@@ -237,178 +244,33 @@ module Sorter =
         }
 
 
-type SorterSet = { degree:Degree; sorterCount:SorterCount; sorters:Map<Guid,Sorter> }
+type SorterSet = { id:SorterSetId; 
+                   degree:Degree; 
+                   sorterCount:SorterCount; 
+                   sorters:Map<Guid,Sorter> }
 module SorterSet =
-    let fromSorters (degree:Degree) (sorters:seq<Sorter>) =
+    let fromSorters (sorterSetId:SorterSetId)
+                    (degree:Degree) 
+                    (sorters:seq<Sorter>) =
         let sorterArray = sorters |> Seq.map(fun s-> 
                         ([s :> obj] |> GuidUtils.guidFromObjList), s)
                                   |> Map.ofSeq
         {
+            SorterSet.id =sorterSetId;
             degree=degree; 
             sorterCount= SorterCount.fromInt sorterArray.Count; 
             sorters = sorterArray
         }
 
     // IRando dependent
-    let createRandom (degree:Degree) (sorterLength:SorterLength) 
+    let createRandom (sorterSetId:SorterSetId)
+                     (degree:Degree) 
+                     (sorterLength:SorterLength) 
                      (switchFreq:SwitchFrequency)
-                     (sorterCount:SorterCount) (rnd:IRando) =
-        fromSorters degree 
-            (seq {1 .. (SorterCount.value sorterCount)} 
-                    |> Seq.map(fun _ -> (Sorter.createRandom degree sorterLength switchFreq rnd))
-                    |> Seq.toArray)
- 
-
-type SwitchUses = {switchCount:SwitchCount; weights:int[]}
-module SwitchUses =
-    let createEmpty (switchCount:SwitchCount) =
-        {switchCount=switchCount; 
-         weights=Array.init (SwitchCount.value switchCount) (fun i -> 0)}
-
-    let create (switchCount:SwitchCount) (weights:int[]) =
-        if  (SwitchCount.value switchCount) = weights.Length then
-            {switchCount=switchCount; weights=weights} |> Ok
-        else Error (sprintf "switchCount: %d is not equal to weights length: %d" 
-                             (SwitchCount.value switchCount) weights.Length) 
-
-    let getWeights switchUses = switchUses.weights
-    let switchCount switchUses = (SwitchCount.value switchUses.switchCount)
-
-    let Add (trackerA:SwitchUses) (trackerB:SwitchUses) =
-        if ((switchCount trackerA) <> (switchCount trackerB))  then
-            (sprintf "switchCounts: %d, %d are not equal" 
-                    (switchCount trackerA) (switchCount trackerB)) |> Error
-        else
-            let weightsSum = Array.map2 (+) (getWeights trackerA) (getWeights trackerB) 
-            {
-                switchCount = SwitchCount.fromInt weightsSum.Length
-                weights = weightsSum;
-            } |> Ok
-
-    let getUsedSwitches (switchUses:SwitchUses) (sorter:Sorter) =
-        let useCount = SwitchCount.value switchUses.switchCount
-        let switches = sorter.switches
-        let weights = (getWeights switchUses)
-        if (switches.Length <> useCount) then
-            sprintf "useCount=%d, SwitchCount=%d" useCount switches.Length |> Error
-        else
-            let res = weights |> Seq.mapi(fun i w -> i,w)
-                                |> Seq.filter(fun t -> (snd t) > 0 )
-                                |> Seq.map(fun t -> switches.[(fst t)])
-                                |> Seq.toArray
-            res |> Ok
-
-    let lastUsedIndex (st:SwitchUses) =
-        let w = (getWeights st)
-        w
-            |> Seq.mapi(fun i x -> (i, x))
-            |> Seq.filter(fun tup -> (snd tup) > 0)
-            |> Seq.maxBy(fst) |> fst
-
-    let lastUsedIndexes (switchCount:SwitchCount) (stseq:seq<SwitchUses>) =            
-        let stRet = createEmpty switchCount
-        let wgts = getWeights stRet
-        let Recordo (stRec:int[]) (stData:SwitchUses) =
-            let lui = lastUsedIndex stData
-            stRec.[lui]<-stRec.[lui] + 1
-        stseq |> Seq.iter(fun st -> Recordo wgts st)
-        stRet
-
-    let getSwitchUseCount (switchUses:SwitchUses) = 
-        getWeights switchUses |> Array.filter(fun i->i>0) 
-                              |> Array.length
-                              |> SwitchCount.create ""
-
-    let getSwitchUseTotal (switchUses:SwitchUses) =
-        (getWeights switchUses) |> Array.sum
-
-    let entropyBits (switchUses:SwitchUses) =
-        (getWeights switchUses) |> Combinatorics.entropyBits
-
-    let getStageCount (degree:Degree) (switches:seq<Switch>) =
-        Stage.mergeSwitchesIntoStages degree switches |> Seq.length
-                                                      |> StageCount.create ""
-
-    let getRefinedStageCount (switchUses:SwitchUses) (sorter:Sorter) =
-        result {
-            let! usedSwitches = getUsedSwitches switchUses sorter
-            let degree = sorter.degree
-            return! getStageCount degree usedSwitches
-        }
-
-    let getRefinedSorter (switchUses:SwitchUses) (sorter:Sorter) =
-        result {
-            let! usedSwitches = getUsedSwitches switchUses sorter
-            let degree = sorter.degree
-            let stages = Stage.mergeSwitchesIntoStages degree usedSwitches |> Seq.toArray
-            let switches = seq {for i in 0 .. (stages.Length - 1) do yield! stages.[i].switches}
-            return Sorter.create degree switches
-        }
-
-    let getSwitchAndStageUses (sorter:Sorter) (switchUses:SwitchUses) =
-        result
-            {
-                let! refinedStageCount = (getRefinedStageCount switchUses sorter)
-                let! switchUseCount = (getSwitchUseCount switchUses)
-                return switchUseCount, refinedStageCount
-            } |> Result.ExtractOrThrow
-
-    let reportResultStats stats =
-        StringUtils.printArrayf 
-            (fun res ->
-            match res with
-            | Ok (s,a,b,c,d) -> sprintf "%f %d %d %d" 
-                                            a b 
-                                            (SwitchCount.value c) 
-                                            (StageCount.value d)
-            | Error msg -> sprintf "%s" msg ) 
-            stats
-
-    let reportStats stats =
-        StringUtils.printArrayf 
-            (fun (s,a,b,c,d) -> sprintf "%f %d %d %d" 
-                                            a b 
-                                            (SwitchCount.value c) 
-                                            (StageCount.value d))
-            stats
-
-
-type SortableUses = {sortableCount:SortableCount; weights:int[]}
-module SortableUses =
-    let createEmpty (sortableCount:SortableCount) =
-        {
-            sortableCount=sortableCount; 
-            weights=Array.init (SortableCount.value sortableCount) (fun i -> 0)
-        }
-    let getWeights sortableUses = sortableUses.weights
-    let sortableCount sortableUses = (SortableCount.value sortableUses.sortableCount)
-
-
-
-type SwitchEventRollout = {
-            switchCount:SwitchCount; 
-            sortableCount:SortableCount; 
-            useRoll:int[]}
-
-module SwitchEventRollout =
-    let create (switchCount:SwitchCount) (sortableCount:SortableCount) = 
-        {
-            switchCount=switchCount;
-            sortableCount=sortableCount;
-            useRoll = Array.zeroCreate ((SwitchCount.value switchCount) * 
-                            (SortableCount.value sortableCount))
-        }
-
-    let toSwitchUses (switchUseRollout:SwitchEventRollout) =
-        let swCt = (SwitchCount.value switchUseRollout.switchCount)
-        let useWeights = Array.zeroCreate swCt
-        let upDateSwU dex v =
-            let swUdex = dex % swCt
-            useWeights.[swUdex] <- useWeights.[swUdex] + v
-
-        switchUseRollout.useRoll |> Array.iteri(fun dex v -> upDateSwU dex v)
-
-        {
-            SwitchUses.switchCount = switchUseRollout.switchCount;
-            SwitchUses.weights = useWeights
-        }
+                     (sorterCount:SorterCount) 
+                     (rnd:IRando) =
+        fromSorters
+            sorterSetId
+            degree 
+            (Array.init (SorterCount.value sorterCount)
+                       (fun _ -> (Sorter.createRandom degree sorterLength switchFreq rnd)))

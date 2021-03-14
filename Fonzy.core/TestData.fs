@@ -1,7 +1,6 @@
 ﻿namespace global
 open System
 
-
 module TestData = 
     let seed = 1234
     let iRando = Rando.fromRngGen (RngGen.createLcg seed)
@@ -14,30 +13,50 @@ module TestData =
     module SorterParts =
         let switchCount = SwitchCount.fromInt 10
         let permSwitchDensity = 0.5
-        let sorterLength = SorterLength.degreeToRecordStageCount degree
+        let sorterLength = degree |> SorterLength.toMediocreRandomPerfLength 
+                                                    SwitchOrStage.Stage 
         let sorterCount = SorterCount.fromInt 50
         let makeRandomSorter() = 
                 Sorter.createRandom degree sorterLength SwitchFrequency.max iRando
 
         let makeRandomTwoCycle = 
-            TwoCyclePerm.makeRandomTwoCycle degree iRando permSwitchDensity
+                TwoCyclePerm.makeRandomTwoCycle 
+                                degree iRando permSwitchDensity
+
         let switchUseArray = Array.init (SwitchCount.value switchCount) 
                                         (fun _ -> iRando.NextPositiveInt)
 
         let switchList = Switch.switchMap 
-                                      |> Seq.take (SwitchCount.value switchCount)
-                                      |> Seq.toList
-
+                                |> Seq.take (SwitchCount.value switchCount)
+                                |> Seq.toList
 
         let listOfSorters = List.init (SorterCount.value sorterCount)
                                       (fun _ -> makeRandomSorter())
 
-        let sorterSet = SorterSet.fromSorters degree listOfSorters
 
-        let RolloutOfAllBinary = SortableSetRollout.allBinary degree
-        let RolloutOfAllSortedBinary = SortableSetRollout.fromSortableIntArrays 
-                                        degree 
-                                        (SortableIntArray.allSorted_0_1 degree)
+
+
+    module SortableSet =
+        let sortableSetId = SortableSetId.fromGuid (Guid.NewGuid())
+        let ssAllIntBits = SortableSetExplicit.allIntBits degree sortableSetId
+        let sortableSet = SortableSet.Explicit ssAllIntBits
+
+    module SorterSet = 
+        let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+        let sorterSet = SorterSet.fromSorters 
+                            sorterSetId 
+                            degree 
+                            SorterParts.listOfSorters
+
+    module SorterActionRecords =
+        let rolloutOfAllBinary = SortableSetRollout.allBinary degree
+                                     |> Result.ExtractOrThrow
+        let rolloutOfAllSortedBinary = 
+                SortableSetRollout.fromSortableIntArrays 
+                           degree 
+                           (SortableIntArray.allSorted_0_1 degree)
+                 |> Result.ExtractOrThrow
+
 
 
     module SorterGa =

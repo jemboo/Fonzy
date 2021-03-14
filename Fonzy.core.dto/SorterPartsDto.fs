@@ -32,15 +32,16 @@ module SorterDto =
         sorter |> toDto |> Json.serialize
 
 
-type SorterSetDto = {degree:int; sorterDtos:SorterDto[]}
+type SorterSetDto = {id:Guid; degree:int; sorterDtos:SorterDto[]}
 module SorterSetDto =
     let fromDto (dto:SorterSetDto) =
         result {
+            let! sorterSetId = dto.id |> SorterSetId.create
             let! degree = dto.degree |> Degree.create ""
             let! sorters = dto.sorterDtos |> Array.map(SorterDto.fromDto)
                                           |> Array.toList
                                           |> Result.sequence
-            return SorterSet.fromSorters degree sorters 
+            return SorterSet.fromSorters sorterSetId degree sorters 
         }
     let fromJson (cereal:string) =
         result {
@@ -49,6 +50,7 @@ module SorterSetDto =
         }
     let toDto (sorterSet:SorterSet) =
         {
+            SorterSetDto.id = (SorterSetId.value sorterSet.id)
             SorterSetDto.sorterDtos = sorterSet.sorters 
                                         |> Map.toArray
                                         |> Array.map(fun kvp -> 

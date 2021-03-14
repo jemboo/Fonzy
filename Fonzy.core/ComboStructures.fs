@@ -127,6 +127,35 @@ module TwoCyclePerm =
         tupes |> Seq.iter(OpPa)
         { degree=degree; values=curPa }
 
+    let makeEvenMode (degree:Degree) =
+        let d = (Degree.value degree)
+        let dm =
+            if (d%2 > 0) then d-1
+            else d
+        let yak p =
+            if p = dm then p
+            else if (p%2 = 0) then
+                 p + 1
+            else p - 1
+        { degree=degree; values=Array.init d (yak) }
+
+    let makeOddMode (degree:Degree) =
+        let d = (Degree.value degree)
+        let dm =
+            if (d%2 = 0) then d-1
+            else d
+        let yak p =
+            if p = dm then p
+            else if p = 0 then p
+            else if (p%2 = 0) then
+                 p - 1
+            else p + 1
+        { degree=degree; values=Array.init d (yak) }
+
+    let makeAltEvenOdd (degree:Degree) =
+        seq {while true do 
+                    yield makeEvenMode degree; 
+                    yield makeOddMode degree; }
 
     // IRando dependent
     

@@ -37,16 +37,19 @@ module TestData =
         module Sorter =
             let count = 10
             let rndSortersName = "rndSortersName"
+            let sorterSetId1 = SorterSetId.fromGuid (Guid.NewGuid())
+            let sorterSetId2 = SorterSetId.fromGuid (Guid.NewGuid())
+            let sorterSetId3 = SorterSetId.fromGuid (Guid.NewGuid())
             let intDistType = IntDistType.Normal (NormalIntegerDistParams.zeroCentered 1.0)
             let sorterLength = SorterLength.degreeTo999StageCount degree
             let switchFreq = SwitchFrequency.max
             let sorterCount = SorterCount.fromInt 10
 
-            let rand1 = CauseSpecSorters.rndGen degree sorterLength 
+            let rand1 = CauseSpecSorters.rndGen sorterSetId1 degree sorterLength 
                              switchFreq sorterCount (nextRnGen()) rndSortersName
-            let rand2 = CauseSpecSorters.rndGen degree sorterLength 
+            let rand2 = CauseSpecSorters.rndGen sorterSetId2 degree sorterLength 
                              switchFreq sorterCount (nextRnGen()) rndSortersName
-            let rand3 = CauseSpecSorters.rndGen degree sorterLength 
+            let rand3 = CauseSpecSorters.rndGen sorterSetId3 degree sorterLength 
                              switchFreq sorterCount (nextRnGen()) rndSortersName
 
 
