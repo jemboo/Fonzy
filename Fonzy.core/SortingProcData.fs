@@ -56,7 +56,7 @@ module SwitchUses =
        stseq |> Seq.iter(fun st -> Recordo wgts st)
        stRet
 
-   let getUsedSwitchCount (switchUses:SwitchUses) = 
+   let toUsedSwitchCount (switchUses:SwitchUses) = 
        getWeights switchUses |> Array.filter(fun i->i>0) 
                              |> Array.length
                              |> SwitchCount.create ""
@@ -90,9 +90,9 @@ module SwitchUses =
        result
            {
                let! refinedStageCount = (getRefinedStageCount switchUses sorter)
-               let! switchUseCount = (getUsedSwitchCount switchUses)
+               let! switchUseCount = (toUsedSwitchCount switchUses)
                return switchUseCount, refinedStageCount
-           } |> Result.ExtractOrThrow
+           }
 
    let reportResultStats stats =
        StringUtils.printArrayf 
@@ -123,7 +123,6 @@ module SortableUses =
     let getWeights sortableUses = sortableUses.weights
     let sortableCount sortableUses = (SortableCount.value sortableUses.sortableCount)
 
-
 type SwitchEventRollout = {
             switchCount:SwitchCount; 
             sortableCount:SortableCount; 
@@ -151,7 +150,6 @@ module SwitchEventRollout =
             SwitchUses.switchCount = switchUseRollout.switchCount;
             SwitchUses.weights = useWeights
         }
-
 
 type SortableSetRollout = {
             degree:Degree; 
@@ -219,7 +217,7 @@ module SortableSetRollout =
                  |> Seq.distinct
                  |> Seq.toArray
 
-    let histogramOfSortableSets (ssRollout:SortableSetRollout) =
+    let histogramOfSortedSortables (ssRollout:SortableSetRollout) =
         ssRollout |> toSortableIntArrays
                  |> Seq.countBy id
                  |> Seq.toArray

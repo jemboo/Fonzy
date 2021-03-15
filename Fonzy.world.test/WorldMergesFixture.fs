@@ -8,7 +8,7 @@ type WorldMergesFixture () =
 
     [<TestMethod>]
     member this.WorldGrandChild () =
-        let worldMerges = WorldMerges.mergeWorlds 
+        let worldMerges = WorldMerge.mergeWorlds 
                             TestData.WorldMerge.mergedWorldId 
                             TestData.WorldMerge.sourceWorldsNameMap 
                             TestData.WorldMerge.mergeMapItems

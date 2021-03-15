@@ -12,6 +12,9 @@ module TestData =
 
     module SorterParts =
         let switchCount = SwitchCount.fromInt 10
+        let goodRefSorter = RefSorter.goodRefSorterForDegree degree
+                            |> Result.ExtractOrThrow
+
         let permSwitchDensity = 0.5
         let sorterLength = degree |> SorterLength.toMediocreRandomPerfLength 
                                                     SwitchOrStage.Stage 

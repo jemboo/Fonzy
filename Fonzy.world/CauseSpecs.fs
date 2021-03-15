@@ -2,7 +2,7 @@
 open System
 
 
-type CauseSpec = {id:Guid; genus:string list; prams:Map<string,string>;}
+type CauseSpec = {id:CauseSpecId; genus:string list; prams:Map<string,string>;}
 
 module CauseSpecRandGen = 
     let intArrayBaseId = Guid.Parse "00000000-0000-0000-0000-000000000001"
@@ -18,7 +18,7 @@ module CauseSpecRandGen =
                      ("intDistType", idt |> IntDistTypeDto.toJson);
                      ("outName", outName)
                      ] |> Map.ofList
-        {CauseSpec.id = id; genus=["RandGen"; "IntArray"]; prams=prams; }
+        {CauseSpec.id = CauseSpecId.fromGuid id; genus=["RandGen"; "IntArray"]; prams=prams; }
 
     let int2dArray (idt:Int2dDistType) (count:int) 
                           (rndGen:RngGen) (outName:string) =
@@ -32,7 +32,7 @@ module CauseSpecRandGen =
                      ("lattice2dDistType", idt |> Int2dDistTypeDto.toJson);
                      ("outName", outName)
                      ] |> Map.ofList
-        {CauseSpec.id = id; genus=["RandGen"; "Int2dArray"]; prams=prams;}
+        {CauseSpec.id = CauseSpecId.fromGuid id; genus=["RandGen"; "Int2dArray"]; prams=prams;}
 
     let uniformInts (minVal:int) (maxVal:int) 
                     (seed:int) (count:int) (outName:string) =
@@ -83,7 +83,7 @@ module CauseSpecSorters =
                      ("rngGen", rndGen |> RngGenDto.toJson);
                      ("sorters", outName)
                      ] |> Map.ofList
-        {CauseSpec.id = id; genus=["Sorters"; "rndGen"]; prams=prams;}
+        {CauseSpec.id = CauseSpecId.fromGuid id; genus=["Sorters"; "rndGen"]; prams=prams;}
 
 
 module CauseSpec = 
@@ -147,5 +147,5 @@ module CauseSpec =
     //    }
 
     let noOpCauseSpecId = Guid.Parse "00000000-0000-0000-0000-000000000000"
-    let noOpCauseSpec = { CauseSpec.id = noOpCauseSpecId; 
+    let noOpCauseSpec = { CauseSpec.id = CauseSpecId.fromGuid noOpCauseSpecId; 
                           genus=["NoOp"]; prams=Map.empty;}

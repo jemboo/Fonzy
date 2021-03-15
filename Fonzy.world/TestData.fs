@@ -68,8 +68,8 @@ module TestData =
     
         let world1Id = Guid.Parse "00000000-0000-0000-0000-000000000881"
         let world2Id = Guid.Parse "00000000-0000-0000-0000-000000000882"
-        let world1ParentId = Guid.Parse "00000000-0000-0000-0000-000000000771"
-        let world2ParentId = Guid.Parse "00000000-0000-0000-0000-000000000772"
+        let world1ParentId = WorldId.fromGuid (Guid.Parse "00000000-0000-0000-0000-000000000771")
+        let world2ParentId = WorldId.fromGuid (Guid.Parse "00000000-0000-0000-0000-000000000772")
 
         let map1 = [("key11","val11"); ("key12","val12"); ("key13","val13"); ("key14","val14")]
                    |> Map.ofList
@@ -87,7 +87,7 @@ module TestData =
     module WorldMerge =
         let world1Name = "world1"
         let world2Name = "world2"
-        let mergedWorldId = Guid.Parse "00000000-0000-0000-0000-000000000991"
+        let mergedWorldId = WorldMergeId.fromGuid (Guid.Parse "00000000-0000-0000-0000-000000000991")
 
         let sourceWorldsNameMap = [(world1Name, World.world1); 
                                    (world2Name, World.world2);]

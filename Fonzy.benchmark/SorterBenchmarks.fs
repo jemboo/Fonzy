@@ -47,7 +47,7 @@ type Md5VsSha256() =
 
 type BenchmarkSorterOps() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
-    let sorter16 = RefSorter.CreateRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
+    let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
     let sortableSet = SortableSetRollout.allBinary degree |> Result.ExtractOrThrow
     let sortableSetEx = SortableSet.Generated (SortableSetGenerated.allIntBits degree)
                             |> SortableSet.getSortableSetExplicit
@@ -68,7 +68,7 @@ type BenchmarkSorterOps() =
 
     [<Benchmark>]
     member this.SAGbySortable() =
-        let ssR = SortingOps.EvalSorterOnSortableSetSAGbySortable 
+        let ssR = SortingOps.evalGroupBySortable 
                             sorter16 sortableSet SortingEval.SwitchUsePlan.All
         ssR
 

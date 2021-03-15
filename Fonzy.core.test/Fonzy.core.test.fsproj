@@ -15,7 +15,7 @@
     <Compile Include="ComboStructuresFixture.fs" />
     <Compile Include="SorterPartsFixture.fs" />
     <Compile Include="SortablesFixture.fs" />
-    <Compile Include="SorterActionRecordsFixture.fs" />
+    <Compile Include="SwitchEventRecordsFixture.fs" />
     <Compile Include="SorterGaFixture.fs" />
     <Compile Include="SorterGaOpsFixture.fs" />
     <Compile Include="OrgsFixture.fs" />

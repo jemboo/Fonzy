@@ -21,48 +21,76 @@ type SorterOpsFixture () =
     //    //Assert.IsTrue(histo.Length > 1)
     //    Assert.IsTrue(true)
 
-    //[<TestMethod>]
-    //member this.SAGbySortable() =
-    //    let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
-    //    let sorter16 = RefSorter.CreateRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
-    //    let sortableSet = SortableSetRollout.allBinary degree |> Result.ExtractOrThrow    
+    [<TestMethod>]
+    member this.evalAndGetSwitchUses() =
+        let refSorter = TestData.SorterParts.goodRefSorter
+        let sortableSet = TestData.SortableSet.ssAllIntBits 
 
-    //    let resR = SortingOps.EvalSorterOnSortableSetSAGbySortable 
-    //                    sorter16 sortableSet SortingEval.SwitchUsePlan.All
-    //    //let wR = snd resR  
-    //    //let su = fst resR
-    //    //let sus  = su.weights |> Array.sortDescending
-    //    //let histo = wR |> SortableSetRollout.toSortableIntArrays
-    //    //               |> Seq.countBy id
-    //    //               |> Seq.toArray
-    //    //Assert.IsTrue(sus.Length > 1)
-    //    Assert.IsTrue(true)
+        let resGroupBySwitch = 
+            SortingOps.evalGroupBySwitch
+                TestData.SorterParts.goodRefSorter 
+                TestData.SorterActionRecords.rolloutOfAllBinary
+                SortingEval.SwitchUsePlan.All
 
-    //[<TestMethod>]
-    //member this.NoSAG() =
-    //    let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
-    //    let sorter16 = RefSorter.CreateRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
-    //    let sortableSet = SortableSetRollout.allBinary degree |> Result.ExtractOrThrow    
+        let resNoGrouping = 
+            SortingOps.evalNoGrouping 
+                TestData.SorterParts.goodRefSorter 
+                TestData.SorterActionRecords.rolloutOfAllBinary
+                SortingEval.SwitchUsePlan.All
+        
+        let switchUsesGrouping = 
+                resGroupBySwitch
+                    |> SortingEval.SwitchEventRecords.getSwitchUses
+                    |> Result.ExtractOrThrow
 
-    //    let resR = SortingOps.EvalSorterOnSortableSetWithNoSAG 
-    //                        sorter16 sortableSet SortingEval.SwitchUsePlan.All
-    //    //let Rollout = snd resR
-    //    //let histo = Rollout |> SortableSetRollout.toSortableIntArrays
-    //    //               |> Seq.countBy id
-    //    //               |> Seq.toArray
+        let switchUsesNoGrouping = 
+                resNoGrouping
+                    |> SortingEval.SwitchEventRecords.getSwitchUses
+                    |> Result.ExtractOrThrow
 
-    //    //let useTrack = fst resR
+        let usedSwitchCount = refSorter  
+                                |> SwitchUses.getUsedSwitches switchUsesGrouping
+                                |> Result.ExtractOrThrow
 
-    //    let rollout = SwitchEventRollout.create 
-    //                            sorter16.switchCount
-    //                            sortableSet.sortableCount
-    //    Assert.IsTrue(true)
+        Assert.AreEqual(switchUsesGrouping, switchUsesNoGrouping)
+        Assert.AreEqual(usedSwitchCount.Length, (SwitchCount.value refSorter.switchCount))
+
+
+    [<TestMethod>]
+    member this.evalAndGetSortableUses() =
+        let refSorter = TestData.SorterParts.goodRefSorter
+        let sortableSet = TestData.SortableSet.ssAllIntBits 
+
+        let resGroupBySortable = 
+            SortingOps.evalGroupBySortable
+                TestData.SorterParts.goodRefSorter 
+                TestData.SorterActionRecords.rolloutOfAllBinary
+                SortingEval.SwitchUsePlan.All
+
+        let resNoGrouping = 
+            SortingOps.evalNoGrouping 
+                TestData.SorterParts.goodRefSorter 
+                TestData.SorterActionRecords.rolloutOfAllBinary
+                SortingEval.SwitchUsePlan.All
+    
+        let sortedSortablesGrouping = 
+            resGroupBySortable
+                |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
+                |> Result.ExtractOrThrow
+
+        let sortedSortablesNoGrouping = 
+                resNoGrouping
+                    |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
+                    |> Result.ExtractOrThrow
+
+        Assert.AreEqual(sortedSortablesGrouping, sortedSortablesNoGrouping)
+        Assert.AreEqual(sortedSortablesNoGrouping.Length, (Degree.value refSorter.degree) + 1)
 
 
     [<TestMethod>]
     member this.evalRecordCorrectSorter() =
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
-        let sorter16 = RefSorter.CreateRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
+        let sorter16 = RefSorter.goodRefSorterForDegree degree |> Result.ExtractOrThrow
         let sortableSetEx = SortableSet.Generated (SortableSetGenerated.allIntBits degree)
                                 |> SortableSet.getSortableSetExplicit
                                 |> Result.ExtractOrThrow 

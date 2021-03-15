@@ -64,7 +64,7 @@ type DataSourceFixture () =
     member this.DirectoryDataSource_GetDs() =
         this.setupAllWorlds()
         let dirDs = new DirectoryDataSource(this.testDir) :> IDataSource
-        let ds = dirDs.GetDataSource(this.world1.id) |> Result.ExtractOrThrow
+        let ds = dirDs.GetDataSource(WorldId.value this.world1.id) |> Result.ExtractOrThrow
         this.tearDownDataSource() 
         Assert.AreEqual(ds |> DataStoreItem.getId, this.world1.id);
 

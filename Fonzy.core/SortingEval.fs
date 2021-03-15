@@ -33,11 +33,31 @@ module SortingEval =
 
 
     module SwitchEventRecords =
-        let getUsedSwitchCount (switchEventRecords:SwitchEventRecords) =
+        let getSwitchUses (switchEventRecords:SwitchEventRecords) =
             match switchEventRecords with
-            | NoGrouping seNg -> 1
-            | GroupbySwitch seGs -> seGs.switchUses |> SwitchUses.getSwitchActionTotal
-            | GroupBySortable seGt -> 1
+            | NoGrouping seNg -> seNg.switchEventRollout 
+                                    |> SwitchEventRollout.toSwitchUses
+                                    |> Ok
+            | GroupbySwitch seGs -> seGs.switchUses 
+                                    |> Ok
+            | GroupBySortable seGt -> "switchUses not in GroupBySortable" |> Error
+
+        let getHistogramOfSortedSortables (switchEventRecords:SwitchEventRecords) =
+            match switchEventRecords with
+            | NoGrouping seNg -> seNg.sortableSetRollout 
+                                    |> SortableSetRollout.histogramOfSortedSortables
+                                    |> Ok
+            | GroupbySwitch seGs ->  "switchUses not in GroupBySortable" |> Error
+            | GroupBySortable seGt -> seGt.sortableSetRollout
+                                      |> SortableSetRollout.histogramOfSortedSortables
+                                      |> Ok
+
+        let getUsedSwitchCount (switchEventRecords:SwitchEventRecords) =
+            result {
+                let! switchUses = getSwitchUses switchEventRecords
+                return! switchUses |> SwitchUses.toUsedSwitchCount
+            }
+
 
     type SwitchEventGrouping =
         | NoGrouping

@@ -7,7 +7,7 @@ open System
 type CauseSpecDto = {id:Guid; genus:string[]; prams:Map<string,string>;}
 module CauseSpecDto =
     let toDto (cs:CauseSpec) =
-        {CauseSpecDto.id = cs.id;
+        {CauseSpecDto.id = CauseSpecId.value cs.id;
          CauseSpecDto.genus = cs.genus|> List.toArray;
          CauseSpecDto.prams = cs.prams;}
 
@@ -15,7 +15,7 @@ module CauseSpecDto =
         cs |> toDto |> Json.serialize
 
     let fromDto (csDto:CauseSpecDto) =
-            {CauseSpec.id = csDto.id;
+            {CauseSpec.id = CauseSpecId.fromGuid csDto.id;
              CauseSpec.genus = csDto.genus |> Array.toList;
              CauseSpec.prams = csDto.prams;
             } |> Ok

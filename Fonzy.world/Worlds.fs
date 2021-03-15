@@ -1,19 +1,22 @@
 ﻿namespace global
 open System
 
-type World = {id:Guid; parentId:Guid; cause:Cause; enviro:Enviro}
+type World = {id:WorldId; parentId:WorldId; cause:Cause; enviro:Enviro}
 
 module World = 
-    let emptyWorldId = Guid.Parse "00000000-0000-0000-0000-000000000000"
+    let emptyWorldId = WorldId.fromGuid (Guid.Parse "00000000-0000-0000-0000-000000000000")
     let empty = 
         {id=emptyWorldId; 
-        parentId=Guid.Empty; 
+        parentId = WorldId.fromGuid Guid.Empty; 
         cause= Causes.noOp; 
         enviro=Enviro.Empty}
 
 
-    let create (parentId:Guid) (cause:Cause) (enviroment:Enviro) =
-          let worldId = GuidUtils.addGuids parentId cause.causeSpec.id
+    let create (parentId:WorldId) (cause:Cause) (enviroment:Enviro) =
+          let worldId = GuidUtils.addGuids 
+                            (WorldId.value parentId) 
+                            (CauseSpecId.value cause.causeSpec.id)
+                        |> WorldId.fromGuid;
           {id=worldId; parentId=parentId; cause=cause; enviro=enviroment}
 
 
@@ -24,14 +27,17 @@ module World =
         }
      
 
-type WorldAction = {childId:Guid; parentWorld:World; cause:Cause;}
+type WorldAction = {childId:WorldId; parentWorld:World; cause:Cause;}
 
 module WorldAction =
 
     let create (parentWorld:World) (cause:Cause) =
             {
-                parentWorld=parentWorld; 
-                childId=GuidUtils.addGuids parentWorld.id cause.causeSpec.id; 
+                parentWorld = parentWorld; 
+                childId = GuidUtils.addGuids 
+                            (WorldId.value parentWorld.id) 
+                            (CauseSpecId.value cause.causeSpec.id)
+                          |> WorldId.fromGuid;
                 cause=cause;
             }
 

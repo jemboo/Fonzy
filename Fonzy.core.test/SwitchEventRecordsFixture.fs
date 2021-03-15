@@ -25,6 +25,6 @@ type SorterActionRecordsFixture() =
     member this.SortableSetRollout_histogramOfSortableSets() =
       let unSortedRollout = TestData.SorterActionRecords.rolloutOfAllBinary
       let sortableCount = SortableCount.value unSortedRollout.sortableCount
-      let histo = unSortedRollout |> SortableSetRollout.histogramOfSortableSets
+      let histo = unSortedRollout |> SortableSetRollout.histogramOfSortedSortables
       let totalCount = histo |> Array.sumBy(snd)
       Assert.AreEqual(sortableCount, totalCount)
