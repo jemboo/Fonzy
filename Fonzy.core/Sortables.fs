@@ -18,10 +18,18 @@ module SortableIntArray =
         IntBits.Sorted_0_1_Sequences (Degree.value degree)
             |> Seq.map(create) |> Seq.toArray
 
-//Returns all 0-1 sequences of length degree
+    //Returns all 0-1 sequences of length degree
     let all_0_1 (degree:Degree) =
         IntBits.AllBinaryTestCasesSeq (Degree.value degree)
             |> Seq.map(create) |> Seq.toArray
+
+    let createRandom (degree:Degree) (rando:IRando) = 
+        Permutation.createRandom degree rando
+            |> Permutation.arrayValues
+            |> create
+
+    let isSorted (sortableIntArray:SortableIntArray) =
+        sortableIntArray |> value |> Combinatorics.isSorted
 
 
 type SortableSetExplicit = {id:SortableSetId; degree:Degree; 

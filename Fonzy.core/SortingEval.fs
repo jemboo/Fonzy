@@ -3,33 +3,28 @@ open System
 
 module SortingEval =
 
-    type SwitchUsePlan =
-        | All 
-        | Range of int*int
-
-
-    type SeNoGrouping  = 
+    type NoGrouping  = 
         {
             switchEventRollout:SwitchEventRollout; 
             sortableSetRollout:SortableSetRollout;
         }
 
-    type SeGroupbySwitch = 
+    type GroupBySwitch = 
         {
             switchUses:SwitchUses; 
             sortableSetRollout:SortableSetRollout;
         }
 
-    type SeGroupBySortable = 
+    type GroupBySortable = 
         {
             sortableUses:SortableUses; 
             sortableSetRollout:SortableSetRollout;
         }
 
     type SwitchEventRecords =
-        | NoGrouping of SeNoGrouping
-        | GroupbySwitch of SeGroupbySwitch
-        | GroupBySortable of SeGroupBySortable
+        | NoGrouping of NoGrouping
+        | BySwitch of GroupBySwitch
+        | BySortable of GroupBySortable
 
 
     module SwitchEventRecords =
@@ -38,17 +33,17 @@ module SortingEval =
             | NoGrouping seNg -> seNg.switchEventRollout 
                                     |> SwitchEventRollout.toSwitchUses
                                     |> Ok
-            | GroupbySwitch seGs -> seGs.switchUses 
+            | BySwitch seGs -> seGs.switchUses 
                                     |> Ok
-            | GroupBySortable seGt -> "switchUses not in GroupBySortable" |> Error
+            | BySortable seGt -> "switchUses not in GroupBySortable" |> Error
 
         let getHistogramOfSortedSortables (switchEventRecords:SwitchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.sortableSetRollout 
                                     |> SortableSetRollout.histogramOfSortedSortables
                                     |> Ok
-            | GroupbySwitch seGs ->  "switchUses not in GroupBySortable" |> Error
-            | GroupBySortable seGt -> seGt.sortableSetRollout
+            | BySwitch seGs ->  "switchUses not in GroupBySortable" |> Error
+            | BySortable seGt -> seGt.sortableSetRollout
                                       |> SortableSetRollout.histogramOfSortedSortables
                                       |> Ok
 
@@ -58,23 +53,37 @@ module SortingEval =
                 return! switchUses |> SwitchUses.toUsedSwitchCount
             }
 
+    type SorterPerf = { 
+                        usedSwitchCount:SwitchCount; 
+                        usedStageCount:StageCount;
+                        sorterId:SorterId;
+                        sortableSetId:SortableSetId
+                     }
 
-    type SwitchEventGrouping =
-        | NoGrouping
-        | BySwitch
-        | BySortable
+    module SorterPerf = 
+        let fromSwitchEventRecords 
+                (sorter:Sorter)
+                (switchEventGrouping:SwitchEventRecords)
+                (sorterId:SorterId)
+                (sortableSetId:SortableSetId) =
+            result {
+                    let! switchUses = 
+                            switchEventGrouping |> SwitchEventRecords.getSwitchUses
+                    let! usedSwitchArray = 
+                            sorter |> SwitchUses.getUsedSwitches switchUses
+                    let! usedSwitchCount = SwitchCount.create "" usedSwitchArray.Length
+                    let! usedStageCount = Stage.getStageCount sorter.degree usedSwitchArray
+                    return {
+                                SorterPerf.usedSwitchCount = usedSwitchCount; 
+                                usedStageCount = usedStageCount;
+                                sorterId = sorterId;
+                                sortableSetId = sortableSetId
+                           }
+               }
 
 
-    type SorterEvalParams =
-        {
-            switchusePlan:SwitchUsePlan;
-            sortableSet:SortableSet;
-            switchEventAggregation:SwitchEventGrouping;
-            sorter:Sorter;
-        }
-
-
-
+    type SortingRecords = 
+            | SorterPerf of SorterPerf
 
 
 

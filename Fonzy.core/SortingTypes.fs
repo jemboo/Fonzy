@@ -1,10 +1,9 @@
 ﻿namespace global
 open System
 
-
-
 // Sorter
 
+type SorterId = private SorterId of Guid
 type SortableCount = private SortableCount of int
 type SortableSetId = private SortableSetId of Guid
 type SorterCount = private SorterCount of int
@@ -30,12 +29,15 @@ module SortableCount =
             return! create "" (gv:?>int)
         }
 
+module SorterId =
+    let value (SorterId v) = v
+    let create id = Ok (SorterId id)
+    let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
 
 module SorterSetId =
     let value (SorterSetId v) = v
     let create id = Ok (SorterSetId id)
     let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
-
 
 module SorterCount =
     let value (SorterCount v) = v

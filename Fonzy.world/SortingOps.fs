@@ -38,12 +38,12 @@ module SortingOps =
     let evalNoGrouping 
                             (sorter:Sorter) 
                             (sortableSetRollout:SortableSetRollout) 
-                            (switchusePlan:SortingEval.SwitchUsePlan) =
+                            (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex = 
             match switchusePlan with
-            | SortingEval.SwitchUsePlan.All -> (0, switchCount)
-            | SortingEval.SwitchUsePlan.Range (min, max) -> (min, max)
+            | Sorting.SwitchUsePlan.All -> (0, switchCount)
+            | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
         let sortableSetRolloutCopy = (SortableSetRollout.copy sortableSetRollout)
         let switchEventRollout = SwitchEventRollout.create sorter.switchCount sortableSetRollout.sortableCount
         let mutable sortableIndex=0
@@ -54,8 +54,8 @@ module SortingOps =
                         switchEventRollout.useRoll sortableIndex
                 sortableIndex <- sortableIndex + 1
         SortingEval.SwitchEventRecords.NoGrouping {
-            SortingEval.SeNoGrouping.switchEventRollout = switchEventRollout; 
-            SortingEval.SeNoGrouping.sortableSetRollout = sortableSetRolloutCopy
+            SortingEval.NoGrouping.switchEventRollout = switchEventRollout; 
+            SortingEval.NoGrouping.sortableSetRollout = sortableSetRolloutCopy
         }
 
 
@@ -91,12 +91,12 @@ module SortingOps =
     let evalGroupBySwitch 
                     (sorter:Sorter) 
                     (ssRollout:SortableSetRollout) 
-                    (switchusePlan:SortingEval.SwitchUsePlan) =
+                    (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex = 
             match switchusePlan with
-            | SortingEval.SwitchUsePlan.All -> (0, switchCount)
-            | SortingEval.SwitchUsePlan.Range (min, max) -> (min, max)
+            | Sorting.SwitchUsePlan.All -> (0, switchCount)
+            | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
         let switchUses = SwitchUses.createEmpty sorter.switchCount
         let sortableSetRolloutCopy = (SortableSetRollout.copy ssRollout)
         let mutable sortableIndex=0
@@ -105,9 +105,9 @@ module SortingOps =
                     sorter firstSwitchDex lastSwitchDex 
                     switchUses sortableSetRolloutCopy sortableIndex
                 sortableIndex <- sortableIndex + 1
-        SortingEval.SwitchEventRecords.GroupbySwitch {
-            SortingEval.SeGroupbySwitch.switchUses = switchUses; 
-            SortingEval.SeGroupbySwitch.sortableSetRollout = sortableSetRolloutCopy
+        SortingEval.SwitchEventRecords.BySwitch {
+            SortingEval.GroupBySwitch.switchUses = switchUses; 
+            SortingEval.GroupBySwitch.sortableSetRollout = sortableSetRolloutCopy
         }
         
     // creates a sorter.switchcount length array to store accumulated
@@ -143,12 +143,12 @@ module SortingOps =
     let evalGroupBySortable 
                     (sorter:Sorter) 
                     (sortableSetRollout:SortableSetRollout) 
-                    (switchusePlan:SortingEval.SwitchUsePlan) =
+                    (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex = 
             match switchusePlan with
-            | SortingEval.SwitchUsePlan.All -> (0, switchCount)
-            | SortingEval.SwitchUsePlan.Range (min, max) -> (min, max)
+            | Sorting.SwitchUsePlan.All -> (0, switchCount)
+            | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
         let sortableUses = SortableUses.createEmpty sortableSetRollout.sortableCount
 
         let sortableSetRolloutCopy = (SortableSetRollout.copy sortableSetRollout)
@@ -158,32 +158,31 @@ module SortingOps =
                     sorter firstSwitchDex lastSwitchDex sortableUses 
                     sortableSetRolloutCopy sortableIndex
                 sortableIndex <- sortableIndex + 1
-        SortingEval.SwitchEventRecords.GroupBySortable   {
-            SortingEval.SeGroupBySortable.sortableUses = sortableUses; 
-            SortingEval.SeGroupBySortable.sortableSetRollout = sortableSetRolloutCopy
+        SortingEval.SwitchEventRecords.BySortable   {
+            SortingEval.GroupBySortable.sortableUses = sortableUses; 
+            SortingEval.GroupBySortable.sortableSetRollout = sortableSetRolloutCopy
         }
 
     let evalSorterOnSortableSetRollout (sorter:Sorter)
                     (sortableSetRollout:SortableSetRollout)
-                    (switchusePlan:SortingEval.SwitchUsePlan) 
-                    (switchEventAgg:SortingEval.SwitchEventGrouping) =
-
+                    (switchusePlan:Sorting.SwitchUsePlan) 
+                    (switchEventAgg:Sorting.EventGrouping) =
         match switchEventAgg with
-        | SortingEval.SwitchEventGrouping.NoGrouping -> 
+        | Sorting.EventGrouping.NoGrouping -> 
                 evalNoGrouping 
                     sorter sortableSetRollout switchusePlan
-        | SortingEval.SwitchEventGrouping.BySwitch -> 
+        | Sorting.EventGrouping.BySwitch -> 
                 evalGroupBySwitch 
                     sorter sortableSetRollout switchusePlan
-        | SortingEval.SwitchEventGrouping.BySortable -> 
+        | Sorting.EventGrouping.BySortable -> 
                 evalGroupBySortable 
                     sorter sortableSetRollout switchusePlan
 
 
     let evalSorter (sorter:Sorter)
                    (sortableSet:SortableSetExplicit)
-                   (switchusePlan:SortingEval.SwitchUsePlan) 
-                   (switchEventAgg:SortingEval.SwitchEventGrouping) =
+                   (switchusePlan:Sorting.SwitchUsePlan) 
+                   (switchEventAgg:Sorting.EventGrouping) =
         let sortableSetRollout = 
             sortableSet.sortableIntArrays
                 |> SortableSetRollout.fromSortableIntArrays
@@ -196,8 +195,8 @@ module SortingOps =
     module SorterSet =
         let eval (sorterSet:SorterSet)
                  (sortableSet:SortableSetExplicit)
-                 (switchusePlan:SortingEval.SwitchUsePlan) 
-                 (switchEventAgg:SortingEval.SwitchEventGrouping) 
+                 (switchusePlan:Sorting.SwitchUsePlan) 
+                 (switchEventAgg:Sorting.EventGrouping) 
                  (_parallel:UseParallel) =
             let sortableSetRollout = sortableSet.sortableIntArrays 
                                         |> SortableSetRollout.fromSortableIntArrays
@@ -243,7 +242,7 @@ module SortingOps =
 
     module History =
 
-        let SwitchOnSortableIntArray (switch:Switch) 
+        let switchOnSortableIntArray (switch:Switch) 
                                      (sortableIntArray:SortableIntArray) =
             let intArray = SortableIntArray.value sortableIntArray
             let lv = intArray.[switch.low]
@@ -257,32 +256,34 @@ module SortingOps =
             else sortableIntArray
 
 
-        let rec SortableHistory (swtiches:Switch list)
+        let rec sortableHistory (swtiches:Switch list)
                                 (sortHistory:SortableIntArray list) =
             match swtiches with
             | [] -> sortHistory
-            | swHead::swTail -> [(SwitchOnSortableIntArray swHead (sortHistory|> List.last))] |> List.append
-                                    (SortableHistory swTail sortHistory)
+            | swHead::swTail -> [(switchOnSortableIntArray swHead (sortHistory|> List.last))] |> List.append
+                                    (sortableHistory swTail sortHistory)
 
-        let SwitchesOnSortableIntArray (swtiches:Switch list)
+
+        let switchesOnSortableIntArray (swtiches:Switch list)
                                        (sortableIntArray:SortableIntArray) =
             let recList = (swtiches  |> List.rev)
-            (SortableHistory swtiches  [sortableIntArray])
+            (sortableHistory swtiches  [sortableIntArray])
 
 
-        let SortTHistSection2 (sorter:Sorter) (mindex:int) (maxdex:int)
+        let sortTHistSection2 (sorter:Sorter) (mindex:int) (maxdex:int)
                             (testCase:SortableIntArray) =
             let sws = sorter.switches |> Array.skip(mindex)
                                         |> Array.take(maxdex - mindex)
                                         |> Array.toList
-            SwitchesOnSortableIntArray sws testCase
+            switchesOnSortableIntArray sws testCase
 
-        let SortTHist2 (sorter:Sorter) (testCase:SortableIntArray) =
+
+        let sortTHist2 (sorter:Sorter) (testCase:SortableIntArray) =
             let sl = SwitchCount.value sorter.switchCount
-            SortTHistSection2 sorter 0 (sl - 1) testCase
+            sortTHistSection2 sorter 0 (sl - 1) testCase
 
 
-        let SortTHistSwitches(switches:Switch list)
+        let sortTHistSwitches(switches:Switch list)
                             (testCase:SortableIntArray) =
             let mutable i = 0
             let mutable lstRet = [testCase]
@@ -302,15 +303,15 @@ module SortingOps =
             lstRet |> List.rev
 
 
-        let SortTHistSwitchList (sorter:Sorter) (mindex:int) (maxdex:int) 
+        let sortTHistSwitchList (sorter:Sorter) (mindex:int) (maxdex:int) 
                                 (testCase:SortableIntArray) =
             let sws = sorter.switches |> Array.skip(mindex)
                                         |> Array.take(maxdex - mindex)
                                         |> Array.toList
-            SortTHistSwitches sws testCase
+            sortTHistSwitches sws testCase
 
 
-        let SortTHist (sorter:Sorter) (testCase:SortableIntArray) =
+        let sortTHist (sorter:Sorter) (testCase:SortableIntArray) =
             let sl = SwitchCount.value sorter.switchCount
-            SortTHistSwitchList sorter 0 (sl - 1) testCase
+            sortTHistSwitchList sorter 0 (sl - 1) testCase
 

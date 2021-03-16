@@ -6,21 +6,6 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 [<TestClass>]
 type SorterOpsFixture () =
 
-    //[<TestMethod>]
-    //member this.SAGbySwitch() =
-    //    let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
-    //    let sorter16 = RefSorter.CreateRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
-    //    let sortableSet = SortableSetRollout.allBinary degree |> Result.ExtractOrThrow    
-
-    //    let resR = SortingOps.EvalSorterOnSortableSetSAGbySwitch 
-    //                    sorter16 sortableSet SortingEval.SwitchUsePlan.All
-    //    //let wR = snd resR    
-    //    //let histo = wR |> SortableSetRollout.toSortableIntArrays
-    //    //               |> Seq.countBy id
-    //    //               |> Seq.toArray
-    //    //Assert.IsTrue(histo.Length > 1)
-    //    Assert.IsTrue(true)
-
     [<TestMethod>]
     member this.evalAndGetSwitchUses() =
         let refSorter = TestData.SorterParts.goodRefSorter
@@ -30,13 +15,13 @@ type SorterOpsFixture () =
             SortingOps.evalGroupBySwitch
                 TestData.SorterParts.goodRefSorter 
                 TestData.SorterActionRecords.rolloutOfAllBinary
-                SortingEval.SwitchUsePlan.All
+                Sorting.SwitchUsePlan.All
 
         let resNoGrouping = 
             SortingOps.evalNoGrouping 
                 TestData.SorterParts.goodRefSorter 
                 TestData.SorterActionRecords.rolloutOfAllBinary
-                SortingEval.SwitchUsePlan.All
+                Sorting.SwitchUsePlan.All
         
         let switchUsesGrouping = 
                 resGroupBySwitch
@@ -65,13 +50,13 @@ type SorterOpsFixture () =
             SortingOps.evalGroupBySortable
                 TestData.SorterParts.goodRefSorter 
                 TestData.SorterActionRecords.rolloutOfAllBinary
-                SortingEval.SwitchUsePlan.All
+                Sorting.SwitchUsePlan.All
 
         let resNoGrouping = 
             SortingOps.evalNoGrouping 
                 TestData.SorterParts.goodRefSorter 
                 TestData.SorterActionRecords.rolloutOfAllBinary
-                SortingEval.SwitchUsePlan.All
+                Sorting.SwitchUsePlan.All
     
         let sortedSortablesGrouping = 
             resGroupBySortable
@@ -88,18 +73,38 @@ type SorterOpsFixture () =
 
 
     [<TestMethod>]
-    member this.evalRecordCorrectSorter() =
+    member this.evalSorter() =
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
-        let sorter16 = RefSorter.goodRefSorterForDegree degree |> Result.ExtractOrThrow
+        let sorter16 = RefSorter.goodRefSorterForDegree degree 
+                        |> Result.ExtractOrThrow
         let sortableSetEx = SortableSet.Generated (SortableSetGenerated.allIntBits degree)
                                 |> SortableSet.getSortableSetExplicit
                                 |> Result.ExtractOrThrow 
 
         let ssR = SortingOps.evalSorter 
-                            sorter16 sortableSetEx SortingEval.SwitchUsePlan.All
-                            SortingEval.SwitchEventGrouping.BySwitch
+                        sorter16 sortableSetEx Sorting.SwitchUsePlan.All
+                        Sorting.EventGrouping.BySwitch
         let switchCount =
             match ssR with
-            | SortingEval.SwitchEventRecords.GroupbySwitch s -> s.switchUses.switchCount
+            | SortingEval.SwitchEventRecords.BySwitch s -> s.switchUses.switchCount
             | _ -> failwith "yoe"
         Assert.IsTrue((SwitchCount.value switchCount) > 0)
+
+
+
+    [<TestMethod>]
+    member this.HistAndHist2() =
+        let testCase = TestData.SorterParts.randomSortableIntArray
+        let goodSorter = TestData.SorterParts.goodRefSorter
+
+        let hist = SortingOps.History.sortTHist goodSorter testCase
+        Assert.IsTrue(hist.Length > 1)
+        let result = hist.Item (hist.Length - 1)
+        Assert.IsTrue(result |> SortableIntArray.isSorted)
+
+        let hist2 = SortingOps.History.sortTHist goodSorter testCase
+        Assert.IsTrue(hist2.Length > 1)
+        let result2 = hist2.Item (hist2.Length - 1)
+        Assert.IsTrue(result2 |> SortableIntArray.isSorted)
+
+        Assert.AreEqual(result, result2)

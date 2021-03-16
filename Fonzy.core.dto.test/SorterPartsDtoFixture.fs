@@ -25,7 +25,7 @@ type SorterPartsDtoFixture () =
 
     [<TestMethod>]
     member this.SorterSetDto() =
-        let sorterSetCereal = TestData.SorterSet.sorterSet |> SorterSetDto.toJson
+        let sorterSetCereal = TestData.SorterSet.mediocreSorterSet |> SorterSetDto.toJson
         let sorterSetBack = sorterSetCereal |> SorterSetDto.fromJson
                                             |> Result.ExtractOrThrow
-        Assert.AreEqual(TestData.SorterSet.sorterSet, sorterSetBack);
+        Assert.AreEqual(TestData.SorterSet.mediocreSorterSet, sorterSetBack);

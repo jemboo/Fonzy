@@ -26,6 +26,9 @@ module TestData =
                 TwoCyclePerm.makeRandomTwoCycle 
                                 degree iRando permSwitchDensity
 
+        let randomSortableIntArray = 
+            SortableIntArray.createRandom degree iRando
+
         let switchUseArray = Array.init (SwitchCount.value switchCount) 
                                         (fun _ -> iRando.NextPositiveInt)
 
@@ -33,7 +36,7 @@ module TestData =
                                 |> Seq.take (SwitchCount.value switchCount)
                                 |> Seq.toList
 
-        let listOfSorters = List.init (SorterCount.value sorterCount)
+        let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
                                       (fun _ -> makeRandomSorter())
 
 
@@ -46,10 +49,11 @@ module TestData =
 
     module SorterSet = 
         let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
-        let sorterSet = SorterSet.fromSorters 
+        let mediocreSorterSet = 
+                    SorterSet.fromSorters 
                             sorterSetId 
                             degree 
-                            SorterParts.listOfSorters
+                            SorterParts.mediocreRandomSorters
 
     module SorterActionRecords =
         let rolloutOfAllBinary = SortableSetRollout.allBinary degree

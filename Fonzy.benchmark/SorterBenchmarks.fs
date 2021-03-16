@@ -69,7 +69,7 @@ type BenchmarkSorterOps() =
     [<Benchmark>]
     member this.SAGbySortable() =
         let ssR = SortingOps.evalGroupBySortable 
-                            sorter16 sortableSet SortingEval.SwitchUsePlan.All
+                            sorter16 sortableSet Sorting.SwitchUsePlan.All
         ssR
 
 
@@ -77,6 +77,6 @@ type BenchmarkSorterOps() =
     [<Benchmark>]
     member this.evalSorter_AggBySwitch() =
         let ssR = SortingOps.evalSorter 
-                            sorter16 sortableSetEx SortingEval.SwitchUsePlan.All
-                            SortingEval.SwitchEventGrouping.BySwitch
+                            sorter16 sortableSetEx Sorting.SwitchUsePlan.All
+                            Sorting.EventGrouping.BySwitch
         ssR

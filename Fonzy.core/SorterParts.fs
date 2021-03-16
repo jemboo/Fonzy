@@ -54,7 +54,6 @@ module Switch =
 
 type Stage = {switches:Switch list; degree:Degree}
 module Stage =
-
     let mergeSwitchesIntoStages (degree:Degree) (switches:seq<Switch>) =
         let mutable stageTracker = Array.init (Degree.value degree) (fun _ -> false)
         let switchesForStage = new ResizeArray<Switch>()
@@ -72,7 +71,6 @@ module Stage =
                             degree = degree}
              }
 
-
     let getStageIndexesFromSwitches (degree:Degree) (switches:seq<Switch>) =
         let mutable stageTracker = Array.init (Degree.value degree) (fun _ -> false)
         let mutable curDex = 0
@@ -88,6 +86,10 @@ module Stage =
                 yield curDex
            }
 
+    let getStageCount (degree:Degree) (switches:seq<Switch>) =
+            mergeSwitchesIntoStages degree switches 
+                    |> Seq.length
+                    |> StageCount.create ""
 
     let convertToTwoCycle (stage:Stage) =
         stage.switches |> Seq.map(fun s -> (s.low, s.hi))
@@ -146,7 +148,10 @@ type Sorter = {degree:Degree;
                switches:array<Switch>; 
                switchCount:SwitchCount}
 module Sorter =
-        
+    let makeId (s:Sorter) = 
+        let gu = [s :> obj] |> GuidUtils.guidFromObjList
+        SorterId.fromGuid gu
+
     let create (degree:Degree) (switches:seq<Switch>) =
         let switchArray = switches |> Seq.toArray
         let switchCount = SwitchCount.fromInt switchArray.Length
@@ -247,14 +252,15 @@ module Sorter =
 type SorterSet = { id:SorterSetId; 
                    degree:Degree; 
                    sorterCount:SorterCount; 
-                   sorters:Map<Guid,Sorter> }
+                   sorters:Map<SorterId,Sorter> }
 module SorterSet =
     let fromSorters (sorterSetId:SorterSetId)
                     (degree:Degree) 
                     (sorters:seq<Sorter>) =
-        let sorterArray = sorters |> Seq.map(fun s-> 
-                        ([s :> obj] |> GuidUtils.guidFromObjList), s)
-                                  |> Map.ofSeq
+        let sorterArray = 
+                sorters 
+                |> Seq.map(fun s-> (s |> Sorter.makeId, s))
+                |> Map.ofSeq
         {
             SorterSet.id =sorterSetId;
             degree=degree; 

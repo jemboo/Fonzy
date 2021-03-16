@@ -68,13 +68,10 @@ module SwitchUses =
        (getWeights switchUses) |> Combinatorics.entropyBits
 
    let getRefinedStageCount (switchUses:SwitchUses) (sorter:Sorter) =
-       let getStageCount (degree:Degree) (switches:seq<Switch>) =
-            Stage.mergeSwitchesIntoStages degree switches |> Seq.length
-                                                          |> StageCount.create ""
        result {
            let! usedSwitches = getUsedSwitches switchUses sorter
            let degree = sorter.degree
-           return! getStageCount degree usedSwitches
+           return! Stage.getStageCount degree usedSwitches
        }
 
    let getRefinedSorter (switchUses:SwitchUses) (sorter:Sorter) =
