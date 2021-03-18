@@ -80,3 +80,87 @@ type BenchmarkSorterOps() =
                             sorter16 sortableSetEx Sorting.SwitchUsePlan.All
                             Sorting.EventGrouping.BySwitch
         ssR
+
+
+type BenchmarkSorterSetOps() =
+    let seed = 1234
+    let iRando = Rando.fromRngGen (RngGen.createLcg seed)
+    let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
+    let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+    let sorterLength = degree |> SorterLength.toMediocreRandomPerfLength 
+                                                SwitchOrStage.Stage 
+    let sorterCount = SorterCount.fromInt 50
+    let makeRandomSorter() = 
+            Sorter.createRandom degree sorterLength SwitchFrequency.max iRando
+
+
+
+    let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
+                                  (fun _ -> makeRandomSorter())
+
+    let mediocreSorterSet = 
+                SorterSet.fromSorters 
+                        sorterSetId 
+                        degree 
+                        mediocreRandomSorters
+
+    let sortableSetEx = SortableSet.Generated 
+                            (SortableSetGenerated.allIntBits degree)
+                            |> SortableSet.getSortableSetExplicit
+                            |> Result.ExtractOrThrow 
+
+
+//|                            Method |       Mean |    Error |   StdDev |
+//|---------------------------------- |-----------:|---------:|---------:|
+//|    getSorterEff_Parallel_BySwitch |   616.0 ms | 11.82 ms | 12.65 ms |
+//|      getSorterEff_Serial_BySwitch | 2,448.6 ms | 40.89 ms | 38.25 ms |
+//| getSorterCoverage_Serial_BySwitch | 2,455.9 ms | 38.43 ms | 35.94 ms |
+//|---------------------------------- |-----------:|---------:|---------:|
+//|    getSorterEff_Parallel_BySwitch |   617.3 ms | 11.11 ms | 10.39 ms |
+//|      getSorterEff_Serial_BySwitch | 3,289.6 ms | 35.27 ms | 31.26 ms |
+//| getSorterCoverage_Serial_BySwitch | 3,311.1 ms | 50.06 ms | 46.83 ms |
+//| getSorterEff_Parallel_NoGrouping  | 1.469 s    | 0.0331 s | 0.0970 s |
+
+    //[<Benchmark>]
+    //member this.getSorterEff_Parallel_NoGrouping() =
+    //    let ssR = SortingOps.SorterSet.eval
+    //                    mediocreSorterSet 
+    //                    sortableSetEx 
+    //                    Sorting.SwitchUsePlan.All
+    //                    Sorting.EventGrouping.NoGrouping
+    //                    (UseParallel.create true)
+    //                    SortingEval.SortingRecords.getSorterEff
+    //    ssR 
+
+    [<Benchmark>]
+    member this.getSorterEff_Parallel_BySwitch() =
+        let ssR = SortingOps.SorterSet.eval
+                        mediocreSorterSet 
+                        sortableSetEx 
+                        Sorting.SwitchUsePlan.All
+                        Sorting.EventGrouping.BySwitch
+                        (UseParallel.create true)
+                        SortingEval.SortingRecords.getSorterEff
+        ssR 
+
+    [<Benchmark>]
+    member this.getSorterEff_Serial_BySwitch() =
+        let ssR = SortingOps.SorterSet.eval
+                        mediocreSorterSet 
+                        sortableSetEx 
+                        Sorting.SwitchUsePlan.All
+                        Sorting.EventGrouping.BySwitch
+                        (UseParallel.create false)
+                        SortingEval.SortingRecords.getSorterEff
+        ssR 
+
+    [<Benchmark>]
+    member this.getSorterCoverage_Serial_BySwitch() =
+        let ssR = SortingOps.SorterSet.eval
+                        mediocreSorterSet 
+                        sortableSetEx 
+                        Sorting.SwitchUsePlan.All
+                        Sorting.EventGrouping.BySwitch
+                        (UseParallel.create false)
+                        SortingEval.SortingRecords.getSorterCoverage
+        ssR 

@@ -4,7 +4,7 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type SorterOpsFixture () =
+type SortingOpsFixture () =
 
     [<TestMethod>]
     member this.evalAndGetSwitchUses() =
@@ -62,11 +62,13 @@ type SorterOpsFixture () =
             resGroupBySortable
                 |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
                 |> Result.ExtractOrThrow
+                |> Array.toList
 
         let sortedSortablesNoGrouping = 
                 resNoGrouping
                     |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
                     |> Result.ExtractOrThrow
+                    |> Array.toList
 
         Assert.AreEqual(sortedSortablesGrouping, sortedSortablesNoGrouping)
         Assert.AreEqual(sortedSortablesNoGrouping.Length, (Degree.value refSorter.degree) + 1)
@@ -77,9 +79,10 @@ type SorterOpsFixture () =
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
         let sorter16 = RefSorter.goodRefSorterForDegree degree 
                         |> Result.ExtractOrThrow
-        let sortableSetEx = SortableSet.Generated (SortableSetGenerated.allIntBits degree)
-                                |> SortableSet.getSortableSetExplicit
-                                |> Result.ExtractOrThrow 
+        let sortableSetEx = SortableSet.Generated 
+                                (SortableSetGenerated.allIntBits degree)
+                            |> SortableSet.getSortableSetExplicit
+                            |> Result.ExtractOrThrow 
 
         let ssR = SortingOps.evalSorter 
                         sorter16 sortableSetEx Sorting.SwitchUsePlan.All
@@ -89,7 +92,6 @@ type SorterOpsFixture () =
             | SortingEval.SwitchEventRecords.BySwitch s -> s.switchUses.switchCount
             | _ -> failwith "yoe"
         Assert.IsTrue((SwitchCount.value switchCount) > 0)
-
 
 
     [<TestMethod>]
@@ -108,3 +110,75 @@ type SorterOpsFixture () =
         Assert.IsTrue(result2 |> SortableIntArray.isSorted)
 
         Assert.AreEqual(result, result2)
+
+
+
+    [<TestMethod>]
+    member this.SorterSet_eval() =
+        let sorterSet = TestData.SorterSet.mediocreSorterSet
+        let sortableSetEx = SortableSet.Generated 
+                                (SortableSetGenerated.allIntBits sorterSet.degree)
+                                |> SortableSet.getSortableSetExplicit
+                                |> Result.ExtractOrThrow 
+        let ssR = SortingOps.SorterSet.eval
+                        sorterSet 
+                        sortableSetEx 
+                        Sorting.SwitchUsePlan.All
+                        Sorting.EventGrouping.BySwitch
+                        (UseParallel.create true)
+                        SortingEval.SortingRecords.getSorterCoverage
+        Assert.IsTrue(true)
+
+        
+        
+    [<TestMethod>]
+    member this.getSorterEff_Parallel_NoGrouping() =
+        let seed = 1234
+        let iRando = Rando.fromRngGen (RngGen.createLcg seed)
+        let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
+        let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+        let sorterLength = degree |> SorterLength.toMediocreRandomPerfLength 
+                                                    SwitchOrStage.Stage 
+        let sorterCount = SorterCount.fromInt 500
+        let makeRandomSorter() = 
+                Sorter.createRandom 
+                        degree 
+                        sorterLength 
+                        SwitchFrequency.max 
+                        iRando
+
+        let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
+                                      (fun _ -> makeRandomSorter())
+
+        let mediocreSorterSet = 
+                    SorterSet.fromSorters 
+                            sorterSetId 
+                            degree 
+                            mediocreRandomSorters
+
+        let sortableSetEx = SortableSet.Generated 
+                                (SortableSetGenerated.allIntBits degree)
+                                |> SortableSet.getSortableSetExplicit
+                                |> Result.ExtractOrThrow 
+
+        //let ssR = SortingOps.SorterSet.eval
+        //                mediocreSorterSet 
+        //                sortableSetEx 
+        //                Sorting.SwitchUsePlan.All
+        //                Sorting.EventGrouping.NoGrouping
+        //                (UseParallel.create false)
+        //                SortingEval.SortingRecords.getSorterEff
+
+        let perfBins = SortingOps.SorterSet.getSorterPerfBins
+                          mediocreSorterSet
+                          sortableSetEx
+                          Sorting.SwitchUsePlan.All
+                          (UseParallel.create true)
+                          
+
+        let yab  = perfBins |> Result.ExtractOrThrow
+        let ct = match yab with
+                 | SortingEval.SorterPerfBins b -> b |> Array.sumBy(snd)
+                 | _ -> 0
+        Assert.IsTrue(ct > 0)
+

@@ -42,9 +42,19 @@ module SortingEval =
             | NoGrouping seNg -> seNg.sortableSetRollout 
                                     |> SortableSetRollout.histogramOfSortedSortables
                                     |> Ok
-            | BySwitch seGs ->  "switchUses not in GroupBySortable" |> Error
+            | BySwitch seGs ->  "sortables not in GroupBySwitch" |> Error
             | BySortable seGt -> seGt.sortableSetRollout
                                       |> SortableSetRollout.histogramOfSortedSortables
+                                      |> Ok
+
+        let getAllSortsWereComplete (switchEventRecords:SwitchEventRecords) =
+            match switchEventRecords with
+            | NoGrouping seNg -> seNg.sortableSetRollout 
+                                    |> SortableSetRollout.isSorted
+                                    |> Ok
+            | BySwitch seGs ->  "sortables not in GroupBySwitch" |> Error
+            | BySortable seGt -> seGt.sortableSetRollout
+                                      |> SortableSetRollout.isSorted
                                       |> Ok
 
         let getUsedSwitchCount (switchEventRecords:SwitchEventRecords) =
@@ -53,73 +63,92 @@ module SortingEval =
                 return! switchUses |> SwitchUses.toUsedSwitchCount
             }
 
-    type SorterPerf = { 
-                        usedSwitchCount:SwitchCount; 
-                        usedStageCount:StageCount;
-                        sorterId:SorterId;
-                        sortableSetId:SortableSetId
-                     }
+    type ResultOfSorterOnSortableSet =
+        {
+            sorter:Sorter; 
+            switchEventRecords:SwitchEventRecords;
+            sorterId:SorterId;
+            sortableSetId:SortableSetId
+        }
 
-    module SorterPerf = 
+    type SorterCoverage = 
+        { 
+            usedSwitchCount:SwitchCount; 
+            usedStageCount:StageCount;
+            sorterId:SorterId;
+            sortableSetId:SortableSetId
+        }
+                     
+    module SorterCoverage = 
         let fromSwitchEventRecords 
-                (sorter:Sorter)
-                (switchEventGrouping:SwitchEventRecords)
-                (sorterId:SorterId)
-                (sortableSetId:SortableSetId) =
+                (r:ResultOfSorterOnSortableSet) =
             result {
                     let! switchUses = 
-                            switchEventGrouping |> SwitchEventRecords.getSwitchUses
+                            r.switchEventRecords |> SwitchEventRecords.getSwitchUses
                     let! usedSwitchArray = 
-                            sorter |> SwitchUses.getUsedSwitches switchUses
+                            r.sorter |> SwitchUses.getUsedSwitches switchUses
                     let! usedSwitchCount = SwitchCount.create "" usedSwitchArray.Length
-                    let! usedStageCount = Stage.getStageCount sorter.degree usedSwitchArray
+                    let! usedStageCount = Stage.getStageCount r.sorter.degree usedSwitchArray
                     return {
-                                SorterPerf.usedSwitchCount = usedSwitchCount; 
+                                SorterCoverage.usedSwitchCount = usedSwitchCount; 
                                 usedStageCount = usedStageCount;
-                                sorterId = sorterId;
-                                sortableSetId = sortableSetId
+                                sorterId = r.sorterId;
+                                sortableSetId = r.sortableSetId
+                           }
+               }
+        
+    type SorterEff = 
+        { 
+            usedSwitchCount:SwitchCount; 
+            usedStageCount:StageCount;
+            sorterId:SorterId;
+            sortableSetId:SortableSetId;
+            sucessfulSort:bool
+        }
+
+
+    module SorterEff = 
+        let fromSwitchEventRecords 
+                (r:ResultOfSorterOnSortableSet) =
+            result {
+                    let! switchUses = 
+                            r.switchEventRecords |> SwitchEventRecords.getSwitchUses
+                    let! success = 
+                            r.switchEventRecords |> SwitchEventRecords.getAllSortsWereComplete
+                    let! usedSwitchArray = 
+                            r.sorter |> SwitchUses.getUsedSwitches switchUses
+                    let! usedSwitchCount = SwitchCount.create "" usedSwitchArray.Length
+                    let! usedStageCount = Stage.getStageCount r.sorter.degree usedSwitchArray
+                    return {
+                                SorterEff.usedSwitchCount = usedSwitchCount; 
+                                usedStageCount = usedStageCount;
+                                sorterId = r.sorterId;
+                                sortableSetId = r.sortableSetId;
+                                sucessfulSort = success
                            }
                }
 
+    type SorterPerfBin = 
+        { 
+            usedSwitchCount:SwitchCount; 
+            usedStageCount:StageCount;
+        }
 
     type SortingRecords = 
-            | SorterPerf of SorterPerf
+            | SorterCoverage of SorterCoverage
+            | SorterEff of SorterEff
+            | SorterPerfBins of (SorterPerfBin*int)[]
 
 
+    module SortingRecords = 
+        let getSorterCoverage (r:ResultOfSorterOnSortableSet) =
+            result {
+                let! sorterCoverage = r |> SorterCoverage.fromSwitchEventRecords
+                return sorterCoverage
+            }
 
-//type SortingResultsW = 
-//    {
-//        switchUses:SwitchUses;
-//        successfulSortCount:SortableCount;
-//        usedSwitchCount:SwitchCount;
-//        usedStageCount:StageCount;
-//        sortableSetId:Guid
-//        sorterId:Guid
-//    }
-
-//module SortingResultsW = 
-//    let headers =
-//        [|"successfulSortCount"; "usedSwitchCount"; "usedStageCount"|]
-
-
-//    let makeStandard (s:Sorter) (sorterId:Guid) (sortableSetId:Guid) 
-//                     (su:SwitchUses) (sc:SortableCount) =
-//        let w, t = (SwitchUses.getSwitchAndStageUses s su)
-//        { 
-//            SortingResultsW.switchUses = su;
-//            successfulSortCount = sc;
-//            usedSwitchCount = w;
-//            usedStageCount = t;
-//            sortableSetId = sortableSetId;
-//            sorterId = sorterId;
-//        }
-
-//    let report (sstr:SortingResultsW) =
-//        [|sprintf "%d" (SortableCount.value sstr.successfulSortCount);
-//          sprintf "%d" (SwitchCount.value sstr.usedSwitchCount);
-//          sprintf "%d" (StageCount.value sstr.usedStageCount);|]
-
-//    let reportOpt (sstr:SortingResultsW option) =
-//        match sstr with
-//        | Some r -> report r
-//        | None -> [|"";"";""|]
+        let getSorterEff (r:ResultOfSorterOnSortableSet) =
+            result {
+                let! sorterEff = r |> SorterEff.fromSwitchEventRecords
+                return sorterEff 
+        }

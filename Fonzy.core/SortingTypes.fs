@@ -209,6 +209,6 @@ module SorterLength =
     let toMediocreRandomPerfLength (wOrT:SwitchOrStage) (degree:Degree) =
         match wOrT with
         | SwitchOrStage.Switch -> (toRecordSorterLength degree SwitchOrStage.Switch) 
-                                            |> Multiply 5.0 
+                                            |> Multiply 9.0 
         | SwitchOrStage.Stage -> (toRecordSorterLength degree SwitchOrStage.Stage) 
-                                            |> Multiply 5.0 
+                                            |> Multiply 9.0 

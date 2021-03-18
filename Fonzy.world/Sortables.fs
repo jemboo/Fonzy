@@ -66,9 +66,6 @@ module SortableSetGenerated =
                    }
 
         | "allIntBits" -> 
-            let makeSia (r:IRando) (d:Degree) =
-                    SortableIntArray.create 
-                        (ZeroOneSequence.Random r (Degree.value d) 0.5 |> Seq.toArray)
             result {
                         let! degree = ssg.prams |> ResultMap.procKeyedInt "degree" 
                                                             (fun d -> Degree.create "" d)

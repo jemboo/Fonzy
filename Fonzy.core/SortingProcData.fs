@@ -35,9 +35,9 @@ module SwitchUses =
            sprintf "useCount=%d, SwitchCount=%d" useCount switches.Length |> Error
        else
            let res = weights |> Seq.mapi(fun i w -> i,w)
-                               |> Seq.filter(fun t -> (snd t) > 0 )
-                               |> Seq.map(fun t -> switches.[(fst t)])
-                               |> Seq.toArray
+                             |> Seq.filter(fun t -> (snd t) > 0 )
+                             |> Seq.map(fun t -> switches.[(fst t)])
+                             |> Seq.toArray
            res |> Ok
 
    let lastUsedIndex (st:SwitchUses) =
@@ -198,7 +198,7 @@ module SortableSetRollout =
 
     let isSorted (ssRollout:SortableSetRollout) =
         let d = (Degree.value ssRollout.degree)
-        seq {0 .. d .. ssRollout.baseArray.Length}
+        seq {0 .. d .. (ssRollout.baseArray.Length - 1)}
             |> Seq.forall(fun dex -> 
                     Combinatorics.isSortedOffset ssRollout.baseArray dex d)
         
@@ -211,10 +211,10 @@ module SortableSetRollout =
 
     let distinctSortableSets (ssRollout:SortableSetRollout) =
         ssRollout |> toSortableIntArrays
-                 |> Seq.distinct
-                 |> Seq.toArray
+                  |> Seq.distinct
+                  |> Seq.toArray
 
     let histogramOfSortedSortables (ssRollout:SortableSetRollout) =
         ssRollout |> toSortableIntArrays
-                 |> Seq.countBy id
-                 |> Seq.toArray
+                  |> Seq.countBy id
+                  |> Seq.toArray

@@ -217,6 +217,9 @@ module CollectionUtils =
                 else Map.add kk 1 acc
             ) Map.empty
 
+    let histoTotalCount<'a> (bins:('a*int)[]) = 
+        bins |> Array.sumBy(snd)
+
 
 module ResultMap =
 
