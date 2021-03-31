@@ -188,10 +188,15 @@ module Sorter =
         } |> Ok
 
     let makeAltEvenOdd (degree:Degree) (stageCount:StageCount) =
-        let twoCycles = TwoCyclePerm.makeAltEvenOdd degree
-                            |> Seq.take (StageCount.value stageCount)
-                            |> Seq.toArray
-        fromTwoCycleArray twoCycles
+        result {
+            let! twoCycles = TwoCycleGen.makeAltEvenOdd degree (Permutation.identity degree)
+                                |> Seq.take (StageCount.value stageCount)
+                                |> Seq.toList
+                                |> Result.sequence
+
+            return fromTwoCycleArray (twoCycles |> List.toArray)
+        }
+
 
 
     // IRando dependent
@@ -204,6 +209,17 @@ module Sorter =
                         |> Seq.take ((StageCount.value stageCount) * (Degree.value degree) / 2)
                         |> Seq.toArray
         create degree switches
+
+    let makeRandomCoConjugates (degree:Degree) (stageCount:StageCount) =
+        result {
+            let! twoCycles = TwoCycleGen.makeAltEvenOdd degree (Permutation.identity degree)
+                                |> Seq.take (StageCount.value stageCount)
+                                |> Seq.toList
+                                |> Result.sequence
+
+            return fromTwoCycleArray (twoCycles |> List.toArray)
+        }
+
 
 
     let createWithRandomSwitches (degree:Degree) 

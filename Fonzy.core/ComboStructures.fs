@@ -37,7 +37,14 @@ module Permutation =
         create p.degree (Combinatorics.inverseMapArray (p |> arrayValues))
 
     let product (pA:Permutation) (pB:Permutation) =
-        create pA.degree  (Combinatorics.composeMapIntArrays (pA |> arrayValues) (pB |> arrayValues))
+        create pA.degree  (Combinatorics.composeMapIntArrays 
+                                (pA |> arrayValues) 
+                                (pB |> arrayValues))
+
+    let conjugate (pA:Permutation) (conj:Permutation) =
+        create pA.degree  (Combinatorics.conjugateIntArrays 
+                                (pA |> arrayValues) 
+                                (conj |> arrayValues))
 
     let productR (pA:Permutation) (pB:Permutation) =
         if (Degree.value pA.degree) <> (Degree.value pB.degree) then
@@ -93,6 +100,16 @@ module TwoCyclePerm =
         { Permutation.degree = tcp.degree; 
           Permutation.values = tcp.values }
 
+    let product (pA:TwoCyclePerm) (pB:TwoCyclePerm) =
+        create pA.degree  (Combinatorics.composeMapIntArrays 
+                                (pA |> arrayValues) 
+                                (pB |> arrayValues))
+
+    let conjugate (pA:TwoCyclePerm) (conj:Permutation) =
+        create pA.degree  (Combinatorics.conjugateIntArrays 
+                                (pA |> arrayValues) 
+                                (conj |> Permutation.arrayValues))
+
     let toTwoCycle (perm:Permutation) =
         if (Permutation.isTwoCycle perm) then
             { TwoCyclePerm.degree = perm.degree; 
@@ -127,6 +144,247 @@ module TwoCyclePerm =
         tupes |> Seq.iter(OpPa)
         { degree=degree; values=curPa }
 
+    // IRando dependent
+    
+    let makeRandomMonoCycle (degree:Degree) (rnd:IRando) =
+        { degree=degree; 
+            values=Combinatorics.makeRandomMonoTwoCycle degree rnd }
+        
+    let makeRandomTwoCycle (degree:Degree) (rnd:IRando) (switchFreq:float) =
+        let switchCount = Rando.multiDraw rnd switchFreq ((Degree.value degree) / 2)
+        { degree=degree; 
+            values=Combinatorics.makeRandomTwoCycleIntArray rnd (Degree.value degree) switchCount}
+    
+    let makeRandomFullTwoCycle (degree:Degree) (rnd:IRando) =
+        { degree=degree; 
+            values=Combinatorics.makeRandomFullTwoCycleIntArray rnd (Degree.value degree)}
+
+
+    
+module TwoCycleGen =
+    let stack (lhs:int[]) (rhs:int[]) =
+        let d = lhs.Length
+        let aa = Array.init (d*2) (fun dex -> 
+            if (dex < d) then lhs.[dex]
+            else rhs.[dex-d] + d)
+        aa
+
+    let quad (qDex:int) (avs:int[])  =
+        let qLen = avs.Length/4
+        let qStart = qLen*qDex
+        let qEnd = qStart + qLen - 1
+        seq {for i=qStart to qEnd do yield avs.[i] }
+
+    let t0 (avs:int[]) =
+        avs
+
+    let t1 (avs:int[]) =
+        quad 3 avs
+        |> Seq.append (quad 1 avs)
+        |> Seq.append (quad 2 avs)
+        |> Seq.append (quad 0 avs)
+        |> Seq.toArray
+
+    let t2 (avs:int[]) =
+        quad 3 avs
+        |> Seq.append (quad 0 avs)
+        |> Seq.append (quad 1 avs)
+        |> Seq.append (quad 2 avs)
+        |> Seq.toArray
+
+    let t3 (avs:int[]) =
+        quad 0 avs
+        |> Seq.append (quad 2 avs)
+        |> Seq.append (quad 1 avs)
+        |> Seq.append (quad 3 avs)
+        |> Seq.toArray
+
+    let t4 (avs:int[]) =
+        quad 1 avs
+        |> Seq.append (quad 2 avs)
+        |> Seq.append (quad 3 avs)
+        |> Seq.append (quad 0 avs)
+        |> Seq.toArray
+
+    let qStack (dex:int) (avsL:int[]) (avsR:int[]) =
+        let avs = stack avsL avsR
+        match dex with
+        | 0 -> t0 avs
+        | 1 -> t1 avs
+        | 2 -> t2 avs
+        | 3 -> t3 avs
+        | _ -> t4 avs
+
+    let qSeed (randy:IRando) =
+        let rv = randy.NextPositiveInt % 2
+        match rv with
+        | 0 -> [|0;1|]
+        | _ -> [|1;0|]
+
+    let rndQstack (randy:IRando) =
+        let q0 = qStack (randy.NextPositiveInt % 5)
+                        (qSeed randy)
+                        (qSeed randy)
+        let q1 = qStack (randy.NextPositiveInt % 5)
+                        (qSeed randy)
+                        (qSeed randy)
+
+        let q2 = qStack (randy.NextPositiveInt % 5)
+                        (qSeed randy)
+                        (qSeed randy)
+
+        let q3 = qStack (randy.NextPositiveInt % 5)
+                        (qSeed randy)
+                        (qSeed randy)
+
+        let h1 = qStack (randy.NextPositiveInt % 5)
+                        q0
+                        q1
+
+        let h2 = qStack (randy.NextPositiveInt % 5)
+                        q2
+                        q3
+
+        let res = qStack (randy.NextPositiveInt % 5)
+                        h1
+                        h2
+        let conj = Combinatorics.composeMapIntArrays res
+                        (Combinatorics.inverseMapArray res)
+        {TwoCyclePerm.degree = Degree.fromInt 16; 
+                    TwoCyclePerm.values = conj; }
+
+
+
+    let evenDegree (degree:Degree) (offset:int) =
+        let d = (Degree.value degree)
+        let shoof v =
+            if (v%2 = 0) then (v + d + offset) % d
+            else (v + d - offset) % d
+        let arr = Array.init d (shoof)
+        {TwoCyclePerm.degree = degree; TwoCyclePerm.values = arr}
+        
+
+    let eightBlock0 (d:Degree) = 
+        let _eightBlock0 (src:int) = 
+            let mm = src % 8
+            let mb = src - mm
+            if mm = 0      then mb + 2
+            else if mm = 1 then mb + 3
+            else if mm = 2 then mb + 0
+            else if mm = 3 then mb + 1
+            else if mm = 4 then mb + 6
+            else if mm = 5 then mb + 7
+            else if mm = 6 then mb + 4
+            else                mb + 5
+        let aa = Array.init (Degree.value d) (_eightBlock0)
+        { degree=d; values=aa }
+
+    let eightBlock1 (d:Degree) = 
+        let _eightBlock1 (src:int) = 
+            let mm = src % 8
+            let mb = src - mm
+            if mm = 0      then mb + 4
+            else if mm = 1 then mb + 5
+            else if mm = 2 then mb + 6
+            else if mm = 3 then mb + 7
+            else if mm = 4 then mb + 0
+            else if mm = 5 then mb + 1
+            else if mm = 6 then mb + 2
+            else                mb + 3
+        let aa = Array.init (Degree.value d) (_eightBlock1)
+        { degree=d; values=aa }
+
+    let eightBlock2 (d:Degree) = 
+        let _eightBlock2 (src:int) = 
+            let mm = src % 8
+            let mb = src - mm
+            if mm = 0      then mb + 1
+            else if mm = 1 then mb + 0
+            else if mm = 2 then mb + 3
+            else if mm = 3 then mb + 2
+            else if mm = 4 then mb + 5
+            else if mm = 5 then mb + 4
+            else if mm = 6 then mb + 7
+            else                mb + 6
+        let aa = Array.init (Degree.value d) (_eightBlock2)
+        { degree=d; values=aa }
+
+
+    let make2EightBlocks (conj:Permutation list) =
+        let coes (conj:Permutation) =
+            result {
+                        let! b0 = TwoCyclePerm.conjugate (eightBlock0 conj.degree) conj
+                        let! b1 = TwoCyclePerm.conjugate (eightBlock1 conj.degree) conj
+                        return seq { yield b0; yield b1; }
+                   }
+        result {
+                    let! rOf = conj |> List.map(fun c -> coes c)
+                                    |> Result.sequence
+                    return rOf |> Seq.concat
+               }
+
+
+    let make3EightBlocks (conj:Permutation list) =
+        let coes (conj:Permutation) =
+            result {
+                        let! b0 = TwoCyclePerm.conjugate (eightBlock0 conj.degree) conj
+                        let! b1 = TwoCyclePerm.conjugate (eightBlock1 conj.degree) conj
+                        let! b2 = TwoCyclePerm.conjugate (eightBlock2 conj.degree) conj
+                        return seq { yield b0; yield b1; yield b2; }
+                   }
+        result {
+                    let! rOf = conj |> List.map(fun c -> coes c)
+                                    |> Result.sequence
+                    return rOf |> Seq.concat
+               }
+
+    let fourBlock0 (d:Degree) = 
+        let _fourBlock0 (src:int) = 
+            let mm = src % 4
+            let mb = src - mm
+            if mm = 0 then mb + 1
+            else if mm = 1 then mb
+            else if mm = 2 then mb + 3
+            else mb + 2
+        let aa = Array.init (Degree.value d) (_fourBlock0)
+        { degree=d; values=aa }
+
+    let fourBlock1 (d:Degree)  = 
+        let _fourBlock1 (src:int) = 
+            let mm = src % 4
+            let mb = src - mm
+            if mm = 0 then mb + 3
+            else if mm = 1 then mb + 2
+            else if mm = 2 then mb + 1
+            else mb
+        let aa = Array.init (Degree.value d) (_fourBlock1)
+        { degree=d; values=aa }
+
+    let fourBlock2 (d:Degree) = 
+        let _fourBlock2 (src:int) = 
+            let mm = src % 4
+            let mb = src - mm
+            if mm = 0 then mb + 2
+            else if mm = 1 then mb + 3
+            else if mm = 2 then mb
+            else mb + 1
+        let aa = Array.init (Degree.value d) (_fourBlock2)
+        { degree=d; values=aa }
+
+    let make3FourBlocks (conj:Permutation list) =
+        let coes (conj:Permutation) =
+            result {
+                        let! b0 = TwoCyclePerm.conjugate (fourBlock0 conj.degree) conj
+                        let! b1 = TwoCyclePerm.conjugate (fourBlock1 conj.degree) conj
+                        let! b2 = TwoCyclePerm.conjugate (fourBlock2 conj.degree) conj
+                        return seq { yield b0; yield b1; yield b2; }
+                   }
+        result {
+                    let! rOf = conj |> List.map(fun c -> coes c)
+                                    |> Result.sequence
+                    return rOf |> Seq.concat
+               }
+
     let makeEvenMode (degree:Degree) =
         let d = (Degree.value degree)
         let dm =
@@ -146,32 +404,56 @@ module TwoCyclePerm =
             else d
         let yak p =
             if p = dm then p
-            else if p = 0 then p
+            else if p = 0 then 0
             else if (p%2 = 0) then
                  p - 1
             else p + 1
         { degree=degree; values=Array.init d (yak) }
 
-    let makeAltEvenOdd (degree:Degree) =
-        seq {while true do 
-                    yield makeEvenMode degree; 
-                    yield makeOddMode degree; }
+    let makeOddModeFromEvenDegreeWithCap (degree:Degree) =
+        let d = (Degree.value degree)
+        let dm =
+            if (d%2 = 0) then d-1
+            else d
+        let yak p =
+            if p = 0 then d-1
+            else if p = d-1 then 0
+            else if (p%2 = 0) then
+                 p - 1
+            else p + 1
+        { degree=degree; values=Array.init d (yak) }
 
-    // IRando dependent
-    
-    let makeRandomMonoCycle (degree:Degree) (rnd:IRando) =
-        { degree=degree; 
-            values=Combinatorics.makeRandomMonoTwoCycle degree rnd }
-        
-    let makeRandomTwoCycle (degree:Degree) (rnd:IRando) (switchFreq:float) =
-        let switchCount = Rando.multiDraw rnd switchFreq ((Degree.value degree) / 2)
-        { degree=degree; 
-            values=Combinatorics.makeRandomTwoCycleIntArray rnd (Degree.value degree) switchCount}
-    
-    let makeRandomFullTwoCycle (degree:Degree) (rnd:IRando) =
-        { degree=degree; 
-            values=Combinatorics.makeRandomFullTwoCycleIntArray rnd (Degree.value degree)}
-    
+    let makeOddModeWithCap (degree:Degree) =
+        let d = (Degree.value degree)
+        if (d%2 = 0) then makeOddModeFromEvenDegreeWithCap degree
+        else makeOddMode degree
+
+    let makeAltEvenOdd (degree:Degree) (conj:Permutation) =
+        seq {while true do 
+                    yield TwoCyclePerm.conjugate 
+                            (makeEvenMode degree) conj; 
+                    yield TwoCyclePerm.conjugate 
+                            (makeOddModeWithCap degree) conj; }
+
+    let makeCoConjugateEvenOdd (conj:Permutation list) =
+        let coes (conj:Permutation) =
+            result {
+                        let! eve = TwoCyclePerm.conjugate 
+                                    (makeEvenMode conj.degree) conj
+                        let! odd = TwoCyclePerm.conjugate 
+                                    (makeOddModeWithCap conj.degree) conj
+                        return seq { yield eve; yield odd; }
+                   }
+        result {
+                    let! rOf = conj |> List.map(fun c -> coes c)
+                                    |> Result.sequence
+                    return rOf |> Seq.concat
+               }
+
+
+
+
+
 
 
 module ZeroOneSequence =

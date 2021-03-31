@@ -22,7 +22,67 @@ type ComboStructuresFixture () =
                     |> Seq.toArray
         Assert.IsTrue (arA.Length > 0)
         Assert.IsTrue (arA.Length < maxPower)
+        Assert.AreEqual(
+            arA.[(Degree.value TestData.degree) - 1], 
+            Permutation.identity TestData.degree)
 
+
+
+    [<TestMethod>]
+    member this.permPowerDist() =
+        let maxPower = 2000
+        let degree = Degree.fromInt 12
+        let permCount = 1000000
+        let randPerms = Permutation.createRandoms 
+                                    degree 
+                                    TestData.iRando
+                        |> Seq.take permCount
+                        |> Seq.map(fun p ->
+                                    p |> (Permutation.powers maxPower) |> Seq.toArray)
+                        |> Seq.toArray
+        let yabs = randPerms |> Array.countBy(fun po->po.Length)
+        yabs |> Array.iter(fun tup -> 
+                        Console.WriteLine (sprintf "%d\t%d" (fst tup) (snd tup)))
+        
+        Assert.IsTrue (randPerms.Length > 0)
+
+
+    [<TestMethod>]
+    member this.stack() =
+        let dd = Degree.fromInt 2
+        let aL = [|0;1|]
+        let aR = [|1;0|]
+        let aS = [|0;1;3;2|]
+        let aSl = aS |> Array.toList
+        let tcpS =  TwoCycleGen.stack aL aR
+                    |> Array.toList
+        Assert.AreEqual (aSl, tcpS)
+
+    [<TestMethod>]
+    member this.quad() =
+        let tAvs = [|0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;|]
+        let pp = tAvs |> TwoCycleGen.t4
+                      |> Seq.toList
+        Assert.AreEqual(pp.Length, tAvs.Length)
+
+    [<TestMethod>]
+    member this.qStack() =
+        let avsL = [|0;1;|]
+        let avsR = [|0;1;|]
+        let pp = TwoCycleGen.qStack 1 avsL avsR
+                 |> Array.toList
+        Assert.AreEqual(pp.Length, avsL.Length + avsR.Length)
+
+
+    [<TestMethod>]
+    member this.rndQStack() =
+        let ys = Array.init 100 (fun _ -> 
+                TwoCycleGen.rndQstack TestData.iRando)
+
+        let chk = ys |> Array.map(TwoCyclePerm.toPermutation)
+                     |> Array.map(Permutation.isTwoCycle)
+
+        Assert.AreEqual(1, 1)
 
     [<TestMethod>]
     member this.TestInversePermutation() =
@@ -77,12 +137,26 @@ type ComboStructuresFixture () =
     [<TestMethod>]
     member this.TwoCyclePerm_makeMode1() =
        let degree = Degree.fromInt 10
-       let aa = TwoCyclePerm.makeOddMode degree
-       //let b0 = Array2D.length1 aa
+       let aa = TwoCycleGen.makeOddMode degree
+       let ac = TwoCycleGen.makeOddModeWithCap degree
+       let acv = TwoCyclePerm.arrayValues ac
 
-       Assert.IsTrue(true)
+       Assert.IsTrue(acv.Length > 0)
 
        
+    [<TestMethod>]
+    member this.TwoCyclePerm_makeCoConjugateEvenOdd() =
+       let degree = Degree.fromInt 10
+       let permLst1 = [Permutation.identity degree; Permutation.identity degree]
+
+       let aa = TwoCycleGen.makeCoConjugateEvenOdd permLst1
+                |> Result.ExtractOrThrow
+       let al = aa |> Seq.toList
+
+       Assert.IsTrue(al.Length > 0)
+
+
+
     [<TestMethod>]
     member this.makeFromTupleSeq() =        
         let rndy = Rando.LcgFromSeed 44
@@ -102,3 +176,11 @@ type ComboStructuresFixture () =
      let expectedArray = [|1; 0; 1; 0; 1; 0|]
      let converted = ZeroOneSequence.FromInteger len 21
      Assert.IsTrue ((expectedArray = converted))
+     
+
+    [<TestMethod>]
+    member this.TwoCycleGen_evenDegree() =
+     let degree = Degree.fromInt 16
+     let res = TwoCycleGen.evenDegree degree 4
+
+     Assert.IsTrue ((TwoCyclePerm.arrayValues res).Length = (Degree.value degree))

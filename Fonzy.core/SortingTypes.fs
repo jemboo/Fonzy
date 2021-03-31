@@ -111,6 +111,17 @@ module SorterLength =
     let makeSwitchCount switchCount =
         SorterLength.Switch (SwitchCount.fromInt switchCount)
 
+    let getStageCount (sorterLength:SorterLength) =
+        match sorterLength with
+        | SorterLength.Stage sl -> sl |> Ok
+        | _ -> "not a StageCount" |> Error
+
+    let getSwitchCount (sorterLength:SorterLength) =
+        match sorterLength with
+        | SorterLength.Switch sl -> sl |> Ok
+        | _ -> "not a SwitchCount" |> Error
+
+
     let Add (lhs:SorterLength) (rhs:SorterLength) =
             match lhs with
                 | SorterLength.Switch (SwitchCount wCtL) -> 

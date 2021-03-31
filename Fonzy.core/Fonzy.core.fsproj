@@ -14,6 +14,7 @@
     <Compile Include="CommonTypes.fs" />
     <Compile Include="RandomTypes.fs" />
     <Compile Include="Rando.fs" />
+    <Compile Include="Tree.fs" />
     <Compile Include="Distributions.fs" />
     <Compile Include="Combinatorics.fs" />
     <Compile Include="ComboStructures.fs" />

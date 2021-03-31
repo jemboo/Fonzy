@@ -56,6 +56,10 @@ module Combinatorics =
     let isTwoCycle (a:int[]) =
         (composeMapIntArrays a a) = identity a.Length
 
+    let fixedCount (a:int[]) =
+        a |> Array.mapi(fun dex e -> if (dex = e) then 1 else 0)
+          |> Array.reduce(+)
+
     let distanceSquared (a:array<int>) (b:array<int>) =
         Array.fold2 (fun acc elem1 elem2 ->
         acc + (elem1 - elem2) * (elem1 - elem2)) 0 a b

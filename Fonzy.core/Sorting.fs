@@ -25,8 +25,6 @@ module Sorting =
 
 
 
-
-
 //type SortingResultsW = 
 //    {
 //        switchUses:SwitchUses;

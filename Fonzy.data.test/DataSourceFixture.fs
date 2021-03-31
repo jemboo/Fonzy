@@ -66,7 +66,7 @@ type DataSourceFixture () =
         let dirDs = new DirectoryDataSource(this.testDir) :> IDataSource
         let ds = dirDs.GetDataSource(WorldId.value this.world1.id) |> Result.ExtractOrThrow
         this.tearDownDataSource() 
-        Assert.AreEqual(ds |> DataStoreItem.getId, this.world1.id);
+        Assert.AreEqual(ds |> DataStoreItem.getId, WorldId.value this.world1.id);
 
 
     [<TestMethod>]

@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="TreeFixture.fs" />
     <Compile Include="UtilsFixture.fs" />
     <Compile Include="FileUtilsFixture.fs" />
     <Compile Include="RandoFixture.fs" />

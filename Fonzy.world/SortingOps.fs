@@ -235,24 +235,19 @@ module SortingOps =
             (switchusePlan:Sorting.SwitchUsePlan)
             (_parallel:UseParallel) =
             result {
-                let! sortingEffs = 
-                    eval 
-                        sorterSet 
-                        sortableSet 
-                        switchusePlan
-                        Sorting.EventGrouping.NoGrouping
-                        _parallel
-                        SortingEval.SortingRecords.getSorterEff
+                let! sorterEffs = 
+                        eval 
+                            sorterSet 
+                            sortableSet 
+                            switchusePlan
+                            Sorting.EventGrouping.BySwitch
+                            _parallel
+                            SortingEval.SortingRecords.getSorterEff
 
-                let bins = sortingEffs 
-                                |> Seq.filter(fun eff->eff.sucessfulSort)
-                                |> Seq.map(fun eff ->
-                                             {SorterPerfBin.usedStageCount=eff.usedStageCount
-                                              SorterPerfBin.usedSwitchCount=eff.usedSwitchCount})
-                                |> Seq.countBy id
-                                |> Seq.toArray
+                let bins = sorterEffs 
+                                |> SorterPerfBin.fromSorterEffs
 
-                return bins |> SortingRecords.SorterPerfBins
+                return bins
             }
 
 

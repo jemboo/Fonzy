@@ -39,7 +39,20 @@ module TestData =
         let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
                                       (fun _ -> makeRandomSorter())
 
+        let maxConjugatePairs = 100
+        let altEvenSorters = List.init maxConjugatePairs (fun stageCt -> 
+                    Sorter.makeAltEvenOdd degree (StageCount.fromInt (stageCt + 1)) )
+                             |> Result.sequence
+                             |> Result.ExtractOrThrow
 
+
+        let sM () = 
+            RefSorter.createRefSorter RefSorter.Green16m
+
+        //let sorterEndM = RefSorter.createRefSorter RefSorter.End16m
+        //                 |> Result.ExtractOrThrow
+        let sorterGreenM = sM ()
+                           |> Result.ExtractOrThrow
 
 
     module SortableSet =
@@ -48,12 +61,21 @@ module TestData =
         let sortableSet = SortableSet.Explicit ssAllIntBits
 
     module SorterSet = 
-        let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+        let mediocreSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+        let altEvenSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
         let mediocreSorterSet = 
                     SorterSet.fromSorters 
-                            sorterSetId 
+                            mediocreSorterSetId 
                             degree 
                             SorterParts.mediocreRandomSorters
+
+        let altEvenSorterSet = 
+                    SorterSet.fromSorters 
+                            altEvenSorterSetId
+                            degree 
+                            SorterParts.altEvenSorters
+
+
 
     module SorterActionRecords =
         let rolloutOfAllBinary = SortableSetRollout.allBinary degree

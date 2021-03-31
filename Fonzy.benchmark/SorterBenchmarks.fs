@@ -109,18 +109,23 @@ type BenchmarkSorterSetOps() =
                             |> SortableSet.getSortableSetExplicit
                             |> Result.ExtractOrThrow 
 
-
+                            
 //|                            Method |       Mean |    Error |   StdDev |
 //|---------------------------------- |-----------:|---------:|---------:|
-//|    getSorterEff_Parallel_BySwitch |   616.0 ms | 11.82 ms | 12.65 ms |
-//|      getSorterEff_Serial_BySwitch | 2,448.6 ms | 40.89 ms | 38.25 ms |
-//| getSorterCoverage_Serial_BySwitch | 2,455.9 ms | 38.43 ms | 35.94 ms |
-//|---------------------------------- |-----------:|---------:|---------:|
-//|    getSorterEff_Parallel_BySwitch |   617.3 ms | 11.11 ms | 10.39 ms |
-//|      getSorterEff_Serial_BySwitch | 3,289.6 ms | 35.27 ms | 31.26 ms |
-//| getSorterCoverage_Serial_BySwitch | 3,311.1 ms | 50.06 ms | 46.83 ms |
-//| getSorterEff_Parallel_NoGrouping  | 1.469 s    | 0.0331 s | 0.0970 s |
+//|    getSorterEff_Parallel_BySwitch |   711.9 ms | 13.60 ms | 13.97 ms |
+//|      getSorterEff_Serial_BySwitch | 4,104.7 ms | 68.45 ms | 64.03 ms |
+//| getSorterCoverage_Serial_BySwitch | 5,652.7 ms | 47.77 ms | 44.68 ms |
 
+//|                           Method |    Mean |    Error |   StdDev |
+//|--------------------------------- |--------:|---------:|---------:|
+//| getSorterEff_Parallel_NoGrouping | 2.363 s | 0.0603 s | 0.1778 s |
+
+
+//|                                Method |    Mean |    Error |   StdDev |  Median |
+//|-------------------------------------- |--------:|---------:|---------:|--------:|
+//| getSorterPerfBins_Parallel_NoGrouping | 2.186 s | 0.0497 s | 0.1450 s | 2.122 s |
+
+// * Warnings *
     //[<Benchmark>]
     //member this.getSorterEff_Parallel_NoGrouping() =
     //    let ssR = SortingOps.SorterSet.eval
@@ -132,35 +137,56 @@ type BenchmarkSorterSetOps() =
     //                    SortingEval.SortingRecords.getSorterEff
     //    ssR 
 
-    [<Benchmark>]
-    member this.getSorterEff_Parallel_BySwitch() =
-        let ssR = SortingOps.SorterSet.eval
-                        mediocreSorterSet 
-                        sortableSetEx 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
-                        (UseParallel.create true)
-                        SortingEval.SortingRecords.getSorterEff
-        ssR 
+    
+    
+    //|                                Method |     Mean |    Error |   StdDev |
+    //|-------------------------------------- |---------:|---------:|---------:|
+    //| getSorterPerfBins_Parallel_NoGrouping | 732.6 ms | 13.69 ms | 14.06 ms |
 
-    [<Benchmark>]
-    member this.getSorterEff_Serial_BySwitch() =
-        let ssR = SortingOps.SorterSet.eval
-                        mediocreSorterSet 
-                        sortableSetEx 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
-                        (UseParallel.create false)
-                        SortingEval.SortingRecords.getSorterEff
-        ssR 
+    //[<Benchmark>]
+    //member this.getSorterPerfBins_Parallel_NoGrouping() =
+        //let perfBins = SortingOps.SorterSet.getSorterPerfBins
+        //    mediocreSorterSet
+        //    sortableSetEx
+        //    Sorting.SwitchUsePlan.All
+        //    (UseParallel.create true)
 
-    [<Benchmark>]
-    member this.getSorterCoverage_Serial_BySwitch() =
-        let ssR = SortingOps.SorterSet.eval
-                        mediocreSorterSet 
-                        sortableSetEx 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
-                        (UseParallel.create false)
-                        SortingEval.SortingRecords.getSorterCoverage
-        ssR 
+
+        //let yab  = perfBins |> Result.ExtractOrThrow
+        //let ct = yab |> Array.sumBy(snd)
+        ////match yab with
+        ////          | SortingEval.SorterPerfBins b -> b |> Array.sumBy(snd)
+        ////          | _ -> 0
+
+    //[<Benchmark>]
+    //member this.getSorterEff_Parallel_BySwitch() =
+    //    let ssR = SortingOps.SorterSet.eval
+    //                    mediocreSorterSet 
+    //                    sortableSetEx 
+    //                    Sorting.SwitchUsePlan.All
+    //                    Sorting.EventGrouping.BySwitch
+    //                    (UseParallel.create true)
+    //                    SortingEval.SortingRecords.getSorterEff
+    //    ssR 
+
+    //[<Benchmark>]
+    //member this.getSorterEff_Serial_BySwitch() =
+    //    let ssR = SortingOps.SorterSet.eval
+    //                    mediocreSorterSet 
+    //                    sortableSetEx 
+    //                    Sorting.SwitchUsePlan.All
+    //                    Sorting.EventGrouping.BySwitch
+    //                    (UseParallel.create false)
+    //                    SortingEval.SortingRecords.getSorterEff
+    //    ssR 
+
+    //[<Benchmark>]
+    //member this.getSorterCoverage_Serial_BySwitch() =
+    //    let ssR = SortingOps.SorterSet.eval
+    //                    mediocreSorterSet 
+    //                    sortableSetEx 
+    //                    Sorting.SwitchUsePlan.All
+    //                    Sorting.EventGrouping.BySwitch
+    //                    (UseParallel.create false)
+    //                    SortingEval.SortingRecords.getSorterCoverage
+    //    ssR 

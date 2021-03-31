@@ -27,11 +27,13 @@ type WorldFixture () =
     member this.worldActionGenIntDist() =
         let worldAction = TestData.WorldAction.IntDist.randomUniform
         let res = WorldAction.createWorld worldAction |> Result.ExtractOrThrow
-        Assert.AreEqual(res.id, TestData.CauseSpec.IntDist.rndUniform.id);
+        Assert.AreEqual(WorldId.value res.id, 
+                        CauseSpecId.value TestData.CauseSpec.IntDist.rndUniform.id);
 
 
     [<TestMethod>]
     member this.worldActionGenSorterDist() =
         let worldAction = TestData.WorldAction.SorterGen.rand1
         let res = WorldAction.createWorld worldAction |> Result.ExtractOrThrow
-        Assert.AreEqual(res.id, TestData.CauseSpec.Sorter.rand1.id);
+        Assert.AreEqual(WorldId.value res.id, 
+                        CauseSpecId.value TestData.CauseSpec.Sorter.rand1.id);

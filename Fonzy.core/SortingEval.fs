@@ -35,14 +35,17 @@ module SortingEval =
                                     |> Ok
             | BySwitch seGs -> seGs.switchUses 
                                     |> Ok
-            | BySortable seGt -> "switchUses not in GroupBySortable" |> Error
+            | BySortable _ -> "switchUses not in GroupBySortable" |> Error
+
 
         let getHistogramOfSortedSortables (switchEventRecords:SwitchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.sortableSetRollout 
                                     |> SortableSetRollout.histogramOfSortedSortables
                                     |> Ok
-            | BySwitch seGs ->  "sortables not in GroupBySwitch" |> Error
+            | BySwitch seGs ->  seGs.sortableSetRollout 
+                                    |> SortableSetRollout.histogramOfSortedSortables
+                                    |> Ok
             | BySortable seGt -> seGt.sortableSetRollout
                                       |> SortableSetRollout.histogramOfSortedSortables
                                       |> Ok
@@ -52,7 +55,9 @@ module SortingEval =
             | NoGrouping seNg -> seNg.sortableSetRollout 
                                     |> SortableSetRollout.isSorted
                                     |> Ok
-            | BySwitch seGs ->  "sortables not in GroupBySwitch" |> Error
+            | BySwitch seGs ->  seGs.sortableSetRollout
+                                    |> SortableSetRollout.isSorted
+                                    |> Ok
             | BySortable seGt -> seGt.sortableSetRollout
                                       |> SortableSetRollout.isSorted
                                       |> Ok
@@ -133,6 +138,30 @@ module SortingEval =
             usedSwitchCount:SwitchCount; 
             usedStageCount:StageCount;
         }
+
+    module SorterPerfBin = 
+        let fromSorterEffs (sorterEffs:SorterEff list) = 
+            sorterEffs 
+            |> Seq.filter(fun eff->eff.sucessfulSort)
+            |> Seq.map(fun eff ->
+                         {SorterPerfBin.usedStageCount=eff.usedStageCount
+                          SorterPerfBin.usedSwitchCount=eff.usedSwitchCount})
+            |> Seq.countBy id
+            |> Seq.toArray
+
+        let repStr (sorterPerfBin:SorterPerfBin) =
+            sprintf "%s\t%s"
+                ((SwitchCount.value sorterPerfBin.usedSwitchCount) |> string)
+                ((StageCount.value sorterPerfBin.usedStageCount) |> string)
+
+        let binReport (bins:(SorterPerfBin*int)[]) = 
+            let repLine (sorterPerfBin:SorterPerfBin) (ct:int) = 
+                    sprintf "%s\t%s"
+                        (repStr sorterPerfBin)
+                        (ct|> string)
+            bins |> StringUtils.printLinesOfArrayf
+                    (fun tup -> repLine (fst tup) (snd tup))
+
 
     type SortingRecords = 
             | SorterCoverage of SorterCoverage

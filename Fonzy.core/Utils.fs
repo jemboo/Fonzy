@@ -208,7 +208,8 @@ module CollectionUtils =
                yield (kv.Key, kv.Value)
        }
 
-    let histogram<'d,'r when 'r:comparison> (keymaker:'d->'r) (qua:seq<'d>) =
+    let histogram<'d,'r when 'r:comparison> (keymaker:'d->'r) 
+                    (qua:seq<'d>) =
         qua
         |> Seq.fold (fun acc fv ->
                 let kk = keymaker fv
