@@ -1,9 +1,6 @@
 ﻿namespace global
 open System
 
-
-
-
 type CauseSpecDto = {id:Guid; genus:string[]; prams:Map<string,string>;}
 module CauseSpecDto =
     let toDto (cs:CauseSpec) =

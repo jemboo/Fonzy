@@ -213,12 +213,12 @@ type SortingOpsFixture () =
 
         //let sorterLength = degree |> SorterLength.toMediocreRandomPerfLength 
         //                                            SwitchOrStage.Stage
-        let sorterLength = SorterLength.makeStageCount 65
+        let sorterLength = SorterLength.makeStageCount 155
 
         let stageCount = sorterLength |> SorterLength.getStageCount
                                       |> Result.ExtractOrThrow
 
-        let sorterCount = SorterCount.fromInt 10000
+        let sorterCount = SorterCount.fromInt 100
 
         let makeCoConjSorter() = 
             //let perms = //seq {Permutation.identity degree; 
@@ -229,11 +229,17 @@ type SortingOpsFixture () =
 
             let perms = List.init 
                             (StageCount.value stageCount)
-                            (fun _ -> TwoCyclePerm.makeRandomFullTwoCycle degree iRando
-                                      |> TwoCyclePerm.toPermutation)
-
+                            (fun _ -> TwoCyclePerm.makeRandomFullTwoCycle degree iRando)
+                        |> List.map (TwoCyclePerm.toPermutation)
+            let perms2 = List.init 
+                            (StageCount.value stageCount)
+                            (fun _ -> sTree.makePerm 0.29 iRando 4)
+                         |> Result.sequence |> Result.ExtractOrThrow
+                         |> List.map (TwoCyclePerm.toPermutation)
+                         
             result {
-                let! stp = perms |> TwoCycleGen.make2EightBlocks
+                
+                let! stp = perms2 |> TwoCycleGen.make3EightBlocks
                 let atp = stp |> Seq.toArray
                 return Sorter.fromTwoCycleArray atp
             }
@@ -268,7 +274,7 @@ type SortingOpsFixture () =
                   
         let ct =  pbr |> Array.sumBy(snd)
 
-        Assert.IsTrue(ct > 0)
+        Assert.IsTrue(true)
 
 
 
@@ -334,6 +340,59 @@ type SortingOpsFixture () =
 
         let pbr  = perfBins |> Result.ExtractOrThrow
         let rep = (pbr |> SorterPerfBin.binReport)
+        Console.WriteLine rep
+
+        Assert.IsTrue(true)
+
+
+
+    [<TestMethod>]
+    member this.makeTreeSorter() =
+        let seed = 12345
+        let iRando = Rando.fromRngGen (RngGen.createLcg seed)
+        let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
+        let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+               
+        let sorterLength = SorterLength.makeStageCount 400
+        let stageCount = sorterLength |> SorterLength.getStageCount
+                                      |> Result.ExtractOrThrow
+   
+        let sorterCount = SorterCount.fromInt 100
+
+        let makeSorter() = 
+            let perms2 = List.init 
+                            (StageCount.value stageCount)
+                            (fun _ -> sTree.makePerm 0.29 iRando 4)
+                            |> Result.sequence |> Result.ExtractOrThrow
+                            |> List.toArray
+            Sorter.fromTwoCycleArray perms2
+
+        let sorterArray = Array.init 
+                               (SorterCount.value sorterCount)
+                               (fun _ -> makeSorter ())  
+
+        let sorterSet = 
+                    SorterSet.fromSorters 
+                            sorterSetId
+                            degree 
+                            sorterArray
+
+        let sortableSetEx = SortableSet.Generated 
+                                (SortableSetGenerated.allIntBits degree)
+                                |> SortableSet.getSortableSetExplicit
+                                |> Result.ExtractOrThrow 
+
+        let perfBins = SortingOps.SorterSet.getSorterPerfBins
+                            sorterSet
+                            sortableSetEx
+                            Sorting.SwitchUsePlan.All
+                            (UseParallel.create true)
+
+        let pbr  = perfBins |> Result.ExtractOrThrow
+        let rep = (pbr |> SorterPerfBin.binReport)
+        let tot = pbr |> Array.sumBy(snd)
+        Console.WriteLine (sprintf "tot:%d" tot)
+        Console.WriteLine ""
         Console.WriteLine rep
 
         Assert.IsTrue(true)

@@ -39,12 +39,9 @@ type TreeFixture () =
 
 
 
-
-
     [<TestMethod>]
     member this.sTree_init() =
         let tg() = NodeType.RandInit0 TestData.iRando 0.29
-        let res = sTree.init 4 0 tg
         let ats = Array.init 100000 (fun _ -> sTree.init 4 0 tg)
         let rese = ats |> Array.map(fun t -> sTree.applyGuide t t)
                        |> Array.map (fun t-> t |> sTree.enumer |> Seq.toArray)

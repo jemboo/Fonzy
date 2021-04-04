@@ -5,7 +5,6 @@ open System
 type Enviro = 
     | Empty
     | ObjectMap of Map<string, string>
-    | MergeSet of Map<Guid, Map<string, string>>
 
 
 module Enviro =
@@ -14,7 +13,6 @@ module Enviro =
         match e with
         | Empty -> "an Empty not an ObjectMap" |> Error
         | ObjectMap m -> m |> Ok
-        | MergeSet s -> "a MergeSet not an ObjectMap" |> Error
 
 
     let addKvpToEnviro (key:string) (dto) (e:Enviro) =
@@ -25,7 +23,6 @@ module Enviro =
                      let! mN = m |> ResultMap.add key (dto|>Json.serialize)
                      return Enviro.ObjectMap mN
                  }
-         | MergeSet _ -> "MergeSet not supported" |> Error
 
 
     let addRootDtoToEnviro<'T> (e:Enviro) (key:string) (dto:'T) 
@@ -38,7 +35,6 @@ module Enviro =
                      let! mN = m |> ResultMap.add key cereal
                      return Enviro.ObjectMap mN
                  }
-         | MergeSet _ -> "MergeSet not supported" |> Error
 
 
     let getDtoAndMetaFromEnviro<'T> (e:Enviro) (key:string) =
@@ -49,7 +45,6 @@ module Enviro =
                      let! ofT, meta = mN |> RootDto.extractFromJson<'T>
                      return ofT, meta
                  }
-         | MergeSet _ -> "MergeSet not supported" |> Error
 
 
     let replaceKvpToEnviro (e:Enviro) (key:string) (dto) 
@@ -62,4 +57,3 @@ module Enviro =
                      let mN = m |> Map.add key cereal
                      return Enviro.ObjectMap mN
                  }
-         | MergeSet _ -> "MergeSet not supported" |> Error

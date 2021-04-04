@@ -210,7 +210,8 @@ module Sorter =
                         |> Seq.toArray
         create degree switches
 
-    let makeRandomCoConjugates (degree:Degree) (stageCount:StageCount) =
+    let makeRandomCoConjugates (degree:Degree) 
+                               (stageCount:StageCount) =
         result {
             let! twoCycles = TwoCycleGen.makeAltEvenOdd degree (Permutation.identity degree)
                                 |> Seq.take (StageCount.value stageCount)
@@ -219,7 +220,6 @@ module Sorter =
 
             return fromTwoCycleArray (twoCycles |> List.toArray)
         }
-
 
 
     let createWithRandomSwitches (degree:Degree) 
@@ -231,15 +231,19 @@ module Sorter =
         create degree switches
 
 
-    let createRandom (degree:Degree) (sorterLength:SorterLength) 
-                     (switchFreq:SwitchFrequency) (rnd:IRando) =
+    let createRandom (degree:Degree) 
+                     (sorterLength:SorterLength) 
+                     (switchFreq:SwitchFrequency) 
+                     (rnd:IRando) =
         match sorterLength with
         | SorterLength.Switch wc -> createWithRandomSwitches degree wc rnd
         | SorterLength.Stage  tc -> createWithRandomStages degree tc switchFreq rnd
 
 
-    let createRandomArray (degree:Degree) (sorterLength:SorterLength) 
-                          (switchFreq:SwitchFrequency) (sorterCount:SorterCount) 
+    let createRandomArray (degree:Degree) 
+                          (sorterLength:SorterLength) 
+                          (switchFreq:SwitchFrequency) 
+                          (sorterCount:SorterCount) 
                           (rnd:IRando) =
         (seq {1 .. (SorterCount.value sorterCount)} 
                 |> Seq.map(fun _ -> (createRandom degree sorterLength switchFreq rnd))

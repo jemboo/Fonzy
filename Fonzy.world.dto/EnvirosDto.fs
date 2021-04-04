@@ -11,7 +11,6 @@ module EnviroDto =
                         value = Json.serialize objectMap}
         | Enviro.Empty -> {cat = "Empty"; value = Json.serialize None}
         
-        | MergeSet s -> {cat = "MergeSet"; value = s |> Json.serialize}
 
     let toJson (idt:Enviro) =
         idt |> toDto |> Json.serialize
@@ -25,11 +24,6 @@ module EnviroDto =
             result {
                 let! b = Json.deserialize<Map<string, string>> eDto.value
                 return Enviro.ObjectMap b
-            }
-        else if eDto.cat = "MergeSet" then
-            result {
-                let! b = Json.deserialize<Map<Guid, Map<string, string>>> eDto.value
-                return Enviro.MergeSet b
             }
         else sprintf "cat: %s for EnviroDto not found"
                       eDto.cat |> Error

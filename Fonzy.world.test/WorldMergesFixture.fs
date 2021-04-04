@@ -39,7 +39,8 @@ type WorldMergesFixture () =
         //let mr = kvps |> List.fold(fun (s:Map<string,string>) (t:string*string) 
         //                                     -> this.addkvp s t) mapq
 
-        let mr = kvps |> List.fold(fun (s:Result<Map<string,string>, string>) (t:string*string) 
+        let mr = kvps |> List.fold(fun (s:Result<Map<string,string>, string>) 
+                                       (t:string*string) 
                                             -> this.addkvp2 s t) mapR
 
         Assert.AreEqual(5, 5);

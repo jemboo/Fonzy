@@ -23,12 +23,12 @@ type sTree<'T> =
 
 
 module sTree = 
-    let rec init d o tg =
+    let rec init d o ntGen =
         match d with
         | 0 -> sTree.Leaf(o)
-        | _ -> sTree.Node(tg(), 
-                          init (d-1) (o) tg, 
-                          init (d-1) (o + (pown 2 (d-1))) tg)
+        | _ -> sTree.Node(ntGen(), 
+                          init (d-1) (o) ntGen, 
+                          init (d-1) (o + (pown 2 (d-1))) ntGen)
 
     let rec enumer sT =
         match sT with
@@ -53,7 +53,6 @@ module sTree =
                 sTree.Leaf(gv)
         | _ , _ -> failwith "Node/Leaf mismatch"
 
-
     let rec applyGuide0 (n:sTree<'T>) (gn:sTree<'T>) =
         match n, gn with
         | sTree.Node (nt, ln, rn), sTree.Node (gt, lg, rg) -> 
@@ -66,76 +65,13 @@ module sTree =
                 sTree.Leaf(gv)
         | _ , _ -> failwith "Node/Leaf mismatch"
 
-
-//type BranchType =
-//    | NoSwitch
-//    | Switch
-
-
-//module BranchType = 
-//    let RandInit0 (randy:IRando) =
-//        let rv = randy.NextFloat
-//        if (rv < 0.8) then BranchType.NoSwitch
-//        else BranchType.Switch
-
-
-//type NoB<'T> =
-//    | Node of NodeType * NoB<'T> * NoB<'T>
-//    | Branch of BranchType * 'T * 'T
-
-   
-
-//module NoB = 
-//    let rec enumerLeaves n =
-//        match n with
-//        | NoB.Node (nt, l, r) -> 
-//                seq { yield! enumerLeaves l;  yield! enumerLeaves r }
-//        | NoB.Branch (bt, l, r) ->
-//                seq { yield l; yield r }
-
-//    let rec enumerBranches n =
-//        match n with
-//        | NoB.Node (nt, l, r) -> 
-//                seq { yield! enumerBranches l;  yield! enumerBranches r }
-//        | NoB.Branch (bt, l, r) -> seq { yield NoB.Branch(bt, l, r) }
-
-
-//    let rec randInit0 (randy:IRando) (n)=
-//        match n with
-//        | NoB.Node (nt, l, r) -> 
-//                Node(NodeType.RandInit0 randy, 
-//                      l |> randInit0 randy, r |> randInit0 randy)
-//        | NoB.Branch (bt, l, r) ->
-//                Branch(BranchType.RandInit0 randy, l, r)
-                
-
-//    let SwichNode (n:NoB<'T>) =
-//        match n with
-//        | NoB.Node (nt, l, r) -> Node(nt, r, l)
-//        | NoB.Branch (bt, l, r) -> Branch(bt, r, l)
-            
-
-//    let MixNode (n:NoB<'T>) =
-//        match n with
-//        | NoB.Node (nt, l, r) -> Node(nt, r, l |> SwichNode)
-//        | _ -> failwith "cant mix a branch"
-
-
-//    let rec applyGuide (n:NoB<'T>) (gn:NoB<'T>) =
-//        match n, gn with
-//        | NoB.Node (nt, ln, rn), NoB.Node (gt, lg, rg) -> 
-//                match nt with
-//                | NodeType.Free -> Node(nt, applyGuide ln lg, applyGuide rn rg)
-//                | NodeType.Slider ->
-//                    Node(nt, applyGuide ln rg, applyGuide rn lg)
-//                | _ -> failwith "wrong NodeType"
-//        | NoB.Branch (bt, lb, rb), NoB.Branch (gt, lg, rg) ->
-//                match bt with
-//                | BranchType.NoSwitch -> Branch(bt, lg, rg)
-//                | BranchType.Switch -> Branch(bt, rb, lb)
-//                | _ -> failwith "wrong BranchType"
-//        | _ , _ -> failwith "Node/Branch mismatch"
-
+    let makePerm (nswFreq:float) (randy:IRando) (logDegree:int) =
+        let degree = Degree.fromInt (pown 2 logDegree)
+        let ntGen() =
+            NodeType.RandInit0 randy nswFreq
+        let sT = init logDegree 0 ntGen
+        applyGuide sT sT |> enumer |> Seq.toArray
+                         |> TwoCyclePerm.create degree
 
 
 type Tree<'T> = 
