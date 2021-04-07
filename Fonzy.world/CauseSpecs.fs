@@ -64,27 +64,39 @@ module CauseSpecSorters =
 
     let rndGen (sorterSetId:SorterSetId) 
                (degree:Degree) 
-               (sorterLength:SorterLength) 
-               (switchFreq:SwitchFrequency) 
+               (switchOrStageCount:SwitchOrStageCount)
                (sorterCount:SorterCount)
                (rndGen:RngGen) 
                (outName:string) =
         let id = seq { rndSortersBaseId:> obj;
-                       degree:> obj; sorterLength:> obj;
-                       switchFreq:> obj;
+                       degree:> obj; switchOrStageCount:> obj;
                        rndGen:> obj; outName:> obj; } 
                         |> GuidUtils.guidFromObjs
         let prams = [
                      ("sorterSetId", sorterSetId |> SorterSetId.value |> string);
                      ("degree", degree |> Degree.value |> string);
-                     ("sorterLength", sorterLength |> SorterLengthDto.toJson);
-                     ("switchFreq", switchFreq |> SwitchFrequency.value |> string);
+                     ("sorterLength", switchOrStageCount |> SwitchOrStageCountDto.toJson);
                      ("sorterCount", sorterCount |> SorterCount.value |> string);
                      ("rngGen", rndGen |> RngGenDto.toJson);
                      ("sorters", outName)
                      ] |> Map.ofList
         {CauseSpec.id = CauseSpecId.fromGuid id; genus=["Sorters"; "rndGen"]; prams=prams;}
 
+    
+    let evalSortersBaseId = Guid.Parse "00000000-0000-0000-0000-000000000003"
+    let eval  (degree:Degree)
+              (testSetName:string)
+              (resultsName:string) =
+        let id = seq { evalSortersBaseId:> obj;
+                       degree:> obj;
+                       testSetName:> obj; resultsName:> obj; } 
+                        |> GuidUtils.guidFromObjs
+        let prams = [
+                     ("degree", degree |> Degree.value |> string);
+                     ("testSet", testSetName);
+                     ("results", resultsName)
+                     ] |> Map.ofList
+        {CauseSpec.id = CauseSpecId.fromGuid id; genus=["Sorters"; "eval"]; prams=prams;}
 
 module CauseSpec = 
     //let lookupKeyedInt<'a> (key:string) 

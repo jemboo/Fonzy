@@ -10,13 +10,14 @@ module TestData =
         RngGen.createLcg randy.NextPositiveInt
 
     module SortableSet =
+        let sorterSetGenId1 = SortableSetId.fromGuid (Guid.Parse "20000000-0000-0000-0000-000000000222")
+        let sorterSetGenId2 = SortableSetId.fromGuid (Guid.Parse "22000000-0000-0000-0000-000000000222")
         let sortableCount = SortableCount.fromInt 5
         let sortableCount2 = SortableCount.fromInt 6
-        let rndBits = SortableSetGenerated.rndBits degree sortableCount rnGen
-        let rndBits2 = SortableSetGenerated.rndBits degree sortableCount2 rnGen
+        let rndBits = SortableSetGenerated.rndBits sorterSetGenId1 degree sortableCount rnGen
+        let rndBits2 = SortableSetGenerated.rndBits sorterSetGenId2 degree sortableCount2 rnGen
 
     module CauseSpec =
-
 
         module IntDist =
             let arrayName = "arrayName"
@@ -34,23 +35,29 @@ module TestData =
                                         int2dDistType arrayCount 
                                         (nextRnGen()) arrayName2d
 
-        module Sorter =
+        module SorterSet =
             let count = 10
             let rndSortersName = "rndSortersName"
-            let sorterSetId1 = SorterSetId.fromGuid (Guid.NewGuid())
-            let sorterSetId2 = SorterSetId.fromGuid (Guid.NewGuid())
-            let sorterSetId3 = SorterSetId.fromGuid (Guid.NewGuid())
+            let testResultsName = "testResultsName"
+            let sorterEvalName = "sorterEvalName"
+            let sorterSetId1 = SorterSetId.fromGuid (Guid.Parse "10000000-0000-0000-0000-000000000222")
+            let sorterSetId2 = SorterSetId.fromGuid (Guid.Parse "11000000-0000-0000-0000-000000000222")
+            let sorterSetId3 = SorterSetId.fromGuid (Guid.Parse "11100000-0000-0000-0000-000000000222")
+            let sorterEvalId = SorterSetId.fromGuid (Guid.Parse "11110000-0000-0000-0000-000000000222")
+
             let intDistType = IntDistType.Normal (NormalIntegerDistParams.zeroCentered 1.0)
-            let sorterLength = SorterLength.degreeTo999StageCount degree
+            let sorterLength = SwitchOrStageCount.degreeTo999StageCount degree
             let switchFreq = SwitchFrequency.max
             let sorterCount = SorterCount.fromInt 10
 
             let rand1 = CauseSpecSorters.rndGen sorterSetId1 degree sorterLength 
-                             switchFreq sorterCount (nextRnGen()) rndSortersName
+                             sorterCount (nextRnGen()) rndSortersName
             let rand2 = CauseSpecSorters.rndGen sorterSetId2 degree sorterLength 
-                             switchFreq sorterCount (nextRnGen()) rndSortersName
+                             sorterCount (nextRnGen()) rndSortersName
             let rand3 = CauseSpecSorters.rndGen sorterSetId3 degree sorterLength 
-                             switchFreq sorterCount (nextRnGen()) rndSortersName
+                             sorterCount (nextRnGen()) rndSortersName
+
+            let eval = CauseSpecSorters.eval degree rndSortersName testResultsName
 
 
     module WorldAction =
@@ -60,9 +67,9 @@ module TestData =
             let randomUniform = WorldAction.create World.empty causeRndUniform
 
         module SorterGen = 
-            let cause1 = Causes.fromCauseSpec CauseSpec.Sorter.rand1 
+            let randCause = Causes.fromCauseSpec CauseSpec.SorterSet.rand1 
                             |> Result.ExtractOrThrow
-            let rand1 = WorldAction.create World.empty cause1
+            let randWorldAction = WorldAction.create World.empty randCause
 
     module World = 
     

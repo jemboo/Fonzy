@@ -13,7 +13,9 @@ type CausesFixture () =
         let env = Enviro.Empty
         let newEnv = cause.op env |> Result.ExtractOrThrow
         let causedProd, causedMeta =  
-            Enviro.getDtoAndMetaFromEnviro<IntDistDto> newEnv TestData.CauseSpec.IntDist.arrayName
+            Enviro.getDtoAndMetaFromEnviro<IntDistDto> 
+                                newEnv 
+                                TestData.CauseSpec.IntDist.arrayName
             |> Result.ExtractOrThrow
 
         let intDist = causedProd |> IntDistDto.fromDto |> Result.ExtractOrThrow
@@ -27,7 +29,9 @@ type CausesFixture () =
         let env = Enviro.Empty
         let newEnv = cause.op env |> Result.ExtractOrThrow
         let causedProd, causedMeta =  
-            Enviro.getDtoAndMetaFromEnviro<Int2dDistDto> newEnv TestData.CauseSpec.IntDist.arrayName2d
+            Enviro.getDtoAndMetaFromEnviro<Int2dDistDto> 
+                                newEnv 
+                                TestData.CauseSpec.IntDist.arrayName2d
             |> Result.ExtractOrThrow
         let intDist = causedProd |> Int2dDistDto.fromDto |> Result.ExtractOrThrow
         Assert.AreEqual(intDist.vals.Length, TestData.CauseSpec.IntDist.arrayCount)

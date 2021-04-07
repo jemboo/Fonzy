@@ -19,7 +19,7 @@ type DataSourceFixture () =
     member this.world1 =
         World.createFromParent 
                 World.empty
-                (TestData.CauseSpec.Sorter.rand1
+                (TestData.CauseSpec.SorterSet.rand1
                     |> Causes.fromCauseSpec
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
@@ -27,7 +27,7 @@ type DataSourceFixture () =
     member this.world2 =
         World.createFromParent 
                 World.empty
-                (TestData.CauseSpec.Sorter.rand2
+                (TestData.CauseSpec.SorterSet.rand2
                     |> Causes.fromCauseSpec
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
@@ -35,7 +35,7 @@ type DataSourceFixture () =
     member this.world3 =
         World.createFromParent 
                 World.empty
-                (TestData.CauseSpec.Sorter.rand3
+                (TestData.CauseSpec.SorterSet.rand3
                     |> Causes.fromCauseSpec
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
@@ -99,8 +99,8 @@ type DataSourceFixture () =
     member this.DirectoryDataSource_TurnWorldActionIntoWorld() =
         this.makeTestDirectory() |> ignore
         let dirDs = new DirectoryDataSource(this.testDir) :> IDataSource
-        let worldAction = TestData.WorldAction.SorterGen.rand1 
-        let worldActionDto = worldAction |> WorldActionDto.toDto
+        let randWorldAction = TestData.WorldAction.SorterGen.randWorldAction 
+        let worldActionDto = randWorldAction |> WorldActionDto.toDto
         let dataStoreItem  = worldActionDto |> DataStoreItem.WorldActionDto
         dirDs.AddNewDataStoreItem dataStoreItem
                                           |> Result.ExtractOrThrow 
@@ -117,7 +117,7 @@ type DataSourceFixture () =
                                         |> WorldActionDto.fromDto
                                         |> Result.ExtractOrThrow
         
-        Assert.AreEqual(worldAction.cause.causeSpec.id, 
+        Assert.AreEqual(randWorldAction.cause.causeSpec.id, 
                         worldActionBack.cause.causeSpec.id)
         let dataStoreWorldDto = WorldAction.createWorld worldActionBack 
                                     |> Result.ExtractOrThrow

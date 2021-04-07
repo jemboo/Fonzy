@@ -31,8 +31,8 @@ type ComboStructuresFixture () =
     [<TestMethod>]
     member this.permPowerDist() =
         let maxPower = 2000
-        let degree = Degree.fromInt 12
-        let permCount = 1000000
+        let degree = Degree.fromInt 16
+        let permCount = 100000
         let randPerms = Permutation.createRandoms 
                                     degree 
                                     TestData.iRando
@@ -41,6 +41,7 @@ type ComboStructuresFixture () =
                                     p |> (Permutation.powers maxPower) |> Seq.toArray)
                         |> Seq.toArray
         let yabs = randPerms |> Array.countBy(fun po->po.Length)
+                             |> Array.sortBy(snd)
         yabs |> Array.iter(fun tup -> 
                         Console.WriteLine (sprintf "%d\t%d" (fst tup) (snd tup)))
         
@@ -174,7 +175,7 @@ type ComboStructuresFixture () =
     member this.ZeroOneSequence_FromInteger() =
      let len = 6
      let expectedArray = [|1; 0; 1; 0; 1; 0|]
-     let converted = ZeroOneSequence.FromInteger len 21
+     let converted = ZeroOneSequence.fromInteger len 21
      Assert.IsTrue ((expectedArray = converted))
      
 

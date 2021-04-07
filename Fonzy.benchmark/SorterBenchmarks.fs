@@ -87,11 +87,11 @@ type BenchmarkSorterSetOps() =
     let iRando = Rando.fromRngGen (RngGen.createLcg seed)
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
-    let sorterLength = degree |> SorterLength.toMediocreRandomPerfLength 
+    let sorterLength = degree |> SwitchOrStageCount.toMediocreRandomPerfLength 
                                                 SwitchOrStage.Stage 
     let sorterCount = SorterCount.fromInt 50
     let makeRandomSorter() = 
-            Sorter.createRandom degree sorterLength SwitchFrequency.max iRando
+            SorterGen.createRandom degree sorterLength SwitchFrequency.max iRando
 
 
 
@@ -100,8 +100,8 @@ type BenchmarkSorterSetOps() =
 
     let mediocreSorterSet = 
                 SorterSet.fromSorters 
-                        sorterSetId 
-                        degree 
+                        sorterSetId
+                        degree
                         mediocreRandomSorters
 
     let sortableSetEx = SortableSet.Generated 

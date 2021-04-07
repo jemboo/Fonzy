@@ -140,13 +140,13 @@ type SortingOpsFixture () =
         let mediocreSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
         let altEvenSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
 
-        let sorterLength = degree |> SorterLength.toMediocreRandomPerfLength 
+        let sorterLength = degree |> SwitchOrStageCount.toMediocreRandomPerfLength 
                                                     SwitchOrStage.Stage 
         let sorterCount = SorterCount.fromInt 500
 
         let maxConjugatePairs = 100
         let altEvenSorters = List.init maxConjugatePairs (fun stageCt -> 
-             Sorter.makeAltEvenOdd degree (StageCount.fromInt (stageCt + 5)))
+             SorterGen.makeAltEvenOdd degree (StageCount.fromInt (stageCt + 5)))
                              |> Result.sequence
                              |> Result.ExtractOrThrow
 
@@ -160,11 +160,11 @@ type SortingOpsFixture () =
             result {
                 let! stp = perms |> TwoCycleGen.makeCoConjugateEvenOdd
                 let atp = stp |> Seq.toArray
-                return Sorter.fromTwoCycleArray atp
+                return SorterGen.fromTwoCycleArray atp
             }
             
         let makeRandomSorter() = 
-                Sorter.createRandom 
+                SorterGen.createRandom 
                         degree 
                         sorterLength 
                         SwitchFrequency.max 
@@ -211,11 +211,11 @@ type SortingOpsFixture () =
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
         let coConjSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
 
-        //let sorterLength = degree |> SorterLength.toMediocreRandomPerfLength 
+        //let sorterLength = degree |> SwitchOrStageCount.toMediocreRandomPerfLength 
         //                                            SwitchOrStage.Stage
-        let sorterLength = SorterLength.makeStageCount 155
+        let sorterLength = SwitchOrStageCount.makeStageCount 155
 
-        let stageCount = sorterLength |> SorterLength.getStageCount
+        let stageCount = sorterLength |> SwitchOrStageCount.getStageCount
                                       |> Result.ExtractOrThrow
 
         let sorterCount = SorterCount.fromInt 100
@@ -241,7 +241,7 @@ type SortingOpsFixture () =
                 
                 let! stp = perms2 |> TwoCycleGen.make3EightBlocks
                 let atp = stp |> Seq.toArray
-                return Sorter.fromTwoCycleArray atp
+                return SorterGen.fromTwoCycleArray atp
             }
 
 
@@ -310,12 +310,12 @@ type SortingOpsFixture () =
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
         let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
         
-        let sorterLength =  degree |> SorterLength.degreeTo999StageCount 
+        let sorterLength =  degree |> SwitchOrStageCount.degreeTo999StageCount 
                                                     
    
         let sorterCount = SorterCount.fromInt 10
         let makeSorter() = 
-            Sorter.createRandom degree sorterLength SwitchFrequency.max iRando
+            SorterGen.createRandom degree sorterLength SwitchFrequency.max iRando
 
         let sorterArray = Array.init 
                                (SorterCount.value sorterCount)
@@ -353,8 +353,8 @@ type SortingOpsFixture () =
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
         let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
                
-        let sorterLength = SorterLength.makeStageCount 400
-        let stageCount = sorterLength |> SorterLength.getStageCount
+        let sorterLength = SwitchOrStageCount.makeStageCount 400
+        let stageCount = sorterLength |> SwitchOrStageCount.getStageCount
                                       |> Result.ExtractOrThrow
    
         let sorterCount = SorterCount.fromInt 100
@@ -365,7 +365,7 @@ type SortingOpsFixture () =
                             (fun _ -> sTree.makePerm 0.29 iRando 4)
                             |> Result.sequence |> Result.ExtractOrThrow
                             |> List.toArray
-            Sorter.fromTwoCycleArray perms2
+            SorterGen.fromTwoCycleArray perms2
 
         let sorterArray = Array.init 
                                (SorterCount.value sorterCount)

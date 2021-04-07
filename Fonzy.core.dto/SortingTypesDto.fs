@@ -1,30 +1,30 @@
 ﻿namespace global
 
-type SorterLengthDto = {wOrT:string; value:int;}
-module SorterLengthDto =
+type SwitchOrStageCountDto = {wOrT:string; value:int;}
+module SwitchOrStageCountDto =
     
-    let toDto (sorterLength:SorterLength) =
+    let toDto (sorterLength:SwitchOrStageCount) =
         match sorterLength with
-        | SorterLength.Switch ct -> {wOrT="Switch"; value=(SwitchCount.value ct)}
-        | SorterLength.Stage ct -> {wOrT="Stage"; value=(StageCount.value ct);}
+        | SwitchOrStageCount.Switch ct -> {wOrT="Switch"; value=(SwitchCount.value ct)}
+        | SwitchOrStageCount.Stage ct -> {wOrT="Stage"; value=(StageCount.value ct);}
 
-    let toJson (sorterLength:SorterLength) =
+    let toJson (sorterLength:SwitchOrStageCount) =
         sorterLength |> toDto |> Json.serialize
 
-    let fromDto (dto:SorterLengthDto) =
+    let fromDto (dto:SwitchOrStageCountDto) =
         let parseCat cat count =
             match cat with
-            | "Switch" -> SorterLength.Switch 
+            | "Switch" -> SwitchOrStageCount.Switch 
                                     ((SwitchCount.create "" count)|> Result.ExtractOrThrow) |> Ok
-            | "Stage" -> SorterLength.Stage 
+            | "Stage" -> SwitchOrStageCount.Stage 
                                     ((StageCount.create "" count)|> Result.ExtractOrThrow) |> Ok
-            | _ -> Error (sprintf "no match for SorterLengthDto: %s" cat)
+            | _ -> Error (sprintf "no match for SwitchOrStageCountDto: %s" cat)
         result {
             return! parseCat dto.wOrT dto.value
         }
 
     let fromJson (cereal:string) =
         result {
-            let! dto = cereal |> Json.deserialize<SorterLengthDto>
+            let! dto = cereal |> Json.deserialize<SwitchOrStageCountDto>
             return! dto |> fromDto
         }

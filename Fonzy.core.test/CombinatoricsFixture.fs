@@ -46,7 +46,7 @@ type CombinatoricsFixture () =
     member this.TestIntArray01_To_Int() =
       let len = 6
       let expectedArray = [|1; 0; 1; 0; 1; 0|]
-      let converted = ZeroOneSequence.FromInteger len 21
+      let converted = ZeroOneSequence.fromInteger len 21
       Assert.IsTrue ((expectedArray = converted))
 
 
@@ -150,7 +150,7 @@ type CombinatoricsFixture () =
     [<TestMethod>]
     member this.TestSorted_0_1_Sequence() =
         let blockLen = 10
-        let block = IntBits.Sorted_O_1_Sequence blockLen 7 |> Seq.toArray
+        let block = IntBits.sorted_O_1_Sequence blockLen 7 |> Seq.toArray
         Assert.IsTrue (block.Length = blockLen)
 
 
@@ -169,7 +169,7 @@ type CombinatoricsFixture () =
     [<TestMethod>]
     member this.TestSorted_0_1_Sequences() =
         let blockLen = 10
-        let block = IntBits.Sorted_0_1_Sequences blockLen
+        let block = IntBits.sorted_0_1_Sequences blockLen
         Assert.IsTrue (block.Length = blockLen + 1)
 
 

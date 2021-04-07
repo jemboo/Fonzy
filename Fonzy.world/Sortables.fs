@@ -13,8 +13,12 @@ module SortableSetGenerated =
             SortableSetGenerated.prams = m
         }
 
-    let rndBits (degree:Degree) (sortableCount:SortableCount) (rngGen:RngGen) = 
-        let m = [("count", (SortableCount.value sortableCount).ToString()); 
+    let rndBits (id:SortableSetId) 
+                (degree:Degree) 
+                (sortableCount:SortableCount) 
+                (rngGen:RngGen) = 
+        let m = [("sortableCount", (SortableCount.value sortableCount).ToString()); 
+                 ("id", (SortableSetId.value id) |> string); 
                  ("degree", (Degree.value degree).ToString()); 
                  ("rngGen", rngGen |> RngGenDto.toJson )] |> Map.ofList
         let id = ([("rndBits" :> obj); (m :> obj)]) |> GuidUtils.guidFromObjList
@@ -35,23 +39,19 @@ module SortableSetGenerated =
             SortableSetGenerated.prams = m
         }
 
-
-
     let generate (ssg:SortableSetGenerated) = 
         match ssg.cat with
         | "rndBits" -> 
             result {
                       let! degree = ssg.prams |> ResultMap.procKeyedInt "degree" 
                                                            (fun d -> Degree.create "" d)
-
-                      let sias = IntBits.AllBinaryTestCasesSeq (Degree.value degree)
-                                    |> Seq.map(SortableIntArray.create)
-                                    |> Seq.toArray
-                      return {
-                                SortableSetExplicit.id = ssg.id;
-                                SortableSetExplicit.degree = degree;
-                                SortableSetExplicit.sortableIntArrays = sias
-                             }
+                      let! rngGen = ssg.prams |> ResultMap.procKeyedString<RngGen> "rngGen" 
+                                                           (RngGenDto.fromJson)
+                      let! sortableCount = ssg.prams |> ResultMap.procKeyedInt "sortableCount" 
+                                                           (SortableCount.create "")
+                      let! id = ssg.prams |> ResultMap.lookupKeyedGuid "id"
+                      let! ssId = SortableSetId.create id
+                      return SortableSetExplicit.rndBits degree rngGen sortableCount ssId
                    }
 
         | "rndPerms" -> 
@@ -73,6 +73,7 @@ module SortableSetGenerated =
                         return SortableSetExplicit.allIntBits degree ssg.id
                     }
         | _ -> Error (sprintf "no match for SortableSetGenerated.cat: %s" ssg.cat)
+
 
 module SortableSet = 
     let getSortableSetExplicit (ss:SortableSet) =

@@ -28,20 +28,20 @@ module SorterFitness =
 
 
 
-type SorterMutationType = 
-    | Switch of MutationRate 
-    | Stage of MutationRate
+//type SorterMutationType = 
+//    | Switch of MutationRate 
+//    | Stage of MutationRate
 
 
-module SorterMutationType =
-    let StrF (mt:SorterMutationType) =
-        match mt with
-        | SorterMutationType.Switch mr -> sprintf "w%.3f" (MutationRate.value mr)
-        | SorterMutationType.Stage mr -> sprintf "t%.3f" (MutationRate.value mr)
+//module SorterMutationType =
+//    let StrF (mt:SorterMutationType) =
+//        match mt with
+//        | SorterMutationType.Switch mr -> sprintf "w%.3f" (MutationRate.value mr)
+//        | SorterMutationType.Stage mr -> sprintf "t%.3f" (MutationRate.value mr)
 
 
-    let mutate (mutationType:SorterMutationType) (rnd:IRando) (sorter:Sorter) =
-        match mutationType with
-        | SorterMutationType.Switch mr -> Sorter.mutateBySwitch mr rnd sorter
-        | SorterMutationType.Stage mr -> Sorter.mutateByStage mr rnd sorter
+//    let mutate (mutationType:SorterMutationType) (rnd:IRando) (sorter:Sorter) =
+//        match mutationType with
+//        | SorterMutationType.Switch mr -> SorterGen.mutateBySwitch mr rnd sorter
+//        | SorterMutationType.Stage mr -> SorterGen.mutateByStage mr rnd sorter
          

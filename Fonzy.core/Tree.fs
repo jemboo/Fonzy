@@ -60,7 +60,6 @@ module sTree =
                 | NodeType.Free -> Node(nt, applyGuide0 ln lg, applyGuide0 rn rg)
                 | NodeType.Switch ->
                     Node(nt, applyGuide0 ln rg, applyGuide0 rn lg)
-                | _ -> failwith "wrong NodeType"
         | sTree.Leaf v, sTree.Leaf gv ->
                 sTree.Leaf(gv)
         | _ , _ -> failwith "Node/Leaf mismatch"

@@ -4,7 +4,7 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type WorldFixture () =
+type WorldsFixture () =
 
     [<TestMethod>]
     member this.WorldGrandChild () =
@@ -26,14 +26,24 @@ type WorldFixture () =
     [<TestMethod>]
     member this.worldActionGenIntDist() =
         let worldAction = TestData.WorldAction.IntDist.randomUniform
-        let res = WorldAction.createWorld worldAction |> Result.ExtractOrThrow
-        Assert.AreEqual(WorldId.value res.id, 
+        let newWorld = WorldAction.createWorld worldAction 
+                    |> Result.ExtractOrThrow
+        Assert.AreEqual(WorldId.value newWorld.id, 
                         CauseSpecId.value TestData.CauseSpec.IntDist.rndUniform.id);
 
 
     [<TestMethod>]
     member this.worldActionGenSorterDist() =
-        let worldAction = TestData.WorldAction.SorterGen.rand1
-        let res = WorldAction.createWorld worldAction |> Result.ExtractOrThrow
-        Assert.AreEqual(WorldId.value res.id, 
-                        CauseSpecId.value TestData.CauseSpec.Sorter.rand1.id);
+        let worldAction = TestData.WorldAction.SorterGen.randWorldAction
+        let newWorld = WorldAction.createWorld worldAction 
+                    |> Result.ExtractOrThrow
+        let genSorterSetDto, meta = 
+            Enviro.getDtoAndMetaFromEnviro<SorterSetDto>
+                                 newWorld.enviro
+                                 TestData.CauseSpec.SorterSet.rndSortersName
+            |> Result.ExtractOrThrow
+        let sorterSet = genSorterSetDto |> SorterSetDto.fromDto
+                                        |> Result.ExtractOrThrow
+        Assert.AreEqual(sorterSet.sorterCount, TestData.CauseSpec.SorterSet.sorterCount)
+        Assert.AreEqual(WorldId.value newWorld.id, 
+                        CauseSpecId.value TestData.CauseSpec.SorterSet.rand1.id);

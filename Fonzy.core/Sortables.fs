@@ -15,12 +15,12 @@ module SortableIntArray =
     //Returns a degree + 1 length array of all 
     // possible sorted 0-1 sequences of length degree
     let allSorted_0_1 (degree:Degree) =
-        IntBits.Sorted_0_1_Sequences (Degree.value degree)
+        IntBits.sorted_0_1_Sequences (Degree.value degree)
             |> Seq.map(create) |> Seq.toArray
 
     //Returns all 0-1 sequences of length degree
     let all_0_1 (degree:Degree) =
-        IntBits.AllBinaryTestCasesSeq (Degree.value degree)
+        IntBits.allBinaryTestCasesSeq (Degree.value degree)
             |> Seq.map(create) |> Seq.toArray
 
     let createRandom (degree:Degree) (rando:IRando) = 
@@ -61,18 +61,18 @@ module SortableSetExplicit =
 
     let rndBits (degree:Degree) 
                 (rngGen:RngGen) 
-                (count:int)
+                (sortableCount:SortableCount)
                 (id:SortableSetId) = 
         let rando = rngGen |> Rando.fromRngGen
-        let sias = Permutation.createRandoms degree rando
-                    |> Seq.take count
-                    |> Seq.map(fun p -> SortableIntArray.create p.values)
+        let sias = ZeroOneSequence.randomArrays degree rando
+                    |> Seq.take (SortableCount.value sortableCount)
+                    |> Seq.map(fun p -> SortableIntArray.create p)
                     |> Seq.toArray
         {
               SortableSetExplicit.id = id;
               SortableSetExplicit.degree = degree;
               SortableSetExplicit.sortableIntArrays = sias
-         }
+        }
 
     let rndPerms (degree:Degree) 
                  (rngGen:RngGen) 

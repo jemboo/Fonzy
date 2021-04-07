@@ -27,7 +27,7 @@ module SorterGenomeDto =
 
     let toDto (sorterGenome:SorterGenome) =
         match sorterGenome with
-        | Permutaions ps ->
+        | SorterGenome.Permutaions ps ->
             let dsf = ps |> List.toArray 
                          |> Array.map(fun p-> p |> TwoCyclePermDto.toDto
                                                 |> Json.serialize)
@@ -35,7 +35,7 @@ module SorterGenomeDto =
                 SorterGenomeDto.cat = "Permutaions"; 
                 value = dsf |> Json.serialize       
             }
-        | Switches sw ->
+        | SorterGenome.Switches sw ->
             {
                 SorterGenomeDto.cat = "Switches"; 
                 value = sw |> List.toArray 

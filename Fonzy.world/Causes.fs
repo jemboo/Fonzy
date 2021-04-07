@@ -13,9 +13,9 @@ module CauseSorters =
                 let! degree = causeSpec.prams |> ResultMap.procKeyedInt "degree" 
                                                          (fun d -> Degree.create "" d)
                 let! sorterLength = causeSpec.prams |> ResultMap.procKeyedString "sorterLength" 
-                                                          (SorterLengthDto.fromJson)
-                let! switchFreq = causeSpec.prams |> ResultMap.procKeyedFloat "switchFreq" 
-                                                          (fun d -> SwitchFrequency.create "" d)
+                                                          (SwitchOrStageCountDto.fromJson)
+                //let! switchFreq = causeSpec.prams |> ResultMap.procKeyedFloat "switchFreq" 
+                //                                          (fun d -> SwitchFrequency.create "" d)
                 let! sorterCount = causeSpec.prams |> ResultMap.procKeyedInt "sorterCount" 
                                                           (fun d -> SorterCount.create "" d)
                 let! rngGen = causeSpec.prams |> ResultMap.procKeyedString "rngGen" 
@@ -23,8 +23,8 @@ module CauseSorters =
                 let! outName = ResultMap.read "sorters" causeSpec.prams
 
                 let randy = Rando.fromRngGen rngGen
-                let sorterArray = Sorter.createRandomArray degree sorterLength
-                                        switchFreq sorterCount randy
+                let sorterArray = SorterGen.createRandomArray degree sorterLength
+                                            sorterCount randy
                 let sorterSet = SorterSet.fromSorters sorterSetId degree sorterArray
                 let sorterSetDto = sorterSet |> SorterSetDto.toDto
                 return! Enviro.addRootDtoToEnviro<SorterSetDto>
@@ -32,10 +32,40 @@ module CauseSorters =
             }
         {Cause.causeSpec=causeSpec; op=causer}
 
+    let eval (causeSpec:CauseSpec) =
+        let causer = fun (e:Enviro) ->
+            result {
+                let! sorterSetId = causeSpec.prams |> ResultMap.procKeyedGuid "sorterSetId" 
+                                                      (SorterSetId.create)
+                let! degree = causeSpec.prams |> ResultMap.procKeyedInt "degree" 
+                                                         (fun d -> Degree.create "" d)
+                let! sorterLength = causeSpec.prams |> ResultMap.procKeyedString "sorterLength" 
+                                                          (SwitchOrStageCountDto.fromJson)
+                //let! switchFreq = causeSpec.prams |> ResultMap.procKeyedFloat "switchFreq" 
+                //                                          (fun d -> SwitchFrequency.create "" d)
+                let! sorterCount = causeSpec.prams |> ResultMap.procKeyedInt "sorterCount" 
+                                                          (fun d -> SorterCount.create "" d)
+                let! rngGen = causeSpec.prams |> ResultMap.procKeyedString "rngGen" 
+                                                          (RngGenDto.fromJson)
+                let! outName = ResultMap.read "sorters" causeSpec.prams
+
+                let randy = Rando.fromRngGen rngGen
+                let sorterArray = SorterGen.createRandomArray degree sorterLength
+                                            sorterCount randy
+                let sorterSet = SorterSet.fromSorters sorterSetId degree sorterArray
+                let sorterSetDto = sorterSet |> SorterSetDto.toDto
+                return! Enviro.addRootDtoToEnviro<SorterSetDto>
+                                    e outName sorterSetDto Map.empty
+            }
+        {Cause.causeSpec=causeSpec; op=causer}
+
+
+
     let fromCauseSpec (genus:string list) (causeSpec:CauseSpec) = 
         match genus with
         | [] -> "No CauseSorters genus" |> Error
         | ["rndGen"] -> rndGen causeSpec |> Ok
+        | ["eval"] -> eval causeSpec |> Ok
         | a::b -> sprintf "CauseTest: %s not handled" a |> Error
 
 

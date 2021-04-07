@@ -2,7 +2,7 @@
 open System
 
 module TestData = 
-    let seed = 1234
+    let seed = 12374
     let iRando = Rando.fromRngGen (RngGen.createLcg seed)
     let degree = Degree.fromInt 8
 
@@ -16,11 +16,11 @@ module TestData =
                             |> Result.ExtractOrThrow
 
         let permSwitchDensity = 0.5
-        let sorterLength = degree |> SorterLength.toMediocreRandomPerfLength 
+        let sorterLength = degree |> SwitchOrStageCount.toMediocreRandomPerfLength 
                                                     SwitchOrStage.Stage 
         let sorterCount = SorterCount.fromInt 50
         let makeRandomSorter() = 
-                Sorter.createRandom degree sorterLength SwitchFrequency.max iRando
+                SorterGen.createRandom degree sorterLength SwitchFrequency.max iRando
 
         let makeRandomTwoCycle = 
                 TwoCyclePerm.makeRandomTwoCycle 
@@ -41,7 +41,7 @@ module TestData =
 
         let maxConjugatePairs = 100
         let altEvenSorters = List.init maxConjugatePairs (fun stageCt -> 
-                    Sorter.makeAltEvenOdd degree (StageCount.fromInt (stageCt + 1)) )
+                    SorterGen.makeAltEvenOdd degree (StageCount.fromInt (stageCt + 1)) )
                              |> Result.sequence
                              |> Result.ExtractOrThrow
 

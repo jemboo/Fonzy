@@ -80,7 +80,6 @@ module Permutation =
         Seq.initInfinite(fun _ -> createRandom degree rnd)
 
 
-
  // a permutation of the set {0, 1,.. (degree-1)}, that is it's own inverse
 type TwoCyclePerm = private { degree:Degree; values:int[] }
 module TwoCyclePerm =
@@ -160,7 +159,6 @@ module TwoCyclePerm =
             values=Combinatorics.makeRandomFullTwoCycleIntArray rnd (Degree.value degree)}
 
 
-    
 module TwoCycleGen =
     let stack (lhs:int[]) (rhs:int[]) =
         let d = lhs.Length
@@ -451,21 +449,23 @@ module TwoCycleGen =
                }
 
 
-
-
-
-
-
 module ZeroOneSequence =
-    let Random (rnd : IRando) (len: int) (pctOnes:float) =
-        Seq.init len (fun n -> if (rnd.NextFloat > pctOnes) then 0 else 1)
+    let randomPctOnes (rnd:IRando) (len:int) (pctOnes:float) =
+        Seq.init len (fun _ -> 
+                if (rnd.NextFloat > pctOnes) then 0 else 1)
 
-    let FromInteger (len:int) (intVers:int) =
+    let fromInteger (len:int) (intVers:int) =
         let bitLoc (loc:int) (intBits:int) =
             if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
         Array.init len (fun i -> bitLoc i intVers)
 
-    let ToInt (len:int) (arrayVers:int[]) =
+    let randomArrays (degree:Degree) (rnd:IRando) =
+        let maxVal = (1 <<< (Degree.value degree))
+        seq { while true do 
+                yield (rnd.NextPositiveInt % maxVal) 
+                      |> fromInteger (Degree.value degree) }
+
+    let toInt (len:int) (arrayVers:int[]) =
         let mutable intRet = 0
         let bump i =
             if (arrayVers.[i] = 1) then
@@ -479,22 +479,26 @@ module ZeroOneSequence =
 type IntBits = { degree:Degree; values:int[] }
 module IntBits =
 
-    let Sorted_O_1_Sequence (blockLen:int) (onesCount:int) =
+    let sorted_O_1_Sequence (blockLen:int) (onesCount:int) =
         seq {for i = 1 to blockLen - onesCount do yield 0; 
              for i = 1 to onesCount do yield 1 }
 
     //Returns a bloclLen + 1 length array 
     // of all possible sorted 0-1 sequences of length blockLen
-    let Sorted_0_1_Sequences (blockLen:int) =
+    let sorted_0_1_Sequences (blockLen:int) =
         seq {for i = 0 to blockLen 
-                do yield (Sorted_O_1_Sequence blockLen i) |> Seq.toArray }
+                do yield (sorted_O_1_Sequence blockLen i) |> Seq.toArray }
             |> Seq.toArray
 
-    let AllBinaryTestCasesSeq (order:int) =
+    let allBinaryTestCasesSeq (order:int) =
         {0 .. (1 <<< order) - 1}
-        |> Seq.map (fun i -> ZeroOneSequence.FromInteger order i)
+        |> Seq.map (fun i -> ZeroOneSequence.fromInteger order i)
 
-    let AllBinaryTestCasesArray (order:int) =
-        Array.init (1 <<< order) (fun i -> ZeroOneSequence.FromInteger order i)
+    let allBinaryTestCasesArray (order:int) =
+        Array.init (1 <<< order) (fun i -> ZeroOneSequence.fromInteger order i)
+
+    let random (degree:Degree) (rnd:IRando) =
+        (ZeroOneSequence.randomArrays degree rnd)
+        |> Seq.map(fun a -> {IntBits.degree=degree; values= a})
 
 
