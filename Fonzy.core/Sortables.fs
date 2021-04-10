@@ -50,34 +50,48 @@ module SortableSet =
 
 
 module SortableSetExplicit = 
+    let allIntBitsId = SorterSetId.fromGuid (Guid.Parse "71000000-0000-0000-0000-000000000222")
+    let rndBitsId =    SorterSetId.fromGuid (Guid.Parse "72000000-0000-0000-0000-000000000222")
+    let rndPermsId = SorterSetId.fromGuid (Guid.Parse "73000000-0000-0000-0000-000000000222")
 
-    let allIntBits (degree:Degree) (id:SortableSetId) = 
+    let allIntBits (degree:Degree) = 
+        let id = seq { allIntBitsId:> obj; 
+                       degree:> obj;} 
+                        |> GuidUtils.guidFromObjs
         {
-              SortableSetExplicit.id = id;
+              SortableSetExplicit.id = SortableSetId.fromGuid id;
               SortableSetExplicit.degree = degree;
               SortableSetExplicit.sortableIntArrays = 
-                    SortableIntArray.all_0_1 degree
+              SortableIntArray.all_0_1 degree
          }
 
     let rndBits (degree:Degree) 
                 (rngGen:RngGen) 
-                (sortableCount:SortableCount)
-                (id:SortableSetId) = 
+                (sortableCount:SortableCount) = 
+        let id = seq { rndBitsId:> obj;
+                       degree:> obj;
+                       rngGen:> obj; 
+                       sortableCount:> obj;} 
+                        |> GuidUtils.guidFromObjs
         let rando = rngGen |> Rando.fromRngGen
         let sias = ZeroOneSequence.randomArrays degree rando
                     |> Seq.take (SortableCount.value sortableCount)
                     |> Seq.map(fun p -> SortableIntArray.create p)
                     |> Seq.toArray
         {
-              SortableSetExplicit.id = id;
+              SortableSetExplicit.id = SortableSetId.fromGuid id;
               SortableSetExplicit.degree = degree;
               SortableSetExplicit.sortableIntArrays = sias
         }
 
     let rndPerms (degree:Degree) 
                  (rngGen:RngGen) 
-                 (sortableCount:SortableCount)
-                 (id:SortableSetId) = 
+                 (sortableCount:SortableCount) = 
+        let id = seq { rndPermsId:> obj;
+                       degree:> obj;
+                       rngGen:> obj;
+                       sortableCount:> obj;} 
+                        |> GuidUtils.guidFromObjs
         let rando = rngGen |> Rando.fromRngGen
         let sia = Permutation.createRandoms degree rando
                     |> Seq.map(fun p -> SortableIntArray.create 
@@ -85,7 +99,7 @@ module SortableSetExplicit =
                     |> Seq.take (SortableCount.value sortableCount)
                     |> Seq.toArray
         {
-              SortableSetExplicit.id = id;
+              SortableSetExplicit.id = SortableSetId.fromGuid id;
               SortableSetExplicit.degree = degree;
               SortableSetExplicit.sortableIntArrays = sia
          }

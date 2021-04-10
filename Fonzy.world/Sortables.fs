@@ -1,5 +1,4 @@
 ﻿namespace global
-open System
 
 module SortableSetGenerated =
 
@@ -49,9 +48,7 @@ module SortableSetGenerated =
                                                            (RngGenDto.fromJson)
                       let! sortableCount = ssg.prams |> ResultMap.procKeyedInt "sortableCount" 
                                                            (SortableCount.create "")
-                      let! id = ssg.prams |> ResultMap.lookupKeyedGuid "id"
-                      let! ssId = SortableSetId.create id
-                      return SortableSetExplicit.rndBits degree rngGen sortableCount ssId
+                      return SortableSetExplicit.rndBits degree rngGen sortableCount
                    }
 
         | "rndPerms" -> 
@@ -62,7 +59,7 @@ module SortableSetGenerated =
                                                             (fun d -> Degree.create "" d)
                       let! rngGen = ssg.prams |> ResultMap.procKeyedString "rngGen" 
                                                                     (RngGenDto.fromJson)
-                      return SortableSetExplicit.rndPerms degree rngGen count ssg.id
+                      return SortableSetExplicit.rndPerms degree rngGen count
                    }
 
         | "allIntBits" -> 
@@ -70,7 +67,7 @@ module SortableSetGenerated =
                         let! degree = ssg.prams |> ResultMap.procKeyedInt "degree" 
                                                             (fun d -> Degree.create "" d)
 
-                        return SortableSetExplicit.allIntBits degree ssg.id
+                        return SortableSetExplicit.allIntBits degree
                     }
         | _ -> Error (sprintf "no match for SortableSetGenerated.cat: %s" ssg.cat)
 

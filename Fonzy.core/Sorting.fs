@@ -14,16 +14,13 @@ module Sorting =
         | BySortable
 
 
-    type OpParams =
-        {
-            switchusePlan:SwitchUsePlan;
-            sortableSet:SortableSet;
-            switchEventAggregation:EventGrouping;
-            sorter:Sorter;
-        }
-
-
-
+    //type OpParams =
+    //    {
+    //        switchusePlan:SwitchUsePlan;
+    //        sortableSet:SortableSet;
+    //        switchEventAggregation:EventGrouping;
+    //        sorter:Sorter;
+    //    }
 
 //type SortingResultsW = 
 //    {

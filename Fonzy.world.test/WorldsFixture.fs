@@ -40,7 +40,7 @@ type WorldsFixture () =
         let genSorterSetDto, meta = 
             Enviro.getDtoAndMetaFromEnviro<SorterSetDto>
                                  newWorld.enviro
-                                 TestData.CauseSpec.SorterSet.rndSortersName
+                                 TestData.CauseSpec.SorterSet.rndSorterSetName
             |> Result.ExtractOrThrow
         let sorterSet = genSorterSetDto |> SorterSetDto.fromDto
                                         |> Result.ExtractOrThrow

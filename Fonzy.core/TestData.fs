@@ -56,8 +56,7 @@ module TestData =
 
 
     module SortableSet =
-        let sortableSetId = SortableSetId.fromGuid (Guid.NewGuid())
-        let ssAllIntBits = SortableSetExplicit.allIntBits degree sortableSetId
+        let ssAllIntBits = SortableSetExplicit.allIntBits degree
         let sortableSet = SortableSet.Explicit ssAllIntBits
 
     module SorterSet = 

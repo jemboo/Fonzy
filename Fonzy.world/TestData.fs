@@ -37,27 +37,76 @@ module TestData =
 
         module SorterSet =
             let count = 10
-            let rndSortersName = "rndSortersName"
+            //let rndSortersName = "rndSortersName"
             let testResultsName = "testResultsName"
-            let sorterEvalName = "sorterEvalName"
+            let sortableSetName = "sortableSetName"
+            let rndSorterSetName = "rndSorterSetName"
+            let sorterEvalResultsName = "sorterEvalResults"
             let sorterSetId1 = SorterSetId.fromGuid (Guid.Parse "10000000-0000-0000-0000-000000000222")
             let sorterSetId2 = SorterSetId.fromGuid (Guid.Parse "11000000-0000-0000-0000-000000000222")
             let sorterSetId3 = SorterSetId.fromGuid (Guid.Parse "11100000-0000-0000-0000-000000000222")
             let sorterEvalId = SorterSetId.fromGuid (Guid.Parse "11110000-0000-0000-0000-000000000222")
 
             let intDistType = IntDistType.Normal (NormalIntegerDistParams.zeroCentered 1.0)
-            let sorterLength = SwitchOrStageCount.degreeTo999StageCount degree
+            let wOtCount = SwitchOrStageCount.degreeTo999StageCount degree
             let switchFreq = SwitchFrequency.max
             let sorterCount = SorterCount.fromInt 10
+            let useParallel = true
 
-            let rand1 = CauseSpecSorters.rndGen sorterSetId1 degree sorterLength 
-                             sorterCount (nextRnGen()) rndSortersName
-            let rand2 = CauseSpecSorters.rndGen sorterSetId2 degree sorterLength 
-                             sorterCount (nextRnGen()) rndSortersName
-            let rand3 = CauseSpecSorters.rndGen sorterSetId3 degree sorterLength 
-                             sorterCount (nextRnGen()) rndSortersName
 
-            let eval = CauseSpecSorters.eval degree rndSortersName testResultsName
+            let srgPr ssid d wOt sc rng ssn =
+                CauseSpecSorters.rndGen ("sorterSetId", ssid)
+                                        ("degree", d)
+                                        ("switchOrStageCount", wOt)
+                                        ("sorterCount", sc)
+                                        ("rndGen", rng)
+                                        (rndSorterSetName, ssn)
+
+            let rand1 = srgPr sorterSetId1 degree wOtCount 
+                             sorterCount (nextRnGen()) rndSorterSetName
+            let rand2 = srgPr sorterSetId2 degree wOtCount 
+                             sorterCount (nextRnGen()) rndSorterSetName
+            let rand3 = srgPr sorterSetId3 degree wOtCount 
+                             sorterCount (nextRnGen()) rndSorterSetName
+
+            let switchUsePlan = Sorting.SwitchUsePlan.All
+            let evalMush d ssn sup sbset up resn =
+                CauseSpecSorters.evalToSorterPerfBins 
+                                        ("degree", d)
+                                        ("sorterSetName", ssn)
+                                        ("switchUsePlan", sup)
+                                        ("sortableSet", sbset)
+                                        ("useParallel", up)
+                                        ("resultsName", resn)
+
+            let evalToSorterPerfBins = 
+                    evalMush
+                            degree 
+                            rndSorterSetName 
+                            switchUsePlan 
+                            TestData.SortableSet.sortableSet
+                            useParallel
+                            sorterEvalResultsName
+
+
+            let genMush d ssn sup sbset up resn =
+                CauseSpecSorters.genToSorterPerfBins 
+                                        ("degree", d)
+                                        ("sorterSetName", ssn)
+                                        ("switchUsePlan", sup)
+                                        ("sortableSet", sbset)
+                                        ("useParallel", up)
+                                        ("resultsName", resn)
+
+
+            let genToSorterPerfBins = 
+                    genMush
+                            degree 
+                            rndSorterSetName 
+                            switchUsePlan 
+                            TestData.SortableSet.sortableSet
+                            useParallel
+                            sorterEvalResultsName
 
 
     module WorldAction =

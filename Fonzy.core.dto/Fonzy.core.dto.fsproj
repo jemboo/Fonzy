@@ -13,10 +13,10 @@
     <Compile Include="GaTypesDto.fs" />
     <Compile Include="SorterPartsDto.fs" />
     <Compile Include="SortablesDto.fs" />
+    <Compile Include="SorterEvalDto.fs" />
     <Compile Include="SorterGaDto.fs" />
     <Compile Include="RootDtos.fs" />
     <Compile Include="OrgsDto.fs" />
-    <Compile Include="SortingGaTypesDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
