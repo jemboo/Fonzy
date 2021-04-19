@@ -6,6 +6,7 @@ open System.Security.Cryptography
 open System.Runtime.Serialization.Formatters.Binary
 open System.IO
 
+
 module ByteUtils =
     let bytesForObj (o:obj) =
         let bf = new BinaryFormatter()
@@ -19,7 +20,6 @@ module ByteUtils =
         let md5 = MD5.Create();
         let bs = bytesForObj o
         md5.ComputeHash(bytesForObj o)
-
 
 
 module GuidUtils = 
@@ -157,7 +157,7 @@ module CollectionUtils =
         lstRet
 
     // returns a sequence of items that occur more than once 
-    let itemsOccuringAtLeastOnce items =
+    let itemsOccuringMoreThanOnce items =
         seq {
             let d = System.Collections.Generic.Dictionary()
             for i in items do
@@ -201,8 +201,11 @@ module CollectionUtils =
             |> Seq.concat
 
 
+    let sortedUnique (items:int seq) =
+        items |> Seq.distinct |> Seq.sort
+
     // get a seq of key-value pairs for easy iteration with for (k,v) in d do...
-    let pairs (d:Dictionary<'a, 'b>) =
+    let toKeyValuePairs (d:Dictionary<'a, 'b>) =
        seq {
            for kv in d do
                yield (kv.Key, kv.Value)

@@ -157,7 +157,6 @@ type ComboStructuresFixture () =
        Assert.IsTrue(al.Length > 0)
 
 
-
     [<TestMethod>]
     member this.makeFromTupleSeq() =        
         let rndy = Rando.LcgFromSeed 44

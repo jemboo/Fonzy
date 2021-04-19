@@ -86,10 +86,19 @@ module SorterModel =
 
 
 
-type SorterGen = | RandSwitches of SwitchCount * IRando * Degree
-                 | RandStages of StageCount * IRando * Degree
+type SorterGen = | RandSwitches of SwitchCount * Degree
+                 | RandStages of StageCount * Degree
+                 | RandCoComp of StageCount * Degree
+                 | RandTriComp of StageCount * Degree
 
 module SorterGen =
+    let getDegree (sorterGen:SorterGen) =
+        match sorterGen with
+        | RandSwitches (_, d) -> d
+        | RandStages (_, d) -> d
+        | RandCoComp (_, d) -> d
+        | RandTriComp (_, d) -> d
+
 
     let fromTwoCycleArray (tc:TwoCyclePerm[]) =
         let switches = tc |> Seq.map(fun tc-> Switch.fromTwoCyclePerm tc)
@@ -120,15 +129,19 @@ module SorterGen =
                         |> Seq.toArray
         Sorter.create degree switches
 
-    let makeRandomCoConjugates (degree:Degree) 
-                               (stageCount:StageCount) =
-        result {
-            let! twoCycles = TwoCycleGen.makeAltEvenOdd degree (Permutation.identity degree)
-                                |> Seq.take (StageCount.value stageCount)
-                                |> Seq.toList
-                                |> Result.sequence
 
-            return fromTwoCycleArray (twoCycles |> List.toArray)
+    let makeRandomConjugatesOfEvenOdd (degree:Degree) 
+                                      (stageCount:StageCount) 
+                                      (iRando:IRando) =
+        result {
+            let perms = List.init 
+                            ((StageCount.value stageCount) / 2)
+                            (fun _ -> TwoCyclePerm.makeRandomFullTwoCycle degree iRando)
+                        |> List.map (TwoCyclePerm.toPermutation)
+
+            let! stp = perms |> TwoCycleGen.makeCoConjugateEvenOdd
+            let atp = stp |> Seq.toArray
+            return fromTwoCycleArray atp
         }
 
 
@@ -141,24 +154,25 @@ module SorterGen =
         Sorter.create degree switches
 
 
-    let createRandom (degree:Degree) 
-                     (switchOrStageCount:SwitchOrStageCount) 
-                     (switchFreq:SwitchFrequency) 
-                     (rnd:IRando) =
-        match switchOrStageCount with
-        | SwitchOrStageCount.Switch wc -> createWithRandomSwitches 
-                                            degree wc rnd
-        | SwitchOrStageCount.Stage  tc -> createWithRandomStages 
-                                            degree tc switchFreq rnd
+    //let createRandom (degree:Degree) 
+    //                 (switchOrStageCount:SwitchOrStageCount) 
+    //                 (switchFreq:SwitchFrequency) 
+    //                 (rnd:IRando) =
+    //    match switchOrStageCount with
+    //    | SwitchOrStageCount.Switch wc -> createWithRandomSwitches 
+    //                                        degree wc rnd
+    //    | SwitchOrStageCount.Stage  tc -> createWithRandomStages 
+    //                                        degree tc switchFreq rnd
 
-    let createRandomArray (degree:Degree)
-                          (switchOrStageCount:SwitchOrStageCount)
-                          (sorterCount:SorterCount)
-                          (rnd:IRando) =
-        let switchFreq = SwitchFrequency.fromFloat 1.0
-        (seq {1 .. (SorterCount.value sorterCount)} 
-                |> Seq.map(fun _ -> (createRandom degree switchOrStageCount switchFreq rnd))
-                |> Seq.toArray)
+
+    //let createRandomArray (degree:Degree)
+    //                      (switchOrStageCount:SwitchOrStageCount)
+    //                      (sorterCount:SorterCount)
+    //                      (rnd:IRando) =
+    //    let switchFreq = SwitchFrequency.fromFloat 1.0
+    //    (seq {1 .. (SorterCount.value sorterCount)} 
+    //            |> Seq.map(fun _ -> (createRandom degree switchOrStageCount switchFreq rnd))
+    //            |> Seq.toArray)
 
 
     let mutateBySwitch (mutationRate:MutationRate) (rnd:IRando) (sorter:Sorter) =
@@ -169,7 +183,9 @@ module SorterGen =
                         |> Seq.toArray
         }
 
-    let mutateByStage (mutationRate:MutationRate) (rnd:IRando) (sorter:Sorter) =
+    let mutateByStage (mutationRate:MutationRate) 
+                      (rnd:IRando) 
+                      (sorter:Sorter) =
         let stages = Stage.mergeSwitchesIntoStages sorter.degree sorter.switches |> Seq.toArray
         let newStages = stages |> Array.map(fun st -> st |> Stage.randomMutate rnd mutationRate)
         let newSwitches = [| for stage in newStages do yield! stage.switches |]
@@ -180,10 +196,42 @@ module SorterGen =
             switches = newSwitches
         }
 
-    let create (sorterGen:SorterGen) =
+    let createRandom2 (sorterGen:SorterGen) 
+                      (randy:IRando) =
         match sorterGen with
-        | SorterGen.RandSwitches  (switchCount, randy, degree) -> 
-                    createWithRandomSwitches degree switchCount randy
-        | SorterGen.RandStages (stageCount, randy, degree) ->
-                    let sc = SwitchFrequency.fromFloat 1.0
-                    createWithRandomStages degree stageCount sc randy
+        | SorterGen.RandSwitches  (switchCount, degree) -> 
+            createWithRandomSwitches 
+                    degree 
+                    switchCount 
+                    randy
+
+        | SorterGen.RandStages (stageCount, degree) ->
+            let sc = SwitchFrequency.fromFloat 1.0
+            createWithRandomStages 
+                    degree 
+                    stageCount 
+                    sc
+                    randy
+
+        | SorterGen.RandCoComp (stageCount, degree) ->
+            makeRandomConjugatesOfEvenOdd 
+                           degree 
+                           stageCount
+                           randy
+            |> Result.ExtractOrThrow
+
+        | SorterGen.RandTriComp (stageCount, degree) ->
+            makeRandomConjugatesOfEvenOdd 
+                           degree 
+                           stageCount
+                           randy
+            |> Result.ExtractOrThrow
+
+
+    let createRandomArray2 (sorterGen:SorterGen)
+                           (sorterCount:SorterCount)
+                           (rnd:IRando) =
+        let switchFreq = SwitchFrequency.fromFloat 1.0
+        (seq {1 .. (SorterCount.value sorterCount)} 
+                |> Seq.map(fun _ -> (createRandom2 sorterGen rnd))
+                |> Seq.toArray)

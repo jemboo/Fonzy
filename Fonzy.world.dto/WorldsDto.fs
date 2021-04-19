@@ -1,8 +1,6 @@
 ﻿namespace global
 open System
 
-
-
 type WorldDto = {id:Guid; parentId:Guid; causeSpecDto:CauseSpecDto; 
                  enviroDto:EnviroDto}
 module WorldDto = 
@@ -35,7 +33,6 @@ module WorldDto =
             let! dto = Json.deserialize<WorldDto> js
             return! fromDto dto
         }
-                     
             
 type WorldActionDto = {childId:Guid; parentWorldDto:WorldDto; 
                        causeSpecDto:CauseSpecDto;}

@@ -7,6 +7,24 @@ open Newtonsoft.Json
 
 
 module FileUtils =
+    let fullTextFilePath (baseDir:string) (fn:string) =
+        Path.Combine(baseDir, fn + ".txt")
+
+    let makeDirectory (dirPath:string) = 
+        try
+            Directory.CreateDirectory(dirPath)
+            |> ignore |> Ok
+        with
+            | ex -> ("error in readFile: " + ex.Message ) |> Result.Error
+
+    let clearDirectory (baseDir:string) =
+        try
+            let files  = Directory.GetFiles(baseDir, "*.*")
+            files |> Array.map(fun f -> File.Delete(f)) |> ignore
+            //Threading.Thread.Sleep(100)
+            Directory.Delete(baseDir) |> Ok
+        with
+            | ex -> ("error in clearDirectory: " + ex.Message ) |> Result.Error
 
     let getFilesInDirectory path ext =
         try

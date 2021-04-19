@@ -48,25 +48,25 @@ module TestData =
             let sorterEvalId = SorterSetId.fromGuid (Guid.Parse "11110000-0000-0000-0000-000000000222")
 
             let intDistType = IntDistType.Normal (NormalIntegerDistParams.zeroCentered 1.0)
-            let wOtCount = SwitchOrStageCount.degreeTo999StageCount degree
+            let stageCount = StageCount.degreeTo999StageCount degree
+            let sorterGen = SorterGen.RandStages (stageCount, degree)
             let switchFreq = SwitchFrequency.max
-            let sorterCount = SorterCount.fromInt 10
+            let sorterCount = SorterCount.fromInt 100
             let useParallel = true
 
 
-            let srgPr ssid d wOt sc rng ssn =
+            let srgPr ssid sg sc rng ssn =
                 CauseSpecSorters.rndGen ("sorterSetId", ssid)
-                                        ("degree", d)
-                                        ("switchOrStageCount", wOt)
+                                        ("sorterGen", sg)
                                         ("sorterCount", sc)
                                         ("rndGen", rng)
                                         (rndSorterSetName, ssn)
 
-            let rand1 = srgPr sorterSetId1 degree wOtCount 
+            let rand1 = srgPr sorterSetId1 sorterGen 
                              sorterCount (nextRnGen()) rndSorterSetName
-            let rand2 = srgPr sorterSetId2 degree wOtCount 
+            let rand2 = srgPr sorterSetId2 sorterGen 
                              sorterCount (nextRnGen()) rndSorterSetName
-            let rand3 = srgPr sorterSetId3 degree wOtCount 
+            let rand3 = srgPr sorterSetId3 sorterGen
                              sorterCount (nextRnGen()) rndSorterSetName
 
             let switchUsePlan = Sorting.SwitchUsePlan.All
@@ -89,10 +89,11 @@ module TestData =
                             sorterEvalResultsName
 
 
-            let genMush d ssn sup sbset up resn =
+            let genMush sg sc rng sup sbset up resn =
                 CauseSpecSorters.genToSorterPerfBins 
-                                        ("degree", d)
-                                        ("sorterSetName", ssn)
+                                        ("sorterGen", sg)
+                                        ("sorterCount", sc)
+                                        ("rndGen", rng)
                                         ("switchUsePlan", sup)
                                         ("sortableSet", sbset)
                                         ("useParallel", up)
@@ -101,8 +102,9 @@ module TestData =
 
             let genToSorterPerfBins = 
                     genMush
-                            degree 
-                            rndSorterSetName 
+                            sorterGen
+                            sorterCount
+                            (nextRnGen())
                             switchUsePlan 
                             TestData.SortableSet.sortableSet
                             useParallel

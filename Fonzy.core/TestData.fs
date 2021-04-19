@@ -19,8 +19,12 @@ module TestData =
         let sorterLength = degree |> SwitchOrStageCount.toMediocreRandomPerfLength 
                                                     SwitchOrStage.Stage 
         let sorterCount = SorterCount.fromInt 50
+        let sorterGen = SorterGen.RandSwitches 
+                                    ((SwitchCount.degreeTo999SwitchCount degree),
+                                    degree)
+
         let makeRandomSorter() = 
-                SorterGen.createRandom degree sorterLength SwitchFrequency.max iRando
+                SorterGen.createRandom2 sorterGen iRando
 
         let makeRandomTwoCycle = 
                 TwoCyclePerm.makeRandomTwoCycle 

@@ -1,33 +1,33 @@
 ﻿namespace global
 
-type SorterPerfBinsDto = {switchCount:int; stageCount:int; binCount:int}
+type SorterPerfBinsDto = int[]
 module SorterPerfBinsDto =
     let toDto (tup:SortingEval.SorterPerfBin*int) =
         let perfBin = fst tup
-        {
-            SorterPerfBinsDto.switchCount = (SwitchCount.value perfBin.usedSwitchCount)
-            SorterPerfBinsDto.stageCount = (StageCount.value perfBin.usedStageCount)
-            SorterPerfBinsDto.binCount = snd tup
-        }
+        [|
+            (SwitchCount.value perfBin.usedSwitchCount)
+            (StageCount.value perfBin.usedStageCount)
+            snd tup
+        |]
 
     let toTup (dto:SorterPerfBinsDto) =
         result {
-            let! uwc = SwitchCount.create "" dto.switchCount
-            let! utc = StageCount.create "" dto.stageCount
+            let! uwc = SwitchCount.create "" dto.[0]
+            let! utc = StageCount.create "" dto.[1]
             return (  
                       { 
                         SortingEval.SorterPerfBin.usedSwitchCount = uwc
                         SortingEval.SorterPerfBin.usedStageCount = utc
                       },
-                      dto.binCount
+                      dto.[2]
                    )
          }
 
     let fromDtos (dtos:SorterPerfBinsDto[]) =
         result {
                 let! tups = dtos |> Array.map(toTup)
-                                |> Array.toList
-                                |> Result.sequence
+                                 |> Array.toList
+                                 |> Result.sequence
 
                 return tups |> List.toArray
             }

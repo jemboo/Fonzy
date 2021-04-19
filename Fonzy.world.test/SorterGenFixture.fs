@@ -4,7 +4,7 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type SortablesFixture () =
+type SorterGenFixture () =
 
     [<TestMethod>]
     member this.rndBits() =

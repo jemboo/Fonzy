@@ -81,3 +81,85 @@ module SwitchUsesDto =
 
     let toJson (switchUses:SwitchUses) =
         switchUses |> toDto |> Json.serialize
+
+type SorterGenDto = {cat:string; prams:Map<string,string>} 
+module SorterGenDto =
+    let toDto (sg:SorterGen) =
+        match sg with
+        | SorterGen.RandSwitches (wc, d) ->
+            let prams = 
+                [
+                    ("switchCount", (SwitchCount.value wc) |> string);
+                    ("degree", (Degree.value d) |> string);
+                ] |> Map.ofList
+            {SorterGenDto.cat="RandSwitches"; SorterGenDto.prams=prams} 
+        | SorterGen.RandStages (tc, d) -> 
+            let prams = 
+                [
+                    ("stageCount", (StageCount.value tc) |> string);
+                    ("degree", (Degree.value d) |> string);
+                ] |> Map.ofList
+            {SorterGenDto.cat="RandStages"; SorterGenDto.prams=prams} 
+        | SorterGen.RandCoComp (tc, d) -> 
+            let prams = 
+                [
+                    ("stageCount", (StageCount.value tc) |> string);
+                    ("degree", (Degree.value d) |> string);
+                ] |> Map.ofList
+            {SorterGenDto.cat="RandCoComp"; SorterGenDto.prams=prams}
+        | SorterGen.RandTriComp (tc, d) -> 
+            let prams = 
+                [
+                    ("stageCount", (StageCount.value tc) |> string);
+                    ("degree", (Degree.value d) |> string);
+                ] |> Map.ofList
+            {SorterGenDto.cat="RandTriComp"; SorterGenDto.prams=prams} 
+
+
+    let toJson (cs:SorterGen) =
+        cs |> toDto |> Json.serialize
+
+    let fromDto (sgDto:SorterGenDto) =
+            match sgDto.cat with
+            | "RandSwitches" -> 
+                    result {
+                            let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
+                                                      (fun d -> Degree.create "" d)
+                            let! switchCount = sgDto.prams |> ResultMap.procKeyedInt "switchCount" 
+                                                      (fun d -> SwitchCount.create "" d)
+                            return SorterGen.RandSwitches (switchCount, degree)
+                           }
+
+            | "RandStages" -> 
+                    result {
+                            let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
+                                                      (fun d -> StageCount.create "" d)
+                            let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
+                                                      (fun d -> Degree.create "" d)
+                            return SorterGen.RandStages (stageCount, degree)
+                           }
+            | "RandCoComp" -> 
+                    result {
+                            let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
+                                                      (fun d -> Degree.create "" d)
+                            let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
+                                                      (fun d -> StageCount.create "" d)
+                            return SorterGen.RandCoComp (stageCount, degree)
+                           }
+
+            | "RandTriComp" -> 
+                    result {
+                            let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
+                                                      (fun d -> Degree.create "" d)
+                            let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
+                                                      (fun d -> StageCount.create "" d)
+                            return SorterGen.RandCoComp (stageCount, degree)
+                           }
+            | _ -> Error (sprintf "no match for SorterGenDto.cat: %s" sgDto.cat)
+
+
+    let fromJson (js:string) =
+        result {
+            let! dto = Json.deserialize<SorterGenDto> js
+            return! fromDto dto
+        }

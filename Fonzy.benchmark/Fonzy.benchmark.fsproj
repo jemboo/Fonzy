@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="WorldRuns.fs" />
     <Compile Include="SorterBenchmarks.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

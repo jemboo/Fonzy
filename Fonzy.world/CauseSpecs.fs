@@ -133,22 +133,19 @@ module CauseSpecSorters =
     let rndSortersBaseId = Guid.Parse "00000000-0000-0000-0000-000000000002"
 
     let rndGen (sorterSetId:string*SorterSetId) 
-               (degree:string*Degree) 
-               (switchOrStageCount:string*SwitchOrStageCount)
+               (sorterGen:string*SorterGen)
                (sorterCount:string*SorterCount)
                (rndGen:string*RngGen) 
                (sorterSetName:string*string) =
 
         let id = seq { rndSortersBaseId:> obj;
-                       degree:> obj; 
-                       switchOrStageCount:> obj;
+                       sorterGen:> obj;
                        rndGen:> obj; 
                        sorterSetName:> obj; } 
                         |> GuidUtils.guidFromObjs
         let prams = [
                      (CauseSpec.tupOp sorterSetId (SorterSetId.value >> string));
-                     (CauseSpec.tupOp degree (Degree.value >> string));
-                     (CauseSpec.tupOp switchOrStageCount SwitchOrStageCountDto.toJson);
+                     (CauseSpec.tupOp sorterGen SorterGenDto.toJson);
                      (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
                      (CauseSpec.tupOp rndGen RngGenDto.toJson);
                      sorterSetName
@@ -179,27 +176,36 @@ module CauseSpecSorters =
                      (CauseSpec.tupOp useParallel Json.serialize);
                      resultsName
                      ] |> Map.ofList
-        {CauseSpec.id = CauseSpecId.fromGuid id; genus=["Sorters"; "evalToSorterPerfBins"]; prams=prams;}
+        {
+            CauseSpec.id = CauseSpecId.fromGuid id; 
+            genus=["Sorters"; "evalToSorterPerfBins"]; 
+            prams=prams;
+        }
 
 
     let genSortersBaseId = Guid.Parse "00000000-0000-0000-0000-000000000004"
     let genToSorterPerfBins 
-              (degree:string*Degree)
-              (sorterSetName:string*string)
+              (sorterGen:string*SorterGen)
+              (sorterCount:string*SorterCount)
+              (rndGen:string*RngGen) 
               (switchUsePlan:string*Sorting.SwitchUsePlan)
               (sortableSet:string*SortableSet)
               (useParallel:string*bool)
               (resultsName:string*string) =
+
         let id = seq { evalSortersBaseId:> obj;
-                       degree:> obj;
-                       sorterSetName:> obj;
-                       switchUsePlan:> obj; 
+                       sorterGen:> obj;
+                       sorterCount:> obj;
+                       rndGen:> obj;
+                       switchUsePlan:> obj;
                        sortableSet:> obj;
+                       useParallel:> obj;
                        resultsName:> obj; } 
                         |> GuidUtils.guidFromObjs
         let prams = [
-                     (CauseSpec.tupOp degree (Degree.value >> string));
-                     sorterSetName;
+                     (CauseSpec.tupOp sorterGen SorterGenDto.toJson);
+                     (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
+                     (CauseSpec.tupOp rndGen RngGenDto.toJson);
                      (CauseSpec.tupOp switchUsePlan Json.serialize);
                      (CauseSpec.tupOp sortableSet SortableSetDto.toJson);
                      (CauseSpec.tupOp useParallel Json.serialize);

@@ -15,8 +15,7 @@ type WorldMergesFixture () =
                             TestData.WorldMerge.enviroM
                                     |> Result.ExtractOrThrow
 
-        let map = worldMerges.enviro |> Enviro.toMap |> Result.ExtractOrThrow
-
+        let map = worldMerges.enviro |> Enviro.toMap |> Result.ExtractOrThrow 
         Assert.AreEqual(worldMerges.id, TestData.WorldMerge.mergedWorldId);
         Assert.AreEqual(map.Count, 3)
 

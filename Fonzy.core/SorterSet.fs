@@ -22,14 +22,12 @@ module SorterSet =
 
     // IRando dependent
     let createRandom (sorterSetId:SorterSetId)
-                     (degree:Degree) 
-                     (switchOrStageCount:SwitchOrStageCount) 
-                     (switchFreq:SwitchFrequency)
+                     (sorterGen:SorterGen) 
                      (sorterCount:SorterCount) 
                      (rnd:IRando) =
         fromSorters
             sorterSetId
-            degree 
+            (sorterGen|> SorterGen.getDegree)
             (Array.init (SorterCount.value sorterCount)
-                       (fun _ -> (SorterGen.createRandom 
-                                    degree switchOrStageCount switchFreq rnd)))
+                       (fun _ -> (SorterGen.createRandom2 
+                                                sorterGen rnd)))

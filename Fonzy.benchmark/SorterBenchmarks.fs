@@ -90,10 +90,11 @@ type BenchmarkSorterSetOps() =
     let sorterLength = degree |> SwitchOrStageCount.toMediocreRandomPerfLength 
                                                 SwitchOrStage.Stage 
     let sorterCount = SorterCount.fromInt 50
+    let sorterGen = SorterGen.RandStages 
+                            ((StageCount.degreeTo999StageCount degree),
+                             degree)
     let makeRandomSorter() = 
-            SorterGen.createRandom degree sorterLength SwitchFrequency.max iRando
-
-
+            SorterGen.createRandom2 sorterGen iRando
 
     let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
                                   (fun _ -> makeRandomSorter())

@@ -60,7 +60,8 @@ module Combinatorics =
         a |> Array.mapi(fun dex e -> if (dex = e) then 1 else 0)
           |> Array.reduce(+)
 
-    let distanceSquared (a:array<int>) (b:array<int>) =
+    let distanceSquared (a:array<int>) 
+                        (b:array<int>) =
         Array.fold2 (fun acc elem1 elem2 ->
         acc + (elem1 - elem2) * (elem1 - elem2)) 0 a b
 
@@ -70,30 +71,16 @@ module Combinatorics =
         let tot = float (a |> Array.sum)
         let fa = a  |> Array.filter(fun i->i>0)
                     |> Array.map (fun i->(float i) / tot)
-        let res = Array.fold (fun acc elem -> acc - elem * f * Math.Log(elem)) 0.0 fa
+        let res = Array.fold (fun acc elem -> 
+                        acc - elem * f * Math.Log(elem)) 0.0 fa
         res 
 
     let unsortednessSquared (a:array<int>) =
         distanceSquared a [|0 .. (a.Length - 1)|]
 
-    // will do conventional sort if the stage array is all 1 or 2 cycles
-    let sortIntArray (sortable: array<int>) (stage:array<int>) (counter:array<int>) =
-        for i = 0 to stage.Length - 1 do
-            let j = stage.[i]
-            if (j > i ) then
-                let stbA = sortable.[i]
-                let stbB = sortable.[j]
-                if(stbB < stbA) then
-                    sortable.[i] <- stbB
-                    sortable.[j] <- stbA
-                    counter.[i] <- counter.[i] + 1
-
-    let sortCopyOfIntArray (sortable: array<int>) (stage:array<int>) (counter:array<int>) =
-        let stbC = Array.copy sortable
-        sortIntArray stbC stage counter
-        stbC
-
-    let makeMonoTwoCycle (degree:Degree) (aDex:int) (bDex:int) =
+    let makeMonoTwoCycle (degree:Degree) 
+                         (aDex:int) 
+                         (bDex:int) =
         Array.init (Degree.value degree) (fun i -> 
             if   (i = aDex) then bDex
             elif (i = bDex) then aDex
@@ -106,10 +93,13 @@ module Combinatorics =
 
     // bins is an increasing set of positive numbers.
     // returns the index of the first member e>value.
-    let findBin (bins:float[]) (value:float) =
+    let findBin (bins:float[]) 
+                (value:float) =
         bins |> Array.findIndex(fun b -> b>value)
 
-    let cumSum (startingVal:float) (weights:float[]) =
+    // converts a density distr to a cumulative distr.
+    let cumSum (startingVal:float) 
+               (weights:float[]) =
         let mutable tot = startingVal
         let cumo w =
             tot<-tot + w
@@ -122,7 +112,8 @@ module Combinatorics =
         seq {for i = 0 to x - 1 do yield (xa.[i], ya.[y-1])}
             |> Seq.append (seq {for i = 0 to y - 2 do yield (xa.[x-1], ya.[i])})
 
-    let drawTwoWithoutRep (degree:Degree) (rnd:IRando) =
+    let drawTwoWithoutRep (degree:Degree) 
+                          (rnd:IRando) =
         let aBit = rnd.NextPositiveInt % Degree.value(degree)
         let mutable bBit = rnd.NextPositiveInt % Degree.value(degree)
         while aBit = bBit do
@@ -130,11 +121,13 @@ module Combinatorics =
         if aBit < bBit then aBit, bBit
         else bBit, aBit
 
-    let makeRandomMonoTwoCycle (degree:Degree) (rnd:IRando) =
+    let makeRandomMonoTwoCycle (degree:Degree) 
+                               (rnd:IRando) =
         let tup = drawTwoWithoutRep degree rnd
         makeMonoTwoCycle degree (fst tup) (snd tup)
 
-    let drawFromWeightedDistribution (weightFunction:float->float) (rnd:IRando) 
+    let drawFromWeightedDistribution (weightFunction:float->float) 
+                                     (rnd:IRando) 
                                      (items:float[]) =
         let bins = items |> Array.map(weightFunction)
                          |> cumSum 0.0
@@ -143,7 +136,8 @@ module Combinatorics =
 
     // returns a sequence of draws from initialList without replacement. 
     // Does not change initialList
-    let fisherYatesShuffle (rnd:IRando) (initialList:array<'a>) =
+    let fisherYatesShuffle (rnd:IRando) 
+                           (initialList:array<'a>) =
         let rndmx max = rnd.NextUInt % max
         let availableFlags = Array.init initialList.Length (fun i -> (i, true))
         let nextItem nLeft =
@@ -158,13 +152,17 @@ module Combinatorics =
         seq {(initialList.Length) .. -1 .. 1}             // Going from the length of the list down to 1
         |> Seq.map (fun i -> nextItem (uint32 i))         // yield the next item
 
-    let randomPermutation (rnd:IRando) (degree:int) =
+    let randomPermutation (rnd:IRando) 
+                          (degree:int) =
          (fisherYatesShuffle rnd)  [|0 .. degree-1|] |> Seq.toArray
 
-    let randomPermutations (rnd:IRando) (degree:int) =
+    let randomPermutations (rnd:IRando) 
+                           (degree:int) =
          Seq.initInfinite (fun n -> randomPermutation rnd degree)
 
-    let makeRandomTwoCycleIntArray (rnd:IRando) (arraysize:int) (cycleCount:int) =
+    let makeRandomTwoCycleIntArray (rnd:IRando) 
+                                   (arraysize:int) 
+                                   (cycleCount:int) =
         let initialList = [|0 .. arraysize-1|]
         let arrayRet = Array.init arraysize (fun i -> i)
         let rndTupes = (fisherYatesShuffle rnd initialList) |> (Seq.chunkBySize 2) |> Seq.toArray
@@ -173,10 +171,14 @@ module Combinatorics =
             arrayRet.[rndTupes.[i].[1]] <- rndTupes.[i].[0]
         arrayRet
 
-    let makeRandomFullTwoCycleIntArray (rnd:IRando) (arraysize:int) =
+    let makeRandomFullTwoCycleIntArray (rnd:IRando) 
+                                       (arraysize:int) =
         makeRandomTwoCycleIntArray rnd arraysize (arraysize/2)
 
-    let MakeRandomFullTwoCycleIntArrays (rnd:IRando) (arraysize:int) (count:int) =
-        seq {1 .. count} |> Seq.map (fun i -> makeRandomFullTwoCycleIntArray rnd arraysize)
+    let MakeRandomFullTwoCycleIntArrays (rnd:IRando) 
+                                        (arraysize:int) 
+                                        (count:int) =
+        seq {1 .. count} |> Seq.map (fun i -> 
+                        makeRandomFullTwoCycleIntArray rnd arraysize)
 
 

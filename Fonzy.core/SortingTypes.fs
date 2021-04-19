@@ -67,6 +67,33 @@ module SwitchCount =
             return! create "" (gv:?>int)
         }
 
+    let degreeToRecordSwitchCount (degree:Degree) =
+        let d = (Degree.value degree)
+        let ct = match d with
+                    | 4 -> 5    | 5 -> 9    | 6 -> 12
+                    | 7 -> 16   | 8 -> 19   | 9 -> 25
+                    | 10 -> 29  | 11 -> 35  | 12 -> 39
+                    | 13 -> 45  | 14 -> 51  | 15 -> 56
+                    | 16 -> 60  | 17 -> 71  | 18 -> 77
+                    | 19 -> 85  | 20 -> 91  | 21 -> 100
+                    | 22 -> 107 | 23 -> 115 | 24 -> 120
+                    | 25 -> 132 | 26 -> 139 | 27 -> 150
+                    | 28 -> 155 | 29 -> 165 | 30 -> 172
+                    | 31 -> 180 | 32 -> 185 | _ -> 0
+        create "" ct |> Result.ExtractOrThrow
+
+    let degreeTo999SwitchCount (degree:Degree) =
+        let d = (Degree.value degree)
+        let ct = match d with
+                    | 6  | 7 -> 600    | 8  | 9 -> 700
+                    | 10 | 11 -> 800   | 12 | 13 -> 1000
+                    | 14 | 15 -> 1200  | 16 | 17 -> 1600
+                    | 18 | 19 -> 2000  | 20 | 21 -> 2200
+                    | 22 | 23 -> 2600  | 24 | 25 -> 3000
+                    | _ -> 0
+        create "" ct |> Result.ExtractOrThrow
+
+
 module SwitchFrequency =
     let value (SwitchFrequency v) = v
     let create fieldName v = 
@@ -91,6 +118,34 @@ module StageCount =
             let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
+
+    let degreeToRecordStageCount (degree:Degree) =
+        let d = (Degree.value degree)
+        let ct = match d with
+                    | 4 ->  3
+                    | 5 | 6 ->  5
+                    | 7 | 8 ->  6
+                    | 9 | 10 -> 7
+                    | 11 | 12 -> 8
+                    | 13 | 14 | 15 | 16 -> 9
+                    | 17 -> 10
+                    | 18 | 19 | 20 -> 11
+                    | 21 | 22 | 23 | 24 -> 12
+                    | 25 | 26 -> 13
+                    | 27 | 28 | 29 | 30 | 31 | 32 -> 14
+                    | _ -> 0
+        create "" ct |> Result.ExtractOrThrow
+
+    let degreeTo999StageCount (degree:Degree) =
+        let d = (Degree.value degree)
+        let ct = match d with
+                    | 8 | 9 -> 140
+                    | 10 | 11 | 12 | 13 | 14 | 15 -> 160
+                    | 16 | 17 | 18 | 19 | 20 | 21 -> 200
+                    | 22 | 23 | 24 | 25 -> 220
+                    | _ -> 0
+        create "" ct |> Result.ExtractOrThrow
+
 
 module SwitchOrStageCount =
     let makeSwitchCountR switchCount =
@@ -143,72 +198,15 @@ module SwitchOrStageCount =
                       ((tCtL |> float) * rhs) |> int |>  StageCount.fromInt |> SwitchOrStageCount.Stage
 
 
-    let degreeToRecordSwitchCount (degree:Degree) =
-        let d = (Degree.value degree)
-        let ct = match d with
-                    | 4 -> 5    | 5 -> 9    | 6 -> 12
-                    | 7 -> 16   | 8 -> 19   | 9 -> 25
-                    | 10 -> 29  | 11 -> 35  | 12 -> 39
-                    | 13 -> 45  | 14 -> 51  | 15 -> 56
-                    | 16 -> 60  | 17 -> 71  | 18 -> 77
-                    | 19 -> 85  | 20 -> 91  | 21 -> 100
-                    | 22 -> 107 | 23 -> 115 | 24 -> 120
-                    | 25 -> 132 | 26 -> 139 | 27 -> 150
-                    | 28 -> 155 | 29 -> 165 | 30 -> 172
-                    | 31 -> 180 | 32 -> 185 | _ -> 0
-        let wc = SwitchCount.create "" ct |> Result.ExtractOrThrow
-        SwitchOrStageCount.Switch wc
-
-    let degreeTo999SwitchCount (degree:Degree) =
-        let d = (Degree.value degree)
-        let ct = match d with
-                    | 6  | 7 -> 600    | 8  | 9 -> 700
-                    | 10 | 11 -> 800   | 12 | 13 -> 1000
-                    | 14 | 15 -> 1200  | 16 | 17 -> 1600
-                    | 18 | 19 -> 2000  | 20 | 21 -> 2200
-                    | 22 | 23 -> 2600  | 24 | 25 -> 3000
-                    | _ -> 0
-        let wc = SwitchCount.create "" ct |> Result.ExtractOrThrow
-        SwitchOrStageCount.Switch wc
-
-    let degreeToRecordStageCount (degree:Degree) =
-        let d = (Degree.value degree)
-        let ct = match d with
-                    | 4 ->  3
-                    | 5 | 6 ->  5
-                    | 7 | 8 ->  6
-                    | 9 | 10 -> 7
-                    | 11 | 12 -> 8
-                    | 13 | 14 | 15 | 16 -> 9
-                    | 17 -> 10
-                    | 18 | 19 | 20 -> 11
-                    | 21 | 22 | 23 | 24 -> 12
-                    | 25 | 26 -> 13
-                    | 27 | 28 | 29 | 30 | 31 | 32 -> 14
-                    | _ -> 0
-        let tc = StageCount.create "" ct |> Result.ExtractOrThrow
-        SwitchOrStageCount.Stage tc
-
-    let degreeTo999StageCount (degree:Degree) =
-        let d = (Degree.value degree)
-        let ct = match d with
-                    | 8 | 9 -> 140
-                    | 10 | 11 | 12 | 13 | 14 | 15 -> 160
-                    | 16 | 17 | 18 | 19 | 20 | 21 -> 200
-                    | 22 | 23 | 24 | 25 -> 220
-                    | _ -> 0
-        let tc = StageCount.create "" ct |> Result.ExtractOrThrow
-        SwitchOrStageCount.Stage tc
-
     let to999Sucessful (degree:Degree) (wOrT:SwitchOrStage) =
         match wOrT with
-        | SwitchOrStage.Switch -> (degreeTo999SwitchCount degree)
-        | SwitchOrStage.Stage -> (degreeTo999StageCount degree)
+        | SwitchOrStage.Switch -> SwitchOrStageCount.Switch (SwitchCount.degreeTo999SwitchCount degree)
+        | SwitchOrStage.Stage -> SwitchOrStageCount.Stage (StageCount.degreeTo999StageCount degree)
 
     let toRecordSwitchOrStageCount (degree:Degree) (wOrT:SwitchOrStage) =
         match wOrT with
-        | SwitchOrStage.Switch -> (degreeToRecordSwitchCount degree)
-        | SwitchOrStage.Stage -> (degreeToRecordStageCount degree)
+        | SwitchOrStage.Switch -> SwitchOrStageCount.Switch (SwitchCount.degreeToRecordSwitchCount degree)
+        | SwitchOrStage.Stage -> SwitchOrStageCount.Stage (StageCount.degreeToRecordStageCount degree)
 
     let toRecordSorterLengthPlus(degree:Degree) (extraLength:SwitchOrStageCount) =
         match extraLength with

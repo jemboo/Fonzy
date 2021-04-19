@@ -135,13 +135,15 @@ type SortingOpsFixture () =
     [<TestMethod>]
     member this.getSorterEff_Parallel_NoGrouping() =
         let seed = 1234
-        let iRando = Rando.fromRngGen (RngGen.createLcg seed)
+        let rngGen = (RngGen.createLcg seed)
+        let iRando = Rando.fromRngGen rngGen
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
         let mediocreSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
         let altEvenSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
 
         let sorterLength = degree |> SwitchOrStageCount.toMediocreRandomPerfLength 
-                                                    SwitchOrStage.Stage 
+                                                    SwitchOrStage.Stage
+        let stageCount = degree |> StageCount.degreeTo999StageCount
         let sorterCount = SorterCount.fromInt 500
 
         let maxConjugatePairs = 100
@@ -164,33 +166,17 @@ type SortingOpsFixture () =
             }
             
         let makeRandomSorter() = 
-                SorterGen.createRandom 
-                        degree 
-                        sorterLength 
-                        SwitchFrequency.max 
-                        iRando
+            let sorterGen = SorterGen.RandStages (stageCount, degree)
+            SorterGen.createRandom2 sorterGen
 
-        let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
-                                      (fun _ -> makeRandomSorter())
-
-        let mediocreSorterSet = 
-                    SorterSet.fromSorters 
-                            mediocreSorterSetId 
-                            degree 
-                            mediocreRandomSorters
+        let mediocreRandomSorters = 
+            List.init (SorterCount.value sorterCount)
+                      (fun _ -> makeRandomSorter())
 
         let sortableSetEx = SortableSet.Generated 
                                 (SortableSetGenerated.allIntBits degree)
                                 |> SortableSet.getSortableSetExplicit
-                                |> Result.ExtractOrThrow 
-
-        //let ssR = SortingOps.SorterSet.eval
-        //                mediocreSorterSet 
-        //                sortableSetEx 
-        //                Sorting.SwitchUsePlan.All
-        //                Sorting.EventGrouping.NoGrouping
-        //                (UseParallel.create false)
-        //                SortingEval.SortingRecords.getSorterEff
+                                |> Result.ExtractOrThrow
 
         let perfBins = SortingOps.SorterSet.getSorterPerfBins
                           altEvenSorterSet
@@ -238,7 +224,6 @@ type SortingOpsFixture () =
                          |> List.map (TwoCyclePerm.toPermutation)
                          
             result {
-                
                 let! stp = perms2 |> TwoCycleGen.make3EightBlocks
                 let atp = stp |> Seq.toArray
                 return SorterGen.fromTwoCycleArray atp
@@ -305,42 +290,44 @@ type SortingOpsFixture () =
 
     [<TestMethod>]
     member this.makePermSorter() =
-        let seed = 12345
-        let iRando = Rando.fromRngGen (RngGen.createLcg seed)
-        let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
-        let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+        //let seed = 12345
+        //let rngGen = (RngGen.createLcg seed)
+        //let iRando = Rando.fromRngGen rngGen
+
+        //let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
+        //let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
         
-        let sorterLength =  degree |> SwitchOrStageCount.degreeTo999StageCount 
+        //let sorterLength =  degree |> SwitchOrStageCount.degreeTo999StageCount 
                                                     
-   
-        let sorterCount = SorterCount.fromInt 10
-        let makeSorter() = 
-            SorterGen.createRandom degree sorterLength SwitchFrequency.max iRando
+        ////let sorterGen = SorterGen.RandStages (stageCount, rngGen, degree)
+        //let sorterCount = SorterCount.fromInt 10
+        //let makeSorter() = 
+        //    SorterGen.createRandom degree sorterLength SwitchFrequency.max iRando
 
-        let sorterArray = Array.init 
-                               (SorterCount.value sorterCount)
-                               (fun _ -> makeSorter ())  
+        //let sorterArray = Array.init 
+        //                       (SorterCount.value sorterCount)
+        //                       (fun _ -> makeSorter ())  
 
-        let sorterSet = 
-                    SorterSet.fromSorters 
-                            sorterSetId
-                            degree 
-                            sorterArray
+        //let sorterSet = 
+        //            SorterSet.fromSorters 
+        //                    sorterSetId
+        //                    degree 
+        //                    sorterArray
 
-        let sortableSetEx = SortableSet.Generated 
-                                (SortableSetGenerated.allIntBits degree)
-                                |> SortableSet.getSortableSetExplicit
-                                |> Result.ExtractOrThrow 
+        //let sortableSetEx = SortableSet.Generated 
+        //                        (SortableSetGenerated.allIntBits degree)
+        //                        |> SortableSet.getSortableSetExplicit
+        //                        |> Result.ExtractOrThrow 
 
-        let perfBins = SortingOps.SorterSet.getSorterPerfBins
-                            sorterSet
-                            sortableSetEx
-                            Sorting.SwitchUsePlan.All
-                            (UseParallel.create true)
+        //let perfBins = SortingOps.SorterSet.getSorterPerfBins
+        //                    sorterSet
+        //                    sortableSetEx
+        //                    Sorting.SwitchUsePlan.All
+        //                    (UseParallel.create true)
 
-        let pbr  = perfBins |> Result.ExtractOrThrow
-        let rep = (pbr |> SorterPerfBin.binReport)
-        Console.WriteLine rep
+        //let pbr  = perfBins |> Result.ExtractOrThrow
+        //let rep = (pbr |> SorterPerfBin.binReport)
+        //Console.WriteLine rep
 
         Assert.IsTrue(true)
 
