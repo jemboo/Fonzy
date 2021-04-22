@@ -62,8 +62,8 @@ type SorterPartsFixture () =
     member this.Stage_gusStagesOfDegree() =
         let degree = Degree.fromInt 16
         let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
-        let startingStageCount = StageCount.fromInt 4
-        let stageCompSpan = StageCount.fromInt 2
+        let startingStageCount = StageCount.fromInt 2
+        let stageCompSpan = StageCount.fromInt 4
         let startingStages = Stage.makeRandomFullStages
                                         degree
                                         randy
@@ -72,7 +72,72 @@ type SorterPartsFixture () =
 
         let pStages = Stage.gusStagesOfDegree
                                 startingStages
+                                stageCompSpan
+                                degree
+                                randy
+                      |> Seq.take(10)
+                      |> Seq.toList
 
-                                        //startingStageCount
-                                        //stageCompSpan
-        Assert.IsTrue(true);
+        Assert.IsTrue(pStages.Length > 0);
+
+
+    [<TestMethod>]
+    member this.Stage_switchIntersection() =
+        let degree = Degree.fromInt 16
+        let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
+        let stageCount = StageCount.fromInt 2
+
+        let startingStages() = 
+            Stage.makeRandomFullStages
+                        degree
+                        randy
+                |> Seq.take (StageCount.value stageCount)
+                |> Stage.switchIntersection
+                |> List.length
+
+        for i=0 to 100 do
+            Console.WriteLine (sprintf "%d" (startingStages()))
+
+        Assert.IsTrue(1 > 0);
+
+
+    [<TestMethod>]
+    member this.Stage_switchPairwiseIntersections() =
+        let degree = Degree.fromInt 16
+        let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
+        let stageCount = StageCount.fromInt 4
+
+        let startingStages() = 
+            Stage.makeRandomFullStages
+                        degree
+                        randy
+                |> Seq.take (StageCount.value stageCount)
+                |> Stage.switchPairwiseIntersections
+                |> Seq.length
+
+        let res = Seq.init 1000 (fun _ -> startingStages())
+
+        let hist = CollectionUtils.histogram (id) res
+        Assert.IsTrue(hist.Count > 0);
+
+
+    [<TestMethod>]
+    member this.Stage_windowedSwitchPairwiseIntersections() =
+        let degree = Degree.fromInt 16
+        let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
+        let stageCount = StageCount.fromInt 10
+        let windowSize = 4
+
+        let startingStages = 
+            Stage.makeRandomFullStages
+                        degree
+                        randy
+                |> Seq.take (StageCount.value stageCount)
+                |> Seq.toArray
+
+        let stageWindows = 
+            startingStages |>
+                    Stage.windowedSwitchPairwiseIntersections windowSize
+            |> Seq.toArray
+
+        Assert.IsTrue(stageWindows.Length > 0);

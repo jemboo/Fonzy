@@ -103,10 +103,26 @@ module SwitchMapTracker =
 type Stage = {switches:Switch list; degree:Degree}
 module Stage =
 
+    // returns a list of switches found in all of the stages
     let switchIntersection (stages:Stage seq) =
         stages |> Seq.map(fun st -> (Set.ofList st.switches))
                |> Set.intersectMany
                |> Set.toList
+
+    // returns a sequence of switches found more than once
+    let switchPairwiseIntersections (stages:Stage seq) =
+        seq { for stage in stages do yield! stage.switches }
+        |> CollectionUtils.itemsOccuringMoreThanOnce
+
+    // returns a sequence of switches found more than once
+    let windowedSwitchPairwiseIntersections 
+                                (windowSize:int) 
+                                (stages:Stage seq) =
+        stages |> CollectionUtils.maxWindowed windowSize
+               |> Seq.map(switchPairwiseIntersections >> Seq.toList)
+               //|> Seq.map(fun t -> switchPairwiseIntersections t
+               //                     |> Seq.toList)
+              // |> switchPairwiseIntersections
 
     let mergeSwitchesIntoStages (degree:Degree) 
                                 (switches:seq<Switch>) =
@@ -210,20 +226,20 @@ module Stage =
                         mutateStage stage tcp
             | _ -> stage
             
+
     let fullStageFromSwitches (degree:Degree) (switches: Switch seq) =
         let usedFlags = Array.init (Degree.value degree) (fun _ -> false)
         None
+
 
     let gusStagesOfDegree (stagesPfx:Stage list)
                           (stageCompSpan:StageCount)
                           (degree:Degree) 
                           (rnd:IRando) =
         let stSp = (StageCount.value stageCompSpan)
-        let compStages = stagesPfx |> List.rev 
-                                   |> Seq.take(stSp)
-                                   |> Seq.toList
-                                   |> List.rev
-
-
+        let compStages = stagesPfx |> CollectionUtils.last stSp
+        (makeRandomFullStages degree rnd) 
+                   |> Seq.append
+                        (compStages |> List.toSeq)
             
-        compStages
+       // compStages

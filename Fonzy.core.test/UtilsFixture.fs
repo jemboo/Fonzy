@@ -49,11 +49,16 @@ type UtilsFixture () =
 // CollectionUtils
 
     [<TestMethod>]
-    member this.listToTuples() =
+    member this.maxWindowed() =
+        let ts = [1; 2; 3; 4; 5; 6]
+        let maxWinSpan = 3
+        let carty = ts |> CollectionUtils.maxWindowed maxWinSpan  |> Seq.toArray
+        Assert.IsTrue(carty.Length > 0)
+
+    [<TestMethod>]
+    member this.listToTransitionTuples() =
         let ts = [1; 2; 1; 4; 5; 6]
         let carty = CollectionUtils.listToTransitionTuples ts  |> Seq.toArray
-
-
         Assert.IsTrue(true)
 
     [<TestMethod>]

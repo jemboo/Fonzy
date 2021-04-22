@@ -122,6 +122,32 @@ module CollectionUtils =
     //    | [] -> Seq.singleton []
     //    | L::Ls -> seq {for x in L do for xs in cart1 Ls -> x::xs}
 
+    //returns the last n items of the list in the original order
+    let rec last n xs =
+      if List.length xs <= n then xs
+      else last n xs.Tail
+
+    //returns the first n items of the list in the original order,
+    //or all the items if it's shorter than n
+    let first n (xs:'a list) =
+        let mn = min n xs.Length
+        xs |> List.take mn
+
+    // makes a sliding window up to width max, or less if there are
+    // not enough elements
+    let maxWindowed (max:int) (items: seq<'a>) =
+        let mutable window = List.Empty
+        let trim() =
+            if window.Length = max then
+               window |> first (max - 1)
+            else    
+               window
+        seq {for item in items do
+                 window <- trim()
+                 window <- window |> List.append [item]
+                 yield window |> List.rev}
+
+
     let listToTransitionTuples (ltt:'a list) =
         let rec yucko (last:'a) (tail:'a list) (tupes: ('a*'a) list) =
             match tail with

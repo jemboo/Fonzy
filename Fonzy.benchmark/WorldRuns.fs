@@ -8,7 +8,7 @@ module RunW =
                                 :> IDataSource
     FileUtils.makeDirectory baseDataDir |> Result.ExtractOrThrow |> ignore
     let seed = DateTime.Now.Ticks |> int
-    let degree = Degree.fromInt 20
+    let degree = Degree.fromInt 22
 
     let ssAllIntBits = SortableSetGenerated.allIntBits degree
                         |> SortableSet.Generated
@@ -33,9 +33,9 @@ module RunW =
     let genToSorterPerfBins (dex:int) =
         let stageCount = StageCount.degreeTo999StageCount degree
         let switchCount = SwitchCount.degreeTo999SwitchCount degree
-       // let sorterGen = SorterGen.RandCoComp (stageCount, degree)
-        let sorterGen = SorterGen.RandSwitches (switchCount, degree)
-        let sorterCount = SorterCount.fromInt 2000
+        let sorterGen = SorterGen.RandCoComp (stageCount, degree)
+       // let sorterGen = SorterGen.RandSwitches (switchCount, degree)
+        let sorterCount = SorterCount.fromInt 500
         let causeSpec = 
                 genMush
                     sorterGen
@@ -43,7 +43,7 @@ module RunW =
                     (nextRnGen())
                     Sorting.SwitchUsePlan.All
                     ssAllIntBits
-                    false
+                    true
                     binResultsName
 
         let cause = causeSpec
