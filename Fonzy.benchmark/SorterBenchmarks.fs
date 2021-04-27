@@ -94,7 +94,7 @@ type BenchmarkSorterSetOps() =
                             ((StageCount.degreeTo999StageCount degree),
                              degree)
     let makeRandomSorter() = 
-            SorterGen.createRandom2 sorterGen iRando
+            SorterGen.createRandom sorterGen iRando
 
     let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
                                   (fun _ -> makeRandomSorter())

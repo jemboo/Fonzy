@@ -4,8 +4,69 @@ open System
 open System.Collections.Generic
 open TreeZipper
 
+module testData =
+    let tree1 = 
+      Tree.Node (1, 
+        Tree.Node (2, 
+          Tree.Node (4, Empty, Empty), 
+          Tree.Node (5, Empty, Empty)), 
+        Tree.Node (3, 
+          Tree.Node (6, 
+            Tree.Node (7, Empty, Empty),
+            Empty), 
+          Tree.Node (8, Empty, Empty)))
+
+    let tree7 =
+      Tree.Node (7, 
+        Tree.Node (3, 
+          Tree.Node (2, Empty, Empty),
+          Tree.Node (5, 
+            Tree.Node (4, Empty, Empty), 
+            Tree.Node (6, Empty, Empty))), 
+        Tree.Node (9, 
+          Tree.Node (8, Empty, Empty), 
+          Tree.Node (10, Empty, Empty)))
+
+
 [<TestClass>]
 type TreeFixture () =
+
+    [<TestMethod>]
+    member this.t0() =
+        Tree.traverseB testData.tree1 
+            |> Seq.iter (printfn "%d") // 1 2 4 5 3 6 7 8
+
+        Assert.AreEqual(1, 1)
+
+    [<TestMethod>]
+    member this.t0a() =
+        let treeD = 
+            Tree.delete 7 testData.tree7
+
+        Assert.AreEqual(1, 1)
+
+    [<TestMethod>]
+    member this.t0b() =
+        let treeD = 
+            Tree.Empty
+            |> Tree.insert 2
+            |> Tree.insert 1
+            |> Tree.insert 5
+            |> Tree.insert 4
+
+        Assert.AreEqual(1, 1)
+
+    [<TestMethod>]
+    member this.t0c() =
+        Tree.traverseD testData.tree1 
+            |> Seq.iter (printfn "%d") // 1 2 4 5 3 6 7 8
+
+        Tree.traverseB testData.tree1 
+            |> Seq.iter (printfn "%d") 
+
+        Assert.AreEqual(1, 1)
+
+
 
     [<TestMethod>]
     member this.t1() =

@@ -24,7 +24,7 @@ module TestData =
                                     degree)
 
         let makeRandomSorter() = 
-                SorterGen.createRandom2 sorterGen iRando
+                SorterGen.createRandom sorterGen iRando
 
         let makeRandomTwoCycle = 
                 TwoCyclePerm.makeRandomTwoCycle 

@@ -29,5 +29,5 @@ module SorterSet =
             sorterSetId
             (sorterGen|> SorterGen.getDegree)
             (Array.init (SorterCount.value sorterCount)
-                       (fun _ -> (SorterGen.createRandom2 
+                       (fun _ -> (SorterGen.createRandom 
                                                 sorterGen rnd)))

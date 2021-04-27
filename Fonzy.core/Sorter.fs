@@ -39,34 +39,34 @@ module Sorter =
         } |> Ok
 
 
-type SorterModel = | Switches of Switch[] * Degree
-                   | TwoCyclePerms of TwoCyclePerm[]
-                  // | Set of SorterModel[] * Degree
+//type SorterModel = | Switches of Switch[] * Degree
+//                   | TwoCyclePerms of TwoCyclePerm[]
+//                  // | Set of SorterModel[] * Degree
 
-module SorterModel =
-    let createWithSwitchArray (degree:Degree) 
-                              (switches:Switch[]) =
-        SorterModel.Switches (switches, degree)
+//module SorterModel =
+//    let createWithSwitchArray (degree:Degree) 
+//                              (switches:Switch[]) =
+//        SorterModel.Switches (switches, degree)
 
-    let createWithTwoCyclePermArray (twoCyclePerms:TwoCyclePerm[]) =
-        SorterModel.TwoCyclePerms (twoCyclePerms)
+//    let createWithTwoCyclePermArray (twoCyclePerms:TwoCyclePerm[]) =
+//        SorterModel.TwoCyclePerms (twoCyclePerms)
 
-    let createRandom (degree:Degree) 
-                     (switchOrStageCount:SwitchOrStageCount) 
-                     (rnd:IRando) =
-        match switchOrStageCount with
-        | SwitchOrStageCount.Switch switchCount -> 
-            let switches = Switch.randomSwitchesOfDegree degree rnd
-                        |> Seq.take (SwitchCount.value switchCount)
-                        |> Seq.toArray 
-            createWithSwitchArray degree switches
+//    let createRandom (degree:Degree) 
+//                     (switchOrStageCount:SwitchOrStageCount) 
+//                     (rnd:IRando) =
+//        match switchOrStageCount with
+//        | SwitchOrStageCount.Switch switchCount -> 
+//            let switches = Switch.randomSwitchesOfDegree degree rnd
+//                        |> Seq.take (SwitchCount.value switchCount)
+//                        |> Seq.toArray 
+//            createWithSwitchArray degree switches
 
-        | SwitchOrStageCount.Stage stageCount ->
-            let perms = Array.init 
-                            (StageCount.value stageCount) 
-                            (fun _ -> TwoCyclePerm.makeRandomTwoCycle 
-                                            degree rnd 1.0)
-            createWithTwoCyclePermArray perms
+//        | SwitchOrStageCount.Stage stageCount ->
+//            let perms = Array.init 
+//                            (StageCount.value stageCount) 
+//                            (fun _ -> TwoCyclePerm.makeRandomTwoCycle 
+//                                            degree rnd 1.0)
+//            createWithTwoCyclePermArray perms
 
 
     //let createWithSetOfSwitchArrays (degree:Degree) 
@@ -89,16 +89,30 @@ module SorterModel =
 type SorterGen = | RandSwitches of SwitchCount * Degree
                  | RandStages of StageCount * Degree
                  | RandCoComp of StageCount * Degree
-                 | RandTriComp of StageCount * Degree
+                 | RandBuddies of StageCount * StageCount * Degree
 
 module SorterGen =
+
     let getDegree (sorterGen:SorterGen) =
         match sorterGen with
         | RandSwitches (_, d) -> d
-        | RandStages (_, d) -> d
-        | RandCoComp (_, d) -> d
-        | RandTriComp (_, d) -> d
+        | RandStages   (_, d) -> d
+        | RandCoComp   (_, d) -> d
+        | RandBuddies  (_, _, d) -> d
 
+
+    let reportString (sorterGen:SorterGen) =
+        match sorterGen with
+        | RandSwitches (wc, d) ->   
+                        sprintf "RandSwitches\t@\t%d" (Degree.value d)
+        | RandStages   (tc, d) -> 
+                        sprintf "RandStages\t@\t%d" (Degree.value d)
+        | RandCoComp   (tc, d) ->   
+                        sprintf "RandCoComp\t@\t%d" (Degree.value d)
+        | RandBuddies  (tc, wc, d) -> 
+                        sprintf "RandBuddies\t%d\t%d" (StageCount.value wc) 
+                                                      (Degree.value d) 
+        
 
     let fromTwoCycleArray (tc:TwoCyclePerm[]) =
         let switches = tc |> Seq.map(fun tc-> Switch.fromTwoCyclePerm tc)
@@ -127,6 +141,17 @@ module SorterGen =
         let switches = (Stage.makeRandomStagedSwitchSeq degree switchFreq rando)
                         |> Seq.take ((StageCount.value stageCount) * (Degree.value degree) / 2)
                         |> Seq.toArray
+        Sorter.create degree switches
+
+    let createWithRandomStageBuddies (degree:Degree) 
+                               (stageCount:StageCount)
+                               (stageWindowSize:StageCount) 
+                               (rando:IRando) =
+        let switches = (Stage.buddyStages List.empty stageWindowSize degree rando)
+                        |> Seq.take (StageCount.value stageCount)
+                        |> Seq.collect(fun st -> st.switches |> List.toSeq)
+                        |> Seq.toArray
+
         Sorter.create degree switches
 
 
@@ -196,7 +221,7 @@ module SorterGen =
             switches = newSwitches
         }
 
-    let createRandom2 (sorterGen:SorterGen) 
+    let createRandom (sorterGen:SorterGen) 
                       (randy:IRando) =
         match sorterGen with
         | SorterGen.RandSwitches  (switchCount, degree) -> 
@@ -220,18 +245,17 @@ module SorterGen =
                            randy
             |> Result.ExtractOrThrow
 
-        | SorterGen.RandTriComp (stageCount, degree) ->
-            makeRandomConjugatesOfEvenOdd 
+        | SorterGen.RandBuddies (stageCount, windowSize, degree) ->
+            createWithRandomStageBuddies
                            degree 
                            stageCount
+                           windowSize
                            randy
-            |> Result.ExtractOrThrow
 
-
-    let createRandomArray2 (sorterGen:SorterGen)
+    let createRandomArray (sorterGen:SorterGen)
                            (sorterCount:SorterCount)
                            (rnd:IRando) =
         let switchFreq = SwitchFrequency.fromFloat 1.0
         (seq {1 .. (SorterCount.value sorterCount)} 
-                |> Seq.map(fun _ -> (createRandom2 sorterGen rnd))
+                |> Seq.map(fun _ -> (createRandom sorterGen rnd))
                 |> Seq.toArray)

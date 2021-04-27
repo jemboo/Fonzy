@@ -3,12 +3,12 @@
 open System
 
 module RunW =
-    let baseDataDir = "C:\\testDirForDataSourceFixture"
+    let baseDataDir = "C:\\SimOut"
     let directoryDataSource = new DirectoryDataSource(baseDataDir) 
                                 :> IDataSource
     FileUtils.makeDirectory baseDataDir |> Result.ExtractOrThrow |> ignore
     let seed = DateTime.Now.Ticks |> int
-    let degree = Degree.fromInt 22
+    let degree = Degree.fromInt 20
 
     let ssAllIntBits = SortableSetGenerated.allIntBits degree
                         |> SortableSet.Generated
@@ -33,9 +33,11 @@ module RunW =
     let genToSorterPerfBins (dex:int) =
         let stageCount = StageCount.degreeTo999StageCount degree
         let switchCount = SwitchCount.degreeTo999SwitchCount degree
-        let sorterGen = SorterGen.RandCoComp (stageCount, degree)
+        let windowSize = StageCount.fromInt  (3 + (dex % 4) * 2)
+       // let sorterGen = SorterGen.RandCoComp (stageCount, degree)
        // let sorterGen = SorterGen.RandSwitches (switchCount, degree)
-        let sorterCount = SorterCount.fromInt 500
+        let sorterGen = SorterGen.RandBuddies (stageCount, windowSize, degree)
+        let sorterCount = SorterCount.fromInt 2000
         let causeSpec = 
                 genMush
                     sorterGen
@@ -67,7 +69,7 @@ module RunW =
 
         
     let dirPerfBinReport (dex:int) =
-        let repDataDir = "C:\\testDirForDataSourceFixture\\22_Co"
+        let repDataDir = "C:\\testDirForDataSourceFixture\\20_stageGen"
         let reportDataSource = new DirectoryDataSource(repDataDir) 
                                     :> IDataSource
         let repNs = reportDataSource.GetDataSourceIds()
@@ -105,4 +107,69 @@ module RunW =
                             (sprintf "%d\t%d\t%d" (SwitchCount.value w) 
                                                   (StageCount.value t) 
                                                   c))
+        dex
+
+
+    let dirPerfBinBySorterGenReport (dex:int) =
+        let repDataDir = "C:\\runArch\\SorterGen\\20"
+        let reportDataSource = new DirectoryDataSource(repDataDir) 
+                                    :> IDataSource
+        let repNs = reportDataSource.GetDataSourceIds()
+                    |> Result.ExtractOrThrow
+                    |> Array.toList
+
+        let perfBinsFromGuid (g:Guid) =
+            result {
+                let! ds = reportDataSource.GetDataSource(g)
+                let! worldDto = ds |> DataStoreItem.getWorldDto
+                let! world = worldDto |> WorldDto.fromDto
+                let! sorterPerfBinsDto, unusedMeta =  
+                        Enviro.getDtoAndMetaFromEnviro<SorterPerfBinsDto[]> 
+                                        world.enviro
+                                        binResultsName
+                let! sorterGen = 
+                        world.cause.causeSpec.prams 
+                        |> ResultMap.procKeyedString "sorterGen" 
+                                                     (SorterGenDto.fromJson)
+
+                let sorterGenRep = sorterGen |> SorterGen.reportString
+                return (sorterGenRep, sorterPerfBinsDto)
+            }
+
+        let procPbInfo (pbinfo:string*SorterPerfBinsDto[])  =
+            let sorterGenReport, sorterPerfBinsDto = pbinfo
+            result {
+                let! sorterPerfBins = SorterPerfBinsDto.fromDtos sorterPerfBinsDto
+                return  sorterPerfBins |> Array.map(fun tup -> 
+                            ((sorterGenReport, fst tup), snd tup))
+            }
+
+        let formatPerfBinTotal (bt:(string*SortingEval.SorterPerfBin)*int) = 
+            let sorterGenInfo = (fst >> fst) bt
+            let binCount = snd bt
+            let perfBin = (fst >> snd) bt
+            sprintf "%s\t%d\t%d\t%d" sorterGenInfo
+                                     (SwitchCount.value perfBin.usedSwitchCount) 
+                                     (StageCount.value perfBin.usedStageCount) 
+                                     binCount
+
+        let perfBinsInfo = repNs |> List.map(perfBinsFromGuid)
+                                |> Result.sequence
+                                |> Result.ExtractOrThrow
+
+        let listofPerfBinArrays = perfBinsInfo 
+                                    |> List.map(procPbInfo)
+                                    |> Result.sequence
+                                    |> Result.ExtractOrThrow
+        let perfBinGroups = listofPerfBinArrays 
+                                    |> List.reduce(fun a b -> Array.append a b)
+                                    |> Array.groupBy(fst)
+
+        let perfBinTotals = perfBinGroups 
+                                    |> Array.map(fun k ->
+                                            (fst k, (snd k) |> Array.sumBy(snd)))
+
+        let rep = perfBinTotals |> Array.map(formatPerfBinTotal)
+        Console.WriteLine("Gen Win degree switch stage count")
+        rep |> Array.iter(Console.WriteLine)
         dex

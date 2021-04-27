@@ -54,52 +54,6 @@ module Switch =
             | _ -> switch
         switches |> Seq.map(fun sw-> mutateSwitch sw)
 
-type SwitchMapTracker = {degree:Degree; tracker:int[] }
-
-module SwitchMapTracker =
-    let create (degree:Degree) = 
-        let trackArraySize = int (Switch.switchCountForDegree degree)
-        {SwitchMapTracker.degree = degree;
-         tracker = Array.zeroCreate trackArraySize}
-
-    let recordSwitches (recVal:int) 
-                       (switchMapTracker:SwitchMapTracker) 
-                       (switches:Switch seq) = 
-        switches |> Seq.iter(fun w -> 
-                switchMapTracker.tracker.[Switch.getIndex w] <- recVal)
-        switchMapTracker
-
-    let recordSwitch (recVal:int) 
-                     (switchMapTracker:SwitchMapTracker) 
-                     (switch:Switch) = 
-        let dex = Switch.getIndex switch
-        if switchMapTracker.tracker.[dex] = 0 then
-           switchMapTracker.tracker.[dex] <- recVal
-           true
-        else false
-
-    let usedIndexes (switchMapTracker:SwitchMapTracker) =
-        switchMapTracker.tracker
-        |> Array.mapi(fun d v -> (d,v))
-        |> Array.filter(fun tup -> (snd tup) > 0)
-        |> Array.map(fst)
-        |> Array.toList
-
-    let ageTracker (switchMapTracker:SwitchMapTracker) =
-        {
-            SwitchMapTracker.degree = switchMapTracker.degree;
-            tracker = switchMapTracker.tracker
-                      |> Array.map(fun v -> v - 1)
-        }
-
-    let recordAndFilter (recVal:int) 
-                        (switchMapTracker:SwitchMapTracker) 
-                        (switches:Switch seq) =
-        seq { for w in switches do
-                if recordSwitch recVal switchMapTracker w then
-                    yield w }
-
-
 type Stage = {switches:Switch list; degree:Degree}
 module Stage =
 
@@ -115,14 +69,11 @@ module Stage =
         |> CollectionUtils.itemsOccuringMoreThanOnce
 
     // returns a sequence of switches found more than once
-    let windowedSwitchPairwiseIntersections 
-                                (windowSize:int) 
-                                (stages:Stage seq) =
+    let windowBuddies (windowSize:int) 
+                      (stages:Stage seq) =
         stages |> CollectionUtils.maxWindowed windowSize
                |> Seq.map(switchPairwiseIntersections >> Seq.toList)
-               //|> Seq.map(fun t -> switchPairwiseIntersections t
-               //                     |> Seq.toList)
-              // |> switchPairwiseIntersections
+
 
     let mergeSwitchesIntoStages (degree:Degree) 
                                 (switches:seq<Switch>) =
@@ -163,7 +114,8 @@ module Stage =
              yield curDex
            }
 
-    let getStageCount (degree:Degree) (switches:seq<Switch>) =
+    let getStageCount (degree:Degree) 
+                      (switches:seq<Switch>) =
             mergeSwitchesIntoStages degree switches 
                     |> Seq.length
                     |> StageCount.create ""
@@ -173,7 +125,8 @@ module Stage =
                         |> TwoCyclePerm.makeFromTupleSeq stage.degree
 
 
-    let mutateStage (stage:Stage) (pair:int*int) =
+    let mutateStage (stage:Stage) 
+                    (pair:int*int) =
         let tcp = stage |> convertToTwoCycle |> TwoCyclePerm.arrayValues
         let a, b = pair
         let c = tcp.[a]
@@ -198,7 +151,8 @@ module Stage =
         {switches=sA; degree=stage.degree}
         
     // IRando dependent
-    let createRandom (degree:Degree) (rnd:IRando) =
+    let createRandom (degree:Degree) 
+                     (rnd:IRando) =
         let switches = (TwoCyclePerm.makeRandomFullTwoCycle degree rnd )
                         |> Switch.fromTwoCyclePerm
         {switches=switches |> Seq.toList; degree=degree}
@@ -208,7 +162,10 @@ module Stage =
                                   (switchFreq:SwitchFrequency) 
                                   (rnd:IRando) =
         let aa (rnd:IRando)  = 
-            (TwoCyclePerm.makeRandomTwoCycle degree rnd (SwitchFrequency.value switchFreq))
+            (TwoCyclePerm.makeRandomTwoCycle 
+                                degree 
+                                rnd 
+                                (SwitchFrequency.value switchFreq))
                     |> Switch.fromTwoCyclePerm
         seq { while true do yield! (aa rnd) }
 
@@ -219,27 +176,45 @@ module Stage =
         |> mergeSwitchesIntoStages degree
 
 
-    let randomMutate (rnd:IRando) (mutationRate:MutationRate) (stage:Stage) = 
+    let randomMutate (rnd:IRando) 
+                     (mutationRate:MutationRate) 
+                     (stage:Stage) = 
         match rnd.NextFloat with
             | k when k < (MutationRate.value mutationRate) -> 
-                        let tcp = Combinatorics.drawTwoWithoutRep stage.degree rnd
+                        let tcp = Combinatorics.drawTwoWithoutRep 
+                                                    stage.degree 
+                                                    rnd
                         mutateStage stage tcp
             | _ -> stage
             
 
-    let fullStageFromSwitches (degree:Degree) (switches: Switch seq) =
+    let fullStageFromSwitches (degree:Degree) 
+                              (switches: Switch seq) =
         let usedFlags = Array.init (Degree.value degree) (fun _ -> false)
         None
 
 
-    let gusStagesOfDegree (stagesPfx:Stage list)
-                          (stageCompSpan:StageCount)
-                          (degree:Degree) 
-                          (rnd:IRando) =
-        let stSp = (StageCount.value stageCompSpan)
-        let compStages = stagesPfx |> CollectionUtils.last stSp
-        (makeRandomFullStages degree rnd) 
-                   |> Seq.append
-                        (compStages |> List.toSeq)
-            
-       // compStages
+    let buddyStages (stagesPfx:Stage list)
+                    (stageWindowSize:StageCount)
+                    (degree:Degree) 
+                    (rnd:IRando) =
+        let maxWindow = (StageCount.value stageWindowSize)
+        let mutable window = stagesPfx |> CollectionUtils.last maxWindow
+        let trim() =
+            if window.Length = maxWindow then
+               window |> CollectionUtils.first (maxWindow - 1)
+            else    
+               window
+
+        let buddyCount (stage:Stage) = 
+            let testWin = stage::window
+            switchPairwiseIntersections testWin
+                          |> Seq.length
+
+        seq { for stage in (makeRandomFullStages degree rnd) do
+                    window <- trim()
+                    if (buddyCount stage) = 0 then
+                        window <- window |> List.append [stage]
+                        yield stage }
+                    |> Seq.append
+                           (stagesPfx |> List.toSeq)

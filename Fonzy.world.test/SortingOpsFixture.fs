@@ -167,7 +167,7 @@ type SortingOpsFixture () =
             
         let makeRandomSorter() = 
             let sorterGen = SorterGen.RandStages (stageCount, degree)
-            SorterGen.createRandom2 sorterGen
+            SorterGen.createRandom sorterGen
 
         let mediocreRandomSorters = 
             List.init (SorterCount.value sorterCount)

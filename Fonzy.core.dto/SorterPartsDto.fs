@@ -107,13 +107,14 @@ module SorterGenDto =
                     ("degree", (Degree.value d) |> string);
                 ] |> Map.ofList
             {SorterGenDto.cat="RandCoComp"; SorterGenDto.prams=prams}
-        | SorterGen.RandTriComp (tc, d) -> 
+        | SorterGen.RandBuddies (tc, ws, d) -> 
             let prams = 
                 [
                     ("stageCount", (StageCount.value tc) |> string);
+                    ("windowSize", (StageCount.value ws) |> string);
                     ("degree", (Degree.value d) |> string);
                 ] |> Map.ofList
-            {SorterGenDto.cat="RandTriComp"; SorterGenDto.prams=prams} 
+            {SorterGenDto.cat="RandBuddies"; SorterGenDto.prams=prams} 
 
 
     let toJson (cs:SorterGen) =
@@ -147,13 +148,15 @@ module SorterGenDto =
                             return SorterGen.RandCoComp (stageCount, degree)
                            }
 
-            | "RandTriComp" -> 
+            | "RandBuddies" -> 
                     result {
                             let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
                                                       (fun d -> Degree.create "" d)
                             let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
+                                                      (fun d -> StageCount.create "" d) 
+                            let! windowSize = sgDto.prams |> ResultMap.procKeyedInt "windowSize" 
                                                       (fun d -> StageCount.create "" d)
-                            return SorterGen.RandCoComp (stageCount, degree)
+                            return SorterGen.RandBuddies (stageCount, windowSize, degree)
                            }
             | _ -> Error (sprintf "no match for SorterGenDto.cat: %s" sgDto.cat)
 

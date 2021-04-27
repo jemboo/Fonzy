@@ -58,28 +58,6 @@ type SorterPartsFixture () =
 
         Assert.AreEqual(1, 1);
 
-    [<TestMethod>]
-    member this.Stage_gusStagesOfDegree() =
-        let degree = Degree.fromInt 16
-        let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
-        let startingStageCount = StageCount.fromInt 2
-        let stageCompSpan = StageCount.fromInt 4
-        let startingStages = Stage.makeRandomFullStages
-                                        degree
-                                        randy
-                             |> Seq.take (StageCount.value startingStageCount)
-                             |> Seq.toList
-
-        let pStages = Stage.gusStagesOfDegree
-                                startingStages
-                                stageCompSpan
-                                degree
-                                randy
-                      |> Seq.take(10)
-                      |> Seq.toList
-
-        Assert.IsTrue(pStages.Length > 0);
-
 
     [<TestMethod>]
     member this.Stage_switchIntersection() =
@@ -122,7 +100,7 @@ type SorterPartsFixture () =
 
 
     [<TestMethod>]
-    member this.Stage_windowedSwitchPairwiseIntersections() =
+    member this.Stage_windowBuddies() =
         let degree = Degree.fromInt 16
         let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
         let stageCount = StageCount.fromInt 10
@@ -136,8 +114,32 @@ type SorterPartsFixture () =
                 |> Seq.toArray
 
         let stageWindows = 
-            startingStages |>
-                    Stage.windowedSwitchPairwiseIntersections windowSize
-            |> Seq.toArray
+            startingStages 
+                |> Stage.windowBuddies windowSize
+                |> Seq.toArray
 
         Assert.IsTrue(stageWindows.Length > 0);
+
+
+    [<TestMethod>]
+    member this.Stage_buddyStages() =
+        let degree = Degree.fromInt 16
+        let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
+        let stageWindowSize = StageCount.fromInt 10
+        let windowSize = 4
+
+        let buddyStages = Stage.buddyStages 
+                            List.Empty 
+                            stageWindowSize
+                            degree
+                            randy
+                         |> Seq.take 100
+                         |> Seq.toArray
+
+        let buddySwitches = 
+            buddyStages 
+                |> Stage.windowBuddies windowSize
+                |> Seq.toArray
+        let count = buddySwitches |> Array.sumBy(List.length)
+
+        Assert.AreEqual(count, 0);

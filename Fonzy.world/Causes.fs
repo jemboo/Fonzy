@@ -29,7 +29,7 @@ module CauseSorters =
                 let randy = Rando.fromRngGen rngGen
 
 
-                let sorterArray = SorterGen.createRandomArray2 
+                let sorterArray = SorterGen.createRandomArray 
                                                 sorterGen 
                                                 sorterCount 
                                                 randy
@@ -59,7 +59,7 @@ module CauseSorters =
                 let! switchUsePlan = 
                         causeSpec.prams 
                         |> ResultMap.procKeyedString "switchUsePlan" 
-                                                          (Json.deserialize<Sorting.SwitchUsePlan>)
+                                                      (Json.deserialize<Sorting.SwitchUsePlan>)
                 let! sortableSet = 
                         causeSpec.prams 
                         |> ResultMap.procKeyedString "sortableSet" 
@@ -123,7 +123,7 @@ module CauseSorters =
                                                             (id >> Result.Ok)
 
                 let randy = Rando.fromRngGen rngGen
-                let sorterArray = SorterGen.createRandomArray2 
+                let sorterArray = SorterGen.createRandomArray 
                                                 sorterGen 
                                                 sorterCount 
                                                 randy
