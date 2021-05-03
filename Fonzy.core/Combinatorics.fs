@@ -139,7 +139,8 @@ module Combinatorics =
     let fisherYatesShuffle (rnd:IRando) 
                            (initialList:array<'a>) =
         let rndmx max = rnd.NextUInt % max
-        let availableFlags = Array.init initialList.Length (fun i -> (i, true))
+        let availableFlags = Array.init initialList.Length 
+                              (fun i -> (i, true))
         let nextItem nLeft =
             let nItem = (rndmx nLeft)                     // Index out of available items
             let index =                                   // Index in original deck
@@ -151,6 +152,69 @@ module Combinatorics =
             initialList.[index]                           // and return the original item
         seq {(initialList.Length) .. -1 .. 1}             // Going from the length of the list down to 1
         |> Seq.map (fun i -> nextItem (uint32 i))         // yield the next item
+
+
+    let reflect (degree:int) (src:int) =
+        degree - src - 1
+
+    let isReflSymmetric (degree:int) (pair:int*int) =
+        (reflect degree (fst pair)) = (snd pair)
+    
+    // returns a random symmetric pairs
+    let reflectivePairs (degree:int)
+                        (rnd:IRando) =
+        let rndmx max = 
+            (int rnd.NextPositiveInt) % max
+        let reflec (dex:int) =
+            reflect degree dex
+
+        let flagedArray = Array.init 
+                            degree
+                            (fun i -> (i, true))
+
+        let availableFlags() =
+            flagedArray                         
+            |> Seq.filter (fun (ndx,f) -> f)
+
+        let canContinue() =
+            availableFlags() |> Seq.length
+                > 1
+
+        let nextItem() =
+            let nItem = rndmx (availableFlags() |> Seq.length)     
+            let index =                          
+                availableFlags()
+                |> Seq.item (int nItem)             
+                |> fst   
+            flagedArray.[index] <- (index, false) 
+            index
+
+        let getReflection (a:int) (b:int) =
+            let aR = reflec a
+            let bR = reflec b
+            if (snd flagedArray.[aR]) && (snd flagedArray.[bR]) then
+                flagedArray.[aR] <- (aR, false) 
+                flagedArray.[bR] <- (bR, false) 
+                Some (bR, aR)
+            else    
+                None
+
+        let nextItems() =
+            let nItemA = nextItem()     
+            let nItemB = nextItem()    
+            if nItemA = (reflec nItemB) then
+                [|(nItemA, nItemB)|]
+            else if (nItemA = (reflec nItemA)) || (nItemB = (reflec nItemB)) then
+                [|(nItemA, nItemB)|]
+            else
+                let res = getReflection nItemA nItemB
+                match res with
+                | Some (reflA, reflB) ->
+                     [|(nItemA, nItemB); (reflA, reflB)|]
+                | None -> [|(nItemA, nItemB)|]
+
+        seq { while canContinue() do yield nextItems() }
+
 
     let randomPermutation (rnd:IRando) 
                           (degree:int) =
@@ -165,7 +229,8 @@ module Combinatorics =
                                    (cycleCount:int) =
         let initialList = [|0 .. arraysize-1|]
         let arrayRet = Array.init arraysize (fun i -> i)
-        let rndTupes = (fisherYatesShuffle rnd initialList) |> (Seq.chunkBySize 2) |> Seq.toArray
+        let rndTupes = (fisherYatesShuffle rnd initialList) 
+                       |> (Seq.chunkBySize 2) |> Seq.toArray
         for i = 0 to cycleCount - 1 do
             arrayRet.[rndTupes.[i].[0]] <- rndTupes.[i].[1]
             arrayRet.[rndTupes.[i].[1]] <- rndTupes.[i].[0]

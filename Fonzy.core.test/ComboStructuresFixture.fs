@@ -27,7 +27,6 @@ type ComboStructuresFixture () =
             Permutation.identity TestData.degree)
 
 
-
     [<TestMethod>]
     member this.permPowerDist() =
         let maxPower = 2000
@@ -155,6 +154,29 @@ type ComboStructuresFixture () =
        let al = aa |> Seq.toList
 
        Assert.IsTrue(al.Length > 0)
+
+
+    [<TestMethod>]
+    member this.TwoCyclePerm_makeReflSymmetric() =
+       let degree = Degree.fromInt 16
+       let rnd = Rando.LcgFromSeed 424
+       let refSyms = Array.init 100 (fun _ ->
+           TwoCyclePerm.makeReflSymmetric
+                                        degree
+                                        rnd)
+       let smyr = refSyms |> Array.toSeq
+                    |> Seq.map 
+                    (Switch.fromTwoCyclePerm >> Seq.toArray)
+                    |> Seq.concat
+                    |> Seq.map(fun sw -> sw = (Switch.reflect degree sw))
+                    |> Seq.countBy(id)
+                    |> Seq.toArray
+       
+       Assert.AreEqual(smyr.Length, 2)
+       let rr = refSyms |> Array.map(fun tcp -> 
+                (tcp, tcp = (tcp |> TwoCyclePerm.reflect)))
+
+       Assert.IsTrue(true)
 
 
     [<TestMethod>]

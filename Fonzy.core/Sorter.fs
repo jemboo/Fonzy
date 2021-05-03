@@ -90,6 +90,7 @@ type SorterGen = | RandSwitches of SwitchCount * Degree
                  | RandStages of StageCount * Degree
                  | RandCoComp of StageCount * Degree
                  | RandBuddies of StageCount * StageCount * Degree
+                 | RandSymmetric of StageCount * Degree
 
 module SorterGen =
 
@@ -99,6 +100,7 @@ module SorterGen =
         | RandStages   (_, d) -> d
         | RandCoComp   (_, d) -> d
         | RandBuddies  (_, _, d) -> d
+        | RandSymmetric   (_, d) -> d
 
 
     let reportString (sorterGen:SorterGen) =
@@ -112,7 +114,9 @@ module SorterGen =
         | RandBuddies  (tc, wc, d) -> 
                         sprintf "RandBuddies\t%d\t%d" (StageCount.value wc) 
                                                       (Degree.value d) 
-        
+        | RandSymmetric   (tc, d) ->   
+                        sprintf "RandSymmetric\t@\t%d" (Degree.value d)
+
 
     let fromTwoCycleArray (tc:TwoCyclePerm[]) =
         let switches = tc |> Seq.map(fun tc-> Switch.fromTwoCyclePerm tc)
@@ -170,6 +174,18 @@ module SorterGen =
         }
 
 
+    let makeRandomSymmetric (degree:Degree) 
+                            (stageCount:StageCount) 
+                            (iRando:IRando) =
+        result {
+            let tcas = Array.init 
+                            (StageCount.value stageCount)
+                            (fun _ -> TwoCyclePerm.makeReflSymmetric degree iRando)
+
+            return fromTwoCycleArray tcas
+        }
+
+
     let createWithRandomSwitches (degree:Degree) 
                                  (switchCount:SwitchCount) 
                                  (rnd:IRando) =
@@ -177,27 +193,6 @@ module SorterGen =
                     |> Seq.take (SwitchCount.value switchCount)
                     |> Seq.toArray
         Sorter.create degree switches
-
-
-    //let createRandom (degree:Degree) 
-    //                 (switchOrStageCount:SwitchOrStageCount) 
-    //                 (switchFreq:SwitchFrequency) 
-    //                 (rnd:IRando) =
-    //    match switchOrStageCount with
-    //    | SwitchOrStageCount.Switch wc -> createWithRandomSwitches 
-    //                                        degree wc rnd
-    //    | SwitchOrStageCount.Stage  tc -> createWithRandomStages 
-    //                                        degree tc switchFreq rnd
-
-
-    //let createRandomArray (degree:Degree)
-    //                      (switchOrStageCount:SwitchOrStageCount)
-    //                      (sorterCount:SorterCount)
-    //                      (rnd:IRando) =
-    //    let switchFreq = SwitchFrequency.fromFloat 1.0
-    //    (seq {1 .. (SorterCount.value sorterCount)} 
-    //            |> Seq.map(fun _ -> (createRandom degree switchOrStageCount switchFreq rnd))
-    //            |> Seq.toArray)
 
 
     let mutateBySwitch (mutationRate:MutationRate) (rnd:IRando) (sorter:Sorter) =
@@ -222,7 +217,7 @@ module SorterGen =
         }
 
     let createRandom (sorterGen:SorterGen) 
-                      (randy:IRando) =
+                     (randy:IRando) =
         match sorterGen with
         | SorterGen.RandSwitches  (switchCount, degree) -> 
             createWithRandomSwitches 
@@ -252,10 +247,27 @@ module SorterGen =
                            windowSize
                            randy
 
+        | SorterGen.RandSymmetric (stageCount, degree) ->
+            makeRandomSymmetric 
+                           degree 
+                           stageCount
+                           randy
+            |> Result.ExtractOrThrow
+
+
+
     let createRandomArray (sorterGen:SorterGen)
-                           (sorterCount:SorterCount)
-                           (rnd:IRando) =
-        let switchFreq = SwitchFrequency.fromFloat 1.0
-        (seq {1 .. (SorterCount.value sorterCount)} 
-                |> Seq.map(fun _ -> (createRandom sorterGen rnd))
-                |> Seq.toArray)
+                               (sorterCount:SorterCount)
+                               (rnd:IRando) =
+            (seq {1 .. (SorterCount.value sorterCount)} 
+                    |> Seq.map(fun _ -> (createRandom sorterGen rnd))
+                    |> Seq.toArray)
+
+
+    let createRandomArrayP (sorterGen:SorterGen)
+                          (sorterCount:SorterCount)
+                          (rnd:IRando) =
+        Array.init (SorterCount.value sorterCount)
+                   (fun _ -> Rando.fromSeed RngType.Lcg rnd.NextPositiveInt)
+                |> Array.Parallel.map
+                            (fun r -> createRandom sorterGen r)

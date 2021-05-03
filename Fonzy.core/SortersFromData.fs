@@ -70,18 +70,18 @@ module SorterWriter =
 
 
 type RefSorter =
-    | Degree3    | Degree4         | Degree5    | Degree6    | Degree7
-    | Degree8    | Degree8Prefix3  | Degree9    | Degree10   | Degree10a
-    | Degree11   | Degree12        | Degree12a  | Degree13   | Degree13a       
-    | Degree14   | Degree14a       | Degree15   | Degree15a  | Degree16 
-    | Degree16a  | Green16         | End16      | Green16m   | End16m     
-    | Degree17   | Degree17a       | Degree17b  | Degree18   | Degree19 
-    | Degree19a  | Degree20        | Degree20a  | Degree21   | Degree21a
-    | Degree22   | Degree22a       | Degree22b  | Degree23   | Degree23a  
-    | Degree24   | Degree24a       | Degree25   | Degree25a  | Degree26  
-    | Degree26a  | Degree27        | Degree27a  | Degree28   | Degree28a  
-    | Degree29   | Degree29a       | Degree30   | Degree30a 
-    | Degree31   | Degree31a       | Degree32   | Degree32a
+    | Degree3    | Degree4         | Degree4Prefix2 | Degree5    | Degree6    | Degree7
+    | Degree8    | Degree8Prefix3  | Degree9        | Degree10   | Degree10a
+    | Degree11   | Degree12        | Degree12a      | Degree13   | Degree13a       
+    | Degree14   | Degree14a       | Degree15       | Degree15a  | Degree16 
+    | Degree16a  | Green16         | End16          | Green16m   | End16m     
+    | Degree17   | Degree17a       | Degree17b      | Degree18   | Degree19 
+    | Degree19a  | Degree20        | Degree20a      | Degree21   | Degree21a
+    | Degree22   | Degree22a       | Degree22b      | Degree23   | Degree23a  
+    | Degree24   | Degree24a       | Degree25       | Degree25a  | Degree26  
+    | Degree26a  | Degree27        | Degree27a      | Degree28   | Degree28a  
+    | Degree29   | Degree29a       | Degree30       | Degree30a 
+    | Degree31   | Degree31a       | Degree32       | Degree32a
     
 
 module RefSorter =
@@ -93,6 +93,7 @@ module RefSorter =
 
         match refSorter with
         | Degree3 -> (SorterData.Degree3Str, d 3) |> Ok        | Degree4 -> (SorterData.Degree4Str, d 4) |> Ok 
+        | Degree4Prefix2 -> (SorterData.Degree4Prefix2Str, d 4) |> Ok 
         | Degree5 -> (SorterData.Degree5Str, d 5) |> Ok         | Degree6 -> (SorterData.Degree6Str, d 6) |> Ok 
         | Degree7 -> (SorterData.Degree7Str, d 7) |> Ok         | Degree8 -> (SorterData.Degree8Str, d 8) |> Ok         
         | Degree9 -> (SorterData.Degree9Str, d 9) |> Ok         | Degree8Prefix3 -> (SorterData.Degree8Prefix3Str, d 8) |> Ok 

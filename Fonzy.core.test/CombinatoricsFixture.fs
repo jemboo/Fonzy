@@ -14,6 +14,23 @@ type CombinatoricsFixture () =
 
 
     [<TestMethod>]
+    member this.TestReflectivePairs() =
+      let degree = 8
+      let rnd = Rando.LcgFromSeed 424 
+      let pairs1 = Combinatorics.reflectivePairs 
+                                    degree
+                                    rnd          
+                     |> Seq.toArray
+
+      let pairs2 = Combinatorics.reflectivePairs 
+                                  degree
+                                  rnd 
+                       |> Seq.toArray
+
+      Assert.AreEqual(degree, degree)
+
+
+    [<TestMethod>]
     member this.MakeRandomMonoTwoCycle() =
       let degree = Degree.create "" 5 |> Result.ExtractOrThrow
       let rnd = Rando.LcgFromSeed 424 

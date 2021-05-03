@@ -42,6 +42,7 @@ module Switch =
                     let p = (int (rnd.NextUInt % maxDex))
                     yield switchMap.[p] }
 
+
     let mutateSwitches (order:Degree) 
                        (mutationRate:MutationRate) 
                        (rnd:IRando) 
@@ -53,6 +54,13 @@ module Switch =
                         switchMap.[(int (rnd.NextUInt % mDex))] 
             | _ -> switch
         switches |> Seq.map(fun sw-> mutateSwitch sw)
+
+
+    let reflect (degree:Degree) (sw:Switch) =
+        let deg = (Degree.value degree)
+        { Switch.low = sw.hi |> Combinatorics.reflect deg;
+          Switch.hi = sw.low |> Combinatorics.reflect deg; }
+
 
 type Stage = {switches:Switch list; degree:Degree}
 module Stage =
@@ -187,12 +195,6 @@ module Stage =
                         mutateStage stage tcp
             | _ -> stage
             
-
-    let fullStageFromSwitches (degree:Degree) 
-                              (switches: Switch seq) =
-        let usedFlags = Array.init (Degree.value degree) (fun _ -> false)
-        None
-
 
     let buddyStages (stagesPfx:Stage list)
                     (stageWindowSize:StageCount)

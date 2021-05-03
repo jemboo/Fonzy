@@ -12,6 +12,10 @@ module TestData =
 
     module SorterParts =
         let switchCount = SwitchCount.fromInt 10
+
+        let deg4Pfx2Sorter = RefSorter.createRefSorter RefSorter.Degree4Prefix2
+                             |> Result.ExtractOrThrow
+
         let goodRefSorter = RefSorter.goodRefSorterForDegree degree
                             |> Result.ExtractOrThrow
 

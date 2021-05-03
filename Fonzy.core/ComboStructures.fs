@@ -79,7 +79,6 @@ module Permutation =
     let createRandoms (degree:Degree) (rnd:IRando) =
         Seq.initInfinite(fun _ -> createRandom degree rnd)
 
-
  // a permutation of the set {0, 1,.. (degree-1)}, that is it's own inverse
 type TwoCyclePerm = private { degree:Degree; values:int[] }
 module TwoCyclePerm =
@@ -152,11 +151,52 @@ module TwoCyclePerm =
     let makeRandomTwoCycle (degree:Degree) (rnd:IRando) (switchFreq:float) =
         let switchCount = Rando.multiDraw rnd switchFreq ((Degree.value degree) / 2)
         { degree=degree; 
-            values=Combinatorics.makeRandomTwoCycleIntArray rnd (Degree.value degree) switchCount}
+            values=Combinatorics.makeRandomTwoCycleIntArray 
+                                    rnd 
+                                    (Degree.value degree) 
+                                    switchCount }
     
     let makeRandomFullTwoCycle (degree:Degree) (rnd:IRando) =
         { degree=degree; 
-            values=Combinatorics.makeRandomFullTwoCycleIntArray rnd (Degree.value degree)}
+            values=Combinatorics.makeRandomFullTwoCycleIntArray 
+                                            rnd 
+                                            (Degree.value degree)}
+
+    let reflect (twoCyclePerm:TwoCyclePerm) =
+        let deg = (Degree.value twoCyclePerm.degree)
+        let refV pos = Combinatorics.reflect deg
+                                             pos
+        let refl = Array.init 
+                        deg
+                        (fun dex -> 
+         twoCyclePerm.values.[refV dex] |> refV)
+        { degree = twoCyclePerm.degree; 
+          values = refl }
+
+
+    let makeReflSymmetric (degree:Degree) 
+                          (rnd:IRando) =
+        let deg = (Degree.value degree)
+        let aRet = Array.init deg (id)
+        let chunkProc (ch:(int*int)[]) =
+            if ch.Length > 1 then
+                let a,b = ch.[0]
+                let c,d = ch.[1]
+                aRet.[a] <- b
+                aRet.[b] <- a
+                aRet.[c] <- d
+                aRet.[d] <- c
+            else
+               let a,b = ch.[0]
+               aRet.[a] <- b
+               aRet.[b] <- a
+
+        let q = Combinatorics.reflectivePairs deg rnd
+                |> Seq.toArray
+        
+        q |> Array.iter(chunkProc)
+
+        { degree=degree; values=aRet }
 
 
 module TwoCycleGen =
@@ -252,7 +292,6 @@ module TwoCycleGen =
                     TwoCyclePerm.values = conj; }
 
 
-
     let evenDegree (degree:Degree) (offset:int) =
         let d = (Degree.value degree)
         let shoof v =
@@ -307,7 +346,6 @@ module TwoCycleGen =
         let aa = Array.init (Degree.value d) (_eightBlock2)
         { degree=d; values=aa }
 
-
     let make2EightBlocks (conj:Permutation list) =
         let coes (conj:Permutation) =
             result {
@@ -320,7 +358,6 @@ module TwoCycleGen =
                                     |> Result.sequence
                     return rOf |> Seq.concat
                }
-
 
     let make3EightBlocks (conj:Permutation list) =
         let coes (conj:Permutation) =
