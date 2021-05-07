@@ -8,7 +8,7 @@ module RunW =
                                 :> IDataSource
     FileUtils.makeDirectory baseDataDir |> Result.ExtractOrThrow |> ignore
     let seed = DateTime.Now.Ticks |> int
-    let degree = Degree.fromInt 16
+    let degree = Degree.fromInt 20
 
     let ssAllIntBits = SortableSetGenerated.allIntBits degree
                         |> SortableSet.Generated
@@ -36,13 +36,13 @@ module RunW =
         let windowSize = StageCount.fromInt dex  //(10 + (dex % 4))
        // let sorterGen = SorterGen.RandCoComp (stageCount, degree)
        // let sorterGen = SorterGen.RandSwitches (switchCount, degree)
-       // let sorterGen = SorterGen.RandBuddies (stageCount, windowSize, degree)
+        let sorterGen = SorterGen.RandBuddies (stageCount, windowSize, degree)
        
-        let sorterGen = match (dex % 2) with
-                        | 0 ->  SorterGen.RandStages (stageCount, degree)
-                        | _ ->  SorterGen.RandSymmetric (stageCount, degree)
+        //let sorterGen = match (dex % 2) with
+        //                | 0 ->  SorterGen.RandStages (stageCount, degree)
+        //                | _ ->  SorterGen.RandSymmetric (stageCount, degree)
 
-        let sorterCount = SorterCount.fromInt 20000
+        let sorterCount = SorterCount.fromInt 2000
         let causeSpec = 
                 genMush
                     sorterGen
@@ -116,7 +116,7 @@ module RunW =
 
 
     let dirPerfBinBySorterGenReport (dex:int) =
-        let repDataDir = "C:\\runArch\\SorterGen\\16\\symVsT"
+        let repDataDir = "C:\\SimOut" // "C:\\runArch\\SorterGen\\16\\symVsT"
         let reportDataSource = new DirectoryDataSource(repDataDir) 
                                     :> IDataSource
         let repNs = reportDataSource.GetDataSourceIds()

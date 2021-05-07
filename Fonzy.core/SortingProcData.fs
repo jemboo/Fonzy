@@ -193,7 +193,7 @@ module SortableSetRollout =
 
     let allBinary (degree:Degree) =
         let baseArray = IntBits.allBinaryTestCasesArray (Degree.value degree)
-                        |> Array.collect(id)
+                        |> Array.collect(fun ia -> ia.values)
         create degree baseArray
 
     let isSorted (ssRollout:SortableSetRollout) =

@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="WorldRuns.fs" />
     <Compile Include="SorterBenchmarks.fs" />
+    <Compile Include="SorterBenchmarks2.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

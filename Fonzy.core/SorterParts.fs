@@ -166,7 +166,7 @@ module Stage =
         {switches=switches |> Seq.toList; degree=degree}
 
 
-    let makeRandomStagedSwitchSeq (degree:Degree) 
+    let makeRandomStagedSwitchSeqOld (degree:Degree) 
                                   (switchFreq:SwitchFrequency) 
                                   (rnd:IRando) =
         let aa (rnd:IRando)  = 
@@ -176,6 +176,18 @@ module Stage =
                                 (SwitchFrequency.value switchFreq))
                     |> Switch.fromTwoCyclePerm
         seq { while true do yield! (aa rnd) }
+
+
+    let makeRandomStagedSwitchSeq (degree:Degree) 
+                                    (switchFreq:SwitchFrequency) 
+                                    (rnd:IRando) =
+        let aa (rnd:IRando)  = 
+            (TwoCyclePerm.makeReflSymmetric 
+                                degree 
+                                rnd )
+                    |> Switch.fromTwoCyclePerm
+        seq { while true do yield! (aa rnd) }
+
 
     
     let makeRandomFullStages (degree:Degree) 

@@ -193,12 +193,20 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
-    member this.ZeroOneSequence_FromInteger() =
+    member this.IntBits_FromInteger() =
      let len = 6
-     let expectedArray = [|1; 0; 1; 0; 1; 0|]
-     let converted = ZeroOneSequence.fromInteger len 21
-     Assert.IsTrue ((expectedArray = converted))
+     let expectedArray = [|1; 1; 1; 0; 1; 0|]
+     let converted = IntBits.fromInteger 6 23
+     Assert.IsTrue ((expectedArray = converted.values))
      
+
+    [<TestMethod>]
+    member this.IntBits_FromAndToInteger() =
+     let testInt = 123456
+     let converted = IntBits.fromInteger 32 testInt
+     let intBack = IntBits.toInteger converted
+     Assert.AreEqual (testInt, intBack)
+
 
     [<TestMethod>]
     member this.TwoCycleGen_evenDegree() =
@@ -206,3 +214,21 @@ type ComboStructuresFixture () =
      let res = TwoCycleGen.evenDegree degree 4
 
      Assert.IsTrue ((TwoCyclePerm.arrayValues res).Length = (Degree.value degree))
+
+
+    [<TestMethod>]
+    member this.uIntBits_stripeRead() =
+     let degree = Degree.fromInt 16
+     let encodedVal = 8675
+     let pos = 11
+     let intBits = IntBits.fromInteger (Degree.value degree)
+                                        encodedVal
+     let blank = uIntBits.zeroCreate (Degree.value degree)
+     let recorded = uIntBits.stripeWrite blank
+                                         intBits
+                                         pos
+     let bitsBack = uIntBits.stripeRead recorded 
+                                         pos
+     let decoded = IntBits.toInteger bitsBack
+
+     Assert.AreEqual (encodedVal, decoded)

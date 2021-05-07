@@ -60,14 +60,6 @@ type CombinatoricsFixture () =
       
 
     [<TestMethod>]
-    member this.TestIntArray01_To_Int() =
-      let len = 6
-      let expectedArray = [|1; 0; 1; 0; 1; 0|]
-      let converted = ZeroOneSequence.fromInteger len 21
-      Assert.IsTrue ((expectedArray = converted))
-
-
-    [<TestMethod>]
     member this.TestCompareArrays() =
       let firstArray = [|2; 4; 6; 8; 10; 12; 14 |]
       let shortArray = [|2; 4; 6; 8; 10; 12; |]

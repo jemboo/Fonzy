@@ -195,7 +195,6 @@ module TwoCyclePerm =
                 |> Seq.toArray
         
         q |> Array.iter(chunkProc)
-
         { degree=degree; values=aRet }
 
 
@@ -486,34 +485,7 @@ module TwoCycleGen =
                }
 
 
-module ZeroOneSequence =
-    let randomPctOnes (rnd:IRando) (len:int) (pctOnes:float) =
-        Seq.init len (fun _ -> 
-                if (rnd.NextFloat > pctOnes) then 0 else 1)
-
-    let fromInteger (len:int) (intVers:int) =
-        let bitLoc (loc:int) (intBits:int) =
-            if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
-        Array.init len (fun i -> bitLoc i intVers)
-
-    let randomArrays (degree:Degree) (rnd:IRando) =
-        let maxVal = (1 <<< (Degree.value degree))
-        seq { while true do 
-                yield (rnd.NextPositiveInt % maxVal) 
-                      |> fromInteger (Degree.value degree) }
-
-    let toInt (len:int) (arrayVers:int[]) =
-        let mutable intRet = 0
-        let bump i =
-            if (arrayVers.[i] = 1) then
-                intRet <- intRet + 1
-            intRet <- intRet * 2
-
-        {1 .. len} |> Seq.iter(fun i -> bump i)
-        intRet
-
-
-type IntBits = { degree:Degree; values:int[] }
+type IntBits = { values:int[] }
 module IntBits =
 
     let sorted_O_1_Sequence (blockLen:int) (onesCount:int) =
@@ -527,15 +499,81 @@ module IntBits =
                 do yield (sorted_O_1_Sequence blockLen i) |> Seq.toArray }
             |> Seq.toArray
 
+    let randomPctOnes (rnd:IRando) (len:int) (pctOnes:float) =
+        Seq.init len (fun _ -> 
+                if (rnd.NextFloat > pctOnes) then 0 else 1)
+
+    let fromInteger (len:int) (intVers:int) =
+        let bitLoc (loc:int) (intBits:int) =
+            if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
+        { IntBits.values = 
+                    Array.init len 
+                               (fun i -> bitLoc i intVers) }
+
+    let toInteger (arrayVers:IntBits) =
+        let mutable intRet = 0
+        let bump i =
+            intRet <- intRet * 2
+            if (arrayVers.values.[i] = 1) then
+                intRet <- intRet + 1
+
+        for i in (arrayVers.values.Length - 1) .. -1 .. 0 do
+            bump i
+        intRet
+
     let allBinaryTestCasesSeq (order:int) =
         {0 .. (1 <<< order) - 1}
-        |> Seq.map (fun i -> ZeroOneSequence.fromInteger order i)
+        |> Seq.map (fun i -> fromInteger order i)
 
     let allBinaryTestCasesArray (order:int) =
-        Array.init (1 <<< order) (fun i -> ZeroOneSequence.fromInteger order i)
+        Array.init (1 <<< order) (fun i -> fromInteger order i)
 
     let random (degree:Degree) (rnd:IRando) =
-        (ZeroOneSequence.randomArrays degree rnd)
-        |> Seq.map(fun a -> {IntBits.degree=degree; values= a})
+        let maxVal = (1 <<< (Degree.value degree))
+        seq { while true do 
+                yield (rnd.NextPositiveInt % maxVal) 
+                      |> fromInteger (Degree.value degree) }
 
 
+
+type uIntBits = { values:uint[] }
+module uIntBits =
+    let zeroCreate (length:int) = 
+        { uIntBits.values = 
+                Array.create length 0u }
+    
+    let stripeWrite (uBits:uIntBits) 
+                    (intBits:IntBits) 
+                    (pos:int) = 
+        let one = (1u <<< pos)
+        let proc dex v =
+            if (intBits.values.[dex] = 1) then
+                v ||| one
+            else
+                v
+        {
+            uIntBits.values = uBits.values |> Array.mapi 
+                        (fun dex v -> proc dex v)
+        }
+
+    let stripeRead (uBits:uIntBits) 
+                   (pos:int) = 
+        let one = (1u <<< pos)
+        let proc dex v =
+            if ((uBits.values.[dex] &&& one) > 0u) then
+                1
+            else 0
+        { IntBits.values = uBits.values |> Array.mapi (proc) }
+
+
+    //let stripeRead (uBits:uIntBits) 
+    //               (pos:int) = 
+    //    let one = (1u <<< pos)
+    //    let mutable vRet = 0u
+    //    let proc dex =
+    //        if ((uBits.values.[dex] &&& one) > 0u) then
+    //            vRet <- vRet ||| one
+    //        else ()
+
+    //    uBits.values |> Array.iteri (fun dex _ -> proc dex)
+    //    vRet

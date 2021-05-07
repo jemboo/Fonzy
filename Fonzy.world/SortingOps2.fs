@@ -31,14 +31,32 @@ module SortingOps2 =
                                             (Degree.value(sortableSetRollout.degree)))))
             localSwitchOffset <- localSwitchOffset + 1
 
+    let private EvalSorterOnSbpWithNoSAG 
+                (sorter:Sorter) 
+                (mindex:int) (maxdex:int) 
+                (sortableSetRollout:SortableSetRollout) 
+                (useTrack:int[])
+                (sortableIndex:int) =
+        let mutable localSwitchOffset = mindex
+        let sortableSetRolloutOffset = sortableIndex * (Degree.value sorter.degree)
+        let switchEventRolloutOffset = sortableIndex * (SwitchCount.value sorter.switchCount)
+        while (localSwitchOffset < maxdex) do
+            let switch = sorter.switches.[localSwitchOffset]
+            let lv = sortableSetRollout.baseArray.[switch.low + sortableSetRolloutOffset]
+            let hv = sortableSetRollout.baseArray.[switch.hi + sortableSetRolloutOffset]
+            let rv = useTrack.[localSwitchOffset + switchEventRolloutOffset]
+            sortableSetRollout.baseArray.[switch.hi + sortableSetRolloutOffset] <- (lv ||| hv)
+            sortableSetRollout.baseArray.[switch.low + sortableSetRolloutOffset] <- (lv &&& hv)
+            useTrack.[localSwitchOffset + switchEventRolloutOffset] <- (((~~~hv) &&& lv) ||| rv)
+            localSwitchOffset <- localSwitchOffset + 1
 
     // creates a (sorter.switchcount * sortableCount ) length 
     // array to store each switch use, thus no SAG (Switch 
     // Action Grouping)
     let evalNoGrouping 
-                            (sorter:Sorter) 
-                            (sortableSetRollout:SortableSetRollout) 
-                            (switchusePlan:Sorting.SwitchUsePlan) =
+                (sorter:Sorter) 
+                (sortableSetRollout:SortableSetRollout) 
+                (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex = 
             match switchusePlan with

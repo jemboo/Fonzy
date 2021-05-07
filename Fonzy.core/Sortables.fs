@@ -21,7 +21,8 @@ module SortableIntArray =
     //Returns all 0-1 sequences of length degree
     let all_0_1 (degree:Degree) =
         IntBits.allBinaryTestCasesSeq (Degree.value degree)
-            |> Seq.map(create) |> Seq.toArray
+            |> Seq.map(fun ia -> create ia.values) 
+            |> Seq.toArray
 
     let createRandom (degree:Degree) (rando:IRando) = 
         Permutation.createRandom degree rando
@@ -74,9 +75,9 @@ module SortableSetExplicit =
                        sortableCount:> obj;} 
                         |> GuidUtils.guidFromObjs
         let rando = rngGen |> Rando.fromRngGen
-        let sias = ZeroOneSequence.randomArrays degree rando
+        let sias = IntBits.random degree rando
                     |> Seq.take (SortableCount.value sortableCount)
-                    |> Seq.map(fun p -> SortableIntArray.create p)
+                    |> Seq.map(fun p -> SortableIntArray.create p.values)
                     |> Seq.toArray
         {
               SortableSetExplicit.id = SortableSetId.fromGuid id;

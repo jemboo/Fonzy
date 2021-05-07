@@ -4,26 +4,6 @@ open System.Security.Cryptography
 open System
 
 
-
-//[<MemoryDiagnoser>]
-type Md5VsSha256() =
-    let N = 100000
-    let data = Array.zeroCreate N
-    let sha256 = SHA256.Create();
-    let md5 = MD5.Create()
-
-    member this.GetData =
-        data
-
-    [<Benchmark(Baseline = true)>]
-    member this.Sha256() =
-        sha256.ComputeHash(data)
-
-    [<Benchmark>]
-    member this.Md5() =
-        md5.ComputeHash(data)
-
-
 //|        Method |      Mean |    Error |   StdDev |
 //|-------------- |----------:|---------:|---------:|
 //|         NoSAG | 111.18 ms | 2.061 ms | 3.022 ms |
@@ -45,7 +25,7 @@ type Md5VsSha256() =
 //| SAGbySortable | 16.15 ms | 0.321 ms | 0.799 ms |
 
 
-type BenchmarkSorterOps() =
+type BenchmarkSorterOps2() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
     let sortableSet = SortableSetRollout.allBinary degree |> Result.ExtractOrThrow
@@ -82,11 +62,7 @@ type BenchmarkSorterOps() =
         ssR
 
 
-
-
-
-
-type BenchmarkSorterSetOps() =
+type BenchmarkSorterSetOps2() =
     let seed = 1234
     let iRando = Rando.fromRngGen (RngGen.createLcg seed)
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
@@ -112,14 +88,7 @@ type BenchmarkSorterSetOps() =
     let sortableSetEx = SortableSet.Generated 
                             (SortableSetGenerated.allIntBits degree)
                             |> SortableSet.getSortableSetExplicit
-                            |> Result.ExtractOrThrow
-
-
-//|                         Method |    Mean |    Error |   StdDev |
-//|------------------------------- |--------:|---------:|---------:|
-//| getSorterEff_Parallel_BySwitch | 1.643 s | 0.0326 s | 0.0305 s |
-
-
+                            |> Result.ExtractOrThrow 
 
                             
 //|                            Method |       Mean |    Error |   StdDev |
@@ -172,7 +141,7 @@ type BenchmarkSorterSetOps() =
 
     [<Benchmark>]
     member this.getSorterEff_Parallel_BySwitch() =
-        let ssR = SortingOps.SorterSet.eval
+        let ssR = SortingOps2.SorterSet.eval
                         mediocreSorterSet 
                         sortableSetEx 
                         Sorting.SwitchUsePlan.All

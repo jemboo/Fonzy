@@ -21,7 +21,7 @@ let main argv =
 
     /// ******* Perfbins ***********
     //Console.WriteLine("Starting Perfbins.main")
-    //let res = (Array.init 1000 (id))
+    //let res = [|6; 7; 8; 6; 7; 8; 6; 7; 8; 6; 7; 8; 6; 7; 8; 6; 7; 8; 6; 7; 8;|]                        /////////(Array.init 1000 (id))
     //          |> Array.map
     //           (fun i -> 
     //                   Console.WriteLine(i)
