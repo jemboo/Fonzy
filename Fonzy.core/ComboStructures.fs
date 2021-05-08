@@ -488,6 +488,9 @@ module TwoCycleGen =
 type IntBits = { values:int[] }
 module IntBits =
 
+    let isZero (ibs:IntBits) = 
+        ibs.values |> Array.forall((=) 0)
+
     let sorted_O_1_Sequence (blockLen:int) (onesCount:int) =
         seq {for i = 1 to blockLen - onesCount do yield 0; 
              for i = 1 to onesCount do yield 1 }
@@ -536,27 +539,26 @@ module IntBits =
 
 
 
-type uIntBits = { values:uint[] }
-module uIntBits =
+type bitsP32 = { values:uint[] }
+module bitsP32 =
     let zeroCreate (length:int) = 
-        { uIntBits.values = 
+        { bitsP32.values = 
                 Array.create length 0u }
-    
-    let stripeWrite (uBits:uIntBits) 
+
+    let stripeWrite (uBits:bitsP32) 
                     (intBits:IntBits) 
                     (pos:int) = 
         let one = (1u <<< pos)
-        let proc dex v =
+        let proc dex =
             if (intBits.values.[dex] = 1) then
-                v ||| one
-            else
-                v
-        {
-            uIntBits.values = uBits.values |> Array.mapi 
-                        (fun dex v -> proc dex v)
-        }
+                uBits.values.[dex] <- 
+                            uBits.values.[dex] ||| one
+        
+        for i=0 to (uBits.values.Length - 1) do
+            proc i
 
-    let stripeRead (uBits:uIntBits) 
+
+    let stripeRead (uBits:bitsP32) 
                    (pos:int) = 
         let one = (1u <<< pos)
         let proc dex v =
@@ -566,14 +568,35 @@ module uIntBits =
         { IntBits.values = uBits.values |> Array.mapi (proc) }
 
 
-    //let stripeRead (uBits:uIntBits) 
-    //               (pos:int) = 
-    //    let one = (1u <<< pos)
-    //    let mutable vRet = 0u
-    //    let proc dex =
-    //        if ((uBits.values.[dex] &&& one) > 0u) then
-    //            vRet <- vRet ||| one
-    //        else ()
+    let fromIntBits (ibSeq:IntBits seq) =
+        let mutable tg = 0
+        seq { 
+              use e = ibSeq.GetEnumerator()
+              let nextChunk() =
+                let res = zeroCreate e.Current.values.Length
+                stripeWrite res e.Current 0
+                let mutable i = 1
+                while i < 32 && e.MoveNext() do
+                    stripeWrite res e.Current i
+                    i <- i + 1
+                res
 
-    //    uBits.values |> Array.iteri (fun dex _ -> proc dex)
-    //    vRet
+              while e.MoveNext() do
+                yield nextChunk()  }
+
+
+    let toIntBits (bp32s:bitsP32 seq) =
+        let mutable tg = 0
+        seq { 
+              use e = bp32s.GetEnumerator()
+              let nextChunk bt32 =
+                let mutable i = 0
+                seq { 
+                   while i < 32 do
+                   let ibts =  stripeRead bt32 i
+                   if (not (IntBits.isZero ibts)) then
+                    yield ibts
+                   i <- i + 1 }
+
+              while e.MoveNext() do
+                yield! nextChunk e.Current  }

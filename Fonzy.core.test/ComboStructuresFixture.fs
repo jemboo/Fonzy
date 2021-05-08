@@ -217,18 +217,52 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
+    member this.uIntBits_fromIntBits() =
+     let degree = Degree.fromInt 16
+     let maxV = 1 <<< (Degree.value degree)
+     let sortableCount = SortableCount.fromInt 100
+     let unEncodedVals = Array.init 
+                            (SortableCount.value sortableCount) 
+                            (fun dex -> (dex * 867 + 1) % maxV)
+     let intBitsArray = 
+        unEncodedVals 
+            |> Array.map(fun av ->
+               IntBits.fromInteger (Degree.value degree)
+                                   av)
+
+     let theUints = bitsP32.zeroCreate (Degree.value degree)
+
+     let bp32s = bitsP32.fromIntBits intBitsArray
+                 |> Seq.toArray
+
+     let bitsBack = bitsP32.toIntBits bp32s
+                    |> Seq.toArray
+
+     for i = 0 to (unEncodedVals.Length - 1) do
+        bitsP32.stripeWrite theUints
+                             intBitsArray.[i]
+                             i
+     let decodedVals = 
+            bitsBack |> Array.map(IntBits.toInteger)
+     let l = decodedVals.Length
+     Assert.AreEqual (bitsBack.Length, l)
+     for i = 0 to (unEncodedVals.Length - 1) do
+         Assert.AreEqual (unEncodedVals.[i], decodedVals.[i])
+
+
+    [<TestMethod>]
     member this.uIntBits_stripeRead() =
      let degree = Degree.fromInt 16
      let encodedVal = 8675
      let pos = 11
      let intBits = IntBits.fromInteger (Degree.value degree)
                                         encodedVal
-     let blank = uIntBits.zeroCreate (Degree.value degree)
-     let recorded = uIntBits.stripeWrite blank
-                                         intBits
-                                         pos
-     let bitsBack = uIntBits.stripeRead recorded 
-                                         pos
+     let blank = bitsP32.zeroCreate (Degree.value degree)
+     bitsP32.stripeWrite blank
+                          intBits
+                          pos
+     let bitsBack = bitsP32.stripeRead blank 
+                                        pos
      let decoded = IntBits.toInteger bitsBack
 
      Assert.AreEqual (encodedVal, decoded)

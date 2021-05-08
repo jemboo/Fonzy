@@ -3,33 +3,6 @@ open System
 open SortingEval
 
 module SortingOps2 =
-    // creates a (sorter.switchcount * sortableCount ) length 
-    // array to store each switch use, thus no SAG (Switch 
-    // Action Grouping)
-    let private EvalSorterOnSortableWithNoSAG 
-                (sorter:Sorter) 
-                (mindex:int) (maxdex:int) 
-                (sortableSetRollout:SortableSetRollout) 
-                (useTrack:int[])
-                (sortableIndex:int) =
-        let mutable looP = true
-        let mutable localSwitchOffset = mindex
-        let sortableSetRolloutOffset = sortableIndex * (Degree.value sorter.degree)
-        let switchEventRolloutOffset = sortableIndex * (SwitchCount.value sorter.switchCount)
-        while ((localSwitchOffset < maxdex) && looP) do
-            let switch = sorter.switches.[localSwitchOffset]
-            let lv = sortableSetRollout.baseArray.[switch.low + sortableSetRolloutOffset]
-            let hv = sortableSetRollout.baseArray.[switch.hi + sortableSetRolloutOffset]
-            if(lv > hv) then
-                sortableSetRollout.baseArray.[switch.hi + sortableSetRolloutOffset] <- lv
-                sortableSetRollout.baseArray.[switch.low + sortableSetRolloutOffset] <- hv
-                useTrack.[localSwitchOffset + switchEventRolloutOffset] <- 1
-            looP <- ((localSwitchOffset % 20 > 0) ||
-                     (not (Combinatorics.isSortedOffset 
-                                            sortableSetRollout.baseArray 
-                                            sortableSetRolloutOffset 
-                                            (Degree.value(sortableSetRollout.degree)))))
-            localSwitchOffset <- localSwitchOffset + 1
 
     let private EvalSorterOnSbpWithNoSAG 
                 (sorter:Sorter) 
@@ -66,7 +39,7 @@ module SortingOps2 =
         let switchEventRollout = SwitchEventRollout.create sorter.switchCount sortableSetRollout.sortableCount
         let mutable sortableIndex=0
         while (sortableIndex < (SortableCount.value sortableSetRollout.sortableCount)) do
-                EvalSorterOnSortableWithNoSAG 
+                EvalSorterOnSbpWithNoSAG 
                         sorter firstSwitchDex 
                         lastSwitchDex sortableSetRolloutCopy 
                         switchEventRollout.useRoll sortableIndex
