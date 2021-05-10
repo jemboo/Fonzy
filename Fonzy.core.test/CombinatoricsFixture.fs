@@ -77,10 +77,11 @@ type CombinatoricsFixture () =
         Assert.IsTrue ((orig = prodR))
         let prodL = Combinatorics.composeMapIntArrays ((Permutation.identity degree) |> Permutation.arrayValues) orig
         Assert.IsTrue ((orig = prodL))
-    
-    
+ 
+
     [<TestMethod>]
-    member this.TestIsSorted() =
+    member this.TestIsSorted2() =
+        Assert.IsTrue (Combinatorics.isSorted Seq.empty<int>)
         Assert.IsFalse (Combinatorics.isSorted [|0; 1; 1; 0; 1; 0|])
         Assert.IsTrue (Combinatorics.isSorted [|0; 0; 0; 0; 1; 1|])
 
@@ -158,9 +159,12 @@ type CombinatoricsFixture () =
 
     [<TestMethod>]
     member this.TestSorted_0_1_Sequence() =
-        let blockLen = 10
-        let block = IntBits.sorted_O_1_Sequence blockLen 7 |> Seq.toArray
-        Assert.IsTrue (block.Length = blockLen)
+        let degree = Degree.fromInt 10
+        let block = IntBits.sorted_O_1_Sequence degree 7
+
+        let blockItems = block.values |> Array.toList
+        Assert.IsTrue(Combinatorics.isSorted blockItems)
+        Assert.IsTrue (blockItems.Length = (Degree.value degree))
 
 
     [<TestMethod>]
@@ -177,9 +181,10 @@ type CombinatoricsFixture () =
 
     [<TestMethod>]
     member this.TestSorted_0_1_Sequences() =
-        let blockLen = 10
-        let block = IntBits.sorted_0_1_Sequences blockLen
-        Assert.IsTrue (block.Length = blockLen + 1)
+        let degree = Degree.fromInt 10
+        let block = IntBits.sorted_0_1_Sequences degree
+                    |> Seq.toArray
+        Assert.IsTrue (block.Length = (Degree.value degree) + 1)
 
 
     [<TestMethod>]

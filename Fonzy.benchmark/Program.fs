@@ -12,12 +12,12 @@ let main argv =
     //Console.Read() |> ignore
    
      /// ******* Perfbins ***********
-     //Console.WriteLine("Starting Perfbins.main")
-     //let res = Array.init 10000 
-     //           (fun i -> 
-     //                   Console.WriteLine(i)
-     //                   RunW.genToSorterPerfBins i)
-     //Console.Read() |> ignore   
+    Console.WriteLine("Starting Perfbins.main")
+    let res = Array.init 10000 
+                (fun i -> 
+                        Console.WriteLine(i)
+                        RunW.genToSorterPerfBins i)
+    Console.Read() |> ignore   
 
     /// ******* Perfbins ***********
     //Console.WriteLine("Starting Perfbins.main")
@@ -30,8 +30,8 @@ let main argv =
 
 
      /// ******* PerfBinsReport ***********
-    Console.WriteLine("Starting PerfBinsReport.main")
-    let res2 =  RunW.dirPerfBinBySorterGenReport(33)
-    Console.Read() |> ignore
+    //Console.WriteLine("Starting PerfBinsReport.main")
+    //let res2 =  RunW.dirPerfBinBySorterGenReport(33)
+    //Console.Read() |> ignore
 
     0 // return an integer exit code

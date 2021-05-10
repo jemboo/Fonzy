@@ -487,22 +487,31 @@ module TwoCycleGen =
 
 type IntBits = { values:int[] }
 module IntBits =
+    let copy (intBits:IntBits) = 
+        {IntBits.values = Array.copy (intBits.values) }
 
     let isZero (ibs:IntBits) = 
         ibs.values |> Array.forall((=) 0)
 
-    let sorted_O_1_Sequence (blockLen:int) (onesCount:int) =
-        seq {for i = 1 to blockLen - onesCount do yield 0; 
-             for i = 1 to onesCount do yield 1 }
+    let isSorted (intBits:IntBits) =
+        Combinatorics.isSorted intBits.values
 
-    //Returns a bloclLen + 1 length array 
-    // of all possible sorted 0-1 sequences of length blockLen
-    let sorted_0_1_Sequences (blockLen:int) =
-        seq {for i = 0 to blockLen 
-                do yield (sorted_O_1_Sequence blockLen i) |> Seq.toArray }
-            |> Seq.toArray
+    let sorted_O_1_Sequence (degree:Degree) 
+                            (onesCount:int) =
+        let totalSize = (Degree.value degree)
+        let numZeroes = totalSize - onesCount
+        { IntBits.values = Array.init totalSize 
+                    (fun i -> if i< numZeroes then 0 else 1)}
 
-    let randomPctOnes (rnd:IRando) (len:int) (pctOnes:float) =
+    //Returns a bloclLen + 1 length array of IntBits
+    // of all possible sorted 0-1 sequences of length degree
+    let sorted_0_1_Sequences (degree:Degree)  =
+        seq { for i = 0 to (Degree.value degree) do 
+                yield (sorted_O_1_Sequence degree i) }
+
+    let randomPctOnes (rnd:IRando) 
+                      (len:int) 
+                      (pctOnes:float) =
         Seq.init len (fun _ -> 
                 if (rnd.NextFloat > pctOnes) then 0 else 1)
 
@@ -524,19 +533,21 @@ module IntBits =
             bump i
         intRet
 
-    let allBinaryTestCasesSeq (order:int) =
-        {0 .. (1 <<< order) - 1}
-        |> Seq.map (fun i -> fromInteger order i)
+    let allBinaryTestCases (degree:Degree) =
+        let dv = Degree.value degree 
+        {0 .. (1 <<< dv) - 1}
+        |> Seq.map (fun i -> fromInteger dv i)
 
     let allBinaryTestCasesArray (order:int) =
         Array.init (1 <<< order) (fun i -> fromInteger order i)
 
-    let random (degree:Degree) (rnd:IRando) =
-        let maxVal = (1 <<< (Degree.value degree))
-        seq { while true do 
-                yield (rnd.NextPositiveInt % maxVal) 
-                      |> fromInteger (Degree.value degree) }
+    let createRandom (degree:Degree) (rando:IRando) = 
+        let perm = Permutation.createRandom degree rando
+        {IntBits.values = perm.values }
 
+    let createRandoms (degree:Degree) (rnd:IRando) =
+        seq { while true do 
+                yield createRandom degree rnd }
 
 
 type bitsP32 = { values:uint[] }
@@ -569,7 +580,6 @@ module bitsP32 =
 
 
     let fromIntBits (ibSeq:IntBits seq) =
-        let mutable tg = 0
         seq { 
               use e = ibSeq.GetEnumerator()
               let nextChunk() =
@@ -586,7 +596,6 @@ module bitsP32 =
 
 
     let toIntBits (bp32s:bitsP32 seq) =
-        let mutable tg = 0
         seq { 
               use e = bp32s.GetEnumerator()
               let nextChunk bt32 =

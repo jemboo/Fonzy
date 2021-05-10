@@ -35,7 +35,7 @@ module TestData =
                                 degree iRando permSwitchDensity
 
         let randomSortableIntArray = 
-            SortableIntArray.createRandom degree iRando
+            IntBits.createRandom degree iRando
 
         let switchUseArray = Array.init (SwitchCount.value switchCount) 
                                         (fun _ -> iRando.NextPositiveInt)
@@ -88,10 +88,12 @@ module TestData =
         let rolloutOfAllBinary = SortableSetRollout.allBinary degree
                                      |> Result.ExtractOrThrow
         let rolloutOfAllSortedBinary = 
+                let ia = IntBits.sorted_0_1_Sequences degree
+                            |> Seq.map(fun ia -> {IntBits.values = ia.values })
                 SortableSetRollout.fromSortableIntArrays 
-                           degree 
-                           (SortableIntArray.allSorted_0_1 degree)
-                 |> Result.ExtractOrThrow
+                            degree
+                            ia
+                    |> Result.ExtractOrThrow
 
 
 

@@ -254,13 +254,13 @@ module SortingOps =
     module History =
 
         let switchOnSortableIntArray (switch:Switch) 
-                                     (sortableIntArray:SortableIntArray) =
-            let intArray = SortableIntArray.value sortableIntArray
+                                     (sortableIntArray:IntBits) =
+            let intArray = sortableIntArray.values
             let lv = intArray.[switch.low]
             let hv = intArray.[switch.hi]
             if(lv > hv) then
-                let sCopy = sortableIntArray |> SortableIntArray.copy
-                let copyInts = SortableIntArray.value sCopy
+                let sCopy = sortableIntArray |> IntBits.copy
+                let copyInts = sCopy.values
                 copyInts.[switch.hi] <- lv
                 copyInts.[switch.low] <- hv
                 sCopy
@@ -268,7 +268,7 @@ module SortingOps =
 
 
         let rec sortableHistory (swtiches:Switch list)
-                                (sortHistory:SortableIntArray list) =
+                                (sortHistory:IntBits list) =
             match swtiches with
             | [] -> sortHistory
             | swHead::swTail -> [(switchOnSortableIntArray swHead (sortHistory|> List.last))] 
@@ -276,33 +276,33 @@ module SortingOps =
 
 
         let switchesOnSortableIntArray (swtiches:Switch list)
-                                       (sortableIntArray:SortableIntArray) =
+                                       (sortableIntArray:IntBits) =
             let recList = (swtiches  |> List.rev)
             (sortableHistory swtiches  [sortableIntArray])
 
 
         let sortTHistSection2 (sorter:Sorter) (mindex:int) (maxdex:int)
-                            (testCase:SortableIntArray) =
+                            (testCase:IntBits) =
             let sws = sorter.switches |> Array.skip(mindex)
                                         |> Array.take(maxdex - mindex)
                                         |> Array.toList
             switchesOnSortableIntArray sws testCase
 
 
-        let sortTHist2 (sorter:Sorter) (testCase:SortableIntArray) =
+        let sortTHist2 (sorter:Sorter) (testCase:IntBits) =
             let sl = SwitchCount.value sorter.switchCount
             sortTHistSection2 sorter 0 (sl - 1) testCase
 
 
         let sortTHistSwitches(switches:Switch list)
-                            (testCase:SortableIntArray) =
+                             (testCase:IntBits) =
             let mutable i = 0
             let mutable lstRet = [testCase]
             let mutable newCase = testCase
 
             while (i < switches.Length) do
-                newCase <- newCase |> SortableIntArray.copy
-                let intArray = SortableIntArray.value newCase
+                newCase <- newCase |> IntBits.copy
+                let intArray = newCase.values
                 let switch = switches.[i]
                 let lv = intArray.[switch.low]
                 let hv = intArray.[switch.hi]
@@ -314,15 +314,17 @@ module SortingOps =
             lstRet |> List.rev
 
 
-        let sortTHistSwitchList (sorter:Sorter) (mindex:int) (maxdex:int) 
-                                (testCase:SortableIntArray) =
+        let sortTHistSwitchList (sorter:Sorter) 
+                                (mindex:int) 
+                                (maxdex:int) 
+                                (testCase:IntBits) =
             let sws = sorter.switches |> Array.skip(mindex)
                                         |> Array.take(maxdex - mindex)
                                         |> Array.toList
             sortTHistSwitches sws testCase
 
 
-        let sortTHist (sorter:Sorter) (testCase:SortableIntArray) =
+        let sortTHist (sorter:Sorter) (testCase:IntBits) =
             let sl = SwitchCount.value sorter.switchCount
             sortTHistSwitchList sorter 0 (sl - 1) testCase
 

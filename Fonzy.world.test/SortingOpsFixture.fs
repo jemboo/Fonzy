@@ -103,12 +103,12 @@ type SortingOpsFixture () =
         let hist = SortingOps.History.sortTHist goodSorter testCase
         Assert.IsTrue(hist.Length > 1)
         let result = hist.Item (hist.Length - 1)
-        Assert.IsTrue(result |> SortableIntArray.isSorted)
+        Assert.IsTrue(result |> IntBits.isSorted)
 
         let hist2 = SortingOps.History.sortTHist goodSorter testCase
         Assert.IsTrue(hist2.Length > 1)
         let result2 = hist2.Item (hist2.Length - 1)
-        Assert.IsTrue(result2 |> SortableIntArray.isSorted)
+        Assert.IsTrue(result2 |> IntBits.isSorted)
 
         Assert.AreEqual(result, result2)
 
@@ -204,7 +204,7 @@ type SortingOpsFixture () =
         let stageCount = sorterLength |> SwitchOrStageCount.getStageCount
                                       |> Result.ExtractOrThrow
 
-        let sorterCount = SorterCount.fromInt 100
+        let sorterCount = SorterCount.fromInt 10
 
         let makeCoConjSorter() = 
             //let perms = //seq {Permutation.identity degree; 
@@ -265,7 +265,6 @@ type SortingOpsFixture () =
 
     [<TestMethod>]
     member this.checkSorterMs() =
-        let sortableSetId = SortableSetId.fromGuid (Guid.NewGuid())
         let rolloutOfAllBin16 = SortableSetRollout.allBinary
                                         (Degree.fromInt 16) 
                                  |> Result.ExtractOrThrow
@@ -344,7 +343,7 @@ type SortingOpsFixture () =
         let stageCount = sorterLength |> SwitchOrStageCount.getStageCount
                                       |> Result.ExtractOrThrow
    
-        let sorterCount = SorterCount.fromInt 100
+        let sorterCount = SorterCount.fromInt 10
 
         let makeSorter() = 
             let perms2 = List.init 

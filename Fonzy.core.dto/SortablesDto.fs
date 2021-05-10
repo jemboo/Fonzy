@@ -13,7 +13,7 @@ module SortableSetExplicitDto =
                            (Degree.value sortableSetExplicit.degree)
             SortableSetExplicitDto.sortableIntArrays = 
                             sortableSetExplicit.sortableIntArrays
-                            |> Array.map(SortableIntArray.value)
+                            |> Array.map(fun avs -> avs.values)
         }
 
     let toJson (sortableSetExplicit:SortableSetExplicit) =
@@ -23,7 +23,8 @@ module SortableSetExplicitDto =
         result {
             let! id = SortableSetId.create dto.id
             let! degree = Degree.create "" dto.degree
-            let sias = dto.sortableIntArrays |> Array.map(SortableIntArray.create)
+            let sias = dto.sortableIntArrays 
+                       |> Array.map(fun avs -> {IntBits.values = avs})
             return  {
                         SortableSetExplicit.id = id
                         SortableSetExplicit.degree = degree

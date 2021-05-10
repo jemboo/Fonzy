@@ -170,17 +170,18 @@ module SortableSetRollout =
             } |> Ok
 
     let fromSortableIntArrays (degree:Degree) 
-                              (baseArrays:SortableIntArray[]) =
+                              (baseArrays:IntBits seq) =
         result {
-            let a = baseArrays |> Array.map(SortableIntArray.value)
-                               |> Array.collect(id)
+            let a = baseArrays |> Seq.map(fun a -> a.values)
+                               |> Seq.collect(id)
+                               |> Seq.toArray
             return! create degree a 
         }
 
     let toSortableIntArrays (ssRollout:SortableSetRollout) =
         let d = (Degree.value ssRollout.degree)
         ssRollout.baseArray |> Array.chunkBySize d
-                           |> Array.map(SortableIntArray.create)
+                            |> Array.map(fun a -> {IntBits.values = a})
 
     let copy (sortableSetRollout:SortableSetRollout) =
         let baseCopy = Array.zeroCreate sortableSetRollout.baseArray.Length

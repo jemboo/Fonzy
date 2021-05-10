@@ -7,12 +7,14 @@ module Combinatorics =
         [|0 .. degree-1|] 
 
     // Splits the sourceArray into segments using segBounds
-    let breakArrayIntoSegments (sourceArray : array<'a>) (segBounds : array<int>) =
+    let breakArrayIntoSegments (sourceArray : array<'a>) 
+                               (segBounds : array<int>) =
         seq {1 .. (segBounds.Length - 1) }
         |> Seq.map(fun i -> sourceArray.[segBounds.[i - 1] .. (segBounds.[i] - 1)])
         |> Seq.toArray
 
-    let composeMapIntArrays (a:array<int>) (b:array<int>) =
+    let composeMapIntArrays (a:array<int>) 
+                            (b:array<int>) =
         let product = Array.init a.Length (fun i -> 0)
         for i = 0 to a.Length - 1 do
            /// product.[a.[b.[i]]] <- i
@@ -26,16 +28,24 @@ module Combinatorics =
       aInv
 
     // conj * a * conj ^ -1
-    let conjugateIntArrays (a:array<int>) (conj:array<int>) =
+    let conjugateIntArrays (a:array<int>) 
+                           (conj:array<int>) =
         composeMapIntArrays conj (composeMapIntArrays a (inverseMapArray conj) )
 
-    let isSorted (values:int[]) =
-        let mutable i=1
-        let mutable looP = true
-        while ((i < values.Length) && looP) do
-             looP <- (values.[i-1] <= values.[i])
-             i<-i+1
-        looP
+    let isSorted (values:int seq) =
+        if values |> Seq.isEmpty then
+            true
+        else
+            let yak = values.GetEnumerator()
+            yak.MoveNext() |> ignore
+            let mutable lastVal = yak.Current
+            let mutable cont = true
+            while (yak.MoveNext() && cont) do
+                if (yak.Current < lastVal) then
+                    cont <- false
+                else
+                    lastVal <- yak.Current
+            cont
 
     let spanIsSorted (values:Span<int>) =
         let mutable i=1
@@ -244,6 +254,6 @@ module Combinatorics =
                                         (arraysize:int) 
                                         (count:int) =
         seq {1 .. count} |> Seq.map (fun i -> 
-                        makeRandomFullTwoCycleIntArray rnd arraysize)
+            makeRandomFullTwoCycleIntArray rnd arraysize)
 
 
