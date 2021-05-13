@@ -533,12 +533,13 @@ module IntBits =
             bump i
         intRet
 
-    let allBinaryTestCases (degree:Degree) =
+    let allBinary (degree:Degree) =
         let dv = Degree.value degree 
         {0 .. (1 <<< dv) - 1}
         |> Seq.map (fun i -> fromInteger dv i)
 
-    let allBinaryTestCasesArray (order:int) =
+    let allBinaryArray (degree:Degree) =
+        let order = (Degree.value degree)
         Array.init (1 <<< order) (fun i -> fromInteger order i)
 
     let createRandom (degree:Degree) (rando:IRando) = 
@@ -552,9 +553,16 @@ module IntBits =
 
 type bitsP32 = { values:uint[] }
 module bitsP32 =
+
     let zeroCreate (length:int) = 
         { bitsP32.values = 
                 Array.create length 0u }
+
+    let copy (pBits:bitsP32) = 
+        {bitsP32.values = Array.copy (pBits.values) }
+
+    let isZero (ibs:bitsP32) = 
+        ibs.values |> Array.forall((=) 0u)
 
     let stripeWrite (uBits:bitsP32) 
                     (intBits:IntBits) 
@@ -577,6 +585,11 @@ module bitsP32 =
                 1
             else 0
         { IntBits.values = uBits.values |> Array.mapi (proc) }
+
+
+    let isSorted (uBits:bitsP32) =
+        seq { 0 .. 31} |> Seq.map (fun pos -> stripeRead uBits pos)
+           |> Seq.forall(IntBits.isSorted)
 
 
     let fromIntBits (ibSeq:IntBits seq) =
@@ -609,3 +622,9 @@ module bitsP32 =
 
               while e.MoveNext() do
                 yield! nextChunk e.Current  }
+
+    let allBinary (degree:Degree) =
+        fromIntBits (IntBits.allBinary degree)
+
+    let createRandoms (degree:Degree) (rnd:IRando) =
+        (IntBits.createRandoms degree rnd) |> fromIntBits

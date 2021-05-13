@@ -34,8 +34,12 @@ module TestData =
                 TwoCyclePerm.makeRandomTwoCycle 
                                 degree iRando permSwitchDensity
 
-        let randomSortableIntArray = 
+        let randomIntBits = 
             IntBits.createRandom degree iRando
+
+        let randomBitsP32 = 
+            bitsP32.createRandoms degree iRando 
+                    |> Seq.head
 
         let switchUseArray = Array.init (SwitchCount.value switchCount) 
                                         (fun _ -> iRando.NextPositiveInt)

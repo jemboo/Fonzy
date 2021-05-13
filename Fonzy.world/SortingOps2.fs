@@ -244,76 +244,37 @@ module SortingOps2 =
 
     module History =
 
-        let switchOnSortableIntArray (switch:Switch) 
-                                     (sortableIntArray:IntBits) =
-            let intArray = sortableIntArray.values
-            let lv = intArray.[switch.low]
-            let hv = intArray.[switch.hi]
-            if(lv > hv) then
-                let sCopy = sortableIntArray |> IntBits.copy
-                let copyInts = sCopy.values
-                copyInts.[switch.hi] <- lv
-                copyInts.[switch.low] <- hv
-                sCopy
-            else sortableIntArray
-
-
-        let rec sortableHistory (swtiches:Switch list)
-                                (sortHistory:IntBits list) =
-            match swtiches with
-            | [] -> sortHistory
-            | swHead::swTail -> [(switchOnSortableIntArray swHead (sortHistory|> List.last))] 
-                                |> List.append (sortableHistory swTail sortHistory)
-
-
-        let switchesOnSortableIntArray (swtiches:Switch list)
-                                       (sortableIntArray:IntBits) =
-            let recList = (swtiches  |> List.rev)
-            (sortableHistory swtiches  [sortableIntArray])
-
-
-        let sortTHistSection2 (sorter:Sorter) (mindex:int) (maxdex:int)
-                            (testCase:IntBits) =
-            let sws = sorter.switches |> Array.skip(mindex)
-                                      |> Array.take(maxdex - mindex)
-                                      |> Array.toList
-            switchesOnSortableIntArray sws testCase
-
-
-        let sortTHist2 (sorter:Sorter) (testCase:IntBits) =
-            let sl = SwitchCount.value sorter.switchCount
-            sortTHistSection2 sorter 0 (sl - 1) testCase
-
-
         let sortTHistSwitches(switches:Switch list)
-                            (testCase:IntBits) =
+                              (pBits:bitsP32) =
             let mutable i = 0
-            let mutable lstRet = [testCase]
-            let mutable newCase = testCase
+            let mutable lstRet = [pBits]
+            let mutable newCase = pBits
 
             while (i < switches.Length) do
-                newCase <- newCase |> IntBits.copy
-                let intArray = newCase.values
+                newCase <- newCase |> bitsP32.copy
+                let uintArray = newCase.values
                 let switch = switches.[i]
-                let lv = intArray.[switch.low]
-                let hv = intArray.[switch.hi]
-                if(lv > hv) then
-                    intArray.[switch.hi] <- lv
-                    intArray.[switch.low] <- hv
+                let lv = uintArray.[switch.low]
+                let hv = uintArray.[switch.hi]
+                uintArray.[switch.hi] <- (lv ||| hv)
+                uintArray.[switch.low] <- (lv &&& hv)
                 lstRet <- newCase::lstRet
                 i <- i+1
             lstRet |> List.rev
 
 
-        let sortTHistSwitchList (sorter:Sorter) (mindex:int) (maxdex:int) 
-                                (testCase:IntBits) =
+        let sortTHistSwitchList (sorter:Sorter) 
+                                 (mindex:int) 
+                                 (maxdex:int) 
+                                 (pBits:bitsP32) =
             let sws = sorter.switches |> Array.skip(mindex)
-                                        |> Array.take(maxdex - mindex)
-                                        |> Array.toList
-            sortTHistSwitches sws testCase
+                                      |> Array.take(maxdex - mindex)
+                                      |> Array.toList
+            sortTHistSwitches sws pBits
 
 
-        let sortTHist (sorter:Sorter) (testCase:IntBits) =
+        let sortTHist2 (sorter:Sorter) 
+                       (pBits:bitsP32) =
             let sl = SwitchCount.value sorter.switchCount
-            sortTHistSwitchList sorter 0 (sl - 1) testCase
+            sortTHistSwitchList sorter 0 (sl - 1) pBits
 

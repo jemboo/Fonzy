@@ -96,22 +96,23 @@ type SortingOpsFixture () =
 
 
     [<TestMethod>]
-    member this.HistAndHist2() =
-        let testCase = TestData.SorterParts.randomSortableIntArray
+    member this.Hist() =
+        let testCase = TestData.SorterParts.randomIntBits
         let goodSorter = TestData.SorterParts.goodRefSorter
-
         let hist = SortingOps.History.sortTHist goodSorter testCase
         Assert.IsTrue(hist.Length > 1)
         let result = hist.Item (hist.Length - 1)
         Assert.IsTrue(result |> IntBits.isSorted)
 
-        let hist2 = SortingOps.History.sortTHist goodSorter testCase
-        Assert.IsTrue(hist2.Length > 1)
-        let result2 = hist2.Item (hist2.Length - 1)
-        Assert.IsTrue(result2 |> IntBits.isSorted)
 
-        Assert.AreEqual(result, result2)
-
+    [<TestMethod>]
+    member this.Hist2() =
+        let testCase = TestData.SorterParts.randomBitsP32
+        let goodSorter = TestData.SorterParts.goodRefSorter
+        let hist = SortingOps2.History.sortTHist2 goodSorter testCase
+        Assert.IsTrue(hist.Length > 1)
+        let result = hist.Item (hist.Length - 1)
+        Assert.IsTrue(result |> bitsP32.isSorted)
 
 
     [<TestMethod>]
