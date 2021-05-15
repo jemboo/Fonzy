@@ -77,7 +77,7 @@ module CauseSorters =
                                         e 
                                         sorterSetName
                 let! sorterSet = sorterSetDto |> SorterSetDto.fromDto
-                let! sortableSetEx = sortableSet |> SortableSet.getSortableSetExplicit
+                let! sortableSetEx = sortableSet |> SortableSetSpec.getSortableSetExplicit
                 let! perfBins = SortingOps.SorterSet.getSorterPerfBins
                                   sorterSet
                                   sortableSetEx
@@ -133,7 +133,7 @@ module CauseSorters =
                                             (sorterGen |> SorterGen.getDegree)
                                             sorterArray
 
-                let! sortableSetEx = sortableSet |> SortableSet.getSortableSetExplicit
+                let! sortableSetEx = sortableSet |> SortableSetSpec.getSortableSetExplicit
                 let! perfBins = SortingOps.SorterSet.getSorterPerfBins
                                   sorterSet
                                   sortableSetEx

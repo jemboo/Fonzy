@@ -5,18 +5,18 @@ type SortableSetExplicitDto = {id:Guid; degree:int; sortableIntArrays:int[][]}
 
 module SortableSetExplicitDto =
     
-    let toDto (sortableSetExplicit:SortableSetExplicit) =
+    let toDto (sortableSetExplicit:SortableSetBinary) =
         {
             SortableSetExplicitDto.id = 
                            (SortableSetId.value sortableSetExplicit.id)
             SortableSetExplicitDto.degree = 
                            (Degree.value sortableSetExplicit.degree)
             SortableSetExplicitDto.sortableIntArrays = 
-                            sortableSetExplicit.sortableIntArrays
+                            sortableSetExplicit.sortables
                             |> Array.map(fun avs -> avs.values)
         }
 
-    let toJson (sortableSetExplicit:SortableSetExplicit) =
+    let toJson (sortableSetExplicit:SortableSetBinary) =
         sortableSetExplicit |> toDto |> Json.serialize
 
     let fromDto (dto:SortableSetExplicitDto) =
@@ -26,9 +26,9 @@ module SortableSetExplicitDto =
             let sias = dto.sortableIntArrays 
                        |> Array.map(fun avs -> {IntBits.values = avs})
             return  {
-                        SortableSetExplicit.id = id
-                        SortableSetExplicit.degree = degree
-                        SortableSetExplicit.sortableIntArrays =sias
+                        SortableSetBinary.id = id
+                        SortableSetBinary.degree = degree
+                        SortableSetBinary.sortables =sias
                     }
         }
 
@@ -74,16 +74,16 @@ type SortableSetDto = {cat:string; value:string;}
 
 module SortableSetDto =
     
-    let toDto (sortableSet:SortableSet) =
+    let toDto (sortableSet:SortableSetSpec) =
         match sortableSet with
-        | SortableSet.Explicit e -> 
+        | SortableSetSpec.Explicit e -> 
                     {cat="Explicit"; 
                      value = e |> SortableSetExplicitDto.toJson }
-        | SortableSet.Generated g -> 
+        | SortableSetSpec.Generated g -> 
                     {cat="Generated"; 
                      value = g |> SortableSetGeneratedDto.toJson }
 
-    let toJson (sorterLength:SortableSet) =
+    let toJson (sorterLength:SortableSetSpec) =
         sorterLength |> toDto |> Json.serialize
 
     let fromDto (dto:SortableSetDto) =
@@ -91,13 +91,13 @@ module SortableSetDto =
             | "Explicit" -> 
                     result {
                             let! exp = dto.value |> SortableSetExplicitDto.fromJson
-                            return SortableSet.Explicit exp
+                            return SortableSetSpec.Explicit exp
                            }
 
             | "Generated" -> 
                     result {
                             let! gen = dto.value |> SortableSetGeneratedDto.fromJson
-                            return SortableSet.Generated gen
+                            return SortableSetSpec.Generated gen
                            }
             | _ -> Error (sprintf "no match for SortableSetDto.cat: %s" dto.cat)
 

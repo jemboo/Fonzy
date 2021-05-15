@@ -80,9 +80,9 @@ type SortingOpsFixture () =
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
         let sorter16 = RefSorter.goodRefSorterForDegree degree 
                         |> Result.ExtractOrThrow
-        let sortableSetEx = SortableSet.Generated 
+        let sortableSetEx = SortableSetSpec.Generated 
                                 (SortableSetGenerated.allIntBits degree)
-                            |> SortableSet.getSortableSetExplicit
+                            |> SortableSetSpec.getSortableSetExplicit
                             |> Result.ExtractOrThrow 
 
         let ssR = SortingOps.evalSorter 
@@ -128,9 +128,9 @@ type SortingOpsFixture () =
         let sorter16 = RefSorter.goodRefSorterForDegree degree 
                         |> Result.ExtractOrThrow
 
-        let sortableSetEx = SortableSet.Generated 
+        let sortableSetEx = SortableSetSpec.Generated 
                                 (SortableSetGenerated.allIntBits degree)
-                            |> SortableSet.getSortableSetExplicit
+                            |> SortableSetSpec.getSortableSetExplicit
                             |> Result.ExtractOrThrow 
 
         let ssR = SortingOps.evalSorter 
@@ -144,14 +144,12 @@ type SortingOpsFixture () =
         Assert.IsTrue(true)
 
 
-
-
     [<TestMethod>]
     member this.SorterSet_eval() =
         let sorterSet = TestData.SorterSet.mediocreSorterSet
-        let sortableSetEx = SortableSet.Generated 
+        let sortableSetEx = SortableSetSpec.Generated 
                                 (SortableSetGenerated.allIntBits sorterSet.degree)
-                                |> SortableSet.getSortableSetExplicit
+                                |> SortableSetSpec.getSortableSetExplicit
                                 |> Result.ExtractOrThrow 
         let ssR = SortingOps.SorterSet.eval
                         sorterSet 
@@ -205,9 +203,9 @@ type SortingOpsFixture () =
             List.init (SorterCount.value sorterCount)
                       (fun _ -> makeRandomSorter())
 
-        let sortableSetEx = SortableSet.Generated 
+        let sortableSetEx = SortableSetSpec.Generated 
                                 (SortableSetGenerated.allIntBits degree)
-                                |> SortableSet.getSortableSetExplicit
+                                |> SortableSetSpec.getSortableSetExplicit
                                 |> Result.ExtractOrThrow
 
         let perfBins = SortingOps.SorterSet.getSorterPerfBins
@@ -273,9 +271,9 @@ type SortingOpsFixture () =
                             sorterArray
 
 
-        let sortableSetEx = SortableSet.Generated 
+        let sortableSetEx = SortableSetSpec.Generated 
                                 (SortableSetGenerated.allIntBits degree)
-                                |> SortableSet.getSortableSetExplicit
+                                |> SortableSetSpec.getSortableSetExplicit
                                 |> Result.ExtractOrThrow 
 
 
@@ -297,7 +295,7 @@ type SortingOpsFixture () =
 
     [<TestMethod>]
     member this.checkSorterMs() =
-        let rolloutOfAllBin16 = SortableSetRollout.allBinary
+        let rolloutOfAllBin16 = IntSetsRollout.allBinary
                                         (Degree.fromInt 16) 
                                  |> Result.ExtractOrThrow
 
@@ -395,9 +393,9 @@ type SortingOpsFixture () =
                             degree 
                             sorterArray
 
-        let sortableSetEx = SortableSet.Generated 
+        let sortableSetEx = SortableSetSpec.Generated 
                                 (SortableSetGenerated.allIntBits degree)
-                                |> SortableSet.getSortableSetExplicit
+                                |> SortableSetSpec.getSortableSetExplicit
                                 |> Result.ExtractOrThrow 
 
         let perfBins = SortingOps.SorterSet.getSorterPerfBins

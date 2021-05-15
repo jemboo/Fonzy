@@ -9,7 +9,7 @@ module SortingOps =
     let private EvalSorterOnSortableWithNoSAG 
                 (sorter:Sorter) 
                 (mindex:int) (maxdex:int) 
-                (sortableSetRollout:SortableSetRollout) 
+                (sortableSetRollout:IntSetsRollout) 
                 (useTrack:int[])
                 (sortableIndex:int) =
         let mutable looP = true
@@ -37,14 +37,14 @@ module SortingOps =
     // Action Grouping)
     let evalNoGrouping 
                             (sorter:Sorter) 
-                            (sortableSetRollout:SortableSetRollout) 
+                            (sortableSetRollout:IntSetsRollout) 
                             (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex = 
             match switchusePlan with
             | Sorting.SwitchUsePlan.All -> (0, switchCount)
             | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
-        let sortableSetRolloutCopy = (SortableSetRollout.copy sortableSetRollout)
+        let sortableSetRolloutCopy = (IntSetsRollout.copy sortableSetRollout)
         let switchEventRollout = SwitchEventRollout.create sorter.switchCount sortableSetRollout.sortableCount
         let mutable sortableIndex=0
         while (sortableIndex < (SortableCount.value sortableSetRollout.sortableCount)) do
@@ -65,7 +65,7 @@ module SortingOps =
                     (sorter:Sorter) 
                     (mindex:int) (maxdex:int) 
                     (switchUses:SwitchUses) 
-                    (sortableSetRollout:SortableSetRollout) 
+                    (sortableSetRollout:IntSetsRollout) 
                     (sortableIndex:int) =
         let useWeights = (SwitchUses.getWeights switchUses)
         let sortableSetRolloutOffset = sortableIndex * (Degree.value sorter.degree)
@@ -90,7 +90,7 @@ module SortingOps =
     // switch uses
     let evalGroupBySwitch 
                     (sorter:Sorter) 
-                    (ssRollout:SortableSetRollout) 
+                    (ssRollout:IntSetsRollout) 
                     (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex = 
@@ -98,7 +98,7 @@ module SortingOps =
             | Sorting.SwitchUsePlan.All -> (0, switchCount)
             | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
         let switchUses = SwitchUses.createEmpty sorter.switchCount
-        let sortableSetRolloutCopy = (SortableSetRollout.copy ssRollout)
+        let sortableSetRolloutCopy = (IntSetsRollout.copy ssRollout)
         let mutable sortableIndex=0
         while (sortableIndex < (SortableCount.value ssRollout.sortableCount)) do
                 EvalSorterOnSortableSAGbySwitch 
@@ -116,7 +116,7 @@ module SortingOps =
                 (sorter:Sorter) 
                 (mindex:int) (maxdex:int) 
                 (sortableUses:SortableUses) 
-                (sortableSetRollout:SortableSetRollout) 
+                (sortableSetRollout:IntSetsRollout) 
                 (sortableIndex:int) =
         let useWeights = SortableUses.getWeights sortableUses
         let sortableSetRolloutOffset = sortableIndex * (Degree.value sorter.degree)
@@ -142,7 +142,7 @@ module SortingOps =
     //// switch uses
     let evalGroupBySortable 
                     (sorter:Sorter) 
-                    (sortableSetRollout:SortableSetRollout) 
+                    (sortableSetRollout:IntSetsRollout) 
                     (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex = 
@@ -151,7 +151,7 @@ module SortingOps =
             | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
         let sortableUses = SortableUses.createEmpty sortableSetRollout.sortableCount
 
-        let sortableSetRolloutCopy = (SortableSetRollout.copy sortableSetRollout)
+        let sortableSetRolloutCopy = (IntSetsRollout.copy sortableSetRollout)
         let mutable sortableIndex = 0
         while (sortableIndex < (SortableCount.value sortableSetRollout.sortableCount)) do
                 evalSwitchesGroupBySortable 
@@ -165,7 +165,7 @@ module SortingOps =
 
     let evalSorterOnSortableSetRollout 
                     (sorter:Sorter)
-                    (sortableSetRollout:SortableSetRollout)
+                    (sortableSetRollout:IntSetsRollout)
                     (switchusePlan:Sorting.SwitchUsePlan) 
                     (switchEventAgg:Sorting.EventGrouping) =
         match switchEventAgg with
@@ -181,12 +181,12 @@ module SortingOps =
 
 
     let evalSorter (sorter:Sorter)
-                   (sortableSet:SortableSetExplicit)
+                   (sortableSet:SortableSetBinary)
                    (switchusePlan:Sorting.SwitchUsePlan) 
                    (switchEventAgg:Sorting.EventGrouping) =
         let sortableSetRollout = 
-            sortableSet.sortableIntArrays
-                |> SortableSetRollout.fromSortableIntArrays
+            sortableSet.sortables
+                |> IntSetsRollout.fromSortableIntArrays
                         sorter.degree
                 |> Result.ExtractOrThrow
         evalSorterOnSortableSetRollout
@@ -196,7 +196,7 @@ module SortingOps =
     module SorterSet =
         let eval<'T> 
                  (sorterSet:SorterSet)
-                 (sortableSet:SortableSetExplicit)
+                 (sortableSet:SortableSetBinary)
                  (switchusePlan:Sorting.SwitchUsePlan) 
                  (switchEventAgg:Sorting.EventGrouping) 
                  (_parallel:UseParallel) 
@@ -215,8 +215,8 @@ module SortingOps =
                 proc resSoSS
 
             result  {
-                let! ssRoll = sortableSet.sortableIntArrays 
-                              |> SortableSetRollout.fromSortableIntArrays
+                let! ssRoll = sortableSet.sortables 
+                              |> IntSetsRollout.fromSortableIntArrays
                                     sorterSet.degree
                 return!
                     match UseParallel.value(_parallel) with
@@ -231,7 +231,7 @@ module SortingOps =
 
         let getSorterPerfBins 
             (sorterSet:SorterSet)
-            (sortableSet:SortableSetExplicit)
+            (sortableSet:SortableSetBinary)
             (switchusePlan:Sorting.SwitchUsePlan)
             (_parallel:UseParallel) =
             result {

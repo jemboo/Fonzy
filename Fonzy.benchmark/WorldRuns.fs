@@ -11,7 +11,7 @@ module RunW =
     let degree = Degree.fromInt 16
 
     let ssAllIntBits = SortableSetGenerated.allIntBits degree
-                        |> SortableSet.Generated
+                        |> SortableSetSpec.Generated
 
     let rnGen = RngGen.createLcg seed
     let randy = Rando.fromRngGen rnGen

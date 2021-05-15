@@ -28,7 +28,6 @@ module MutationRate =
         }
 
 // Common
-
 type EntityId = private EntityId of Guid
 type JsonString = private JsonString of string
 type ReportingFrequency = private ReportingFrequency of int

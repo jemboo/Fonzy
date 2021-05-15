@@ -509,11 +509,13 @@ module IntBits =
         seq { for i = 0 to (Degree.value degree) do 
                 yield (sorted_O_1_Sequence degree i) }
 
+
     let randomPctOnes (rnd:IRando) 
                       (len:int) 
                       (pctOnes:float) =
         Seq.init len (fun _ -> 
                 if (rnd.NextFloat > pctOnes) then 0 else 1)
+
 
     let fromInteger (len:int) (intVers:int) =
         let bitLoc (loc:int) (intBits:int) =
@@ -521,6 +523,7 @@ module IntBits =
         { IntBits.values = 
                     Array.init len 
                                (fun i -> bitLoc i intVers) }
+
 
     let toInteger (arrayVers:IntBits) =
         let mutable intRet = 0
@@ -533,14 +536,17 @@ module IntBits =
             bump i
         intRet
 
+
     let seqOfAllFor (degree:Degree) =
         let dv = Degree.value degree 
         {0 .. (1 <<< dv) - 1}
         |> Seq.map (fun i -> fromInteger dv i)
 
+
     let arrayOfAllFor (degree:Degree) =
         let order = (Degree.value degree)
         Array.init (1 <<< order) (fun i -> fromInteger order i)
+
 
     let createRandom (degree:Degree) (rando:IRando) = 
         let perm = 
@@ -548,8 +554,7 @@ module IntBits =
                        (fun _ -> let q = rando.NextFloat
                                  if (q > 0.5) then 1 else 0   )
         {IntBits.values = perm }
-        //let perm = Permutation.createRandom degree rando
-        //{IntBits.values = perm.values }
+
 
     let createRandoms (degree:Degree) (rnd:IRando) =
         seq { while true do 
@@ -564,7 +569,7 @@ module bitsP32 =
                 Array.create length 0u }
 
     let copy (pBits:bitsP32) = 
-        {bitsP32.values = Array.copy (pBits.values) }
+        { bitsP32.values = Array.copy (pBits.values) }
 
     let isZero (ibs:bitsP32) = 
         ibs.values |> Array.forall((=) 0u)
@@ -629,8 +634,97 @@ module bitsP32 =
                 yield! nextChunk e.Current  }
 
 
-    let allBinary (degree:Degree) =
+    let seqOfAllFor (degree:Degree) =
         fromIntBits (IntBits.seqOfAllFor degree)
+
+
+    let arrayOfAllFor (degree:Degree) =
+        fromIntBits (IntBits.arrayOfAllFor degree)
+
+
+    let createRandoms (degree:Degree) (rnd:IRando) =
+        (IntBits.createRandoms degree rnd) |> fromIntBits
+
+
+
+type bitsP64 = { values: uint64[] }
+module bitsP64 =
+
+    let zeroCreate (length:int) = 
+        { bitsP64.values = 
+                Array.create length 0UL }
+
+    let copy (pBits:bitsP64) = 
+        { bitsP64.values = Array.copy (pBits.values) }
+
+    let isZero (ibs:bitsP64) = 
+        ibs.values |> Array.forall((=) 0UL)
+
+    let stripeWrite (uBits:bitsP64) 
+                    (intBits:IntBits) 
+                    (pos:int) = 
+        let one = (1UL <<< pos)
+        let proc dex =
+            if (intBits.values.[dex] = 1) then
+                uBits.values.[dex] <- 
+                            uBits.values.[dex] ||| one
+        
+        for i=0 to (uBits.values.Length - 1) do
+            proc i
+
+
+    let stripeRead (uBits:bitsP64) 
+                   (pos:int) = 
+        let one = (1UL <<< pos)
+        let proc dex v =
+            if ((uBits.values.[dex] &&& one) > 0UL) then
+                1
+            else 0
+        { IntBits.values = uBits.values |> Array.mapi (proc) }
+
+
+    let isSorted (uBits:bitsP64) =
+        seq { 0 .. 63} |> Seq.map (fun pos -> stripeRead uBits pos)
+           |> Seq.forall(IntBits.isSorted)
+
+
+    let fromIntBits (ibSeq:IntBits seq) =
+        seq { 
+              use e = ibSeq.GetEnumerator()
+              let nextChunk() =
+                let res = zeroCreate e.Current.values.Length
+                stripeWrite res e.Current 0
+                let mutable i = 1
+                while i < 64 && e.MoveNext() do
+                    stripeWrite res e.Current i
+                    i <- i + 1
+                res
+
+              while e.MoveNext() do
+                yield nextChunk()  }
+
+
+    let toIntBits (bp32s:bitsP64 seq) =
+        seq { 
+              use e = bp32s.GetEnumerator()
+              let nextChunk bt64 =
+                let mutable i = 0
+                seq { 
+                   while i < 64 do
+                   let ibts =  stripeRead bt64 i
+                   if (not (IntBits.isZero ibts)) then
+                    yield ibts
+                   i <- i + 1 }
+
+              while e.MoveNext() do
+                yield! nextChunk e.Current  }
+
+
+    let seqOfAllFor (degree:Degree) =
+        fromIntBits (IntBits.seqOfAllFor degree)
+
+    let arrayOfAllFor (degree:Degree) =
+        fromIntBits (IntBits.arrayOfAllFor degree)
 
     let createRandoms (degree:Degree) (rnd:IRando) =
         (IntBits.createRandoms degree rnd) |> fromIntBits

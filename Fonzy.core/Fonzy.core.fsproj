@@ -25,7 +25,9 @@
     <Compile Include="SorterSet.fs" />
     <Compile Include="Sortables.fs" />
     <Compile Include="SortingProcData.fs" />
+    <Compile Include="SortableRollout.fs" />
     <Compile Include="SortingEval.fs" />
+    <Compile Include="SortableSetSpec.fs" />
     <Compile Include="Sorting.fs" />
     <Compile Include="GaTypes.fs" />
     <Compile Include="SortingGaTypes.fs" />

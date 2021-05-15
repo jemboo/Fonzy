@@ -68,8 +68,8 @@ module TestData =
 
 
     module SortableSet =
-        let ssAllIntBits = SortableSetExplicit.allIntBits degree
-        let sortableSet = SortableSet.Explicit ssAllIntBits
+        let ssAllIntBits = SortableSetBinary.allIntBits degree
+        let sortableSet = SortableSetSpec.Explicit ssAllIntBits
 
     module SorterSet = 
         let mediocreSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
@@ -89,12 +89,12 @@ module TestData =
 
 
     module SorterActionRecords =
-        let rolloutOfAllBinary = SortableSetRollout.allBinary degree
+        let rolloutOfAllBinary = IntSetsRollout.allBinary degree
                                      |> Result.ExtractOrThrow
         let rolloutOfAllSortedBinary = 
                 let ia = IntBits.sorted_0_1_Sequences degree
                             |> Seq.map(fun ia -> {IntBits.values = ia.values })
-                SortableSetRollout.fromSortableIntArrays 
+                IntSetsRollout.fromSortableIntArrays 
                             degree
                             ia
                     |> Result.ExtractOrThrow
