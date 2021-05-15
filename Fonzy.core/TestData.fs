@@ -3,7 +3,7 @@ open System
 
 module TestData = 
     let seed = 12374
-    let iRando = Rando.fromRngGen (RngGen.createLcg seed)
+    let iRando = Rando.fromRngGen (RngGen.createNet seed)
     let degree = Degree.fromInt 8
 
     module ComboStructures =

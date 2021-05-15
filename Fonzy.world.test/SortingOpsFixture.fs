@@ -115,6 +115,37 @@ type SortingOpsFixture () =
         Assert.IsTrue(result |> bitsP32.isSorted)
 
 
+
+    [<TestMethod>]
+    member this.evalSorter2() =
+        let testCase = TestData.SorterParts.randomBitsP32
+        let goodSorter = TestData.SorterParts.goodRefSorter
+
+
+
+
+        let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
+        let sorter16 = RefSorter.goodRefSorterForDegree degree 
+                        |> Result.ExtractOrThrow
+
+        let sortableSetEx = SortableSet.Generated 
+                                (SortableSetGenerated.allIntBits degree)
+                            |> SortableSet.getSortableSetExplicit
+                            |> Result.ExtractOrThrow 
+
+        let ssR = SortingOps.evalSorter 
+                        sorter16 sortableSetEx Sorting.SwitchUsePlan.All
+                        Sorting.EventGrouping.BySwitch
+        let switchCount =
+            match ssR with
+            | SortingEval.SwitchEventRecords.BySwitch s -> s.switchUses.switchCount
+            | _ -> failwith "yoe"
+
+        Assert.IsTrue(true)
+
+
+
+
     [<TestMethod>]
     member this.SorterSet_eval() =
         let sorterSet = TestData.SorterSet.mediocreSorterSet

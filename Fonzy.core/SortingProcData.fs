@@ -47,7 +47,8 @@ module SwitchUses =
            |> Seq.filter(fun tup -> (snd tup) > 0)
            |> Seq.maxBy(fst) |> fst
 
-   let lastUsedIndexes (switchCount:SwitchCount) (stseq:seq<SwitchUses>) =            
+   let lastUsedIndexes (switchCount:SwitchCount) 
+                       (stseq:seq<SwitchUses>) =            
        let stRet = createEmpty switchCount
        let wgts = getWeights stRet
        let Recordo (stRec:int[]) (stData:SwitchUses) =
@@ -67,14 +68,16 @@ module SwitchUses =
    let entropyBits (switchUses:SwitchUses) =
        (getWeights switchUses) |> Combinatorics.entropyBits
 
-   let getRefinedStageCount (switchUses:SwitchUses) (sorter:Sorter) =
+   let getRefinedStageCount (switchUses:SwitchUses) 
+                            (sorter:Sorter) =
        result {
            let! usedSwitches = getUsedSwitches switchUses sorter
            let degree = sorter.degree
            return! Stage.getStageCount degree usedSwitches
        }
 
-   let getRefinedSorter (switchUses:SwitchUses) (sorter:Sorter) =
+   let getRefinedSorter (switchUses:SwitchUses) 
+                        (sorter:Sorter) =
        result {
            let! usedSwitches = getUsedSwitches switchUses sorter
            let degree = sorter.degree
@@ -83,7 +86,8 @@ module SwitchUses =
            return Sorter.create degree switches
        }
 
-   let getSwitchAndStageUses (sorter:Sorter) (switchUses:SwitchUses) =
+   let getSwitchAndStageUses (sorter:Sorter) 
+                             (switchUses:SwitchUses) =
        result
            {
                let! refinedStageCount = (getRefinedStageCount switchUses sorter)
@@ -126,13 +130,14 @@ type SwitchEventRollout = {
             useRoll:int[]}
 
 module SwitchEventRollout =
-    let create (switchCount:SwitchCount) (sortableCount:SortableCount) = 
-        {
-            switchCount=switchCount;
+    let create (switchCount:SwitchCount) 
+               (sortableCount:SortableCount) = 
+        {   switchCount=switchCount;
             sortableCount=sortableCount;
-            useRoll = Array.zeroCreate ((SwitchCount.value switchCount) * 
-                            (SortableCount.value sortableCount))
-        }
+            useRoll = Array.zeroCreate 
+                        ((SwitchCount.value switchCount) * 
+                        (SortableCount.value sortableCount))    }
+
 
     let toSwitchUses (switchUseRollout:SwitchEventRollout) =
         let swCt = (SwitchCount.value switchUseRollout.switchCount)
@@ -143,16 +148,15 @@ module SwitchEventRollout =
 
         switchUseRollout.useRoll |> Array.iteri(fun dex v -> upDateSwU dex v)
 
-        {
-            SwitchUses.switchCount = switchUseRollout.switchCount;
-            SwitchUses.weights = useWeights
-        }
+        {   SwitchUses.switchCount = switchUseRollout.switchCount;
+            SwitchUses.weights = useWeights    }
 
-type SortableSetRollout = {
-            degree:Degree; 
+
+type SortableSetRollout = 
+        {   degree:Degree; 
             baseArray:int[]; 
-            sortableCount:SortableCount
-        }
+            sortableCount:SortableCount  }
+
 
 module SortableSetRollout =
     let create (degree:Degree) (baseArray:int[] ) =
@@ -169,6 +173,7 @@ module SortableSetRollout =
                     (baseCopy.Length / (Degree.value degree))
             } |> Ok
 
+
     let fromSortableIntArrays (degree:Degree) 
                               (baseArrays:IntBits seq) =
         result {
@@ -178,6 +183,7 @@ module SortableSetRollout =
             return! create degree a 
         }
 
+
     let toSortableIntArrays (ssRollout:SortableSetRollout) =
         let d = (Degree.value ssRollout.degree)
         ssRollout.baseArray |> Array.chunkBySize d
@@ -186,14 +192,13 @@ module SortableSetRollout =
     let copy (sortableSetRollout:SortableSetRollout) =
         let baseCopy = Array.zeroCreate sortableSetRollout.baseArray.Length
         Array.Copy(sortableSetRollout.baseArray, baseCopy, baseCopy.Length)
-        {
-            SortableSetRollout.degree=sortableSetRollout.degree; 
+        {   SortableSetRollout.degree=sortableSetRollout.degree; 
             baseArray=baseCopy;
-            sortableCount=sortableSetRollout.sortableCount
-        }
+            sortableCount=sortableSetRollout.sortableCount }
+
 
     let allBinary (degree:Degree) =
-        let baseArray = IntBits.allBinaryArray degree
+        let baseArray = IntBits.arrayOfAllFor degree
                         |> Array.collect(fun ia -> ia.values)
         create degree baseArray
 

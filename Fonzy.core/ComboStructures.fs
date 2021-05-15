@@ -533,18 +533,23 @@ module IntBits =
             bump i
         intRet
 
-    let allBinary (degree:Degree) =
+    let seqOfAllFor (degree:Degree) =
         let dv = Degree.value degree 
         {0 .. (1 <<< dv) - 1}
         |> Seq.map (fun i -> fromInteger dv i)
 
-    let allBinaryArray (degree:Degree) =
+    let arrayOfAllFor (degree:Degree) =
         let order = (Degree.value degree)
         Array.init (1 <<< order) (fun i -> fromInteger order i)
 
     let createRandom (degree:Degree) (rando:IRando) = 
-        let perm = Permutation.createRandom degree rando
-        {IntBits.values = perm.values }
+        let perm = 
+            Array.init (Degree.value degree)
+                       (fun _ -> let q = rando.NextFloat
+                                 if (q > 0.5) then 1 else 0   )
+        {IntBits.values = perm }
+        //let perm = Permutation.createRandom degree rando
+        //{IntBits.values = perm.values }
 
     let createRandoms (degree:Degree) (rnd:IRando) =
         seq { while true do 
@@ -623,8 +628,9 @@ module bitsP32 =
               while e.MoveNext() do
                 yield! nextChunk e.Current  }
 
+
     let allBinary (degree:Degree) =
-        fromIntBits (IntBits.allBinary degree)
+        fromIntBits (IntBits.seqOfAllFor degree)
 
     let createRandoms (degree:Degree) (rnd:IRando) =
         (IntBits.createRandoms degree rnd) |> fromIntBits

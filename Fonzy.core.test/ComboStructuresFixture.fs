@@ -58,12 +58,14 @@ type ComboStructuresFixture () =
                     |> Array.toList
         Assert.AreEqual (aSl, tcpS)
 
+
     [<TestMethod>]
     member this.quad() =
         let tAvs = [|0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;|]
         let pp = tAvs |> TwoCycleGen.t4
                       |> Seq.toList
         Assert.AreEqual(pp.Length, tAvs.Length)
+
 
     [<TestMethod>]
     member this.qStack() =
@@ -100,6 +102,7 @@ type ComboStructuresFixture () =
        let rnd = Rando.LcgFromSeed 424
        let tcp = TwoCyclePerm.makeMonoCycle degree 2 3 |> Result.ExtractOrThrow
        Assert.IsTrue(tcp |> TwoCyclePerm.toPermutation |> Permutation.isTwoCycle)
+
 
     [<TestMethod>]
     member this.TestMakeAllMonoCycles() =
@@ -256,13 +259,15 @@ type ComboStructuresFixture () =
      let encodedVal = 8675
      let pos = 11
      let intBits = IntBits.fromInteger (Degree.value degree)
-                                        encodedVal
+                                       encodedVal
+
      let blank = bitsP32.zeroCreate (Degree.value degree)
      bitsP32.stripeWrite blank
-                          intBits
-                          pos
+                         intBits
+                         pos
      let bitsBack = bitsP32.stripeRead blank 
-                                        pos
+                                       pos
+
      let decoded = IntBits.toInteger bitsBack
 
      Assert.AreEqual (encodedVal, decoded)

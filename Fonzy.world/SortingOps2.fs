@@ -245,7 +245,7 @@ module SortingOps2 =
     module History =
 
         let sortTHistSwitches(switches:Switch list)
-                              (pBits:bitsP32) =
+                             (pBits:bitsP32) =
             let mutable i = 0
             let mutable lstRet = [pBits]
             let mutable newCase = pBits
@@ -253,11 +253,13 @@ module SortingOps2 =
             while (i < switches.Length) do
                 newCase <- newCase |> bitsP32.copy
                 let uintArray = newCase.values
-                let switch = switches.[i]
-                let lv = uintArray.[switch.low]
-                let hv = uintArray.[switch.hi]
-                uintArray.[switch.hi] <- (lv ||| hv)
-                uintArray.[switch.low] <- (lv &&& hv)
+                let sw = switches.[i]
+                let lv = uintArray.[sw.low]
+                let hv = uintArray.[sw.hi]
+                let nhv = (lv ||| hv)
+                let nlv = (lv &&& hv)
+                uintArray.[sw.hi] <- (lv ||| hv)
+                uintArray.[sw.low] <- (lv &&& hv)
                 lstRet <- newCase::lstRet
                 i <- i+1
             lstRet |> List.rev

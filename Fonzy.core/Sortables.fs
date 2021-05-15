@@ -37,7 +37,7 @@ module SortableSetExplicit =
               SortableSetExplicit.id = SortableSetId.fromGuid id;
               SortableSetExplicit.degree = degree;
               SortableSetExplicit.sortableIntArrays = 
-                        (IntBits.allBinaryArray degree)
+                        (IntBits.arrayOfAllFor degree)
                         |> Seq.toArray
          }
 
