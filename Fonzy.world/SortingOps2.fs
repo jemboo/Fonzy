@@ -7,19 +7,19 @@ module SortingOps2 =
     let private EvalSorterOnSbpWithNoSAG 
                 (sorter:Sorter) 
                 (mindex:int) (maxdex:int) 
-                (sortableSetRollout:IntSetsRollout) 
-                (useTrack:int[])
+                (bP32SetsRollout:bP32SetsRollout) 
+                (useTrack:uint[])
                 (sortableIndex:int) =
         let mutable localSwitchOffset = mindex
         let sortableSetRolloutOffset = sortableIndex * (Degree.value sorter.degree)
         let switchEventRolloutOffset = sortableIndex * (SwitchCount.value sorter.switchCount)
         while (localSwitchOffset < maxdex) do
             let switch = sorter.switches.[localSwitchOffset]
-            let lv = sortableSetRollout.baseArray.[switch.low + sortableSetRolloutOffset]
-            let hv = sortableSetRollout.baseArray.[switch.hi + sortableSetRolloutOffset]
+            let lv = bP32SetsRollout.baseArray.[switch.low + sortableSetRolloutOffset]
+            let hv = bP32SetsRollout.baseArray.[switch.hi + sortableSetRolloutOffset]
             let rv = useTrack.[localSwitchOffset + switchEventRolloutOffset]
-            sortableSetRollout.baseArray.[switch.hi + sortableSetRolloutOffset] <- (lv ||| hv)
-            sortableSetRollout.baseArray.[switch.low + sortableSetRolloutOffset] <- (lv &&& hv)
+            bP32SetsRollout.baseArray.[switch.hi + sortableSetRolloutOffset] <- (lv ||| hv)
+            bP32SetsRollout.baseArray.[switch.low + sortableSetRolloutOffset] <- (lv &&& hv)
             useTrack.[localSwitchOffset + switchEventRolloutOffset] <- (((~~~hv) &&& lv) ||| rv)
             localSwitchOffset <- localSwitchOffset + 1
 
@@ -28,27 +28,34 @@ module SortingOps2 =
     // Action Grouping)
     let evalNoGrouping 
                 (sorter:Sorter) 
-                (sortableSetRollout:IntSetsRollout) 
+                (bP32SetsRollout:bP32SetsRollout) 
                 (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex = 
             match switchusePlan with
             | Sorting.SwitchUsePlan.All -> (0, switchCount)
             | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
-        let sortableSetRolloutCopy = (IntSetsRollout.copy sortableSetRollout)
-        let switchEventRollout = SwitchEventRollout.create sorter.switchCount sortableSetRollout.sortableCount
-        let mutable sortableIndex=0
-        while (sortableIndex < (SortableCount.value sortableSetRollout.sortableCount)) do
-                EvalSorterOnSbpWithNoSAG 
-                        sorter firstSwitchDex 
-                        lastSwitchDex sortableSetRolloutCopy 
-                        switchEventRollout.useRoll sortableIndex
-                sortableIndex <- sortableIndex + 1
-        SwitchEventRecords.NoGrouping {
-            NoGrouping.switchEventRollout = switchEventRollout; 
-            NoGrouping.sortableSetRollout = sortableSetRolloutCopy
-        }
+        
+        let bPsRollCopy = BP32SetsRollout.copy bP32SetsRollout
+        let seRollbp32 = SwitchEventRolloutBp32.create 
+                                sorter.switchCount
+                                bPsRollCopy.sortableCount
 
+        let mutable sortableBlockDex = 0
+        while (sortableBlockDex < seRollbp32.sortableBlockCount) do
+            EvalSorterOnSbpWithNoSAG
+                            sorter
+                            firstSwitchDex lastSwitchDex
+                            bPsRollCopy
+                            seRollbp32.useRoll.values
+                            sortableBlockDex
+            sortableBlockDex <- sortableBlockDex + 1
+
+        //SwitchEventRecords.NoGrouping {
+        //    NoGrouping.switchEventRollout = switchEventRollout; 
+        //    NoGrouping.sortableSetRollout = bP32SetsRolloutCopy
+        //}
+        None
 
     // creates a sorter.switchcount length array to store accumulated
     // switch uses
@@ -159,17 +166,17 @@ module SortingOps2 =
                     (sortableSetRollout:IntSetsRollout)
                     (switchusePlan:Sorting.SwitchUsePlan) 
                     (switchEventAgg:Sorting.EventGrouping) =
-        match switchEventAgg with
-        | Sorting.EventGrouping.NoGrouping -> 
-                evalNoGrouping 
-                    sorter sortableSetRollout switchusePlan
-        | Sorting.EventGrouping.BySwitch -> 
-                evalGroupBySwitch 
-                    sorter sortableSetRollout switchusePlan
-        | Sorting.EventGrouping.BySortable -> 
-                evalGroupBySortable 
-                    sorter sortableSetRollout switchusePlan
-
+        //match switchEventAgg with
+        //| Sorting.EventGrouping.NoGrouping -> 
+        //        evalNoGrouping 
+        //            sorter sortableSetRollout switchusePlan
+        //| Sorting.EventGrouping.BySwitch -> 
+        //        evalGroupBySwitch 
+        //            sorter sortableSetRollout switchusePlan
+        //| Sorting.EventGrouping.BySortable -> 
+        //        evalGroupBySortable 
+        //            sorter sortableSetRollout switchusePlan
+        None
 
     let evalSorter (sorter:Sorter)
                    (sortableSet:SortableSetBinary)
@@ -184,62 +191,62 @@ module SortingOps2 =
             sorter sortableSetRollout switchusePlan switchEventAgg
 
 
-    module SorterSet =
-        let eval<'T> 
-                 (sorterSet:SorterSet)
-                 (sortableSet:SortableSetBinary)
-                 (switchusePlan:Sorting.SwitchUsePlan) 
-                 (switchEventAgg:Sorting.EventGrouping) 
-                 (_parallel:UseParallel) 
-                 (proc:ResultOfSorterOnSortableSet -> Result<'T, string>) =
+    //module SorterSet =
+    //    let eval<'T> 
+    //             (sorterSet:SorterSet)
+    //             (sortableSet:SortableSetBinary)
+    //             (switchusePlan:Sorting.SwitchUsePlan) 
+    //             (switchEventAgg:Sorting.EventGrouping) 
+    //             (_parallel:UseParallel) 
+    //             (proc:ResultOfSorterOnSortableSet -> Result<'T, string>) =
 
-            let rewrap tup ssr = 
-                let sorterId, sorter = tup
-                let swEvRecs = evalSorterOnSortableSetRollout 
-                                    sorter ssr switchusePlan switchEventAgg
-                let resSoSS = {
-                    ResultOfSorterOnSortableSet.sorter = sorter;
-                    ResultOfSorterOnSortableSet.switchEventRecords = swEvRecs;
-                    ResultOfSorterOnSortableSet.sorterId = sorterId;
-                    ResultOfSorterOnSortableSet.sortableSetId = sortableSet.id
-                }
-                proc resSoSS
+    //        let rewrap tup ssr = 
+    //            let sorterId, sorter = tup
+    //            let swEvRecs = evalSorterOnSortableSetRollout 
+    //                                sorter ssr switchusePlan switchEventAgg
+    //            let resSoSS = {
+    //                ResultOfSorterOnSortableSet.sorter = sorter;
+    //                ResultOfSorterOnSortableSet.switchEventRecords = swEvRecs;
+    //                ResultOfSorterOnSortableSet.sorterId = sorterId;
+    //                ResultOfSorterOnSortableSet.sortableSetId = sortableSet.id
+    //            }
+    //            proc resSoSS
 
-            result  {
-                let! ssRoll = sortableSet.sortables 
-                              |> IntSetsRollout.fromSortableIntArrays
-                                    sorterSet.degree
-                return!
-                    match UseParallel.value(_parallel) with
-                    | true  -> sorterSet.sorters |> Map.toArray 
-                                                 |> Array.Parallel.map(fun s-> rewrap s ssRoll)
-                                                 |> Array.toList
-                                                 |> Result.sequence
-                    | false -> sorterSet.sorters |> Map.toList 
-                                                 |> List.map(fun s-> rewrap s ssRoll)
-                                                 |> Result.sequence
-            }
+    //        result  {
+    //            let! ssRoll = sortableSet.sortables 
+    //                          |> IntSetsRollout.fromSortableIntArrays
+    //                                sorterSet.degree
+    //            return!
+    //                match UseParallel.value(_parallel) with
+    //                | true  -> sorterSet.sorters |> Map.toArray 
+    //                                             |> Array.Parallel.map(fun s-> rewrap s ssRoll)
+    //                                             |> Array.toList
+    //                                             |> Result.sequence
+    //                | false -> sorterSet.sorters |> Map.toList 
+    //                                             |> List.map(fun s-> rewrap s ssRoll)
+    //                                             |> Result.sequence
+    //        }
 
-        let getSorterPerfBins 
-            (sorterSet:SorterSet)
-            (sortableSet:SortableSetBinary)
-            (switchusePlan:Sorting.SwitchUsePlan)
-            (_parallel:UseParallel) =
-            result {
-                let! sorterEffs = 
-                        eval 
-                            sorterSet 
-                            sortableSet 
-                            switchusePlan
-                            Sorting.EventGrouping.BySwitch
-                            _parallel
-                            SortingEval.SortingRecords.getSorterEff
+    //    let getSorterPerfBins 
+    //        (sorterSet:SorterSet)
+    //        (sortableSet:SortableSetBinary)
+    //        (switchusePlan:Sorting.SwitchUsePlan)
+    //        (_parallel:UseParallel) =
+    //        result {
+    //            let! sorterEffs = 
+    //                    eval 
+    //                        sorterSet 
+    //                        sortableSet 
+    //                        switchusePlan
+    //                        Sorting.EventGrouping.BySwitch
+    //                        _parallel
+    //                        SortingEval.SortingRecords.getSorterEff
 
-                let bins = sorterEffs 
-                                |> SorterPerfBin.fromSorterEffs
+    //            let bins = sorterEffs 
+    //                            |> SorterPerfBin.fromSorterEffs
 
-                return bins
-            }
+    //            return bins
+    //        }
 
 
     module History =
@@ -251,7 +258,7 @@ module SortingOps2 =
             let mutable newCase = pBits
 
             while (i < switches.Length) do
-                newCase <- newCase |> bitsP32.copy
+                newCase <- newCase |> BitsP32.copy
                 let uintArray = newCase.values
                 let sw = switches.[i]
                 let lv = uintArray.[sw.low]

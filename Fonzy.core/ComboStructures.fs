@@ -487,6 +487,11 @@ module TwoCycleGen =
 
 type IntBits = { values:int[] }
 module IntBits =
+
+    let zeroCreate (count:int) = 
+        { IntBits.values = 
+                Array.create count 0 }
+
     let copy (intBits:IntBits) = 
         {IntBits.values = Array.copy (intBits.values) }
 
@@ -562,14 +567,21 @@ module IntBits =
 
 
 type bitsP32 = { values:uint[] }
-module bitsP32 =
+module BitsP32 =
 
-    let zeroCreate (length:int) = 
+    let zeroCreate (count:int) = 
         { bitsP32.values = 
-                Array.create length 0u }
+                Array.create count 0u }
+
+
+    let zeroSubCreate (count:int) = 
+        { bitsP32.values = 
+                Array.create ((count + 31) / 32) 0u }
+
 
     let copy (pBits:bitsP32) = 
         { bitsP32.values = Array.copy (pBits.values) }
+
 
     let isZero (ibs:bitsP32) = 
         ibs.values |> Array.forall((=) 0u)
@@ -640,19 +652,28 @@ module bitsP32 =
 
     let arrayOfAllFor (degree:Degree) =
         fromIntBits (IntBits.arrayOfAllFor degree)
+        |> Seq.toArray
 
 
-    let createRandoms (degree:Degree) (rnd:IRando) =
-        (IntBits.createRandoms degree rnd) |> fromIntBits
+    let createRandoms (degree:Degree) 
+                      (rnd:IRando) 
+                      (count:int) =
+        (IntBits.createRandoms degree rnd) 
+            |> Seq.take count
+            |> fromIntBits
 
 
 
 type bitsP64 = { values: uint64[] }
-module bitsP64 =
+module BitsP64 =
 
-    let zeroCreate (length:int) = 
+    let zeroCreate (count:int) = 
         { bitsP64.values = 
-                Array.create length 0UL }
+                Array.create count 0UL }
+
+    let zeroSubCreate (count:int) = 
+        { bitsP64.values = 
+                Array.create ((count + 63) / 64) 0UL }
 
     let copy (pBits:bitsP64) = 
         { bitsP64.values = Array.copy (pBits.values) }
@@ -684,7 +705,7 @@ module bitsP64 =
 
 
     let isSorted (uBits:bitsP64) =
-        seq { 0 .. 63} |> Seq.map (fun pos -> stripeRead uBits pos)
+        seq { 0 .. 63 } |> Seq.map (fun pos -> stripeRead uBits pos)
            |> Seq.forall(IntBits.isSorted)
 
 
@@ -723,8 +744,15 @@ module bitsP64 =
     let seqOfAllFor (degree:Degree) =
         fromIntBits (IntBits.seqOfAllFor degree)
 
+
     let arrayOfAllFor (degree:Degree) =
         fromIntBits (IntBits.arrayOfAllFor degree)
+        |> Seq.toArray
 
-    let createRandoms (degree:Degree) (rnd:IRando) =
-        (IntBits.createRandoms degree rnd) |> fromIntBits
+
+    let createRandoms (degree:Degree) 
+                      (rnd:IRando) 
+                      (count:int) =
+        (IntBits.createRandoms degree rnd) 
+            |> Seq.take count
+            |> fromIntBits

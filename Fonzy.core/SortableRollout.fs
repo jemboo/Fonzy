@@ -1,34 +1,6 @@
 ﻿namespace global
 open System
 
-type SwitchEventRollout = {
-            switchCount:SwitchCount; 
-            sortableCount:SortableCount; 
-            useRoll:int[]}
-
-module SwitchEventRollout =
-    let create (switchCount:SwitchCount) 
-               (sortableCount:SortableCount) = 
-        {   switchCount=switchCount;
-            sortableCount=sortableCount;
-            useRoll = Array.zeroCreate 
-                        ((SwitchCount.value switchCount) * 
-                        (SortableCount.value sortableCount))    }
-
-
-    let toSwitchUses (switchUseRollout:SwitchEventRollout) =
-        let swCt = (SwitchCount.value switchUseRollout.switchCount)
-        let useWeights = Array.zeroCreate swCt
-        let upDateSwU dex v =
-            let swUdex = dex % swCt
-            useWeights.[swUdex] <- useWeights.[swUdex] + v
-
-        switchUseRollout.useRoll |> Array.iteri(fun dex v -> upDateSwU dex v)
-
-        {   SwitchUses.switchCount = switchUseRollout.switchCount;
-            SwitchUses.weights = useWeights    }
-
-
 type IntSetsRollout = 
         {   degree:Degree; 
             baseArray:int[]; 
@@ -36,7 +8,8 @@ type IntSetsRollout =
 
 
 module IntSetsRollout =
-    let create (degree:Degree) (baseArray:int[] ) =
+
+    let create (degree:Degree) (baseArray:int[]) =
         if baseArray.Length < 0 + (Degree.value degree) then
             Error (sprintf "baseArray length %d is not a multiple of degree: %d:" 
                     baseArray.Length (Degree.value degree))
@@ -44,11 +17,12 @@ module IntSetsRollout =
             let baseCopy = Array.zeroCreate baseArray.Length
             Array.Copy(baseArray, baseCopy, baseArray.Length)
             {
-                IntSetsRollout.degree=degree; 
-                baseArray=baseCopy; 
-                sortableCount= SortableCount.fromInt 
+                IntSetsRollout.degree = degree; 
+                baseArray = baseCopy; 
+                sortableCount = SortableCount.fromInt 
                     (baseCopy.Length / (Degree.value degree))
             } |> Ok
+
 
     let fromSortableIntArrays (degree:Degree) 
                               (baseArrays:IntBits seq) =
@@ -65,6 +39,7 @@ module IntSetsRollout =
         ssRollout.baseArray |> Array.chunkBySize d
                             |> Array.map(fun a -> {IntBits.values = a})
 
+
     let copy (sortableSetRollout:IntSetsRollout) =
         let baseCopy = Array.zeroCreate sortableSetRollout.baseArray.Length
         Array.Copy(sortableSetRollout.baseArray, baseCopy, baseCopy.Length)
@@ -78,12 +53,14 @@ module IntSetsRollout =
                         |> Array.collect(fun ia -> ia.values)
         create degree baseArray
 
+
     let isSorted (ssRollout:IntSetsRollout) =
         let d = (Degree.value ssRollout.degree)
         seq {0 .. d .. (ssRollout.baseArray.Length - 1)}
             |> Seq.forall(fun dex -> 
                     Combinatorics.isSortedOffset ssRollout.baseArray dex d)
         
+
     let sortedCount (ssRollout:IntSetsRollout) =
         let d = (Degree.value ssRollout.degree)
         seq {0 .. d .. (ssRollout.baseArray.Length - 1)}
@@ -91,12 +68,128 @@ module IntSetsRollout =
                     Combinatorics.isSortedOffset ssRollout.baseArray dex d)
             |> Seq.length
 
+
     let distinctSortableSets (ssRollout:IntSetsRollout) =
         ssRollout |> toSortableIntArrays
                   |> Seq.distinct
                   |> Seq.toArray
 
+
     let histogramOfSortedSortables (ssRollout:IntSetsRollout) =
         ssRollout |> toSortableIntArrays
                   |> Seq.countBy id
                   |> Seq.toArray
+
+
+
+type bP32SetsRollout = 
+        {   degree:Degree; 
+            baseArray:uint[]; 
+            sortableCount:SortableCount  }
+
+
+module BP32SetsRollout =
+
+    let create (degree:Degree) 
+               (baseArray:uint[] ) 
+               (sortableCount:SortableCount) =
+        if baseArray.Length < 0 + (Degree.value degree) then
+            Error (sprintf "baseArray length %d is not a multiple of degree: %d:" 
+                    baseArray.Length (Degree.value degree))
+        else
+            let baseCopy = Array.zeroCreate baseArray.Length
+            Array.Copy(baseArray, baseCopy, baseArray.Length)
+            {
+                bP32SetsRollout.degree = degree; 
+                baseArray = baseCopy; 
+                sortableCount = sortableCount
+            } |> Ok
+
+
+    let fromSortableIntArrays (degree:Degree) 
+                              (baseArrays:bitsP32 seq) 
+                              (sortableCount:SortableCount) =
+        result {
+            let a = baseArrays |> Seq.map(fun a -> a.values)
+                               |> Seq.collect(id)
+                               |> Seq.toArray
+            return! create degree a sortableCount
+        }
+
+
+    let toBitsP32Arrays (ssRollout:bP32SetsRollout) =
+        let d = (Degree.value ssRollout.degree)
+        ssRollout.baseArray |> Array.chunkBySize d
+                            |> Array.map(fun a -> {bitsP32.values = a})
+
+
+    let copy (src:bP32SetsRollout) =
+        let baseCopy = Array.zeroCreate src.baseArray.Length
+        Array.Copy(src.baseArray, baseCopy, baseCopy.Length)
+        {   bP32SetsRollout.degree=src.degree; 
+            baseArray=baseCopy;
+            sortableCount=src.sortableCount }
+
+    let allBinary (degree:Degree) =
+        let arraySets = BitsP32.arrayOfAllFor degree
+        let baseArray = arraySets
+                        |> Array.collect(fun ia -> ia.values)
+        create degree baseArray (SortableCount.fromInt arraySets.Length)
+
+
+
+type bP64SetsRollout = 
+        {   degree:Degree; 
+            baseArray:uint64[]; 
+            sortableCount:SortableCount  }
+
+
+module BP64SetsRollout =
+
+    let create (degree:Degree) 
+               (baseArray:uint64[]) 
+               (sortableCount:SortableCount) =
+
+        if baseArray.Length < 0 + (Degree.value degree) then
+            Error (sprintf "baseArray length %d is not a multiple of degree: %d:" 
+                    baseArray.Length (Degree.value degree))
+        else
+            let baseCopy = Array.zeroCreate baseArray.Length
+            Array.Copy(baseArray, baseCopy, baseArray.Length)
+            {
+                bP64SetsRollout.degree = degree; 
+                baseArray = baseCopy; 
+                sortableCount = sortableCount
+            } |> Ok
+
+
+    let fromSortableIntArrays (degree:Degree) 
+                              (baseArrays:bitsP64 seq) 
+                              (sortableCount:SortableCount) =
+        result {
+            let a = baseArrays |> Seq.map(fun a -> a.values)
+                               |> Seq.collect(id)
+                               |> Seq.toArray
+            return! create degree a sortableCount
+        }
+
+
+    let toBitsP32Arrays (ssRollout:bP64SetsRollout) =
+        let d = (Degree.value ssRollout.degree)
+        ssRollout.baseArray |> Array.chunkBySize d
+                            |> Array.map(fun a -> {bitsP64.values = a})
+
+
+    let copy (sortableSetRollout:bP64SetsRollout) =
+        let baseCopy = Array.zeroCreate sortableSetRollout.baseArray.Length
+        Array.Copy(sortableSetRollout.baseArray, baseCopy, baseCopy.Length)
+        {   bP64SetsRollout.degree=sortableSetRollout.degree; 
+            baseArray=baseCopy;
+            sortableCount=sortableSetRollout.sortableCount }
+
+
+    let allBinary (degree:Degree) =
+        let arraySets = BitsP64.arrayOfAllFor degree
+        let baseArray = arraySets
+                        |> Array.collect(fun ia -> ia.values)
+        create degree baseArray (SortableCount.fromInt arraySets.Length)

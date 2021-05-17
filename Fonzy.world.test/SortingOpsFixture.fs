@@ -112,7 +112,7 @@ type SortingOpsFixture () =
         let hist = SortingOps2.History.sortTHist2 goodSorter testCase
         Assert.IsTrue(hist.Length > 1)
         let result = hist.Item (hist.Length - 1)
-        Assert.IsTrue(result |> bitsP32.isSorted)
+        Assert.IsTrue(result |> BitsP32.isSorted)
 
 
 

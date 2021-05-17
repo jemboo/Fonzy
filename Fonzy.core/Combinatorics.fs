@@ -63,6 +63,23 @@ module Combinatorics =
              i<-i+1
         looP
 
+    let isSortedOffsetU (baseValues:uint[]) (offset:int) (length:int) =
+        let mutable i=1
+        let mutable looP = true
+        while ((i < length) && looP) do
+             looP <- (baseValues.[i+offset-1] <= baseValues.[i+offset])
+             i<-i+1
+        looP
+
+    let isSortedOffsetUL (baseValues:uint64[]) (offset:int) (length:int) =
+        let mutable i=1
+        let mutable looP = true
+        while ((i < length) && looP) do
+             looP <- (baseValues.[i+offset-1] <= baseValues.[i+offset])
+             i<-i+1
+        looP
+
+
     let isTwoCycle (a:int[]) =
         (composeMapIntArrays a a) = identity a.Length
 

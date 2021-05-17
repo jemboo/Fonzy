@@ -5,7 +5,7 @@ module SortingEval =
 
     type NoGrouping  = 
         {
-            switchEventRollout:SwitchEventRollout; 
+            switchEventRollout:switchEventRolloutInt; 
             sortableSetRollout:IntSetsRollout;
         }
 
@@ -31,7 +31,7 @@ module SortingEval =
         let getSwitchUses (switchEventRecords:SwitchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.switchEventRollout 
-                                    |> SwitchEventRollout.toSwitchUses
+                                    |> SwitchEventRolloutInt.toSwitchUses
                                     |> Ok
             | BySwitch seGs -> seGs.switchUses 
                                     |> Ok

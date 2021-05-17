@@ -233,16 +233,16 @@ type ComboStructuresFixture () =
                IntBits.fromInteger (Degree.value degree)
                                    av)
 
-     let theUints = bitsP32.zeroCreate (Degree.value degree)
+     let theUints = BitsP32.zeroCreate (Degree.value degree)
 
-     let bp32s = bitsP32.fromIntBits intBitsArray
+     let bp32s = BitsP32.fromIntBits intBitsArray
                  |> Seq.toArray
 
-     let bitsBack = bitsP32.toIntBits bp32s
+     let bitsBack = BitsP32.toIntBits bp32s
                     |> Seq.toArray
 
      for i = 0 to (unEncodedVals.Length - 1) do
-        bitsP32.stripeWrite theUints
+        BitsP32.stripeWrite theUints
                              intBitsArray.[i]
                              i
      let decodedVals = 
@@ -260,12 +260,12 @@ type ComboStructuresFixture () =
      let pos = 11
      let intBits = IntBits.fromInteger (Degree.value degree)
                                        encodedVal
-
-     let blank = bitsP32.zeroCreate (Degree.value degree)
-     bitsP32.stripeWrite blank
+     let yab = Array.init 50 (fun i -> (i + 10 - 1) / 10)
+     let blank = BitsP32.zeroCreate (Degree.value degree)
+     BitsP32.stripeWrite blank
                          intBits
                          pos
-     let bitsBack = bitsP32.stripeRead blank 
+     let bitsBack = BitsP32.stripeRead blank 
                                        pos
 
      let decoded = IntBits.toInteger bitsBack

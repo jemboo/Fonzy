@@ -139,16 +139,16 @@ type BenchmarkSorterSetOps2() =
         ////          | SortingEval.SorterPerfBins b -> b |> Array.sumBy(snd)
         ////          | _ -> 0
 
-    [<Benchmark>]
-    member this.getSorterEff_Parallel_BySwitch() =
-        let ssR = SortingOps2.SorterSet.eval
-                        mediocreSorterSet 
-                        sortableSetEx 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
-                        (UseParallel.create true)
-                        SortingEval.SortingRecords.getSorterEff
-        ssR 
+    //[<Benchmark>]
+    //member this.getSorterEff_Parallel_BySwitch() =
+    //    let ssR = SortingOps2.SorterSet.eval
+    //                    mediocreSorterSet 
+    //                    sortableSetEx 
+    //                    Sorting.SwitchUsePlan.All
+    //                    Sorting.EventGrouping.BySwitch
+    //                    (UseParallel.create true)
+    //                    SortingEval.SortingRecords.getSorterEff
+    //    ssR 
 
     //[<Benchmark>]
     //member this.getSorterEff_Serial_BySwitch() =

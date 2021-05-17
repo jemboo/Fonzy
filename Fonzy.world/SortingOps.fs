@@ -36,26 +36,28 @@ module SortingOps =
     // array to store each switch use, thus no SAG (Switch 
     // Action Grouping)
     let evalNoGrouping 
-                            (sorter:Sorter) 
-                            (sortableSetRollout:IntSetsRollout) 
-                            (switchusePlan:Sorting.SwitchUsePlan) =
+                        (sorter:Sorter) 
+                        (intSetsRollout:IntSetsRollout) 
+                        (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex = 
             match switchusePlan with
             | Sorting.SwitchUsePlan.All -> (0, switchCount)
             | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
-        let sortableSetRolloutCopy = (IntSetsRollout.copy sortableSetRollout)
-        let switchEventRollout = SwitchEventRollout.create sorter.switchCount sortableSetRollout.sortableCount
+        let ssRollCopy = IntSetsRollout.copy intSetsRollout
+        let seRoll = SwitchEventRolloutInt.create
+                                            sorter.switchCount
+                                            intSetsRollout.sortableCount
         let mutable sortableIndex=0
-        while (sortableIndex < (SortableCount.value sortableSetRollout.sortableCount)) do
+        while (sortableIndex < (SortableCount.value intSetsRollout.sortableCount)) do
                 EvalSorterOnSortableWithNoSAG 
                         sorter firstSwitchDex 
-                        lastSwitchDex sortableSetRolloutCopy 
-                        switchEventRollout.useRoll sortableIndex
+                        lastSwitchDex ssRollCopy 
+                        seRoll.useRoll.values sortableIndex
                 sortableIndex <- sortableIndex + 1
         SwitchEventRecords.NoGrouping {
-            NoGrouping.switchEventRollout = switchEventRollout; 
-            NoGrouping.sortableSetRollout = sortableSetRolloutCopy
+            NoGrouping.switchEventRollout = seRoll; 
+            NoGrouping.sortableSetRollout = ssRollCopy
         }
 
 

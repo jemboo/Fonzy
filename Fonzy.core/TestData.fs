@@ -38,7 +38,7 @@ module TestData =
             IntBits.createRandom degree iRando
 
         let randomBitsP32 = 
-            bitsP32.createRandoms degree iRando 
+            BitsP32.createRandoms degree iRando 1
                     |> Seq.head
 
         let switchUseArray = Array.init (SwitchCount.value switchCount) 
