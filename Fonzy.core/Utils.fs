@@ -22,6 +22,23 @@ module ByteUtils =
         md5.ComputeHash(bytesForObj o)
 
 
+    let trueBitCount32 (u32:uint) =
+        let mutable tc = 0
+        for i in 0 .. 31 do
+            let qua = (u32 &&& (1u <<< i)) > 0u
+            if qua then
+                tc <- tc + 1
+        tc
+
+    let trueBitCount64 (u64:uint64) =
+        let mutable tc = 0
+        for i in 0 .. 63 do
+            let qua = (u64 &&& (1UL <<< i)) > 0UL
+            if qua then
+                tc <- tc + 1
+        tc
+
+
 module GuidUtils = 
 
     let makeGuid (g1:uint64) (g2:uint64) (g3:uint64) (g4:uint64) =

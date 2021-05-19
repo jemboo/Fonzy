@@ -17,6 +17,22 @@ type UtilsFixture () =
         Assert.AreNotEqual(gA, gB)
 
 
+    [<TestMethod>]
+    member this.trueBitCount32() =
+        let gA = IntBits.create [|1;0;0;0;0;1;1;0;0;0;0;1;1;0;1;0;0;0;0;1|]
+        let gB = IntBits.toUint32 gA
+        let tc = ByteUtils.trueBitCount32 gB
+        Assert.AreEqual(tc, 7)
+
+
+    [<TestMethod>]
+    member this.trueBitCount64() =
+        let gA = IntBits.create [|1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1|]
+        let gB = IntBits.toUint64 gA
+        let tc = ByteUtils.trueBitCount64 gB
+        Assert.AreEqual(tc, 25)
+
+
     // GuidUtils
 
     [<TestMethod>]

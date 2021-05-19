@@ -28,3 +28,9 @@ type SorterActionRecordsFixture() =
       let histo = unSortedRollout |> IntSetsRollout.histogramOfSortedSortables
       let totalCount = histo |> Array.sumBy(snd)
       Assert.AreEqual(sortableCount, totalCount)
+
+
+    [<TestMethod>]
+    member this.SwitchUseB32_toSwitchUses() =
+
+      Assert.IsTrue(true)

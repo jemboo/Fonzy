@@ -62,52 +62,53 @@ module SortingOps2 =
     let private EvalSorterOnSortableSAGbySwitch 
                     (sorter:Sorter) 
                     (mindex:int) (maxdex:int) 
-                    (switchUses:SwitchUses) 
-                    (sortableSetRollout:IntSetsRollout) 
+                    (switchUseB32:SwitchUseB32) 
+                    (bP32SetsRollout:bP32SetsRollout) 
                     (sortableIndex:int) =
-        let useWeights = (SwitchUses.getWeights switchUses)
+        let useWeights = (SwitchUseB32.getWeights switchUseB32)
         let sortableSetRolloutOffset = sortableIndex * (Degree.value sorter.degree)
         let mutable looP = true
         let mutable localSwitchOffset = mindex
         while ((localSwitchOffset < maxdex) && looP) do
             let switch = sorter.switches.[localSwitchOffset]
-            let lv = sortableSetRollout.baseArray.[switch.low + sortableSetRolloutOffset]
-            let hv = sortableSetRollout.baseArray.[switch.hi + sortableSetRolloutOffset]
-            if(lv > hv) then
-                sortableSetRollout.baseArray.[switch.hi + sortableSetRolloutOffset] <- lv
-                sortableSetRollout.baseArray.[switch.low + sortableSetRolloutOffset] <- hv
-                useWeights.[localSwitchOffset] <- useWeights.[localSwitchOffset] + 1
-                looP <- ((localSwitchOffset % 20 > 0) ||
-                         (not (Combinatorics.isSortedOffset 
-                                                sortableSetRollout.baseArray 
-                                                sortableSetRolloutOffset 
-                                                (Degree.value(sorter.degree)))))
+            let lv = bP32SetsRollout.baseArray.[switch.low + sortableSetRolloutOffset]
+            let hv = bP32SetsRollout.baseArray.[switch.hi + sortableSetRolloutOffset]
+            let rv = useWeights.[localSwitchOffset]
+            bP32SetsRollout.baseArray.[switch.hi + sortableSetRolloutOffset] <- (lv ||| hv)
+            bP32SetsRollout.baseArray.[switch.low + sortableSetRolloutOffset] <- (lv &&& hv)
+            useWeights.[localSwitchOffset] <- (((~~~hv) &&& lv) ||| rv)
             localSwitchOffset <- localSwitchOffset+1
 
     // creates a sorter.switchcount length array to store accumulated
     // switch uses
     let evalGroupBySwitch 
                     (sorter:Sorter) 
-                    (ssRollout:IntSetsRollout) 
+                    (bP32SetsRollout:bP32SetsRollout)  
                     (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex = 
             match switchusePlan with
             | Sorting.SwitchUsePlan.All -> (0, switchCount)
             | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
-        let switchUses = SwitchUses.createEmpty sorter.switchCount
-        let sortableSetRolloutCopy = (IntSetsRollout.copy ssRollout)
-        let mutable sortableIndex=0
-        while (sortableIndex < (SortableCount.value ssRollout.sortableCount)) do
+        let switchUseB32 = SwitchUseB32.createEmpty sorter.switchCount
+        let bP32SetsRolloutCopy = (BP32SetsRollout.copy bP32SetsRollout)
+        let mutable sortableIndex = 0
+        while (sortableIndex < bP32SetsRollout.baseArray.Length) do
                 EvalSorterOnSortableSAGbySwitch 
-                    sorter firstSwitchDex lastSwitchDex 
-                    switchUses sortableSetRolloutCopy sortableIndex
+                    sorter 
+                    firstSwitchDex lastSwitchDex 
+                    switchUseB32 
+                    bP32SetsRolloutCopy 
+                    sortableIndex
                 sortableIndex <- sortableIndex + 1
-        SwitchEventRecords.BySwitch {
-            GroupBySwitch.switchUses = switchUses; 
-            GroupBySwitch.sortableSetRollout = sortableSetRolloutCopy
-        }
-        
+        let switchUses = SwitchUseB32.toSwitchUses switchUseB32
+                         |> Result.ExtractOrThrow
+        //SwitchEventRecords.BySwitch {
+        //    GroupBySwitch.switchUses = switchUses; 
+        //    GroupBySwitch.sortableSetRollout = bP32SetsRolloutCopy
+        //}
+        None
+
     // creates a sorter.switchcount length array to store accumulated
     // switch uses
     let private evalSwitchesGroupBySortable 

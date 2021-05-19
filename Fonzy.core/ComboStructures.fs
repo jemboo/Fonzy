@@ -488,6 +488,9 @@ module TwoCycleGen =
 type IntBits = { values:int[] }
 module IntBits =
 
+    let create (avs:int[]) = 
+        {IntBits.values = avs}
+
     let zeroCreate (count:int) = 
         { IntBits.values = 
                 Array.create count 0 }
@@ -537,6 +540,48 @@ module IntBits =
             if (arrayVers.values.[i] = 1) then
                 intRet <- intRet + 1
 
+        for i in (arrayVers.values.Length - 1) .. -1 .. 0 do
+            bump i
+        intRet
+
+        
+        
+    let fromUint32 (len:int) (intVers:int) =
+        let bitLoc (loc:int) (intBits:int) =
+            if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
+        { IntBits.values = 
+                    Array.init len 
+                                (fun i -> bitLoc i intVers) }
+        
+        
+    let toUint32 (arrayVers:IntBits) =
+        let mutable intRet = 0u
+        let bump i =
+            intRet <- intRet * 2u
+            if (arrayVers.values.[i] = 1) then
+                intRet <- intRet + 1u
+        
+        for i in (arrayVers.values.Length - 1) .. -1 .. 0 do
+            bump i
+        intRet
+
+                
+                
+    let fromUint64 (len:int) (intVers:int) =
+        let bitLoc (loc:int) (intBits:int) =
+            if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
+        { IntBits.values = 
+                    Array.init len 
+                                (fun i -> bitLoc i intVers) }
+                
+                
+    let toUint64 (arrayVers:IntBits) =
+        let mutable intRet = 0UL
+        let bump i =
+            intRet <- intRet * 2UL
+            if (arrayVers.values.[i] = 1) then
+                intRet <- intRet + 1UL
+                
         for i in (arrayVers.values.Length - 1) .. -1 .. 0 do
             bump i
         intRet

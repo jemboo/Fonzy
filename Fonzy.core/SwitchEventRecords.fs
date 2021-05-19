@@ -130,6 +130,12 @@ module SwitchUseB32 =
    let getWeights switchUses = switchUses.weights
    let switchCount switchUses = (SwitchCount.value switchUses.switchCount)
 
+   let toSwitchUses (switchUseB32:SwitchUseB32) = 
+       let suA = switchUseB32.weights
+                 |> Array.map(ByteUtils.trueBitCount32)
+       SwitchUses.create switchUseB32.switchCount suA
+
+
 
 type SwitchUseB64 = {switchCount:SwitchCount; weights:uint64[]}
 module SwitchUseB64 =
@@ -145,6 +151,11 @@ module SwitchUseB64 =
 
    let getWeights switchUses = switchUses.weights
    let switchCount switchUses = (SwitchCount.value switchUses.switchCount)
+
+   let toSwitchUses (switchUseB64:SwitchUseB64) = 
+       let suA = switchUseB64.weights
+                 |> Array.map(ByteUtils.trueBitCount64)
+       SwitchUses.create switchUseB64.switchCount suA
 
 
 

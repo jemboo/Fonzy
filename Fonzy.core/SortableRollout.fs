@@ -7,6 +7,25 @@ type IntSetsRollout =
             sortableCount:SortableCount  }
 
 
+type bP32SetsRollout = 
+        {   degree:Degree; 
+            baseArray:uint[]; 
+            sortableCount:SortableCount  }
+
+
+type bP64SetsRollout = 
+        {   degree:Degree; 
+            baseArray:uint64[]; 
+            sortableCount:SortableCount  }
+
+
+type SortableRollout =
+    | Int of bP32SetsRollout
+    | Bp32 of bP32SetsRollout
+    | Bp64 of bP64SetsRollout
+
+
+
 module IntSetsRollout =
 
     let create (degree:Degree) (baseArray:int[]) =
@@ -81,13 +100,6 @@ module IntSetsRollout =
                   |> Seq.toArray
 
 
-
-type bP32SetsRollout = 
-        {   degree:Degree; 
-            baseArray:uint[]; 
-            sortableCount:SortableCount  }
-
-
 module BP32SetsRollout =
 
     let create (degree:Degree) 
@@ -135,13 +147,6 @@ module BP32SetsRollout =
         let baseArray = arraySets
                         |> Array.collect(fun ia -> ia.values)
         create degree baseArray (SortableCount.fromInt arraySets.Length)
-
-
-
-type bP64SetsRollout = 
-        {   degree:Degree; 
-            baseArray:uint64[]; 
-            sortableCount:SortableCount  }
 
 
 module BP64SetsRollout =
