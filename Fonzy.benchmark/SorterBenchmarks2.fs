@@ -28,10 +28,10 @@ open System
 type BenchmarkSorterOps2() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
-    let sortableSet = IntSetsRollout.allBinary degree |> Result.ExtractOrThrow
-    let sortableSetEx = SortableSetSpec.Generated (SortableSetGenerated.allIntBits degree)
-                            |> SortableSetSpec.getSortableSetExplicit
-                            |> Result.ExtractOrThrow
+    let sortableSet = BP32SetsRollout.allBinary degree |> Result.ExtractOrThrow
+    let sortableSetbp32 = SortableSetBp32.allIntBits degree
+    let sortableSetbp64 = SortableSetBp64.allIntBits degree
+
     //[<Benchmark>]
     //member this.NoSAG() =
     //    let ssR = SortingOps.EvalSorterOnSortableSetWithNoSAG 
@@ -46,20 +46,32 @@ type BenchmarkSorterOps2() =
     //    ssR
 
 
+    //[<Benchmark>]
+    //member this.SAGbySortable() =
+    //    let ssR = SortingBp32.evalGroupBySortable 
+    //                        sorter16 sortableSet Sorting.SwitchUsePlan.All
+    //    ssR
+
+    //|                     Method |       Mean |    Error |   StdDev |
+    //|--------------------------- |-----------:|---------:|---------:|
+    //| evalSorterBp32_AggBySwitch | 1,092.8 us | 15.29 us | 16.99 us |
+    //| evalSorterBp64_AggBySwitch |   639.0 us | 11.28 us | 10.56 us |
+    
+
     [<Benchmark>]
-    member this.SAGbySortable() =
-        let ssR = SortingOps.evalGroupBySortable 
-                            sorter16 sortableSet Sorting.SwitchUsePlan.All
-        ssR
-
-
-
-    [<Benchmark>]
-    member this.evalSorter_AggBySwitch() =
-        let ssR = SortingOps.evalSorter 
-                            sorter16 sortableSetEx Sorting.SwitchUsePlan.All
+    member this.evalSorterBp32_AggBySwitch() =
+        let ssR = SortingBp32.evalSorter 
+                            sorter16 sortableSetbp32 Sorting.SwitchUsePlan.All
                             Sorting.EventGrouping.BySwitch
         ssR
+
+    [<Benchmark>]
+    member this.evalSorterBp64_AggBySwitch() =
+        let ssR = SortingBp64.evalSorter 
+                            sorter16 sortableSetbp64 Sorting.SwitchUsePlan.All
+                            Sorting.EventGrouping.BySwitch
+        ssR
+
 
 
 type BenchmarkSorterSetOps2() =
@@ -141,7 +153,7 @@ type BenchmarkSorterSetOps2() =
 
     //[<Benchmark>]
     //member this.getSorterEff_Parallel_BySwitch() =
-    //    let ssR = SortingOps2.SorterSet.eval
+    //    let ssR = SortingBp32.SorterSet.eval
     //                    mediocreSorterSet 
     //                    sortableSetEx 
     //                    Sorting.SwitchUsePlan.All

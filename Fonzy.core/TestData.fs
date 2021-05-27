@@ -94,10 +94,10 @@ module TestData =
         let rolloutOfAllSortedBinary = 
                 let ia = IntBits.sorted_0_1_Sequences degree
                             |> Seq.map(fun ia -> {IntBits.values = ia.values })
-                IntSetsRollout.fromSortableIntArrays 
-                            degree
-                            ia
-                    |> Result.ExtractOrThrow
+                IntSetsRollout.fromIntBits 
+                               degree
+                               ia
+                |> Result.ExtractOrThrow
 
 
 

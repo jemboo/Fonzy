@@ -20,7 +20,7 @@ type bP64SetsRollout =
 
 
 type SortableRollout =
-    | Int of bP32SetsRollout
+    | Int of IntSetsRollout
     | Bp32 of bP32SetsRollout
     | Bp64 of bP64SetsRollout
 
@@ -43,8 +43,8 @@ module IntSetsRollout =
             } |> Ok
 
 
-    let fromSortableIntArrays (degree:Degree) 
-                              (baseArrays:IntBits seq) =
+    let fromIntBits (degree:Degree) 
+                    (baseArrays:IntBits seq) =
         result {
             let a = baseArrays |> Seq.map(fun a -> a.values)
                                |> Seq.collect(id)
@@ -53,18 +53,18 @@ module IntSetsRollout =
         }
 
 
-    let toSortableIntArrays (ssRollout:IntSetsRollout) =
-        let d = (Degree.value ssRollout.degree)
-        ssRollout.baseArray |> Array.chunkBySize d
+    let toIntBits (intsRoll:IntSetsRollout) =
+        let d = (Degree.value intsRoll.degree)
+        intsRoll.baseArray |> Array.chunkBySize d
                             |> Array.map(fun a -> {IntBits.values = a})
 
 
-    let copy (sortableSetRollout:IntSetsRollout) =
-        let baseCopy = Array.zeroCreate sortableSetRollout.baseArray.Length
-        Array.Copy(sortableSetRollout.baseArray, baseCopy, baseCopy.Length)
-        {   IntSetsRollout.degree=sortableSetRollout.degree; 
+    let copy (intsRoll:IntSetsRollout) =
+        let baseCopy = Array.zeroCreate intsRoll.baseArray.Length
+        Array.Copy(intsRoll.baseArray, baseCopy, baseCopy.Length)
+        {   IntSetsRollout.degree=intsRoll.degree; 
             baseArray=baseCopy;
-            sortableCount=sortableSetRollout.sortableCount }
+            sortableCount=intsRoll.sortableCount }
 
 
     let allBinary (degree:Degree) =
@@ -73,31 +73,36 @@ module IntSetsRollout =
         create degree baseArray
 
 
-    let isSorted (ssRollout:IntSetsRollout) =
-        let d = (Degree.value ssRollout.degree)
-        seq {0 .. d .. (ssRollout.baseArray.Length - 1)}
-            |> Seq.forall(fun dex -> 
-                    Combinatorics.isSortedOffset ssRollout.baseArray dex d)
+    let isSorted (intsRoll:IntSetsRollout) =
+        intsRoll |> toIntBits 
+                 |> Array.forall(IntBits.isSorted)
+
+    //let isSorted (ssRollout:IntSetsRollout) =
+    //    let d = (Degree.value ssRollout.degree)
+    //    seq {0 .. d .. (ssRollout.baseArray.Length - 1)}
+    //        |> Seq.forall(fun dex -> 
+    //                Combinatorics.isSortedOffset ssRollout.baseArray dex d)
         
 
-    let sortedCount (ssRollout:IntSetsRollout) =
-        let d = (Degree.value ssRollout.degree)
-        seq {0 .. d .. (ssRollout.baseArray.Length - 1)}
+    let sortedCount (intsRoll:IntSetsRollout) =
+        let d = (Degree.value intsRoll.degree)
+        seq {0 .. d .. (intsRoll.baseArray.Length - 1)}
             |> Seq.filter (fun dex -> 
-                    Combinatorics.isSortedOffset ssRollout.baseArray dex d)
+                    Combinatorics.isSortedOffset intsRoll.baseArray dex d)
             |> Seq.length
 
 
-    let distinctSortableSets (ssRollout:IntSetsRollout) =
-        ssRollout |> toSortableIntArrays
-                  |> Seq.distinct
-                  |> Seq.toArray
+    let intBitsDistinct (intsRoll:IntSetsRollout) =
+        intsRoll |> toIntBits
+                 |> Seq.distinct
+                 |> Seq.toArray
 
 
-    let histogramOfSortedSortables (ssRollout:IntSetsRollout) =
-        ssRollout |> toSortableIntArrays
-                  |> Seq.countBy id
-                  |> Seq.toArray
+    let intBitsHist (intsRollout:IntSetsRollout) =
+        intsRollout |> toIntBits
+                    |> Seq.countBy id
+                    |> Seq.toArray
+
 
 
 module BP32SetsRollout =
@@ -118,35 +123,52 @@ module BP32SetsRollout =
             } |> Ok
 
 
-    let fromSortableIntArrays (degree:Degree) 
-                              (baseArrays:bitsP32 seq) 
-                              (sortableCount:SortableCount) =
+    let fromBitsP32 (degree:Degree) 
+                    (baseArrays:bitsP32 seq) =
         result {
             let a = baseArrays |> Seq.map(fun a -> a.values)
                                |> Seq.collect(id)
                                |> Seq.toArray
-            return! create degree a sortableCount
+            return! create degree a (SortableCount.fromInt a.Length)
         }
 
 
-    let toBitsP32Arrays (ssRollout:bP32SetsRollout) =
-        let d = (Degree.value ssRollout.degree)
-        ssRollout.baseArray |> Array.chunkBySize d
-                            |> Array.map(fun a -> {bitsP32.values = a})
+    let toBitsP32 (bp32Roll:bP32SetsRollout) =
+        let d = (Degree.value bp32Roll.degree)
+        bp32Roll.baseArray |> Seq.chunkBySize d
+                           |> Seq.map(fun a -> {bitsP32.values = a})
+
+
+    let toIntBits (bp32Roll:bP32SetsRollout) =
+        bp32Roll |> toBitsP32
+                 |> BitsP32.toIntBits
+
+
+    let isSorted (bp32Roll:bP32SetsRollout) =
+        bp32Roll |> toIntBits 
+                 |> Seq.forall(IntBits.isSorted)
+
+
+    let intBitsHist (bp32Roll:bP32SetsRollout) =
+        bp32Roll |> toIntBits
+                 |> Seq.countBy id
+                 |> Seq.toArray
 
 
     let copy (src:bP32SetsRollout) =
         let baseCopy = Array.zeroCreate src.baseArray.Length
         Array.Copy(src.baseArray, baseCopy, baseCopy.Length)
-        {   bP32SetsRollout.degree=src.degree; 
-            baseArray=baseCopy;
-            sortableCount=src.sortableCount }
+        {   bP32SetsRollout.degree = src.degree; 
+            baseArray = baseCopy;
+            sortableCount = src.sortableCount }
+
 
     let allBinary (degree:Degree) =
         let arraySets = BitsP32.arrayOfAllFor degree
         let baseArray = arraySets
                         |> Array.collect(fun ia -> ia.values)
         create degree baseArray (SortableCount.fromInt arraySets.Length)
+
 
 
 module BP64SetsRollout =
@@ -168,29 +190,44 @@ module BP64SetsRollout =
             } |> Ok
 
 
-    let fromSortableIntArrays (degree:Degree) 
-                              (baseArrays:bitsP64 seq) 
-                              (sortableCount:SortableCount) =
+    let fromBitsP64 (degree:Degree) 
+                    (baseArrays:bitsP64 seq) =
         result {
             let a = baseArrays |> Seq.map(fun a -> a.values)
                                |> Seq.collect(id)
                                |> Seq.toArray
-            return! create degree a sortableCount
+            return! create degree a (SortableCount.fromInt a.Length)
         }
 
 
-    let toBitsP32Arrays (ssRollout:bP64SetsRollout) =
+    let toBitsP64 (ssRollout:bP64SetsRollout) =
         let d = (Degree.value ssRollout.degree)
-        ssRollout.baseArray |> Array.chunkBySize d
-                            |> Array.map(fun a -> {bitsP64.values = a})
+        ssRollout.baseArray |> Seq.chunkBySize d
+                            |> Seq.map(fun a -> {bitsP64.values = a})
 
 
-    let copy (sortableSetRollout:bP64SetsRollout) =
-        let baseCopy = Array.zeroCreate sortableSetRollout.baseArray.Length
-        Array.Copy(sortableSetRollout.baseArray, baseCopy, baseCopy.Length)
-        {   bP64SetsRollout.degree=sortableSetRollout.degree; 
+    let toIntBits (ssRollout:bP64SetsRollout) =
+        ssRollout |> toBitsP64
+                  |> BitsP64.toIntBits
+
+
+    let isSorted (bp64Roll:bP64SetsRollout) =
+        bp64Roll |> toIntBits 
+                 |> Seq.forall(IntBits.isSorted)
+
+
+    let intBitsHist (bp64Roll:bP64SetsRollout) =
+        bp64Roll |> toIntBits
+                 |> Seq.countBy id
+                 |> Seq.toArray
+
+
+    let copy (bP64Roll:bP64SetsRollout) =
+        let baseCopy = Array.zeroCreate bP64Roll.baseArray.Length
+        Array.Copy(bP64Roll.baseArray, baseCopy, baseCopy.Length)
+        {   bP64SetsRollout.degree=bP64Roll.degree; 
             baseArray=baseCopy;
-            sortableCount=sortableSetRollout.sortableCount }
+            sortableCount=bP64Roll.sortableCount }
 
 
     let allBinary (degree:Degree) =
@@ -198,3 +235,27 @@ module BP64SetsRollout =
         let baseArray = arraySets
                         |> Array.collect(fun ia -> ia.values)
         create degree baseArray (SortableCount.fromInt arraySets.Length)
+
+
+
+module SortableRollout =
+
+    let copy (sortableRollout:SortableRollout) =
+        match sortableRollout with
+        | Int  isr ->    isr |> IntSetsRollout.copy |> SortableRollout.Int
+        | Bp32  bp32r -> bp32r |> BP32SetsRollout.copy |> SortableRollout.Bp32
+        | Bp64  bp64r -> bp64r |> BP64SetsRollout.copy |> SortableRollout.Bp64
+
+
+    let isSorted (sortableRollout:SortableRollout) =
+        match sortableRollout with
+        | Int  isr ->    isr |> IntSetsRollout.isSorted
+        | Bp32  bp32r -> bp32r |> BP32SetsRollout.isSorted
+        | Bp64  bp64r -> bp64r |> BP64SetsRollout.isSorted
+
+
+    let intBitsHist (sortableRollout:SortableRollout) =
+        match sortableRollout with
+        | Int  isr ->    isr |> IntSetsRollout.intBitsHist
+        | Bp32  bp32r -> bp32r |> BP32SetsRollout.intBitsHist
+        | Bp64  bp64r -> bp64r |> BP64SetsRollout.intBitsHist

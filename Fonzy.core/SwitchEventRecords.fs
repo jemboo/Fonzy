@@ -57,7 +57,7 @@ module SwitchUses =
        stseq |> Seq.iter(fun st -> Recordo wgts st)
        stRet
 
-   let toUsedSwitchCount (switchUses:SwitchUses) = 
+   let usedSwitchCount (switchUses:SwitchUses) = 
        getWeights switchUses |> Array.filter(fun i->i>0) 
                              |> Array.length
                              |> SwitchCount.create ""
@@ -91,7 +91,7 @@ module SwitchUses =
        result
            {
                let! refinedStageCount = (getRefinedStageCount switchUses sorter)
-               let! switchUseCount = (toUsedSwitchCount switchUses)
+               let! switchUseCount = (usedSwitchCount switchUses)
                return switchUseCount, refinedStageCount
            }
 
@@ -115,6 +115,7 @@ module SwitchUses =
            stats
 
 
+
 type SwitchUseB32 = {switchCount:SwitchCount; weights:uint[]}
 module SwitchUseB32 =
    let createEmpty (switchCount:SwitchCount) =
@@ -129,6 +130,11 @@ module SwitchUseB32 =
 
    let getWeights switchUses = switchUses.weights
    let switchCount switchUses = (SwitchCount.value switchUses.switchCount)
+   
+   let usedSwitchCount (switchUses:SwitchUseB32) = 
+       getWeights switchUses |> Array.filter(fun i -> i > 0u) 
+                             |> Array.length
+                             |> SwitchCount.create ""
 
    let toSwitchUses (switchUseB32:SwitchUseB32) = 
        let suA = switchUseB32.weights

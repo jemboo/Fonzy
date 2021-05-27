@@ -17,7 +17,7 @@ type SorterActionRecordsFixture() =
     [<TestMethod>]
     member this.SortableSetRollout_distinctResults() =
       let unsortedRollout = TestData.SorterActionRecords.rolloutOfAllSortedBinary
-      let drs = unsortedRollout |> IntSetsRollout.distinctSortableSets
+      let drs = unsortedRollout |> IntSetsRollout.intBitsDistinct
       Assert.IsTrue(drs.Length = (Degree.value TestData.degree) + 1)
 
 
@@ -25,7 +25,7 @@ type SorterActionRecordsFixture() =
     member this.SortableSetRollout_histogramOfSortableSets() =
       let unSortedRollout = TestData.SorterActionRecords.rolloutOfAllBinary
       let sortableCount = SortableCount.value unSortedRollout.sortableCount
-      let histo = unSortedRollout |> IntSetsRollout.histogramOfSortedSortables
+      let histo = unSortedRollout |> IntSetsRollout.intBitsHist
       let totalCount = histo |> Array.sumBy(snd)
       Assert.AreEqual(sortableCount, totalCount)
 
