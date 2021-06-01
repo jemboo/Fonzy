@@ -2,7 +2,7 @@
 open System
 open SortingEval
 
-module SortingOps =
+module SortingInts =
     // uses a (sorter.switchcount * sortableCount ) length 
     // array to store each switch use, thus no SAG (Switch 
     // Action Grouping)
@@ -170,7 +170,7 @@ module SortingOps =
         }
 
 
-    let evalSorterOnSortableSetRollout 
+    let evalSorterOnIntSetsRollout
                     (sorter:Sorter)
                     (sortableSetRollout:IntSetsRollout)
                     (switchusePlan:Sorting.SwitchUsePlan) 
@@ -196,12 +196,47 @@ module SortingOps =
                 |> IntSetsRollout.fromIntBits
                         sorter.degree
                 |> Result.ExtractOrThrow
-        evalSorterOnSortableSetRollout
+        evalSorterOnIntSetsRollout
             sorter sortableSetRollout switchusePlan switchEventAgg
 
 
 
     module SorterSet =
+
+        let eval0<'T> 
+                (sorterSet:SorterSet)
+                (intSetsRollout:IntSetsRollout)
+                (sortableSetId:SortableSetId)
+                (switchusePlan:Sorting.SwitchUsePlan) 
+                (switchEventAgg:Sorting.EventGrouping) 
+                (_parallel:UseParallel) 
+                (proc:ResultOfSorterOnSortableSet -> Result<'T, string>) =
+
+            let rewrap tup ssr = 
+                let sorterId, sorter = tup
+                let swEvRecs = evalSorterOnIntSetsRollout 
+                                    sorter ssr switchusePlan switchEventAgg
+                let resSoSS = {
+                    ResultOfSorterOnSortableSet.sorter = sorter;
+                    ResultOfSorterOnSortableSet.switchEventRecords = swEvRecs;
+                    ResultOfSorterOnSortableSet.sorterId = sorterId;
+                    ResultOfSorterOnSortableSet.sortableSetId = sortableSetId
+                }
+                proc resSoSS
+
+            result  {
+                return!
+                    match UseParallel.value(_parallel) with
+                    | true  -> sorterSet.sorters |> Map.toArray 
+                                                 |> Array.Parallel.map(fun s-> rewrap s intSetsRollout)
+                                                 |> Array.toList
+                                                 |> Result.sequence
+                    | false -> sorterSet.sorters |> Map.toList 
+                                                 |> List.map(fun s-> rewrap s intSetsRollout)
+                                                 |> Result.sequence
+            }
+
+
 
         let eval<'T> 
                  (sorterSet:SorterSet)
@@ -213,7 +248,7 @@ module SortingOps =
 
             let rewrap tup ssr = 
                 let sorterId, sorter = tup
-                let swEvRecs = evalSorterOnSortableSetRollout 
+                let swEvRecs = evalSorterOnIntSetsRollout 
                                     sorter ssr switchusePlan switchEventAgg
                 let resSoSS = {
                     ResultOfSorterOnSortableSet.sorter = sorter;
@@ -237,6 +272,12 @@ module SortingOps =
                                                  |> List.map(fun s-> rewrap s ssRoll)
                                                  |> Result.sequence
             }
+
+
+
+
+
+
 
         let getSorterPerfBins 
             (sorterSet:SorterSet)

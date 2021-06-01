@@ -10,16 +10,16 @@ type SortingOpsFixture () =
     [<TestMethod>]
     member this.evalAndGetSwitchUses() =
         let refSorter = TestData.SorterParts.goodRefSorter
-        let sortableSet = TestData.SortableSet.ssAllIntBits 
+        let sortableSet = TestData.SortableSet.ssBinary 
 
         let resGroupBySwitch = 
-            SortingOps.evalGroupBySwitch
+            SortingInts.evalGroupBySwitch
                 TestData.SorterParts.goodRefSorter 
                 TestData.SorterActionRecords.rolloutOfAllBinary
                 Sorting.SwitchUsePlan.All
 
         let resNoGrouping = 
-            SortingOps.evalNoGrouping 
+            SortingInts.evalNoGrouping 
                 TestData.SorterParts.goodRefSorter 
                 TestData.SorterActionRecords.rolloutOfAllBinary
                 Sorting.SwitchUsePlan.All
@@ -45,16 +45,16 @@ type SortingOpsFixture () =
     [<TestMethod>]
     member this.evalAndGetSortableUses() =
         let refSorter = TestData.SorterParts.goodRefSorter
-        let sortableSet = TestData.SortableSet.ssAllIntBits 
+        let sortableSet = TestData.SortableSet.ssBinary 
 
         let resGroupBySortable = 
-            SortingOps.evalGroupBySortable
+            SortingInts.evalGroupBySortable
                 TestData.SorterParts.goodRefSorter 
                 TestData.SorterActionRecords.rolloutOfAllBinary
                 Sorting.SwitchUsePlan.All
 
         let resNoGrouping = 
-            SortingOps.evalNoGrouping 
+            SortingInts.evalNoGrouping 
                 TestData.SorterParts.goodRefSorter 
                 TestData.SorterActionRecords.rolloutOfAllBinary
                 Sorting.SwitchUsePlan.All
@@ -80,13 +80,12 @@ type SortingOpsFixture () =
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
         let sorter16 = RefSorter.goodRefSorterForDegree degree 
                         |> Result.ExtractOrThrow
-        let sortableSetEx = SortableSetSpec.Generated 
-                                (SortableSetGenerated.allIntBits degree)
-                            |> SortableSetSpec.getSortableSetExplicit
-                            |> Result.ExtractOrThrow 
+        let sortableSetBinary = SortableSetBinary.allIntBits degree
 
-        let ssR = SortingOps.evalSorter 
-                        sorter16 sortableSetEx Sorting.SwitchUsePlan.All
+        let ssR = SortingInts.evalSorter 
+                        sorter16 
+                        sortableSetBinary
+                        Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
         let switchCount =
             match ssR with
@@ -99,7 +98,7 @@ type SortingOpsFixture () =
     member this.Hist() =
         let testCase = TestData.SorterParts.randomIntBits
         let goodSorter = TestData.SorterParts.goodRefSorter
-        let hist = SortingOps.History.sortTHist goodSorter testCase
+        let hist = SortingInts.History.sortTHist goodSorter testCase
         Assert.IsTrue(hist.Length > 1)
         let result = hist.Item (hist.Length - 1)
         Assert.IsTrue(result |> IntBits.isSorted)
@@ -107,12 +106,12 @@ type SortingOpsFixture () =
 
     [<TestMethod>]
     member this.Hist2() =
-        let testCase = TestData.SorterParts.randomBitsP32
+        let testCase = TestData.SorterParts.randomBitsP64
         let goodSorter = TestData.SorterParts.goodRefSorter
-        let hist = SortingBp32.History.sortTHist2 goodSorter testCase
+        let hist = SortingBp64.History.sortTHist goodSorter testCase
         Assert.IsTrue(hist.Length > 1)
         let result = hist.Item (hist.Length - 1)
-        Assert.IsTrue(result |> BitsP32.isSorted)
+        Assert.IsTrue(result |> BitsP64.isSorted)
 
 
 
@@ -122,9 +121,9 @@ type SortingOpsFixture () =
         let sorter16 = RefSorter.goodRefSorterForDegree degree 
                         |> Result.ExtractOrThrow
 
-        let sortableSetEx = SortableSetBp32.allIntBits degree
+        let sortableSetEx = SortableSetBp64.allIntBits degree
 
-        let ssR = SortingBp32.evalSorter 
+        let ssR = SortingBp64.evalSorter 
                         sorter16 sortableSetEx Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
         let switchCount =
@@ -143,9 +142,9 @@ type SortingOpsFixture () =
 
         let sorterSet = TestData.SorterSet.mediocreSorterSet
 
-        let sortableSetEx = SortableSetBp32.allIntBits sorterSet.degree
+        let sortableSetEx = SortableSetBp64.allIntBits sorterSet.degree
 
-        let ssR = SortingBp32.SorterSet.eval
+        let ssR = SortingBp64.SorterSet.eval
                         sorterSet 
                         sortableSetEx 
                         Sorting.SwitchUsePlan.All
@@ -316,7 +315,7 @@ type SortingOpsFixture () =
                  |> Result.ExtractOrThrow
 
         let resEndM = 
-            SortingOps.evalGroupBySwitch
+            SortingInts.evalGroupBySwitch
                 sM
                 rolloutOfAllBin16
                 Sorting.SwitchUsePlan.All

@@ -5,15 +5,12 @@ type SortableSetBinary = {id:SortableSetId; degree:Degree;
                             sortables:IntBits[]}
 type SortableSetInteger = {id:SortableSetId; degree:Degree; 
                             sortables:int[][]}
-type SortableSetBp32 = {id:SortableSetId; degree:Degree; 
-                            sortables:bitsP32[]}
 type SortableSetBp64 = {id:SortableSetId; degree:Degree; 
                             sortables:bitsP64[]}
 
 type SortableSet =
      | Binary of SortableSetBinary
      | Integer of SortableSetInteger
-     | Bp32 of SortableSetBp32
      | Bp64 of SortableSetBp64
 
 
@@ -31,7 +28,21 @@ module SortableSetBinary =
               SortableSetBinary.sortables = 
                         (IntBits.arrayOfAllFor degree)
                         |> Seq.toArray
-         }
+        }
+
+
+    let allBp64 (degree:Degree) = 
+        let id = seq { allIntBitsId:> obj; 
+                       degree:> obj;} 
+                        |> GuidUtils.guidFromObjs
+        {
+              SortableSetBp64.id = SortableSetId.fromGuid id;
+              SortableSetBp64.degree = degree;
+              SortableSetBp64.sortables = 
+                        (BitsP64.arrayOfAllFor degree)
+                        |> Seq.toArray
+        }
+
 
     let rndBits (degree:Degree) 
                 (rngGen:RngGen) 
@@ -75,43 +86,6 @@ module SortableSetInteger =
               SortableSetInteger.sortables = sia
         }
      
-     
-module SortableSetBp32 = 
-        
-    let allIntBitsId = SorterSetId.fromGuid (Guid.Parse "74000000-0000-0000-0000-000000000222")
-    let rndBitsId =    SorterSetId.fromGuid (Guid.Parse "75000000-0000-0000-0000-000000000222")
-        
-    let allIntBits (degree:Degree) = 
-        let id = seq { allIntBitsId:> obj; 
-                        degree:> obj;} 
-                        |> GuidUtils.guidFromObjs
-        {
-                SortableSetBp32.id = SortableSetId.fromGuid id;
-                SortableSetBp32.degree = degree;
-                SortableSetBp32.sortables = 
-                        (BitsP32.arrayOfAllFor degree)
-                        |> Seq.toArray
-            }
-        
-    let rndBits (degree:Degree) 
-                (rngGen:RngGen) 
-                (sortableCount:SortableCount) = 
-        let id = seq { rndBitsId:> obj;
-                        degree:> obj;
-                        rngGen:> obj; 
-                        sortableCount:> obj;} 
-                        |> GuidUtils.guidFromObjs
-        let rando = rngGen |> Rando.fromRngGen
-        let sias = BitsP32.createRandoms  degree 
-                                            rando
-                                            (SortableCount.value sortableCount)
-                    |> Seq.toArray
-        {
-            SortableSetBp32.id = SortableSetId.fromGuid id;
-            SortableSetBp32.degree = degree;
-            SortableSetBp32.sortables = sias
-        }
-
 
 module SortableSetBp64 = 
 
@@ -149,3 +123,11 @@ module SortableSetBp64 =
             SortableSetBp64.degree = degree;
             SortableSetBp64.sortables = sias
         }
+
+
+module SortableSet = 
+    let iD (ss:SortableSet) =
+        match ss with
+        | Binary  ss -> ss.id
+        | Integer  ss -> ss.id
+        | Bp64 ss -> ss.id

@@ -6,18 +6,18 @@ open BenchmarkDotNet.Running
 [<EntryPoint>]
 let main argv =
     /// ******* Benchmark ***********
-    Console.WriteLine("Starting Benchmark.main")
-    let summary = BenchmarkRunner.Run<BenchmarkSorterOps2>()
-    printfn "%A" summary
-    Console.Read() |> ignore
+    //Console.WriteLine("Starting Benchmark.main")
+    //let summary = BenchmarkRunner.Run<BenchmarkSorterOps2>()
+    //printfn "%A" summary
+    //Console.Read() |> ignore
    
      /// ******* Perfbins ***********
-    //Console.WriteLine("Starting Perfbins.main")
-    //let res = Array.init 10000 
-    //            (fun i -> 
-    //                    Console.WriteLine(i)
-    //                    RunW.genToSorterPerfBins i)
-    //Console.Read() |> ignore   
+    Console.WriteLine("Starting Perfbins.main")
+    let res = Array.init 10000 
+                (fun i -> 
+                        Console.WriteLine(i)
+                        RunBp64.genToSorterPerfBins i)
+    Console.Read() |> ignore   
 
     /// ******* Perfbins ***********
     //Console.WriteLine("Starting Perfbins.main")

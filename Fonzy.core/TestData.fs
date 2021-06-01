@@ -37,8 +37,8 @@ module TestData =
         let randomIntBits = 
             IntBits.createRandom degree iRando
 
-        let randomBitsP32 = 
-            BitsP32.createRandoms degree iRando 1
+        let randomBitsP64 = 
+            BitsP64.createRandoms degree iRando 1
                     |> Seq.head
 
         let switchUseArray = Array.init (SwitchCount.value switchCount) 
@@ -68,8 +68,9 @@ module TestData =
 
 
     module SortableSet =
-        let ssAllIntBits = SortableSetBinary.allIntBits degree
-        let sortableSet = SortableSetSpec.Explicit ssAllIntBits
+        let ssBinary = SortableSetBinary.allIntBits degree
+        let sortableSet =  ssBinary |> SortableSet.Binary
+                                    |> SortableSetSpec.Explicit
 
     module SorterSet = 
         let mediocreSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())

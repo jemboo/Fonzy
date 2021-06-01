@@ -28,8 +28,6 @@ open System
 type BenchmarkSorterOps2() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
-    let sortableSet = BP32SetsRollout.allBinary degree |> Result.ExtractOrThrow
-    let sortableSetbp32 = SortableSetBp32.allIntBits degree
     let sortableSetbp64 = SortableSetBp64.allIntBits degree
 
     //[<Benchmark>]
@@ -58,17 +56,13 @@ type BenchmarkSorterOps2() =
     //| evalSorterBp64_AggBySwitch |   639.0 us | 11.28 us | 10.56 us |
     
 
-    [<Benchmark>]
-    member this.evalSorterBp32_AggBySwitch() =
-        let ssR = SortingBp32.evalSorter 
-                            sorter16 sortableSetbp32 Sorting.SwitchUsePlan.All
-                            Sorting.EventGrouping.BySwitch
-        ssR
 
     [<Benchmark>]
     member this.evalSorterBp64_AggBySwitch() =
         let ssR = SortingBp64.evalSorter 
-                            sorter16 sortableSetbp64 Sorting.SwitchUsePlan.All
+                            sorter16 
+                            sortableSetbp64 
+                            Sorting.SwitchUsePlan.All
                             Sorting.EventGrouping.BySwitch
         ssR
 

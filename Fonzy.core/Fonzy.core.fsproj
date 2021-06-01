@@ -27,8 +27,8 @@
     <Compile Include="SwitchEventRecords.fs" />
     <Compile Include="SortableRollout.fs" />
     <Compile Include="SwitchEventRollout.fs" />
-    <Compile Include="SortingEval.fs" />
     <Compile Include="SortableSetSpec.fs" />
+    <Compile Include="SortingEval.fs" />
     <Compile Include="Sorting.fs" />
     <Compile Include="GaTypes.fs" />
     <Compile Include="SortingGaTypes.fs" />

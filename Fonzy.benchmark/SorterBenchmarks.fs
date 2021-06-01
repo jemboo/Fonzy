@@ -49,9 +49,13 @@ type BenchmarkSorterOps() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
     let sortableSet = IntSetsRollout.allBinary degree |> Result.ExtractOrThrow
-    let sortableSetEx = SortableSetSpec.Generated (SortableSetGenerated.allIntBits degree)
-                            |> SortableSetSpec.getSortableSetExplicit
-                            |> Result.ExtractOrThrow
+    let sortableSetBinary = SortableSetBinary.allIntBits degree
+    
+    
+    
+    //SortableSetSpec.Generated (SortableSetGenerated.allIntBits degree)
+    //                        |> SortableSetSpec.getSortableSetExplicit
+    //                        |> Result.ExtractOrThrow
     //[<Benchmark>]
     //member this.NoSAG() =
     //    let ssR = SortingOps.EvalSorterOnSortableSetWithNoSAG 
@@ -68,7 +72,7 @@ type BenchmarkSorterOps() =
 
     [<Benchmark>]
     member this.SAGbySortable() =
-        let ssR = SortingOps.evalGroupBySortable 
+        let ssR = SortingInts.evalGroupBySortable 
                             sorter16 sortableSet Sorting.SwitchUsePlan.All
         ssR
 
@@ -76,8 +80,10 @@ type BenchmarkSorterOps() =
 
     [<Benchmark>]
     member this.evalSorter_AggBySwitch() =
-        let ssR = SortingOps.evalSorter 
-                            sorter16 sortableSetEx Sorting.SwitchUsePlan.All
+        let ssR = SortingInts.evalSorter 
+                            sorter16 
+                            sortableSetBinary 
+                            Sorting.SwitchUsePlan.All
                             Sorting.EventGrouping.BySwitch
         ssR
 

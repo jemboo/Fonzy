@@ -37,6 +37,8 @@ module AncestryDto =
         else sprintf "cat: %s for AncestryDto not found"
                       eDto.cat |> Error
 
+
+
 type GenomeDto = {cat:string; value:string}
 module GenomeDto =
     let toDto (genome:Genome) =
@@ -90,6 +92,7 @@ module PhenotypeDto =
                       eDto.cat |> Error
 
 
+
 type OrgPerformanceDto = {cat:string; value:string}
 module OrgPerformanceDto =
     let toDto (orgPerformance:OrgPerformance) =
@@ -111,6 +114,7 @@ module OrgPerformanceDto =
             }
         else sprintf "cat: %s for PhenotypeEvalDto not found"
                       eDto.cat |> Error
+
 
 
 type PhenotypeEvalDto = {cat:string; value:string}
@@ -136,6 +140,7 @@ module PhenotypeEvalDto =
             }
         else sprintf "cat: %s for PhenotypeEvalDto not found"
                       eDto.cat |> Error
+
 
 
 type OrgDto = 

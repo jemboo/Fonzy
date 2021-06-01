@@ -72,6 +72,78 @@ module RunW =
         dex
 
 
+
+
+module RunBp64 =
+    let baseDataDir = "C:\\SimOut"
+    let directoryDataSource = new DirectoryDataSource(baseDataDir) 
+                                :> IDataSource
+    FileUtils.makeDirectory baseDataDir |> Result.ExtractOrThrow |> ignore
+    let seed = DateTime.Now.Ticks |> int
+    let degree = Degree.fromInt 16
+
+    let srtbSetSpec = SortableSetGenerated.allBp64 degree
+                        |> SortableSetSpec.Generated
+
+    let rnGen = RngGen.createLcg seed
+    let randy = Rando.fromRngGen rnGen
+    let binResultsName = "sorterPerfBins"
+    let nextRnGen() =
+        RngGen.createLcg randy.NextPositiveInt
+
+    let genMush sg sc rng sup sbset up resn =
+        CauseSpecSorters.genToSorterPerfBins 
+                                ("sorterGen", sg)
+                                ("sorterCount", sc)
+                                ("rndGen", rng)
+                                ("switchUsePlan", sup)
+                                ("sortableSet", sbset)
+                                ("useParallel", up)
+                                ("resultsName", resn)
+
+
+    let genToSorterPerfBins (dex:int) =
+        let stageCount = StageCount.degreeTo999StageCount degree
+        let switchCount = SwitchCount.degreeTo999SwitchCount degree
+        let windowSize = StageCount.fromInt 3  //(10 + (dex % 4))
+       // let sorterGen = SorterGen.RandCoComp (stageCount, degree)
+       // let sorterGen = SorterGen.RandSwitches (switchCount, degree)
+        let sorterGen = SorterGen.RandBuddies (stageCount, windowSize, degree)
+       
+        //let sorterGen = match (dex % 2) with
+        //                | 0 ->  SorterGen.RandStages (stageCount, degree)
+        //                | _ ->  SorterGen.RandSymmetric (stageCount, degree)
+
+        let sorterCount = SorterCount.fromInt 10000
+        let causeSpec = 
+                genMush
+                    sorterGen
+                    sorterCount
+                    (nextRnGen())
+                    Sorting.SwitchUsePlan.All
+                    srtbSetSpec
+                    true
+                    binResultsName
+
+        let cause = causeSpec
+                        |> Causes.fromCauseSpec
+                        |> Result.ExtractOrThrow
+
+        let binSpecWorld = 
+            World.createFromParent 
+                World.empty
+                cause
+            |> Result.ExtractOrThrow
+            |> WorldDto.toDto
+            |> DataStoreItem.WorldDto
+
+        let fp = directoryDataSource.AddNewDataStoreItem 
+                    binSpecWorld
+                 |> Result.ExtractOrThrow
+        dex
+
+
+
         
     let dirPerfBinReport (dex:int) =
         let repDataDir = "C:\\testDirForDataSourceFixture\\20_stageGen"

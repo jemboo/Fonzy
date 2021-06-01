@@ -172,7 +172,7 @@ module CauseSpecSorters =
                      (CauseSpec.tupOp degree (Degree.value >> string));
                      sorterSetName;
                      (CauseSpec.tupOp switchUsePlan Json.serialize);
-                     (CauseSpec.tupOp sortableSet SortableSetDto.toJson);
+                     (CauseSpec.tupOp sortableSet SortableSetSpecDto.toJson);
                      (CauseSpec.tupOp useParallel Json.serialize);
                      resultsName
                      ] |> Map.ofList
@@ -207,7 +207,7 @@ module CauseSpecSorters =
                      (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
                      (CauseSpec.tupOp rndGen RngGenDto.toJson);
                      (CauseSpec.tupOp switchUsePlan Json.serialize);
-                     (CauseSpec.tupOp sortableSet SortableSetDto.toJson);
+                     (CauseSpec.tupOp sortableSet SortableSetSpecDto.toJson);
                      (CauseSpec.tupOp useParallel Json.serialize);
                      resultsName
                      ] |> Map.ofList

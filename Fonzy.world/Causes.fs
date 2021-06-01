@@ -63,7 +63,7 @@ module CauseSorters =
                 let! sortableSet = 
                         causeSpec.prams 
                         |> ResultMap.procKeyedString "sortableSet" 
-                                                          (SortableSetDto.fromJson)
+                                                          (SortableSetSpecDto.fromJson)
                 let! useParallel = 
                         causeSpec.prams 
                         |> ResultMap.lookupKeyedBool "useParallel"
@@ -112,7 +112,7 @@ module CauseSorters =
                 let! sortableSet = 
                         causeSpec.prams 
                             |> ResultMap.procKeyedString "sortableSet" 
-                                                          (SortableSetDto.fromJson)
+                                                          (SortableSetSpecDto.fromJson)
                 let! useParallel = 
                         causeSpec.prams 
                             |> ResultMap.lookupKeyedBool "useParallel"

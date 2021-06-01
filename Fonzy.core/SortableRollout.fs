@@ -7,11 +7,6 @@ type IntSetsRollout =
             sortableCount:SortableCount  }
 
 
-type bP32SetsRollout = 
-        {   degree:Degree; 
-            baseArray:uint[]; 
-            sortableCount:SortableCount  }
-
 
 type bP64SetsRollout = 
         {   degree:Degree; 
@@ -21,7 +16,6 @@ type bP64SetsRollout =
 
 type SortableRollout =
     | Int of IntSetsRollout
-    | Bp32 of bP32SetsRollout
     | Bp64 of bP64SetsRollout
 
 
@@ -48,6 +42,14 @@ module IntSetsRollout =
         result {
             let a = baseArrays |> Seq.map(fun a -> a.values)
                                |> Seq.collect(id)
+                               |> Seq.toArray
+            return! create degree a 
+        }
+
+    let fromIntArrays (degree:Degree) 
+                      (baseArrays:int[] seq) =
+        result {
+            let a = baseArrays |> Seq.collect(id)
                                |> Seq.toArray
             return! create degree a 
         }
@@ -102,72 +104,6 @@ module IntSetsRollout =
         intsRollout |> toIntBits
                     |> Seq.countBy id
                     |> Seq.toArray
-
-
-
-module BP32SetsRollout =
-
-    let create (degree:Degree) 
-               (baseArray:uint[] ) 
-               (sortableCount:SortableCount) =
-        if baseArray.Length < 0 + (Degree.value degree) then
-            Error (sprintf "baseArray length %d is not a multiple of degree: %d:" 
-                    baseArray.Length (Degree.value degree))
-        else
-            let baseCopy = Array.zeroCreate baseArray.Length
-            Array.Copy(baseArray, baseCopy, baseArray.Length)
-            {
-                bP32SetsRollout.degree = degree; 
-                baseArray = baseCopy; 
-                sortableCount = sortableCount
-            } |> Ok
-
-
-    let fromBitsP32 (degree:Degree) 
-                    (baseArrays:bitsP32 seq) =
-        result {
-            let a = baseArrays |> Seq.map(fun a -> a.values)
-                               |> Seq.collect(id)
-                               |> Seq.toArray
-            return! create degree a (SortableCount.fromInt a.Length)
-        }
-
-
-    let toBitsP32 (bp32Roll:bP32SetsRollout) =
-        let d = (Degree.value bp32Roll.degree)
-        bp32Roll.baseArray |> Seq.chunkBySize d
-                           |> Seq.map(fun a -> {bitsP32.values = a})
-
-
-    let toIntBits (bp32Roll:bP32SetsRollout) =
-        bp32Roll |> toBitsP32
-                 |> BitsP32.toIntBits
-
-
-    let isSorted (bp32Roll:bP32SetsRollout) =
-        bp32Roll |> toIntBits 
-                 |> Seq.forall(IntBits.isSorted)
-
-
-    let intBitsHist (bp32Roll:bP32SetsRollout) =
-        bp32Roll |> toIntBits
-                 |> Seq.countBy id
-                 |> Seq.toArray
-
-
-    let copy (src:bP32SetsRollout) =
-        let baseCopy = Array.zeroCreate src.baseArray.Length
-        Array.Copy(src.baseArray, baseCopy, baseCopy.Length)
-        {   bP32SetsRollout.degree = src.degree; 
-            baseArray = baseCopy;
-            sortableCount = src.sortableCount }
-
-
-    let allBinary (degree:Degree) =
-        let arraySets = BitsP32.arrayOfAllFor degree
-        let baseArray = arraySets
-                        |> Array.collect(fun ia -> ia.values)
-        create degree baseArray (SortableCount.fromInt arraySets.Length)
 
 
 
@@ -243,19 +179,16 @@ module SortableRollout =
     let copy (sortableRollout:SortableRollout) =
         match sortableRollout with
         | Int  isr ->    isr |> IntSetsRollout.copy |> SortableRollout.Int
-        | Bp32  bp32r -> bp32r |> BP32SetsRollout.copy |> SortableRollout.Bp32
         | Bp64  bp64r -> bp64r |> BP64SetsRollout.copy |> SortableRollout.Bp64
 
 
     let isSorted (sortableRollout:SortableRollout) =
         match sortableRollout with
         | Int  isr ->    isr |> IntSetsRollout.isSorted
-        | Bp32  bp32r -> bp32r |> BP32SetsRollout.isSorted
         | Bp64  bp64r -> bp64r |> BP64SetsRollout.isSorted
 
 
     let intBitsHist (sortableRollout:SortableRollout) =
         match sortableRollout with
         | Int  isr ->    isr |> IntSetsRollout.intBitsHist
-        | Bp32  bp32r -> bp32r |> BP32SetsRollout.intBitsHist
         | Bp64  bp64r -> bp64r |> BP64SetsRollout.intBitsHist

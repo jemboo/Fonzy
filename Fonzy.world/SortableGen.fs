@@ -12,6 +12,16 @@ module SortableSetGenerated =
             SortableSetGenerated.prams = m
         }
 
+    let allBp64 (degree:Degree) = 
+        let m = [("degree", (Degree.value degree).ToString());]
+                    |> Map.ofList
+        let id = ([("allBp64" :> obj); (m :> obj)]) |> GuidUtils.guidFromObjList
+        {
+            SortableSetGenerated.id = id |> SortableSetId.fromGuid;
+            SortableSetGenerated.cat = "allBp64";
+            SortableSetGenerated.prams = m
+        }
+
     let rndBits (id:SortableSetId) 
                 (degree:Degree) 
                 (sortableCount:SortableCount) 
@@ -48,7 +58,7 @@ module SortableSetGenerated =
                                                            (RngGenDto.fromJson)
                       let! sortableCount = ssg.prams |> ResultMap.procKeyedInt "sortableCount" 
                                                            (SortableCount.create "")
-                      return SortableSetBinary.rndBits degree rngGen sortableCount
+                      return (SortableSetBinary.rndBits degree rngGen sortableCount) |> SortableSet.Binary
                    }
 
         //| "rndPerms" -> 
@@ -67,8 +77,18 @@ module SortableSetGenerated =
                         let! degree = ssg.prams |> ResultMap.procKeyedInt "degree" 
                                                             (fun d -> Degree.create "" d)
 
-                        return SortableSetBinary.allIntBits degree
+                        return  ( SortableSetBinary.allIntBits degree ) |> SortableSet.Binary
                     }
+
+        | "allBp64" -> 
+            result {
+                        let! degree = ssg.prams |> ResultMap.procKeyedInt "degree" 
+                                                            (fun d -> Degree.create "" d)
+
+                        return ( SortableSetBinary.allBp64 degree ) |> SortableSet.Bp64
+                    }
+
+
         | _ -> Error (sprintf "no match for SortableSetGenerated.cat: %s" ssg.cat)
 
 

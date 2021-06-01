@@ -145,6 +145,40 @@ module SortingBp64 =
 
 
     module SorterSet =
+
+        let eval0<'T> 
+                 (sorterSet:SorterSet)
+                 (bP64SetsRollout:bP64SetsRollout)
+                 (sortableSetId:SortableSetId)
+                 (switchusePlan:Sorting.SwitchUsePlan) 
+                 (switchEventAgg:Sorting.EventGrouping) 
+                 (_parallel:UseParallel) 
+                 (proc:ResultOfSorterOnSortableSet -> Result<'T, string>) =
+
+            let rewrap tup ssr = 
+                let sorterId, sorter = tup
+                let swEvRecs = evalSorterOnSortableSetRollout 
+                                    sorter ssr switchusePlan switchEventAgg
+                let resSoSS = {
+                    ResultOfSorterOnSortableSet.sorter = sorter;
+                    ResultOfSorterOnSortableSet.switchEventRecords = swEvRecs;
+                    ResultOfSorterOnSortableSet.sorterId = sorterId;
+                    ResultOfSorterOnSortableSet.sortableSetId = sortableSetId
+                }
+                proc resSoSS
+
+            result  {
+                return!
+                    match UseParallel.value(_parallel) with
+                    | true  -> sorterSet.sorters |> Map.toArray 
+                                                 |> Array.Parallel.map(fun s-> rewrap s bP64SetsRollout)
+                                                 |> Array.toList
+                                                 |> Result.sequence
+                    | false -> sorterSet.sorters |> Map.toList 
+                                                 |> List.map(fun s-> rewrap s bP64SetsRollout)
+                                                 |> Result.sequence
+            }
+
         let eval<'T> 
                  (sorterSet:SorterSet)
                  (sortableSet:SortableSetBp64)
@@ -180,38 +214,39 @@ module SortingBp64 =
                                                  |> Result.sequence
             }
 
-    //    let getSorterPerfBins 
-    //        (sorterSet:SorterSet)
-    //        (sortableSet:SortableSetBinary)
-    //        (switchusePlan:Sorting.SwitchUsePlan)
-    //        (_parallel:UseParallel) =
-    //        result {
-    //            let! sorterEffs = 
-    //                    eval 
-    //                        sorterSet 
-    //                        sortableSet 
-    //                        switchusePlan
-    //                        Sorting.EventGrouping.BySwitch
-    //                        _parallel
-    //                        SortingEval.SortingRecords.getSorterEff
 
-    //            let bins = sorterEffs 
-    //                            |> SorterPerfBin.fromSorterEffs
+        let getSorterPerfBins 
+            (sorterSet:SorterSet)
+            (sortableSet:SortableSetBp64)
+            (switchusePlan:Sorting.SwitchUsePlan)
+            (_parallel:UseParallel) =
+            result {
+                let! sorterEffs = 
+                        eval 
+                            sorterSet 
+                            sortableSet 
+                            switchusePlan
+                            Sorting.EventGrouping.BySwitch
+                            _parallel
+                            SortingEval.SortingRecords.getSorterEff
 
-    //            return bins
-    //        }
+                let bins = sorterEffs 
+                                |> SorterPerfBin.fromSorterEffs
+
+                return bins
+            }
 
 
     module History =
 
         let sortTHistSwitches(switches:Switch list)
-                             (pBits:bitsP32) =
+                             (pBits:bitsP64) =
             let mutable i = 0
             let mutable lstRet = [pBits]
             let mutable newCase = pBits
 
             while (i < switches.Length) do
-                newCase <- newCase |> BitsP32.copy
+                newCase <- newCase |> BitsP64.copy
                 let uintArray = newCase.values
                 let sw = switches.[i]
                 let lv = uintArray.[sw.low]
@@ -228,15 +263,15 @@ module SortingBp64 =
         let sortTHistSwitchList (sorter:Sorter) 
                                  (mindex:int) 
                                  (maxdex:int) 
-                                 (pBits:bitsP32) =
+                                 (pBits:bitsP64) =
             let sws = sorter.switches |> Array.skip(mindex)
                                       |> Array.take(maxdex - mindex)
                                       |> Array.toList
             sortTHistSwitches sws pBits
 
 
-        let sortTHist2 (sorter:Sorter) 
-                       (pBits:bitsP32) =
+        let sortTHist (sorter:Sorter) 
+                      (pBits:bitsP64) =
             let sl = SwitchCount.value sorter.switchCount
-            sortTHistSwitchList sorter 0 (sl - 1) pBits
+            sortTHistSwitchList sorter 0 sl pBits
 
