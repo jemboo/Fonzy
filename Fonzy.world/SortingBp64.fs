@@ -4,7 +4,7 @@ open SortingEval
 
 module SortingBp64 =
 
-    let private evalSorterOnSbpWithNoSAG 
+    let private switchRangeWithNoSAG 
                 (sorter:Sorter) 
                 (mindex:int) (maxdex:int) 
                 (bp64SetsRollout:bP64SetsRollout) 
@@ -27,7 +27,7 @@ module SortingBp64 =
     // creates a (sorter.switchcount * sortableCount ) length 
     // array to store each switch use, thus no SAG (Switch 
     // Action Grouping)
-    let evalNoGrouping 
+    let sorterWithNoSAG
                 (sorter:Sorter) 
                 (bP64SetsRollout:bP64SetsRollout) 
                 (switchusePlan:Sorting.SwitchUsePlan) =
@@ -44,25 +44,26 @@ module SortingBp64 =
 
         let mutable sortableBlockDex = 0
         while (sortableBlockDex < seRollbp64.sortableBlockCount) do
-            evalSorterOnSbpWithNoSAG
+            switchRangeWithNoSAG
                             sorter
-                            firstSwitchDex lastSwitchDex
+                            firstSwitchDex 
+                            lastSwitchDex
                             bPsRollCopy
                             seRollbp64.useRoll.values
                             sortableBlockDex
+
             sortableBlockDex <- sortableBlockDex + 1
 
-        //SwitchEventRecords.NoGrouping {
-        //    NoGrouping.switchEventRollout = seRollbp32
-        //    NoGrouping.sortableRollout = SortableRollout.Bp32 
-        //                                        bPsRollCopy
-        //}
-        None
+        SwitchEventRecords.NoGrouping {
+            NoGrouping.switchEventRollout = seRollbp64 |> switchEventRollout.Bp64
+            NoGrouping.sortableRollout = bPsRollCopy |> SortableRollout.Bp64 
+                                                
+        }
 
 
     // uses a sorter.switchcount length array to store accumulated
     // switch uses
-    let private evalSorterOnSortableSAGbySwitch 
+    let private switchRangeMakeSwitchUses 
                     (sorter:Sorter) 
                     (mindex:int) (maxdex:int) 
                     (switchUseB64:SwitchUseB64) 
@@ -85,10 +86,11 @@ module SortingBp64 =
 
     // creates a sorter.switchcount length array to store accumulated
     // switch uses
-    let evalGroupBySwitch 
+    let sorterMakeSwitchUses
                     (sorter:Sorter) 
                     (bp64SetsRollout:bP64SetsRollout)  
                     (switchusePlan:Sorting.SwitchUsePlan) =
+
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex =
             match switchusePlan with
@@ -98,13 +100,16 @@ module SortingBp64 =
         let bp64SetsRolloutCopy = (BP64SetsRollout.copy bp64SetsRollout)
         let mutable sortableIndex = 0
         while (sortableIndex < bp64SetsRollout.baseArray.Length) do
-                evalSorterOnSortableSAGbySwitch 
+                switchRangeMakeSwitchUses 
                     sorter 
-                    firstSwitchDex lastSwitchDex
+                    firstSwitchDex 
+                    lastSwitchDex
                     switchUseB64
                     bp64SetsRolloutCopy
                     sortableIndex
+
                 sortableIndex <- sortableIndex + (Degree.value sorter.degree)
+
         let switchUses = SwitchUseB64.toSwitchUses switchUseB64
                          |> Result.ExtractOrThrow
         SwitchEventRecords.BySwitch {
@@ -114,21 +119,24 @@ module SortingBp64 =
         }
 
 
-    let evalSorterOnSortableSetRollout 
+    let evalSorterOnBP64SetsRollout
                     (sorter:Sorter)
                     (bp64SetsRollout:bP64SetsRollout)
                     (switchusePlan:Sorting.SwitchUsePlan) 
                     (switchEventAgg:Sorting.EventGrouping) =
+
         match switchEventAgg with
         | Sorting.EventGrouping.NoGrouping -> 
-                failwith ""
-                //evalNoGrouping 
-                //    sorter bp64SetsRollout switchusePlan
+                sorterWithNoSAG
+                      sorter 
+                      bp64SetsRollout 
+                      switchusePlan
+
         | Sorting.EventGrouping.BySwitch -> 
-                evalGroupBySwitch 
-                    sorter bp64SetsRollout switchusePlan
-        | Sorting.EventGrouping.BySortable -> 
-                failwith ""
+                sorterMakeSwitchUses 
+                    sorter 
+                    bp64SetsRollout 
+                    switchusePlan
 
 
     let evalSorter (sorter:Sorter)
@@ -140,8 +148,9 @@ module SortingBp64 =
                 |> BP64SetsRollout.fromBitsP64
                         sorter.degree
                 |> Result.ExtractOrThrow
-        evalSorterOnSortableSetRollout
+        evalSorterOnBP64SetsRollout
             sorter sortableSetRollout switchusePlan switchEventAgg
+
 
 
     module SorterSet =
@@ -157,7 +166,7 @@ module SortingBp64 =
 
             let rewrap tup ssr = 
                 let sorterId, sorter = tup
-                let swEvRecs = evalSorterOnSortableSetRollout 
+                let swEvRecs = evalSorterOnBP64SetsRollout 
                                     sorter ssr switchusePlan switchEventAgg
                 let resSoSS = {
                     ResultOfSorterOnSortableSet.sorter = sorter;
@@ -189,7 +198,7 @@ module SortingBp64 =
 
             let rewrap tup ssr = 
                 let sorterId, sorter = tup
-                let swEvRecs = evalSorterOnSortableSetRollout 
+                let swEvRecs = evalSorterOnBP64SetsRollout 
                                     sorter ssr switchusePlan switchEventAgg
                 let resSoSS = {
                     ResultOfSorterOnSortableSet.sorter = sorter;

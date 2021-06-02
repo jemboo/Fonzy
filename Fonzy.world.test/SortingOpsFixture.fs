@@ -13,13 +13,13 @@ type SortingOpsFixture () =
         let sortableSet = TestData.SortableSet.ssBinary 
 
         let resGroupBySwitch = 
-            SortingInts.evalGroupBySwitch
+            SortingInts.sorterMakeSwitchUses
                 TestData.SorterParts.goodRefSorter 
                 TestData.SorterActionRecords.rolloutOfAllBinary
                 Sorting.SwitchUsePlan.All
 
         let resNoGrouping = 
-            SortingInts.evalNoGrouping 
+            SortingInts.sorterWithNoSAG 
                 TestData.SorterParts.goodRefSorter 
                 TestData.SorterActionRecords.rolloutOfAllBinary
                 Sorting.SwitchUsePlan.All
@@ -43,35 +43,22 @@ type SortingOpsFixture () =
 
 
     [<TestMethod>]
-    member this.evalAndGetSortableUses() =
+    member this.getHistogramOfSortedSortables() =
         let refSorter = TestData.SorterParts.goodRefSorter
-        let sortableSet = TestData.SortableSet.ssBinary 
 
-        let resGroupBySortable = 
-            SortingInts.evalGroupBySortable
-                TestData.SorterParts.goodRefSorter 
+        let switchEventRecords = 
+            SortingInts.sorterWithNoSAG 
+                refSorter 
                 TestData.SorterActionRecords.rolloutOfAllBinary
                 Sorting.SwitchUsePlan.All
-
-        let resNoGrouping = 
-            SortingInts.evalNoGrouping 
-                TestData.SorterParts.goodRefSorter 
-                TestData.SorterActionRecords.rolloutOfAllBinary
-                Sorting.SwitchUsePlan.All
-    
-        let sortedSortablesGrouping = 
-            resGroupBySortable
-                |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
-                |> Result.ExtractOrThrow
-                |> Array.toList
+   
 
         let sortedSortablesNoGrouping = 
-                resNoGrouping
+                switchEventRecords
                     |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
                     |> Result.ExtractOrThrow
                     |> Array.toList
 
-        Assert.AreEqual(sortedSortablesGrouping, sortedSortablesNoGrouping)
         Assert.AreEqual(sortedSortablesNoGrouping.Length, (Degree.value refSorter.degree) + 1)
 
 
@@ -315,7 +302,7 @@ type SortingOpsFixture () =
                  |> Result.ExtractOrThrow
 
         let resEndM = 
-            SortingInts.evalGroupBySwitch
+            SortingInts.sorterMakeSwitchUses
                 sM
                 rolloutOfAllBin16
                 Sorting.SwitchUsePlan.All

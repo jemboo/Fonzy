@@ -6,6 +6,20 @@ type switchEventRolloutInt = {
             sortableCount:SortableCount; 
             useRoll:IntBits}
 
+
+type switchEventRolloutBp64 = {
+        switchCount:SwitchCount;
+        sortableCount:SortableCount;
+        sortableBlockCount:int;
+        useRoll:bitsP64 }
+
+
+type switchEventRollout =
+     | Int of switchEventRolloutInt
+     | Bp64 of switchEventRolloutBp64
+
+
+
 module SwitchEventRolloutInt =
     let create (switchCount:SwitchCount) 
                (sortableCount:SortableCount) = 
@@ -29,40 +43,6 @@ module SwitchEventRolloutInt =
             SwitchUses.weights = useWeights    }
 
 
-
-type switchEventRolloutBp32 = {
-    switchCount:SwitchCount; 
-    sortableCount:SortableCount;
-    sortableBlockCount:int;
-    useRoll:bitsP32 }
-
-module SwitchEventRolloutBp32 =
-    let create (switchCount:SwitchCount) 
-               (sortableCount:SortableCount) = 
-
-        let ur = BitsP32.zeroSubCreate
-                              ((SwitchCount.value switchCount) * 
-                               (SortableCount.value sortableCount)) 
-        {   switchCount=switchCount;
-            sortableCount=sortableCount;
-            sortableBlockCount=ur.values.Length;
-            useRoll = ur }
-
-    let toSwitchUses (switchEvents:switchEventRolloutBp32) =
-        let switchCt = (SwitchCount.value switchEvents.switchCount)
-
-        {   SwitchUses.switchCount = switchEvents.switchCount;
-            SwitchUses.weights = Array.zeroCreate switchCt }
-
-
-
-type switchEventRolloutBp64 = {
-        switchCount:SwitchCount;
-        sortableCount:SortableCount;
-        sortableBlockCount:int;
-        useRoll:bitsP64 }
-
-
 module SwitchEventRolloutBp64 =
     let create (switchCount:SwitchCount) 
                (sortableCount:SortableCount) = 
@@ -82,3 +62,11 @@ module SwitchEventRolloutBp64 =
 
         {   SwitchUses.switchCount = switchEvents.switchCount;
             SwitchUses.weights = Array.zeroCreate switchCt }
+            
+
+
+module SwitchEventRollout =
+    let toSwitchUses (switchEventRollout:switchEventRollout) =
+        match switchEventRollout with
+        | Int si -> si |> SwitchEventRolloutInt.toSwitchUses
+        | Bp64 bp -> bp |> SwitchEventRolloutBp64.toSwitchUses

@@ -5,7 +5,7 @@ module SortingEval =
 
     type NoGrouping  = 
         {
-            switchEventRollout:switchEventRolloutInt; 
+            switchEventRollout:switchEventRollout; 
             sortableRollout:SortableRollout;
         }
 
@@ -15,27 +15,20 @@ module SortingEval =
             sortableRollout:SortableRollout;
         }
 
-    type GroupBySortable = 
-        {
-            sortableUses:SortableUses; 
-            sortableRollout:SortableRollout;
-        }
-
     type SwitchEventRecords =
         | NoGrouping of NoGrouping
         | BySwitch of GroupBySwitch
-        | BySortable of GroupBySortable
 
 
     module SwitchEventRecords =
+
         let getSwitchUses (switchEventRecords:SwitchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.switchEventRollout 
-                                    |> SwitchEventRolloutInt.toSwitchUses
+                                    |> SwitchEventRollout.toSwitchUses
                                     |> Ok
             | BySwitch seGs -> seGs.switchUses 
                                     |> Ok
-            | BySortable _ -> "switchUses not in GroupBySortable" |> Error
 
 
         let getHistogramOfSortedSortables (switchEventRecords:SwitchEventRecords) =
@@ -46,9 +39,6 @@ module SortingEval =
             | BySwitch seGs ->  seGs.sortableRollout 
                                     |> SortableRollout.intBitsHist
                                     |> Ok
-            | BySortable seGt -> seGt.sortableRollout
-                                      |> SortableRollout.intBitsHist
-                                      |> Ok
 
         let getAllSortsWereComplete (switchEventRecords:SwitchEventRecords) =
             match switchEventRecords with
@@ -58,9 +48,6 @@ module SortingEval =
             | BySwitch seGs ->  seGs.sortableRollout
                                     |> SortableRollout.isSorted
                                     |> Ok
-            | BySortable seGt -> seGt.sortableRollout
-                                      |> SortableRollout.isSorted
-                                      |> Ok
 
         let getUsedSwitchCount (switchEventRecords:SwitchEventRecords) =
             result {

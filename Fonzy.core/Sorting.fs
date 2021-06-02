@@ -11,7 +11,6 @@ module Sorting =
     type EventGrouping =
         | NoGrouping
         | BySwitch
-        | BySortable
 
 
     //type OpParams =
