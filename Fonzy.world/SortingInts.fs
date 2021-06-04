@@ -150,7 +150,7 @@ module SortingInts =
 
     module SorterSet =
 
-        let eval0<'T> 
+        let eval<'T> 
                 (sorterSet:SorterSet)
                 (intSetsRollout:IntSetsRollout)
                 (sortableSetId:SortableSetId)
@@ -184,53 +184,21 @@ module SortingInts =
             }
 
 
-
-        let eval<'T> 
-                 (sorterSet:SorterSet)
-                 (sortableSet:SortableSetBinary)
-                 (switchusePlan:Sorting.SwitchUsePlan) 
-                 (switchEventAgg:Sorting.EventGrouping) 
-                 (_parallel:UseParallel) 
-                 (proc:ResultOfSorterOnSortableSet -> Result<'T, string>) =
-
-            let rewrap tup ssr = 
-                let sorterId, sorter = tup
-                let swEvRecs = evalSorterOnIntSetsRollout 
-                                    sorter ssr switchusePlan switchEventAgg
-                let resSoSS = {
-                    ResultOfSorterOnSortableSet.sorter = sorter;
-                    ResultOfSorterOnSortableSet.switchEventRecords = swEvRecs;
-                    ResultOfSorterOnSortableSet.sorterId = sorterId;
-                    ResultOfSorterOnSortableSet.sortableSetId = sortableSet.id
-                }
-                proc resSoSS
-
-            result  {
-                let! ssRoll = sortableSet.sortables 
-                              |> IntSetsRollout.fromIntBits
-                                    sorterSet.degree
-                return!
-                    match UseParallel.value(_parallel) with
-                    | true  -> sorterSet.sorters |> Map.toArray 
-                                                 |> Array.Parallel.map(fun s-> rewrap s ssRoll)
-                                                 |> Array.toList
-                                                 |> Result.sequence
-                    | false -> sorterSet.sorters |> Map.toList 
-                                                 |> List.map(fun s-> rewrap s ssRoll)
-                                                 |> Result.sequence
-            }
-
-
         let getSorterPerfBins 
             (sorterSet:SorterSet)
             (sortableSet:SortableSetBinary)
             (switchusePlan:Sorting.SwitchUsePlan)
             (_parallel:UseParallel) =
             result {
-                let! sorterEffs = 
-                        eval 
+                let! ssRoll = sortableSet.sortables 
+                                |> IntSetsRollout.fromIntBits
+                                    sorterSet.degree
+
+                let! sorterEffs =
+                        eval
                             sorterSet 
-                            sortableSet 
+                            ssRoll
+                            sortableSet.id
                             switchusePlan
                             Sorting.EventGrouping.BySwitch
                             _parallel

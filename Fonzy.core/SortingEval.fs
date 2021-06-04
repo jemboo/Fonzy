@@ -52,7 +52,7 @@ module SortingEval =
         let getUsedSwitchCount (switchEventRecords:SwitchEventRecords) =
             result {
                 let! switchUses = getSwitchUses switchEventRecords
-                return! switchUses |> SwitchUses.usedSwitchCount
+                return switchUses |> SwitchUses.usedSwitchCount
             }
 
     type ResultOfSorterOnSortableSet =

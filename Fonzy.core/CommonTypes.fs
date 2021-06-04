@@ -14,6 +14,10 @@ module Degree =
             let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
+    let binExp (v: Degree) =
+        let fexp = (value v) |> float
+        ( ** ) 2.0 fexp |> int
+
 
 type MutationRate = private MutationRate of float
 module MutationRate =
@@ -26,6 +30,7 @@ module MutationRate =
             let! gv = ResultMap.read key m
             return! create "" (gv:?>float)
         }
+
 
 // Common
 type EntityId = private EntityId of Guid

@@ -716,9 +716,8 @@ module BitsP64 =
         { bitsP64.values = 
                 Array.create count 0UL }
 
-    let zeroSubCreate (count:int) = 
-        { bitsP64.values = 
-                Array.create ((count + 63) / 64) 0UL }
+    let pBlocksFor (count:int) = 
+        ((count + 63) / 64)
 
     let copy (pBits:bitsP64) = 
         { bitsP64.values = Array.copy (pBits.values) }
@@ -728,25 +727,16 @@ module BitsP64 =
 
     let stripeWrite (uBits:bitsP64) 
                     (intBits:IntBits) 
-                    (pos:int) = 
-        let one = (1UL <<< pos)
-        let proc dex =
-            if (intBits.values.[dex] = 1) then
-                uBits.values.[dex] <- 
-                            uBits.values.[dex] ||| one
-        
-        for i=0 to (uBits.values.Length - 1) do
-            proc i
+                    (pos:int) =
+
+        ByteUtils.stripeWrite uBits.values
+                              intBits.values
+                              pos
 
 
     let stripeRead (uBits:bitsP64) 
                    (pos:int) = 
-        let one = (1UL <<< pos)
-        let proc dex v =
-            if ((uBits.values.[dex] &&& one) > 0UL) then
-                1
-            else 0
-        { IntBits.values = uBits.values |> Array.mapi (proc) }
+        { IntBits.values = ByteUtils.stripeRead uBits.values pos }
 
 
     let isSorted (uBits:bitsP64) =
@@ -770,9 +760,10 @@ module BitsP64 =
                 yield nextChunk()  }
 
 
-    let toIntBits (bp32s:bitsP64 seq) =
+    // returns only the nonzero Inbits
+    let toIntBits (bp64s:bitsP64 seq) =
         seq { 
-              use e = bp32s.GetEnumerator()
+              use e = bp64s.GetEnumerator()
               let nextChunk bt64 =
                 let mutable i = 0
                 seq { 

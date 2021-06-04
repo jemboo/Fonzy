@@ -90,8 +90,15 @@ module TestData =
 
 
     module SorterActionRecords =
-        let rolloutOfAllBinary = IntSetsRollout.allBinary degree
-                                     |> Result.ExtractOrThrow
+
+        let intSetsRolloutAllBinary = IntSetsRollout.allBinary degree
+                                      |> Result.ExtractOrThrow
+
+        let bP64SetsRolloutAllBinary = BP64SetsRollout.allBinary degree
+                                       |> Result.ExtractOrThrow
+
+
+
         let rolloutOfAllSortedBinary = 
                 let ia = IntBits.sorted_0_1_Sequences degree
                             |> Seq.map(fun ia -> {IntBits.values = ia.values })

@@ -19,7 +19,7 @@ module SortingOps =
                     result {
                         let! intSetsRollout = ssb.sortables |> IntSetsRollout.fromIntBits
                                                                sorterSet.degree
-                        return! SortingInts.SorterSet.eval0 
+                        return! SortingInts.SorterSet.eval 
                                     sorterSet
                                     intSetsRollout
                                     ssb.id
@@ -31,11 +31,11 @@ module SortingOps =
 
              | Integer ssb -> 
                     result {
-                        let! intSetsRollout = ssb.sortables |> IntSetsRollout.fromIntArrays
+                        let! bp64SetsRollout = ssb.sortables |> IntSetsRollout.fromIntArrays
                                                                sorterSet.degree
-                        return! SortingInts.SorterSet.eval0 
+                        return! SortingInts.SorterSet.eval 
                                     sorterSet
-                                    intSetsRollout
+                                    bp64SetsRollout
                                     ssb.id
                                     switchusePlan
                                     switchEventAgg
@@ -45,11 +45,11 @@ module SortingOps =
 
              | Bp64 ssb -> 
                        result {
-                           let! intSetsRollout = ssb.sortables |> BP64SetsRollout.fromBitsP64
+                           let! bp64SetsRollout = ssb.sortables |> BP64SetsRollout.fromBitsP64
                                                                   sorterSet.degree
-                           return! SortingBp64.SorterSet.eval0 
+                           return! SortingBp64.SorterSet.eval 
                                        sorterSet
-                                       intSetsRollout
+                                       bp64SetsRollout
                                        ssb.id
                                        switchusePlan
                                        switchEventAgg

@@ -8,6 +8,7 @@ open System.IO
 
 
 module ByteUtils =
+
     let bytesForObj (o:obj) =
         let bf = new BinaryFormatter()
         use ms = new MemoryStream()
@@ -37,6 +38,29 @@ module ByteUtils =
             if qua then
                 tc <- tc + 1
         tc
+
+
+    let stripeWrite (uBits:uint64[]) 
+                    (intBits:int[]) 
+                    (pos:int) = 
+        let one = (1UL <<< pos)
+        let proc dex =
+            if (intBits.[dex] = 1) then
+                uBits.[dex] <- 
+                            uBits.[dex] ||| one
+    
+        for i=0 to (uBits.Length - 1) do
+            proc i
+
+
+    let stripeRead (uBits:uint64[]) 
+                   (pos:int) = 
+        let one = (1UL <<< pos)
+        let proc dex v =
+            if ((uBits.[dex] &&& one) > 0UL) then
+                1
+            else 0
+        uBits |> Array.mapi (proc)
 
 
 module GuidUtils = 
@@ -163,6 +187,22 @@ module CollectionUtils =
                  window <- trim()
                  window <- window |> List.append [item]
                  yield window |> List.rev}
+
+    //let chunkAndSum<'T when 'T : (static member (+) : 'T -> 'T -> 'T )> (chunkSz:int) (vals:seq<'T>) =
+    //    let addArrays<'T when 'T : (static member (+) : 'T -> 'T -> 'T )> (a:'T[]) (b:'T[]) =
+    //        Array.init a.Length (fun dex -> a.[dex] + b.[dex])
+
+    //    vals |> Seq.chunkBySize chunkSz
+    //         |> Seq.toArray
+    //         |> Array.reduce addArrays
+
+    let chunkAndSum (chunkSz:int) (vals:seq<int>) =
+        let addArrays (a:int[]) (b:int[]) =
+            Array.init a.Length (fun dex -> a.[dex] + b.[dex])
+
+        vals |> Seq.chunkBySize chunkSz
+             |> Seq.toArray
+             |> Array.reduce addArrays
 
 
     let listToTransitionTuples (ltt:'a list) =

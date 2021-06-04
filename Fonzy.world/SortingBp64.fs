@@ -6,21 +6,23 @@ module SortingBp64 =
 
     let private switchRangeWithNoSAG 
                 (sorter:Sorter) 
-                (mindex:int) (maxdex:int) 
+                (mindex:int) 
+                (maxdex:int) 
                 (bp64SetsRollout:bP64SetsRollout) 
                 (useTrack:uint64[])
-                (sortableIndex:int) =
+                (bpBlockIndex:int) =
+
         let mutable localSwitchOffset = mindex
-        let sortableSetRolloutOffset = sortableIndex * (Degree.value sorter.degree)
-        let switchEventRolloutOffset = sortableIndex * (SwitchCount.value sorter.switchCount)
+        let sortableSetRolloutOffset = bpBlockIndex * (Degree.value sorter.degree)
+        let switchEventRolloutOffset = bpBlockIndex * 
+                                       (SwitchCount.value sorter.switchCount)
         while (localSwitchOffset < maxdex) do
             let switch = sorter.switches.[localSwitchOffset]
             let lv = bp64SetsRollout.baseArray.[switch.low + sortableSetRolloutOffset]
             let hv = bp64SetsRollout.baseArray.[switch.hi + sortableSetRolloutOffset]
-            let rv = useTrack.[localSwitchOffset + switchEventRolloutOffset]
             bp64SetsRollout.baseArray.[switch.hi + sortableSetRolloutOffset] <- (lv ||| hv)
             bp64SetsRollout.baseArray.[switch.low + sortableSetRolloutOffset] <- (lv &&& hv)
-            useTrack.[localSwitchOffset + switchEventRolloutOffset] <- (((~~~hv) &&& lv) ||| rv)
+            useTrack.[localSwitchOffset + switchEventRolloutOffset] <- ((~~~hv) &&& lv)
             localSwitchOffset <- localSwitchOffset + 1
 
 
@@ -31,6 +33,7 @@ module SortingBp64 =
                 (sorter:Sorter) 
                 (bP64SetsRollout:bP64SetsRollout) 
                 (switchusePlan:Sorting.SwitchUsePlan) =
+
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex = 
             match switchusePlan with
@@ -38,7 +41,7 @@ module SortingBp64 =
             | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
         
         let bPsRollCopy = BP64SetsRollout.copy bP64SetsRollout
-        let seRollbp64 = SwitchEventRolloutBp64.create 
+        let seRollbp64 = SwitchEventRolloutBp64.create
                                 sorter.switchCount
                                 bPsRollCopy.sortableCount
 
@@ -155,7 +158,7 @@ module SortingBp64 =
 
     module SorterSet =
 
-        let eval0<'T> 
+        let eval<'T> 
                  (sorterSet:SorterSet)
                  (bP64SetsRollout:bP64SetsRollout)
                  (sortableSetId:SortableSetId)
@@ -188,41 +191,6 @@ module SortingBp64 =
                                                  |> Result.sequence
             }
 
-        let eval<'T> 
-                 (sorterSet:SorterSet)
-                 (sortableSet:SortableSetBp64)
-                 (switchusePlan:Sorting.SwitchUsePlan) 
-                 (switchEventAgg:Sorting.EventGrouping) 
-                 (_parallel:UseParallel) 
-                 (proc:ResultOfSorterOnSortableSet -> Result<'T, string>) =
-
-            let rewrap tup ssr = 
-                let sorterId, sorter = tup
-                let swEvRecs = evalSorterOnBP64SetsRollout 
-                                    sorter ssr switchusePlan switchEventAgg
-                let resSoSS = {
-                    ResultOfSorterOnSortableSet.sorter = sorter;
-                    ResultOfSorterOnSortableSet.switchEventRecords = swEvRecs;
-                    ResultOfSorterOnSortableSet.sorterId = sorterId;
-                    ResultOfSorterOnSortableSet.sortableSetId = sortableSet.id
-                }
-                proc resSoSS
-
-            result  {
-                let! ssRoll = sortableSet.sortables 
-                              |> BP64SetsRollout.fromBitsP64
-                                    sorterSet.degree
-                return!
-                    match UseParallel.value(_parallel) with
-                    | true  -> sorterSet.sorters |> Map.toArray 
-                                                 |> Array.Parallel.map(fun s-> rewrap s ssRoll)
-                                                 |> Array.toList
-                                                 |> Result.sequence
-                    | false -> sorterSet.sorters |> Map.toList 
-                                                 |> List.map(fun s-> rewrap s ssRoll)
-                                                 |> Result.sequence
-            }
-
 
         let getSorterPerfBins 
             (sorterSet:SorterSet)
@@ -230,10 +198,16 @@ module SortingBp64 =
             (switchusePlan:Sorting.SwitchUsePlan)
             (_parallel:UseParallel) =
             result {
-                let! sorterEffs = 
+
+                let! ssRoll = sortableSet.sortables 
+                              |> BP64SetsRollout.fromBitsP64
+                                    sorterSet.degree
+
+                let! sorterEffs =
                         eval 
-                            sorterSet 
-                            sortableSet 
+                            sorterSet
+                            ssRoll
+                            sortableSet.id
                             switchusePlan
                             Sorting.EventGrouping.BySwitch
                             _parallel

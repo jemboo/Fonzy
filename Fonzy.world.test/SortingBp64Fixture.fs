@@ -5,25 +5,25 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 open SortingEval
 
 [<TestClass>]
-type SortingOpsFixture () =
+type SortingBp64Fixture () =
 
     [<TestMethod>]
-    member this.evalAndGetSwitchUses() =
-        let refSorter = TestData.SorterParts.goodRefSorter
-        let sortableSet = TestData.SortableSet.ssBinary 
+    member this.sorterWithNoSAG() =
+        let refSorter = TestData.SorterParts.mediocreRandomSorters
+                        |> List.head
 
         let resGroupBySwitch = 
-            SortingInts.sorterMakeSwitchUses
-                TestData.SorterParts.goodRefSorter 
-                TestData.SorterActionRecords.intSetsRolloutAllBinary
+            SortingBp64.sorterMakeSwitchUses
+                refSorter
+                TestData.SorterActionRecords.bP64SetsRolloutAllBinary
                 Sorting.SwitchUsePlan.All
 
         let resNoGrouping = 
-            SortingInts.sorterWithNoSAG 
-                TestData.SorterParts.goodRefSorter 
-                TestData.SorterActionRecords.intSetsRolloutAllBinary
+            SortingBp64.sorterWithNoSAG 
+                refSorter
+                TestData.SorterActionRecords.bP64SetsRolloutAllBinary
                 Sorting.SwitchUsePlan.All
-        
+
         let switchUsesGrouping = 
                 resGroupBySwitch
                     |> SortingEval.SwitchEventRecords.getSwitchUses
@@ -34,12 +34,13 @@ type SortingOpsFixture () =
                     |> SortingEval.SwitchEventRecords.getSwitchUses
                     |> Result.ExtractOrThrow
 
-        let usedSwitchCount = refSorter  
-                                |> SwitchUses.getUsedSwitches switchUsesGrouping
-                                |> Result.ExtractOrThrow
+        let usedSwitchCountGrouping = switchUsesGrouping 
+                                      |> SwitchUses.usedSwitchCount
 
-        Assert.AreEqual(switchUsesGrouping, switchUsesNoGrouping)
-        Assert.AreEqual(usedSwitchCount.Length, (SwitchCount.value refSorter.switchCount))
+        let usedSwitchCountNoGrouping = switchUsesNoGrouping 
+                                        |> SwitchUses.usedSwitchCount
+
+        Assert.AreEqual(usedSwitchCountGrouping, usedSwitchCountNoGrouping)
 
 
     [<TestMethod>]

@@ -126,13 +126,13 @@ module BP64SetsRollout =
             } |> Ok
 
 
-    let fromBitsP64 (degree:Degree) 
+    let fromBitsP64 (degree:Degree)
                     (baseArrays:bitsP64 seq) =
         result {
             let a = baseArrays |> Seq.map(fun a -> a.values)
                                |> Seq.collect(id)
                                |> Seq.toArray
-            return! create degree a (SortableCount.fromInt a.Length)
+            return! create degree a (SortableCount.fromInt (a.Length * 64))
         }
 
 
@@ -170,7 +170,7 @@ module BP64SetsRollout =
         let arraySets = BitsP64.arrayOfAllFor degree
         let baseArray = arraySets
                         |> Array.collect(fun ia -> ia.values)
-        create degree baseArray (SortableCount.fromInt arraySets.Length)
+        create degree baseArray (degree |> Degree.binExp |> SortableCount.fromInt)
 
 
 

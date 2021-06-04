@@ -115,6 +115,14 @@ type UtilsFixture () =
         Assert.IsTrue(true)
 
 
+    [<TestMethod>]
+    member this.chunkAndSum() =
+        let wab = [1;2;3;4;5;6;7;8;9]
+        let res = CollectionUtils.chunkAndSum wab 3
+                  |> Array.toList
+        Assert.AreEqual(res, [12; 15; 18])
+
+
         
     // ResultMap
 

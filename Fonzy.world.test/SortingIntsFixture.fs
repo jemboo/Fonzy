@@ -5,12 +5,11 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 open SortingEval
 
 [<TestClass>]
-type SortingOpsFixture () =
+type SortingIntsFixture () =
 
     [<TestMethod>]
-    member this.evalAndGetSwitchUses() =
+    member this.sorterWithNoSAG() =
         let refSorter = TestData.SorterParts.goodRefSorter
-        let sortableSet = TestData.SortableSet.ssBinary 
 
         let resGroupBySwitch = 
             SortingInts.sorterMakeSwitchUses

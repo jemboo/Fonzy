@@ -23,11 +23,13 @@ type switchEventRollout =
 module SwitchEventRolloutInt =
     let create (switchCount:SwitchCount) 
                (sortableCount:SortableCount) = 
-        {   switchCount=switchCount;
-            sortableCount=sortableCount;
+        {   
+            switchEventRolloutInt.switchCount = switchCount;
+            sortableCount = sortableCount;
             useRoll = IntBits.zeroCreate 
                         ((SwitchCount.value switchCount) * 
-                        (SortableCount.value sortableCount))    }
+                        (SortableCount.value sortableCount))    
+        }
 
 
     let toSwitchUses (switchEvents:switchEventRolloutInt) =
@@ -39,29 +41,37 @@ module SwitchEventRolloutInt =
 
         switchEvents.useRoll.values |> Array.iteri(fun dex v -> upDateSwU dex v)
 
-        {   SwitchUses.switchCount = switchEvents.switchCount;
-            SwitchUses.weights = useWeights    }
+        {   
+            SwitchUses.switchCount = switchEvents.switchCount;
+            SwitchUses.weights = useWeights    
+        }
 
 
 module SwitchEventRolloutBp64 =
     let create (switchCount:SwitchCount) 
                (sortableCount:SortableCount) = 
 
-        let ur = BitsP64.zeroSubCreate
+        let blockCount = (SortableCount.value sortableCount) |> BitsP64.pBlocksFor
+        let ur = BitsP64.zeroCreate
                               ((SwitchCount.value switchCount) * 
-                               (SortableCount.value sortableCount))
+                               blockCount)
 
         {   switchCount = switchCount;
             sortableCount = sortableCount;
-            sortableBlockCount = ur.values.Length;
-            useRoll = ur }
+            sortableBlockCount = blockCount;
+            useRoll = ur 
+        }
 
 
     let toSwitchUses (switchEvents:switchEventRolloutBp64) =
         let switchCt = (SwitchCount.value switchEvents.switchCount)
 
+        let weights = switchEvents.useRoll.values
+                       |> Array.map(fun l -> ByteUtils.trueBitCount64 l )
+                       |> CollectionUtils.chunkAndSum switchCt
+
         {   SwitchUses.switchCount = switchEvents.switchCount;
-            SwitchUses.weights = Array.zeroCreate switchCt }
+            SwitchUses.weights = weights }
             
 
 

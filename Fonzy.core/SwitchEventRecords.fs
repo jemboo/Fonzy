@@ -58,9 +58,9 @@ module SwitchUses =
        stRet
 
    let usedSwitchCount (switchUses:SwitchUses) = 
-       getWeights switchUses |> Array.filter(fun i->i>0) 
+       getWeights switchUses |> Array.filter(fun i-> i > 0) 
                              |> Array.length
-                             |> SwitchCount.create ""
+                             |> SwitchCount.fromInt
 
    let getSwitchActionTotal (switchUses:SwitchUses) =
        (getWeights switchUses) |> Array.sum
@@ -91,7 +91,7 @@ module SwitchUses =
        result
            {
                let! refinedStageCount = (getRefinedStageCount switchUses sorter)
-               let! switchUseCount = (usedSwitchCount switchUses)
+               let switchUseCount = (usedSwitchCount switchUses)
                return switchUseCount, refinedStageCount
            }
 

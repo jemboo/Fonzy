@@ -227,3 +227,14 @@ type CombinatoricsFixture () =
          let h1 = Combinatorics.makeHull seqX seqY 1 2
                   |> Seq.toArray
          Assert.IsTrue (true)
+
+
+    [<TestMethod>]
+    member this.StripeReadAndWrite() =
+        let srcUla = [|128822345678987UL; 0UL; 475555577799876091UL|]
+        let destUla = [|0UL; 0UL; 0UL|]
+        let ivals = [|0..63|] |> Array.map (fun v ->  ByteUtils.stripeRead srcUla v)
+        [0..63] |> List.map (fun v ->  ByteUtils.stripeWrite destUla ivals.[v] v)
+            |> ignore
+        for i = 0 to 2 do
+            Assert.AreEqual(srcUla.[i], destUla.[i])
