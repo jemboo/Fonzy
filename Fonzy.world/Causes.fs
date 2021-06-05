@@ -78,11 +78,12 @@ module CauseSorters =
                                         sorterSetName
                 let! sorterSet = sorterSetDto |> SorterSetDto.fromDto
                 let! sortableSetEx = sortableSet |> SortableSetSpec.getSortableSetExplicit
-                let! perfBins = SortingOps.SorterSet.getSorterPerfBins
-                                  sorterSet
-                                  sortableSetEx
-                                  switchUsePlan
-                                  (UseParallel.create useParallel)
+                let! coverageBins = SortingOps.SorterSet.getSorterCoverageBins
+                                      sorterSet
+                                      sortableSetEx
+                                      switchUsePlan
+                                      (UseParallel.create useParallel)
+                let perfBins = coverageBins |> Array.map(fun cb -> ((fst cb).sorterPerfBin , (snd cb)))
                 let perfBinsDto = perfBins |> SorterPerfBinsDto.toDtos
                 return! Enviro.addRootDtoToEnviro<SorterPerfBinsDto[]>
                                     Enviro.Empty resultsName perfBinsDto Map.empty
@@ -134,11 +135,12 @@ module CauseSorters =
                                             sorterArray
 
                 let! sortableSetEx = sortableSet |> SortableSetSpec.getSortableSetExplicit
-                let! perfBins = SortingOps.SorterSet.getSorterPerfBins
-                                  sorterSet
-                                  sortableSetEx
-                                  switchUsePlan
-                                  (UseParallel.create useParallel)
+                let! coverageBins = SortingOps.SorterSet.getSorterCoverageBins
+                                      sorterSet
+                                      sortableSetEx
+                                      switchUsePlan
+                                      (UseParallel.create useParallel)
+                let perfBins = coverageBins |> Array.map(fun cb -> ((fst cb).sorterPerfBin , (snd cb)))
                 let perfBinsDto = perfBins |> SorterPerfBinsDto.toDtos
 
                 return! Enviro.addRootDtoToEnviro<SorterPerfBinsDto[]>

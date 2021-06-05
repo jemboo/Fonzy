@@ -40,6 +40,7 @@ module SwitchUses =
                              |> Seq.toArray
            res |> Ok
 
+
    let lastUsedIndex (st:SwitchUses) =
        let w = (getWeights st)
        w

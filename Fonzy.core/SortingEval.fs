@@ -19,6 +19,12 @@ module SortingEval =
         | NoGrouping of NoGrouping
         | BySwitch of GroupBySwitch
 
+    type SorterPerfBin = 
+        { 
+            usedSwitchCount:SwitchCount; 
+            usedStageCount:StageCount;
+        }
+
 
     module SwitchEventRecords =
 
@@ -57,21 +63,29 @@ module SortingEval =
 
     type ResultOfSorterOnSortableSet =
         {
+            sorterId:SorterId;
             sorter:Sorter; 
             switchEventRecords:SwitchEventRecords;
-            sorterId:SorterId;
             sortableSetId:SortableSetId
         }
 
     type SorterCoverage = 
         { 
-            usedSwitchCount:SwitchCount; 
-            usedStageCount:StageCount;
             sorterId:SorterId;
-            sortableSetId:SortableSetId
+            sortableSetId:SortableSetId;
+            sorterPerfBin:SorterPerfBin; 
         }
+        
+    type SorterEff = 
+        { 
+            sorterCoverage:SorterCoverage;
+            sucessfulSort:bool
+        }
+
+
                      
     module SorterCoverage = 
+
         let fromSwitchEventRecords 
                 (r:ResultOfSorterOnSortableSet) =
             result {
@@ -81,58 +95,38 @@ module SortingEval =
                             r.sorter |> SwitchUses.getUsedSwitches switchUses
                     let! usedSwitchCount = SwitchCount.create "" usedSwitchArray.Length
                     let! usedStageCount = Stage.getStageCount r.sorter.degree usedSwitchArray
+                    let perfBin = {SorterPerfBin.usedStageCount = usedStageCount;
+                                   usedSwitchCount=usedSwitchCount }
                     return {
-                                SorterCoverage.usedSwitchCount = usedSwitchCount; 
-                                usedStageCount = usedStageCount;
+                                SorterCoverage.sorterPerfBin = perfBin; 
                                 sorterId = r.sorterId;
                                 sortableSetId = r.sortableSetId
                            }
                }
         
-    type SorterEff = 
-        { 
-            usedSwitchCount:SwitchCount; 
-            usedStageCount:StageCount;
-            sorterId:SorterId;
-            sortableSetId:SortableSetId;
-            sucessfulSort:bool
-        }
-
 
     module SorterEff = 
+
         let fromSwitchEventRecords 
                 (r:ResultOfSorterOnSortableSet) =
             result {
-                    let! switchUses = 
-                            r.switchEventRecords |> SwitchEventRecords.getSwitchUses
+                    let! sorterCoverage = 
+                            r |> SorterCoverage.fromSwitchEventRecords
                     let! success = 
                             r.switchEventRecords |> SwitchEventRecords.getAllSortsWereComplete
-                    let! usedSwitchArray = 
-                            r.sorter |> SwitchUses.getUsedSwitches switchUses
-                    let! usedSwitchCount = SwitchCount.create "" usedSwitchArray.Length
-                    let! usedStageCount = Stage.getStageCount r.sorter.degree usedSwitchArray
                     return {
-                                SorterEff.usedSwitchCount = usedSwitchCount; 
-                                usedStageCount = usedStageCount;
-                                sorterId = r.sorterId;
-                                sortableSetId = r.sortableSetId;
+                                SorterEff.sorterCoverage = sorterCoverage;
                                 sucessfulSort = success
                            }
                }
 
-    type SorterPerfBin = 
-        { 
-            usedSwitchCount:SwitchCount; 
-            usedStageCount:StageCount;
-        }
 
     module SorterPerfBin = 
+
         let fromSorterEffs (sorterEffs:SorterEff list) = 
             sorterEffs 
             |> Seq.filter(fun eff->eff.sucessfulSort)
-            |> Seq.map(fun eff ->
-                         {SorterPerfBin.usedStageCount=eff.usedStageCount
-                          SorterPerfBin.usedSwitchCount=eff.usedSwitchCount})
+            |> Seq.map(fun eff -> eff.sorterCoverage)
             |> Seq.countBy id
             |> Seq.toArray
 

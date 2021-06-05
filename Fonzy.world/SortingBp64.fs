@@ -192,34 +192,6 @@ module SortingBp64 =
             }
 
 
-        let getSorterPerfBins 
-            (sorterSet:SorterSet)
-            (sortableSet:SortableSetBp64)
-            (switchusePlan:Sorting.SwitchUsePlan)
-            (_parallel:UseParallel) =
-            result {
-
-                let! ssRoll = sortableSet.sortables 
-                              |> BP64SetsRollout.fromBitsP64
-                                    sorterSet.degree
-
-                let! sorterEffs =
-                        eval 
-                            sorterSet
-                            ssRoll
-                            sortableSet.id
-                            switchusePlan
-                            Sorting.EventGrouping.BySwitch
-                            _parallel
-                            SortingEval.SortingRecords.getSorterEff
-
-                let bins = sorterEffs 
-                                |> SorterPerfBin.fromSorterEffs
-
-                return bins
-            }
-
-
     module History =
 
         let sortTHistSwitches(switches:Switch list)

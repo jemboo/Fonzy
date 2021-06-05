@@ -118,7 +118,7 @@ type UtilsFixture () =
     [<TestMethod>]
     member this.chunkAndSum() =
         let wab = [1;2;3;4;5;6;7;8;9]
-        let res = CollectionUtils.chunkAndSum wab 3
+        let res = CollectionUtils.chunkAndSum 3 wab
                   |> Array.toList
         Assert.AreEqual(res, [12; 15; 18])
 

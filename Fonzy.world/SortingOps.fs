@@ -58,7 +58,7 @@ module SortingOps =
                        }
 
 
-      let getSorterPerfBins 
+      let getSorterCoverageBins 
             (sorterSet:SorterSet)
             (sortableSet:SortableSet)
             (switchusePlan:Sorting.SwitchUsePlan)
@@ -75,7 +75,7 @@ module SortingOps =
                             SortingEval.SortingRecords.getSorterEff
 
                 let bins = sorterEffs 
-                                |> SorterPerfBin.fromSorterEffs
+                                |> SortingEval.SorterPerfBin.fromSorterEffs
 
                 return bins
             }

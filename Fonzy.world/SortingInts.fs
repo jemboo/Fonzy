@@ -184,33 +184,6 @@ module SortingInts =
             }
 
 
-        let getSorterPerfBins 
-            (sorterSet:SorterSet)
-            (sortableSet:SortableSetBinary)
-            (switchusePlan:Sorting.SwitchUsePlan)
-            (_parallel:UseParallel) =
-            result {
-                let! ssRoll = sortableSet.sortables 
-                                |> IntSetsRollout.fromIntBits
-                                    sorterSet.degree
-
-                let! sorterEffs =
-                        eval
-                            sorterSet 
-                            ssRoll
-                            sortableSet.id
-                            switchusePlan
-                            Sorting.EventGrouping.BySwitch
-                            _parallel
-                            SortingEval.SortingRecords.getSorterEff
-
-                let bins = sorterEffs 
-                                |> SorterPerfBin.fromSorterEffs
-
-                return bins
-            }
-
-
     module History =
 
         let sortTHistSwitches(switches:Switch list)
@@ -245,5 +218,5 @@ module SortingInts =
 
         let sortTHist (sorter:Sorter) (testCase:IntBits) =
             let sl = SwitchCount.value sorter.switchCount
-            sortTHistSwitchList sorter 0 (sl - 1) testCase
+            sortTHistSwitchList sorter 0 sl testCase
 
