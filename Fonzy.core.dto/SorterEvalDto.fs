@@ -18,6 +18,7 @@ module SorterPerfBinsDto =
                       { 
                         SortingEval.SorterPerf.usedSwitchCount = uwc
                         SortingEval.SorterPerf.usedStageCount = utc
+                        SortingEval.SorterPerf.sucessful = None
                       },
                       dto.[2]
                    )

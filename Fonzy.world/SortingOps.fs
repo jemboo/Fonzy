@@ -62,6 +62,7 @@ module SortingOps =
             (sorterSet:SorterSet)
             (sortableSet:SortableSet)
             (switchusePlan:Sorting.SwitchUsePlan)
+            (checkSuccess:bool)
             (_parallel:UseParallel) =
 
             result {
@@ -72,7 +73,8 @@ module SortingOps =
                             switchusePlan
                             Sorting.EventGrouping.BySwitch
                             _parallel
-                            SortingEval.SortingRecords.getSorterEff
+                            (SortingEval.SortingRecords.getSorterCoverage
+                                                checkSuccess)
 
                 let bins = sorterEffs 
                                 |> SortingEval.SorterPerf.fromSorterEffs

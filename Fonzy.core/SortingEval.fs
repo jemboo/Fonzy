@@ -1,34 +1,42 @@
 ﻿namespace global
-open System
 
 module SortingEval =
 
-    type NoGrouping  = 
+    type noGrouping  = 
         {
             switchEventRollout:switchEventRollout; 
             sortableRollout:SortableRollout;
         }
 
-    type GroupBySwitch = 
+    type groupBySwitch = 
         {
             switchUses:SwitchUses; 
             sortableRollout:SortableRollout;
         }
 
-    type SwitchEventRecords =
-        | NoGrouping of NoGrouping
-        | BySwitch of GroupBySwitch
+    type switchEventRecords =
+        | NoGrouping of noGrouping
+        | BySwitch of groupBySwitch
 
-    type SorterPerf = 
+    type sorterPerf = 
         { 
             usedSwitchCount:SwitchCount; 
             usedStageCount:StageCount;
+            successful:bool Option
         }
 
+    type sorterPerfBin = 
+        { 
+            usedSwitchCount:SwitchCount; 
+            usedStageCount:StageCount;
+            sorterCount:SorterCount;
+            successCount:int;
+            failCount:int;
+        }
 
     module SwitchEventRecords =
 
-        let getSwitchUses (switchEventRecords:SwitchEventRecords) =
+        let getSwitchUses (switchEventRecords:switchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.switchEventRollout 
                                     |> SwitchEventRollout.toSwitchUses
@@ -37,7 +45,7 @@ module SortingEval =
                                     |> Ok
 
 
-        let getHistogramOfSortedSortables (switchEventRecords:SwitchEventRecords) =
+        let getHistogramOfSortedSortables (switchEventRecords:switchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.sortableRollout 
                                     |> SortableRollout.intBitsHist
@@ -46,7 +54,7 @@ module SortingEval =
                                     |> SortableRollout.intBitsHist
                                     |> Ok
 
-        let getAllSortsWereComplete (switchEventRecords:SwitchEventRecords) =
+        let getAllSortsWereComplete (switchEventRecords:switchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.sortableRollout 
                                     |> SortableRollout.isSorted
@@ -55,37 +63,31 @@ module SortingEval =
                                     |> SortableRollout.isSorted
                                     |> Ok
 
-        let getUsedSwitchCount (switchEventRecords:SwitchEventRecords) =
+        let getUsedSwitchCount (switchEventRecords:switchEventRecords) =
             result {
                 let! switchUses = getSwitchUses switchEventRecords
                 return switchUses |> SwitchUses.usedSwitchCount
             }
 
-    type SortingResult =
+    type sortingResult =
         {
             sorterId:SorterId;
             sortableSetId:SortableSetId
             sorter:Sorter; 
-            switchEventRecords:SwitchEventRecords;
+            switchEventRecords:switchEventRecords;
         }
 
-    type SorterCoverage = 
+    type sorterCoverage = 
         { 
             sorterId:SorterId;
             sortableSetId:SortableSetId;
-            sorterPerfBin:SorterPerf; 
+            sorterPerf:sorterPerf; 
         }
         
-    type SorterEff = 
-        { 
-            sorterCoverage:SorterCoverage;
-            sucessfulSort:bool
-        }
-
                      
     module SorterCoverage = 
 
-        let fromSwitchEventRecords (r:SortingResult) =
+        let fromSwitchEventRecords (checkSuccess:bool) (r:sortingResult) =
             result {
                     let! switchUses = 
                             r.switchEventRecords |> SwitchEventRecords.getSwitchUses
@@ -93,47 +95,58 @@ module SortingEval =
                             r.sorter |> SwitchUses.getUsedSwitches switchUses
                     let! usedSwitchCount = SwitchCount.create "" usedSwitchArray.Length
                     let! usedStageCount = Stage.getStageCount r.sorter.degree usedSwitchArray
-                    let perfBin = {SorterPerf.usedStageCount = usedStageCount;
+                    let! success = 
+                        match checkSuccess with
+                        | true -> r.switchEventRecords 
+                                  |> SwitchEventRecords.getAllSortsWereComplete
+                                  |> Result.map Some
+                        | false -> None |> Ok
+
+                    let perfBin = {sorterPerf.usedStageCount = usedStageCount;
+                                   successful = success;
                                    usedSwitchCount=usedSwitchCount }
                     return {
-                                SorterCoverage.sorterPerfBin = perfBin; 
-                                sorterId = r.sorterId;
-                                sortableSetId = r.sortableSetId
-                           }
-               }
-        
-
-    module SorterEff = 
-
-        let fromSwitchEventRecords (r:SortingResult) =
-            result {
-                    let! sorterCoverage = 
-                            r |> SorterCoverage.fromSwitchEventRecords
-                    let! success = 
-                            r.switchEventRecords |> SwitchEventRecords.getAllSortsWereComplete
-                    return {
-                                SorterEff.sorterCoverage = sorterCoverage;
-                                sucessfulSort = success
+                            sorterCoverage.sorterPerf = perfBin; 
+                            sorterId = r.sorterId;
+                            sortableSetId = r.sortableSetId
                            }
                }
 
 
-    module SorterPerf = 
+    module SorterPerfBin = 
+    
+        let fromSorterCoverage (coverage:sorterCoverage seq) =
 
-        let fromSorterEffs (sorterEffs:SorterEff list) = 
-            sorterEffs 
-            |> Seq.filter(fun eff->eff.sucessfulSort)
-            |> Seq.map(fun eff -> eff.sorterCoverage)
-            |> Seq.countBy id
-            |> Seq.toArray
+            let extractSorterPerfBin ((stc, swc), (scs:sorterCoverage[])) =
+                let succ = scs |> Array.filter(fun sc -> sc.sorterPerf.successful = (Some true))
+                               |> Array.length
+                let fayl = scs |> Array.filter(fun sc -> sc.sorterPerf.successful = (Some false))
+                               |> Array.length
+                {
+                    sorterPerfBin.sorterCount = SorterCount.fromInt scs.Length
+                    usedStageCount = stc;
+                    usedSwitchCount = swc;
+                    successCount = succ;
+                    failCount = fayl;
+                }
 
-        let repStr (sorterPerfBin:SorterPerf) =
+            let gp = coverage
+                        |> Seq.toArray
+                        |> Array.groupBy(fun c-> (c.sorterPerf.usedStageCount, 
+                                                  c.sorterPerf.usedSwitchCount))
+                        |> Array.map(extractSorterPerfBin)
+            gp
+
+
+    module SorterPerfR = 
+
+        let repStr (sorterPerfBin:sorterPerf) =
             sprintf "%s\t%s"
                 ((SwitchCount.value sorterPerfBin.usedSwitchCount) |> string)
                 ((StageCount.value sorterPerfBin.usedStageCount) |> string)
 
-        let binReport (bins:(SorterPerf*int)[]) = 
-            let repLine (sorterPerfBin:SorterPerf) (ct:int) = 
+        let binReport (bins:(sorterPerf*int)[]) = 
+            let repLine (sorterPerfBin:sorterPerf) (ct:int) = 
                     sprintf "%s\t%s"
                         (repStr sorterPerfBin)
                         (ct|> string)
@@ -141,21 +154,15 @@ module SortingEval =
                     (fun tup -> repLine (fst tup) (snd tup))
 
 
-    type SortingRecords = 
-            | SorterCoverage of SorterCoverage
-            | SorterEff of SorterEff
-            | SorterPerfBins of (SorterPerf*int)[]
+    type sortingRecords = 
+            | SorterCoverage of sorterCoverage
+            | SorterPerfBins of sorterPerfBin[]
 
 
     module SortingRecords = 
-        let getSorterCoverage (r:SortingResult) =
+        let getSorterCoverage (checkSuccess:bool) (r:sortingResult) =
             result {
-                let! sorterCoverage = r |> SorterCoverage.fromSwitchEventRecords
+                let! sorterCoverage = r |> SorterCoverage.fromSwitchEventRecords 
+                                                checkSuccess
                 return sorterCoverage
             }
-
-        let getSorterEff (r:SortingResult) =
-            result {
-                let! sorterEff = r |> SorterEff.fromSwitchEventRecords
-                return sorterEff 
-        }

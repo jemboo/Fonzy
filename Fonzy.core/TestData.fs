@@ -107,6 +107,88 @@ module TestData =
                                ia
                 |> Result.ExtractOrThrow
 
+    open SortingEval
+    module SortingEvalT = 
+        let SorterCoverages() =
+            let sorterId1 = SorterId.fromGuid (Guid.NewGuid())
+            let sorterId2 = SorterId.fromGuid (Guid.NewGuid())
+            let sorterId3 = SorterId.fromGuid (Guid.NewGuid())
+            let sorterId4 = SorterId.fromGuid (Guid.NewGuid())
+            let sorterId5 = SorterId.fromGuid (Guid.NewGuid())
+
+            let sortableSetId1 = SortableSetId.fromGuid (Guid.NewGuid())
+            let switchCount1 = SwitchCount.fromInt 1
+            let switchCount2 = SwitchCount.fromInt 2
+            let stageCount1 = StageCount.fromInt 1
+            let stageCount2 = StageCount.fromInt 2
+
+            let sorterPerf1 = 
+                { 
+                    sorterPerf.usedSwitchCount = switchCount1;
+                    usedStageCount = stageCount1;
+                    successful = Some false
+                }
+
+            let sorterPerf2 = 
+                { 
+                    sorterPerf.usedSwitchCount = switchCount1;
+                    usedStageCount = stageCount1;
+                    successful = Some true
+                }
+
+            let sorterPerf3 = 
+                    { 
+                        sorterPerf.usedSwitchCount = switchCount2;
+                        usedStageCount = stageCount2;
+                        successful = Some true
+                    }
+
+            let sorterPerf4 = 
+                { 
+                    sorterPerf.usedSwitchCount = switchCount2;
+                    usedStageCount = stageCount2;
+                    successful = None
+                }
+
+            let sorterCoverage1 =
+                { 
+                    sorterCoverage.sorterId = sorterId1;
+                    sortableSetId = sortableSetId1;
+                    sorterPerf = sorterPerf1
+                }
+
+            let sorterCoverage2 =
+                { 
+                    sorterCoverage.sorterId = sorterId2;
+                    sortableSetId = sortableSetId1;
+                    sorterPerf = sorterPerf2
+                }
+
+            let sorterCoverage3 =
+                { 
+                    SortingEval.sorterCoverage.sorterId = sorterId3;
+                    SortingEval.sorterCoverage.sortableSetId = sortableSetId1;
+                    SortingEval.sorterCoverage.sorterPerf = sorterPerf3
+                }
+
+            let sorterCoverage4 =
+                { 
+                    SortingEval.sorterCoverage.sorterId = sorterId4;
+                    SortingEval.sorterCoverage.sortableSetId = sortableSetId1;
+                    SortingEval.sorterCoverage.sorterPerf = sorterPerf4
+                }
+
+            let sorterCoverage5 =
+                { 
+                    SortingEval.sorterCoverage.sorterId = sorterId5;
+                    SortingEval.sorterCoverage.sortableSetId = sortableSetId1;
+                    SortingEval.sorterCoverage.sorterPerf = sorterPerf4
+                }
+
+
+            [sorterCoverage1; sorterCoverage2; sorterCoverage3; sorterCoverage4; sorterCoverage5]
+
+
 
 
     module SorterGa =

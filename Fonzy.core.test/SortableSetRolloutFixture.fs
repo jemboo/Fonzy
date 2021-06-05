@@ -4,7 +4,7 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type SorterActionRecordsFixture() =
+type SortableSetRolloutFixture() =
 
     [<TestMethod>]
     member this.SortableSetRollout_IsSorted() =
