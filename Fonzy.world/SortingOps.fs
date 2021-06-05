@@ -12,7 +12,7 @@ module SortingOps =
              (switchusePlan:Sorting.SwitchUsePlan) 
              (switchEventAgg:Sorting.EventGrouping) 
              (_parallel:UseParallel) 
-             (proc:ResultOfSorterOnSortableSet -> Result<'T, string>) =
+             (proc:SortingResult -> Result<'T, string>) =
 
              match sortableSet with
              | Binary ssb -> 

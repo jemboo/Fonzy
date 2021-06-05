@@ -61,12 +61,12 @@ module SortingEval =
                 return switchUses |> SwitchUses.usedSwitchCount
             }
 
-    type ResultOfSorterOnSortableSet =
+    type SortingResult =
         {
             sorterId:SorterId;
+            sortableSetId:SortableSetId
             sorter:Sorter; 
             switchEventRecords:SwitchEventRecords;
-            sortableSetId:SortableSetId
         }
 
     type SorterCoverage = 
@@ -87,7 +87,7 @@ module SortingEval =
     module SorterCoverage = 
 
         let fromSwitchEventRecords 
-                (r:ResultOfSorterOnSortableSet) =
+                (r:SortingResult) =
             result {
                     let! switchUses = 
                             r.switchEventRecords |> SwitchEventRecords.getSwitchUses
@@ -107,8 +107,7 @@ module SortingEval =
 
     module SorterEff = 
 
-        let fromSwitchEventRecords 
-                (r:ResultOfSorterOnSortableSet) =
+        let fromSwitchEventRecords (r:SortingResult) =
             result {
                     let! sorterCoverage = 
                             r |> SorterCoverage.fromSwitchEventRecords
@@ -151,13 +150,13 @@ module SortingEval =
 
 
     module SortingRecords = 
-        let getSorterCoverage (r:ResultOfSorterOnSortableSet) =
+        let getSorterCoverage (r:SortingResult) =
             result {
                 let! sorterCoverage = r |> SorterCoverage.fromSwitchEventRecords
                 return sorterCoverage
             }
 
-        let getSorterEff (r:ResultOfSorterOnSortableSet) =
+        let getSorterEff (r:SortingResult) =
             result {
                 let! sorterEff = r |> SorterEff.fromSwitchEventRecords
                 return sorterEff 

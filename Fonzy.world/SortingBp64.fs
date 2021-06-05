@@ -165,17 +165,17 @@ module SortingBp64 =
                  (switchusePlan:Sorting.SwitchUsePlan) 
                  (switchEventAgg:Sorting.EventGrouping) 
                  (_parallel:UseParallel) 
-                 (proc:ResultOfSorterOnSortableSet -> Result<'T, string>) =
+                 (proc:SortingResult -> Result<'T, string>) =
 
             let rewrap tup ssr = 
                 let sorterId, sorter = tup
                 let swEvRecs = evalSorterOnBP64SetsRollout 
                                     sorter ssr switchusePlan switchEventAgg
                 let resSoSS = {
-                    ResultOfSorterOnSortableSet.sorter = sorter;
-                    ResultOfSorterOnSortableSet.switchEventRecords = swEvRecs;
-                    ResultOfSorterOnSortableSet.sorterId = sorterId;
-                    ResultOfSorterOnSortableSet.sortableSetId = sortableSetId
+                    SortingResult.sorter = sorter;
+                    SortingResult.switchEventRecords = swEvRecs;
+                    SortingResult.sorterId = sorterId;
+                    SortingResult.sortableSetId = sortableSetId
                 }
                 proc resSoSS
 
