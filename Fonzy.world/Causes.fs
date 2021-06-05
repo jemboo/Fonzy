@@ -85,7 +85,7 @@ module CauseSorters =
                                       (UseParallel.create useParallel)
                 let perfBins = coverageBins |> Array.map(fun cb -> ((fst cb).sorterPerfBin , (snd cb)))
                 let perfBinsDto = perfBins |> SorterPerfBinsDto.toDtos
-                return! Enviro.addRootDtoToEnviro<SorterPerfBinsDto[]>
+                return! Enviro.addRootDtoToEnviro<SorterPerfDto[]>
                                     Enviro.Empty resultsName perfBinsDto Map.empty
             }
         {Cause.causeSpec=causeSpec; op=causer}
@@ -143,7 +143,7 @@ module CauseSorters =
                 let perfBins = coverageBins |> Array.map(fun cb -> ((fst cb).sorterPerfBin , (snd cb)))
                 let perfBinsDto = perfBins |> SorterPerfBinsDto.toDtos
 
-                return! Enviro.addRootDtoToEnviro<SorterPerfBinsDto[]>
+                return! Enviro.addRootDtoToEnviro<SorterPerfDto[]>
                                     Enviro.Empty 
                                     resultsName 
                                     perfBinsDto 

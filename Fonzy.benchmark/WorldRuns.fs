@@ -159,7 +159,7 @@ module RunBp64 =
                 let! worldDto = ds |> DataStoreItem.getWorldDto
                 let! world = worldDto |> WorldDto.fromDto
                 let! sorterPerfBinsDto, unusedMeta =  
-                     Enviro.getDtoAndMetaFromEnviro<SorterPerfBinsDto[]> 
+                     Enviro.getDtoAndMetaFromEnviro<SorterPerfDto[]> 
                                         world.enviro
                                         binResultsName
                 return sorterPerfBinsDto
@@ -201,7 +201,7 @@ module RunBp64 =
                 let! worldDto = ds |> DataStoreItem.getWorldDto
                 let! world = worldDto |> WorldDto.fromDto
                 let! sorterPerfBinsDto, unusedMeta =  
-                        Enviro.getDtoAndMetaFromEnviro<SorterPerfBinsDto[]> 
+                        Enviro.getDtoAndMetaFromEnviro<SorterPerfDto[]> 
                                         world.enviro
                                         binResultsName
                 let! sorterGen = 
@@ -213,7 +213,7 @@ module RunBp64 =
                 return (sorterGenRep, sorterPerfBinsDto)
             }
 
-        let procPbInfo (pbinfo:string*SorterPerfBinsDto[])  =
+        let procPbInfo (pbinfo:string*SorterPerfDto[])  =
             let sorterGenReport, sorterPerfBinsDto = pbinfo
             result {
                 let! sorterPerfBins = SorterPerfBinsDto.fromDtos sorterPerfBinsDto
@@ -221,7 +221,7 @@ module RunBp64 =
                             ((sorterGenReport, fst tup), snd tup))
             }
 
-        let formatPerfBinTotal (bt:(string*SortingEval.SorterPerfBin)*int) = 
+        let formatPerfBinTotal (bt:(string*SortingEval.SorterPerf)*int) = 
             let sorterGenInfo = (fst >> fst) bt
             let binCount = snd bt
             let perfBin = (fst >> snd) bt

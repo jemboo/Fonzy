@@ -75,7 +75,7 @@ module SortingOps =
                             SortingEval.SortingRecords.getSorterEff
 
                 let bins = sorterEffs 
-                                |> SortingEval.SorterPerfBin.fromSorterEffs
+                                |> SortingEval.SorterPerf.fromSorterEffs
 
                 return bins
             }

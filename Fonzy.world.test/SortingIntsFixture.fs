@@ -251,7 +251,7 @@ type SortingIntsFixture () =
                           (UseParallel.create true)
 
         //let pbr  = perfBins |> Result.ExtractOrThrow
-        //let rep = (pbr |> SorterPerfBin.binReport)
+        //let rep = (pbr |> SorterPerf.binReport)
         //Console.WriteLine rep
                   
         //let ct =  pbr |> Array.sumBy(snd)
@@ -322,7 +322,7 @@ type SortingIntsFixture () =
         //                    (UseParallel.create true)
 
         //let pbr  = perfBins |> Result.ExtractOrThrow
-        //let rep = (pbr |> SorterPerfBin.binReport)
+        //let rep = (pbr |> SorterPerf.binReport)
         //Console.WriteLine rep
 
         Assert.IsTrue(true)
@@ -372,7 +372,7 @@ type SortingIntsFixture () =
                             (UseParallel.create true)
 
         //let pbr  = perfBins |> Result.ExtractOrThrow
-        //let rep = (pbr |> SorterPerfBin.binReport)
+        //let rep = (pbr |> SorterPerf.binReport)
         //let tot = pbr |> Array.sumBy(snd)
         //Console.WriteLine (sprintf "tot:%d" tot)
         //Console.WriteLine ""

@@ -19,7 +19,7 @@ module SortingEval =
         | NoGrouping of NoGrouping
         | BySwitch of GroupBySwitch
 
-    type SorterPerfBin = 
+    type SorterPerf = 
         { 
             usedSwitchCount:SwitchCount; 
             usedStageCount:StageCount;
@@ -73,7 +73,7 @@ module SortingEval =
         { 
             sorterId:SorterId;
             sortableSetId:SortableSetId;
-            sorterPerfBin:SorterPerfBin; 
+            sorterPerfBin:SorterPerf; 
         }
         
     type SorterEff = 
@@ -82,12 +82,10 @@ module SortingEval =
             sucessfulSort:bool
         }
 
-
                      
     module SorterCoverage = 
 
-        let fromSwitchEventRecords 
-                (r:SortingResult) =
+        let fromSwitchEventRecords (r:SortingResult) =
             result {
                     let! switchUses = 
                             r.switchEventRecords |> SwitchEventRecords.getSwitchUses
@@ -95,7 +93,7 @@ module SortingEval =
                             r.sorter |> SwitchUses.getUsedSwitches switchUses
                     let! usedSwitchCount = SwitchCount.create "" usedSwitchArray.Length
                     let! usedStageCount = Stage.getStageCount r.sorter.degree usedSwitchArray
-                    let perfBin = {SorterPerfBin.usedStageCount = usedStageCount;
+                    let perfBin = {SorterPerf.usedStageCount = usedStageCount;
                                    usedSwitchCount=usedSwitchCount }
                     return {
                                 SorterCoverage.sorterPerfBin = perfBin; 
@@ -120,7 +118,7 @@ module SortingEval =
                }
 
 
-    module SorterPerfBin = 
+    module SorterPerf = 
 
         let fromSorterEffs (sorterEffs:SorterEff list) = 
             sorterEffs 
@@ -129,13 +127,13 @@ module SortingEval =
             |> Seq.countBy id
             |> Seq.toArray
 
-        let repStr (sorterPerfBin:SorterPerfBin) =
+        let repStr (sorterPerfBin:SorterPerf) =
             sprintf "%s\t%s"
                 ((SwitchCount.value sorterPerfBin.usedSwitchCount) |> string)
                 ((StageCount.value sorterPerfBin.usedStageCount) |> string)
 
-        let binReport (bins:(SorterPerfBin*int)[]) = 
-            let repLine (sorterPerfBin:SorterPerfBin) (ct:int) = 
+        let binReport (bins:(SorterPerf*int)[]) = 
+            let repLine (sorterPerfBin:SorterPerf) (ct:int) = 
                     sprintf "%s\t%s"
                         (repStr sorterPerfBin)
                         (ct|> string)
@@ -146,7 +144,7 @@ module SortingEval =
     type SortingRecords = 
             | SorterCoverage of SorterCoverage
             | SorterEff of SorterEff
-            | SorterPerfBins of (SorterPerfBin*int)[]
+            | SorterPerfBins of (SorterPerf*int)[]
 
 
     module SortingRecords = 

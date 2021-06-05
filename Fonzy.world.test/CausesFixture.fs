@@ -66,7 +66,7 @@ type CausesFixture () =
         let envEvalRes = causeEval.op envGen |> Result.ExtractOrThrow
 
         let sorterEvalResults, unusedMeta =  
-             Enviro.getDtoAndMetaFromEnviro<SorterPerfBinsDto[]> 
+             Enviro.getDtoAndMetaFromEnviro<SorterPerfDto[]> 
                                 envEvalRes
                                 TestData.CauseSpec.SorterSet.sorterEvalResultsName
             |> Result.ExtractOrThrow
@@ -87,7 +87,7 @@ type CausesFixture () =
         let envEvalRes = causeEval.op envGen |> Result.ExtractOrThrow
 
         let sorterEvalResults, unusedMeta =  
-             Enviro.getDtoAndMetaFromEnviro<SorterPerfBinsDto[]> 
+             Enviro.getDtoAndMetaFromEnviro<SorterPerfDto[]> 
                                 envEvalRes
                                 TestData.CauseSpec.SorterSet.sorterEvalResultsName
             |> Result.ExtractOrThrow
