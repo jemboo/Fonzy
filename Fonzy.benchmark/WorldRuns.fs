@@ -114,7 +114,7 @@ module RunBp64 =
         //                | 0 ->  SorterGen.RandStages (stageCount, degree)
         //                | _ ->  SorterGen.RandSymmetric (stageCount, degree)
 
-        let sorterCount = SorterCount.fromInt 10000
+        let sorterCount = SorterCount.fromInt 100
         let causeSpec = 
                 genMush
                     sorterGen
@@ -143,7 +143,6 @@ module RunBp64 =
         dex
 
 
-
         
     let dirPerfBinReport (dex:int) =
         let repDataDir = "C:\\testDirForDataSourceFixture\\20_stageGen"
@@ -159,7 +158,7 @@ module RunBp64 =
                 let! worldDto = ds |> DataStoreItem.getWorldDto
                 let! world = worldDto |> WorldDto.fromDto
                 let! sorterPerfBinsDto, unusedMeta =  
-                     Enviro.getDtoAndMetaFromEnviro<SorterPerfDto[]> 
+                     Enviro.getDtoAndMetaFromEnviro<sorterPerfBinDto[]> 
                                         world.enviro
                                         binResultsName
                 return sorterPerfBinsDto
@@ -168,23 +167,22 @@ module RunBp64 =
         let perfBinsDto = repNs |> List.map(perfBinsFromGuid)
                                 |> Result.sequence
                                 |> Result.ExtractOrThrow
-        let perfBinsList = perfBinsDto |> List.map(SorterPerfBinsDto.fromDtos)
+        let perfBinsList = perfBinsDto |> List.map(SorterPerfBinDto.fromDtos)
                                        |> Result.sequence
                                        |> Result.ExtractOrThrow
         let perfBins = perfBinsList |> List.reduce(fun a b -> Array.append a b)
-                                    |> Array.groupBy(fst)
+                                    |> Array.groupBy(fun pb-> (pb.usedStageCount, pb.usedSwitchCount))
         let perfBinTotals = perfBins |> Array.map(fun k ->
-                                            (fst k, (snd k) |> Array.sumBy(snd)))
+                                            (fst k, (snd k) |> Array.sumBy(fun pb->pb.successCount)))
         let rep = perfBinTotals |> Array.map(fun tup -> 
-                            ((fst tup).usedSwitchCount,
-                             (fst tup).usedStageCount,   
-                             (snd tup)))
+                            (StageCount.value (tup |> fst |> fst)),
+                            (SwitchCount.value (tup |> fst |> snd)),   
+                             (snd tup))
         let p = rep |> Array.iter(fun (w, t, c) -> 
                         Console.WriteLine 
-                            (sprintf "%d\t%d\t%d" (SwitchCount.value w) 
-                                                  (StageCount.value t) 
-                                                  c))
+                            (sprintf "%d\t%d\t%d" w t c))
         dex
+
 
 
     let dirPerfBinBySorterGenReport (dex:int) =
@@ -201,7 +199,7 @@ module RunBp64 =
                 let! worldDto = ds |> DataStoreItem.getWorldDto
                 let! world = worldDto |> WorldDto.fromDto
                 let! sorterPerfBinsDto, unusedMeta =  
-                        Enviro.getDtoAndMetaFromEnviro<SorterPerfDto[]> 
+                        Enviro.getDtoAndMetaFromEnviro<sorterPerfBinDto[]> 
                                         world.enviro
                                         binResultsName
                 let! sorterGen = 
@@ -213,15 +211,15 @@ module RunBp64 =
                 return (sorterGenRep, sorterPerfBinsDto)
             }
 
-        let procPbInfo (pbinfo:string*SorterPerfDto[])  =
+        let procPbInfo (pbinfo:string*sorterPerfBinDto[])  =
             let sorterGenReport, sorterPerfBinsDto = pbinfo
             result {
-                let! sorterPerfBins = SorterPerfBinsDto.fromDtos sorterPerfBinsDto
-                return  sorterPerfBins |> Array.map(fun tup -> 
-                            ((sorterGenReport, fst tup), snd tup))
+                let! sorterPerfBins = SorterPerfBinDto.fromDtos sorterPerfBinsDto
+                return  sorterPerfBins |> Array.map(fun spb -> 
+                            ((sorterGenReport, spb), spb.successCount))
             }
 
-        let formatPerfBinTotal (bt:(string*SortingEval.SorterPerf)*int) = 
+        let formatPerfBinTotal (bt:(string*SortingEval.sorterPerfBin)*int) = 
             let sorterGenInfo = (fst >> fst) bt
             let binCount = snd bt
             let perfBin = (fst >> snd) bt

@@ -7,7 +7,7 @@ open BenchmarkDotNet.Running
 let main argv =
     /// ******* Benchmark ***********
     Console.WriteLine("Starting Benchmark.main")
-    let summary = BenchmarkRunner.Run<BenchmarkSorterOnBp64>()
+    let summary = BenchmarkRunner.Run<BenchmarkSorterSetOnBp64>()
     printfn "%A" summary
     Console.Read() |> ignore
    

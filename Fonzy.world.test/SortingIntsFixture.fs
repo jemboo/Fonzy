@@ -122,7 +122,7 @@ type SortingIntsFixture () =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
                         (UseParallel.create true)
-                        SortingEval.SortingRecords.getSorterCoverage
+                        (SortingEval.SortingRecords.getSorterCoverage true)
                         |> Result.ExtractOrThrow
 
         Assert.AreEqual(SorterCount.value sorterSet.sorterCount, ssR.Length)
@@ -179,10 +179,11 @@ type SortingIntsFixture () =
                           altEvenSorterSet
                           sortableSetEx
                           Sorting.SwitchUsePlan.All
+                          true
                           (UseParallel.create true)
                           
         let yab  = perfBins |> Result.ExtractOrThrow
-        let ct = yab |> Array.sumBy(snd)
+        let ct = yab |> Array.sumBy(fun spb -> (SorterCount.value spb.sorterCount))
         Assert.IsTrue(ct > 0)
 
 
@@ -248,6 +249,7 @@ type SortingIntsFixture () =
                           coConjSorterSet
                           sortableSetEx
                           Sorting.SwitchUsePlan.All
+                          true
                           (UseParallel.create true)
 
         //let pbr  = perfBins |> Result.ExtractOrThrow
@@ -369,6 +371,7 @@ type SortingIntsFixture () =
                             sorterSet
                             sortableSetEx
                             Sorting.SwitchUsePlan.All
+                            true
                             (UseParallel.create true)
 
         //let pbr  = perfBins |> Result.ExtractOrThrow

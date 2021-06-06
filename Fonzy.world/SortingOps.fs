@@ -12,8 +12,9 @@ module SortingOps =
              (switchusePlan:Sorting.SwitchUsePlan) 
              (switchEventAgg:Sorting.EventGrouping) 
              (_parallel:UseParallel) 
-             (proc:SortingResult -> Result<'T, string>) =
-
+             (proc:sortingResult -> Result<'T, string>) =
+             
+             let yab = 5
              match sortableSet with
              | Binary ssb -> 
                     result {
@@ -66,7 +67,7 @@ module SortingOps =
             (_parallel:UseParallel) =
 
             result {
-                let! sorterEffs = 
+                let! sorterCovs = 
                         eval
                             sorterSet 
                             sortableSet 
@@ -76,8 +77,8 @@ module SortingOps =
                             (SortingEval.SortingRecords.getSorterCoverage
                                                 checkSuccess)
 
-                let bins = sorterEffs 
-                                |> SortingEval.SorterPerf.fromSorterEffs
+                let bins = sorterCovs 
+                                |> SortingEval.SorterPerfBin.fromSorterCoverage
 
                 return bins
             }

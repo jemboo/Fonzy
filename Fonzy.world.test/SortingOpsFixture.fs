@@ -76,7 +76,7 @@ type SortingOpsFixture () =
                         Sorting.EventGrouping.BySwitch
         let switchCount =
             match ssR with
-            | SortingEval.SwitchEventRecords.BySwitch s -> s.switchUses.switchCount
+            | SortingEval.switchEventRecords.BySwitch s -> s.switchUses.switchCount
             | _ -> failwith "yoe"
         Assert.IsTrue((SwitchCount.value switchCount) > 0)
 
@@ -115,7 +115,7 @@ type SortingOpsFixture () =
                         Sorting.EventGrouping.BySwitch
         let switchCount =
             match ssR with
-            | SortingEval.SwitchEventRecords.BySwitch s -> 
+            | SortingEval.switchEventRecords.BySwitch s -> 
                                  SwitchUses.usedSwitchCount s.switchUses
                                  |> Ok
             | _ -> failwith "yoe"
@@ -157,7 +157,7 @@ type SortingOpsFixture () =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
                         (UseParallel.create true)
-                        SortingEval.SortingRecords.getSorterCoverage
+                        (SortingEval.SortingRecords.getSorterCoverage true)
         Assert.IsTrue(true)
 
         
@@ -212,8 +212,9 @@ type SortingOpsFixture () =
                           altEvenSorterSet
                           sortableSetEx
                           Sorting.SwitchUsePlan.All
+                          true
                           (UseParallel.create true)
                           
         let yab  = perfBins |> Result.ExtractOrThrow
-        let ct = yab |> Array.sumBy(snd)
+        let ct = yab |> Array.sumBy(fun pfb -> (SorterCount.value pfb.sorterCount))
         Assert.IsTrue(ct > 0)

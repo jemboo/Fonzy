@@ -132,7 +132,7 @@ module BP64SetsRollout =
             let a = baseArrays |> Seq.map(fun a -> a.values)
                                |> Seq.collect(id)
                                |> Seq.toArray
-            return! create degree a (SortableCount.fromInt (a.Length * 64))
+            return! create degree a (SortableCount.fromInt ((64 * a.Length) / (Degree.value degree)))
         }
 
 

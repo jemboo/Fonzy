@@ -59,9 +59,9 @@ module SortingInts =
                         sortableIndex
 
                 sortableIndex <- sortableIndex + 1
-        SwitchEventRecords.NoGrouping {
-            NoGrouping.switchEventRollout = seRoll |> switchEventRollout.Int
-            NoGrouping.sortableRollout = ssRollCopy |> SortableRollout.Int 
+        switchEventRecords.NoGrouping {
+            noGrouping.switchEventRollout = seRoll |> switchEventRollout.Int
+            noGrouping.sortableRollout = ssRollCopy |> SortableRollout.Int 
                                                 
         }
 
@@ -113,9 +113,9 @@ module SortingInts =
                     sorter firstSwitchDex lastSwitchDex 
                     switchUses sortableSetRolloutCopy sortableIndex
                 sortableIndex <- sortableIndex + 1
-        SwitchEventRecords.BySwitch {
-            GroupBySwitch.switchUses = switchUses; 
-            GroupBySwitch.sortableRollout = SortableRollout.Int 
+        switchEventRecords.BySwitch {
+            groupBySwitch.switchUses = switchUses; 
+            groupBySwitch.sortableRollout = SortableRollout.Int 
                                                 sortableSetRolloutCopy
         }
         
@@ -157,17 +157,17 @@ module SortingInts =
                 (switchusePlan:Sorting.SwitchUsePlan) 
                 (switchEventAgg:Sorting.EventGrouping) 
                 (_parallel:UseParallel) 
-                (proc:SortingResult -> Result<'T, string>) =
+                (proc:sortingResult -> Result<'T, string>) =
 
             let rewrap tup ssr = 
                 let sorterId, sorter = tup
                 let swEvRecs = evalSorterOnIntSetsRollout 
                                     sorter ssr switchusePlan switchEventAgg
                 let resSoSS = {
-                    SortingResult.sorter = sorter;
-                    SortingResult.switchEventRecords = swEvRecs;
-                    SortingResult.sorterId = sorterId;
-                    SortingResult.sortableSetId = sortableSetId
+                    sortingResult.sorter = sorter;
+                    sortingResult.switchEventRecords = swEvRecs;
+                    sortingResult.sorterId = sorterId;
+                    sortingResult.sortableSetId = sortableSetId
                 }
                 proc resSoSS
 

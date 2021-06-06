@@ -57,9 +57,9 @@ module SortingBp64 =
 
             sortableBlockDex <- sortableBlockDex + 1
 
-        SwitchEventRecords.NoGrouping {
-            NoGrouping.switchEventRollout = seRollbp64 |> switchEventRollout.Bp64
-            NoGrouping.sortableRollout = bPsRollCopy |> SortableRollout.Bp64 
+        switchEventRecords.NoGrouping {
+            noGrouping.switchEventRollout = seRollbp64 |> switchEventRollout.Bp64
+            noGrouping.sortableRollout = bPsRollCopy |> SortableRollout.Bp64 
                                                 
         }
 
@@ -115,9 +115,9 @@ module SortingBp64 =
 
         let switchUses = SwitchUseB64.toSwitchUses switchUseB64
                          |> Result.ExtractOrThrow
-        SwitchEventRecords.BySwitch {
-            GroupBySwitch.switchUses = switchUses; 
-            GroupBySwitch.sortableRollout = SortableRollout.Bp64
+        switchEventRecords.BySwitch {
+            groupBySwitch.switchUses = switchUses; 
+            groupBySwitch.sortableRollout = SortableRollout.Bp64
                                                 bp64SetsRolloutCopy
         }
 
@@ -165,17 +165,17 @@ module SortingBp64 =
                  (switchusePlan:Sorting.SwitchUsePlan) 
                  (switchEventAgg:Sorting.EventGrouping) 
                  (_parallel:UseParallel) 
-                 (proc:SortingResult -> Result<'T, string>) =
+                 (proc:sortingResult -> Result<'T, string>) =
 
             let rewrap tup ssr = 
                 let sorterId, sorter = tup
                 let swEvRecs = evalSorterOnBP64SetsRollout 
                                     sorter ssr switchusePlan switchEventAgg
                 let resSoSS = {
-                    SortingResult.sorter = sorter;
-                    SortingResult.switchEventRecords = swEvRecs;
-                    SortingResult.sorterId = sorterId;
-                    SortingResult.sortableSetId = sortableSetId
+                    sortingResult.sorter = sorter;
+                    sortingResult.switchEventRecords = swEvRecs;
+                    sortingResult.sorterId = sorterId;
+                    sortingResult.sortableSetId = sortableSetId
                 }
                 proc resSoSS
 

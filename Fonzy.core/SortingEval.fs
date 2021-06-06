@@ -18,6 +18,7 @@ module SortingEval =
         | NoGrouping of noGrouping
         | BySwitch of groupBySwitch
 
+
     type sorterPerf = 
         { 
             usedSwitchCount:SwitchCount; 
@@ -130,33 +131,11 @@ module SortingEval =
                     failCount = fayl;
                 }
 
-            let gp = coverage
-                        |> Seq.toArray
-                        |> Array.groupBy(fun c-> (c.sorterPerf.usedStageCount, 
-                                                  c.sorterPerf.usedSwitchCount))
-                        |> Array.map(extractSorterPerfBin)
-            gp
-
-
-    module SorterPerfR = 
-
-        let repStr (sorterPerfBin:sorterPerf) =
-            sprintf "%s\t%s"
-                ((SwitchCount.value sorterPerfBin.usedSwitchCount) |> string)
-                ((StageCount.value sorterPerfBin.usedStageCount) |> string)
-
-        let binReport (bins:(sorterPerf*int)[]) = 
-            let repLine (sorterPerfBin:sorterPerf) (ct:int) = 
-                    sprintf "%s\t%s"
-                        (repStr sorterPerfBin)
-                        (ct|> string)
-            bins |> StringUtils.printLinesOfArrayf
-                    (fun tup -> repLine (fst tup) (snd tup))
-
-
-    type sortingRecords = 
-            | SorterCoverage of sorterCoverage
-            | SorterPerfBins of sorterPerfBin[]
+            coverage
+                |> Seq.toArray
+                |> Array.groupBy(fun c-> (c.sorterPerf.usedStageCount, 
+                                          c.sorterPerf.usedSwitchCount))
+                |> Array.map(extractSorterPerfBin)
 
 
     module SortingRecords = 

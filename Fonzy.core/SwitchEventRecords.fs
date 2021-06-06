@@ -117,33 +117,6 @@ module SwitchUses =
 
 
 
-type SwitchUseB32 = {switchCount:SwitchCount; weights:uint[]}
-module SwitchUseB32 =
-   let createEmpty (switchCount:SwitchCount) =
-       {switchCount=switchCount; 
-        weights=Array.init (SwitchCount.value switchCount) (fun i -> 0u)}
-
-   let create (switchCount:SwitchCount) (weights:uint[]) =
-       if  (SwitchCount.value switchCount) = weights.Length then
-           {switchCount=switchCount; weights=weights} |> Ok
-       else Error (sprintf "switchCount: %d is not equal to weights length: %d" 
-                            (SwitchCount.value switchCount) weights.Length) 
-
-   let getWeights switchUses = switchUses.weights
-   let switchCount switchUses = (SwitchCount.value switchUses.switchCount)
-   
-   let usedSwitchCount (switchUses:SwitchUseB32) = 
-       getWeights switchUses |> Array.filter(fun i -> i > 0u) 
-                             |> Array.length
-                             |> SwitchCount.create ""
-
-   let toSwitchUses (switchUseB32:SwitchUseB32) = 
-       let suA = switchUseB32.weights
-                 |> Array.map(ByteUtils.trueBitCount32)
-       SwitchUses.create switchUseB32.switchCount suA
-
-
-
 type SwitchUseB64 = {switchCount:SwitchCount; weights:uint64[]}
 module SwitchUseB64 =
    let createEmpty (switchCount:SwitchCount) =

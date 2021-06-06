@@ -1,30 +1,32 @@
 ﻿namespace global
 
-type SorterPerfDto = int[]
-module SorterPerfBinsDto =
-    let toDto (tup:SortingEval.SorterPerf*int) =
-        let perfBin = fst tup
+type sorterPerfBinDto = int[]
+module SorterPerfBinDto =
+    let toDto (spb:SortingEval.sorterPerfBin) =
         [|
-            (SwitchCount.value perfBin.usedSwitchCount)
-            (StageCount.value perfBin.usedStageCount)
-            snd tup
+            (SwitchCount.value spb.usedSwitchCount)
+            (StageCount.value spb.usedStageCount)
+            (SorterCount.value spb.sorterCount)
+            spb.successCount
+            spb.failCount
         |]
 
-    let toTup (dto:SorterPerfDto) =
+    let toTup (dto:sorterPerfBinDto) =
         result {
             let! uwc = SwitchCount.create "" dto.[0]
             let! utc = StageCount.create "" dto.[1]
-            return (  
-                      { 
-                        SortingEval.SorterPerf.usedSwitchCount = uwc
-                        SortingEval.SorterPerf.usedStageCount = utc
-                        SortingEval.SorterPerf.sucessful = None
-                      },
-                      dto.[2]
-                   )
-         }
+            let! stc = SorterCount.create "" dto.[2]
+            return
+                { 
+                    SortingEval.sorterPerfBin.usedSwitchCount = uwc;
+                    SortingEval.sorterPerfBin.usedStageCount = utc;
+                    SortingEval.sorterPerfBin.sorterCount = stc;
+                    SortingEval.sorterPerfBin.successCount = dto.[3]
+                    SortingEval.sorterPerfBin.failCount = dto.[4]
+                }
+        }
 
-    let fromDtos (dtos:SorterPerfDto[]) =
+    let fromDtos (dtos:sorterPerfBinDto[]) =
         result {
                 let! tups = dtos |> Array.map(toTup)
                                  |> Array.toList
@@ -33,14 +35,14 @@ module SorterPerfBinsDto =
                 return tups |> List.toArray
             }
 
-    let toDtos (perfBins:(SortingEval.SorterPerf*int)[]) =
+    let toDtos (perfBins:SortingEval.sorterPerfBin[]) =
         perfBins |> Array.map(toDto)
 
-    let toJson (perfBins:(SortingEval.SorterPerf*int)[]) =
+    let toJson (perfBins:SortingEval.sorterPerfBin[]) =
         perfBins |> toDtos |> Json.serialize
 
     let fromJson (json:string) =
         result {
-            let! dto = Json.deserialize<SorterPerfDto[]> json
+            let! dto = Json.deserialize<sorterPerfBinDto[]> json
             return! dto |> fromDtos
         }
