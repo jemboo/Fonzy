@@ -166,7 +166,7 @@ module Stage =
         {switches=switches |> Seq.toList; degree=degree}
 
 
-    let makeRandomStagedSwitchSeqOld (degree:Degree) 
+    let makeRandomStagedSwitchSeq (degree:Degree) 
                                   (switchFreq:SwitchFrequency) 
                                   (rnd:IRando) =
         let aa (rnd:IRando)  = 
@@ -178,9 +178,9 @@ module Stage =
         seq { while true do yield! (aa rnd) }
 
 
-    let makeRandomStagedSwitchSeq (degree:Degree) 
-                                    (switchFreq:SwitchFrequency) 
-                                    (rnd:IRando) =
+    let makeRandomStagedReflSymmetricSwitchSeq 
+                                  (degree:Degree)
+                                  (rnd:IRando) =
         let aa (rnd:IRando)  = 
             (TwoCyclePerm.makeReflSymmetric 
                                 degree 
@@ -190,9 +190,10 @@ module Stage =
 
 
     
-    let makeRandomFullStages (degree:Degree) 
+    let makeRandomReflSymmetricStages 
+                             (degree:Degree) 
                              (rnd:IRando) =
-        makeRandomStagedSwitchSeq degree SwitchFrequency.max rnd
+        makeRandomStagedReflSymmetricSwitchSeq degree rnd
         |> mergeSwitchesIntoStages degree
 
 
@@ -208,10 +209,10 @@ module Stage =
             | _ -> stage
             
 
-    let buddyStages (stagesPfx:Stage list)
-                    (stageWindowSize:StageCount)
-                    (degree:Degree) 
-                    (rnd:IRando) =
+    let toBuddyStages  (stagesPfx:Stage list)
+                     (stageWindowSize:StageCount)
+                     (stageSeq: seq<Stage>) =
+
         let maxWindow = (StageCount.value stageWindowSize)
         let mutable window = stagesPfx |> CollectionUtils.last maxWindow
         let trim() =
@@ -225,10 +226,31 @@ module Stage =
             switchPairwiseIntersections testWin
                           |> Seq.length
 
-        seq { for stage in (makeRandomFullStages degree rnd) do
+        seq { for stage in stageSeq do
                     window <- trim()
                     if (buddyCount stage) = 0 then
                         window <- window |> List.append [stage]
                         yield stage }
                     |> Seq.append
                            (stagesPfx |> List.toSeq)
+
+
+    let reflSymmetricBuddyStages (stageWindowSize:StageCount)
+                                 (degree:Degree) 
+                                 (rnd:IRando) 
+                                 (stagesPfx:Stage list) =
+        toBuddyStages stagesPfx
+                    stageWindowSize
+                    (makeRandomReflSymmetricStages degree rnd)
+
+
+    let makeBuddyStages (stageWindowSize:StageCount)
+                        (switchFreq:SwitchFrequency) 
+                        (degree:Degree) 
+                        (rnd:IRando) 
+                        (stagesPfx:Stage list)  =
+        toBuddyStages stagesPfx
+                      stageWindowSize
+                      (makeRandomStagedSwitchSeq degree switchFreq  rnd 
+                         |> mergeSwitchesIntoStages degree)
+

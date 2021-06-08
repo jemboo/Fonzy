@@ -43,12 +43,12 @@ type BenchSorterOnInts() =
 
 
         
-        //|                                     Method |     Mean |    Error |   StdDev |
-        //|------------------------------------------- |---------:|---------:|---------:|
-        //|    getSorterCoverage50_Parallel_NoGrouping |  7.754 s | 0.1898 s | 0.5536 s |
-        //| getSorterCoverage50_Parallel_GroupBySwitch |  3.279 s | 0.0579 s | 0.0483 s |
-        //|      getSorterCoverage50_Serial_NoGrouping | 31.213 s | 0.1030 s | 0.0913 s |
-        //|   getSorterCoverage50_Serial_GroupBySwitch | 14.823 s | 0.0582 s | 0.0545 s |
+//|                                     Method |     Mean |    Error |   StdDev |
+//|------------------------------------------- |---------:|---------:|---------:|
+//|    getSorterCoverage50_Parallel_NoGrouping |  7.754 s | 0.1898 s | 0.5536 s |
+//| getSorterCoverage50_Parallel_GroupBySwitch |  3.279 s | 0.0579 s | 0.0483 s |
+//|      getSorterCoverage50_Serial_NoGrouping | 31.213 s | 0.1030 s | 0.0913 s |
+//|   getSorterCoverage50_Serial_GroupBySwitch | 14.823 s | 0.0582 s | 0.0545 s |
         
 type BenchSorterSetOnInts() =
     let seed = 1234

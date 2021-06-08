@@ -13,7 +13,7 @@ type SorterPartsFixture () =
         let stageCount = StageCount.fromInt 2
 
         let startingStages() = 
-            Stage.makeRandomFullStages
+            Stage.makeRandomReflSymmetricStages
                         degree
                         randy
                 |> Seq.take (StageCount.value stageCount)
@@ -33,7 +33,7 @@ type SorterPartsFixture () =
         let stageCount = StageCount.fromInt 4
 
         let startingStages() = 
-            Stage.makeRandomFullStages
+            Stage.makeRandomReflSymmetricStages
                         degree
                         randy
                 |> Seq.take (StageCount.value stageCount)
@@ -54,7 +54,7 @@ type SorterPartsFixture () =
         let windowSize = 4
 
         let startingStages = 
-            Stage.makeRandomFullStages
+            Stage.makeRandomReflSymmetricStages
                         degree
                         randy
                 |> Seq.take (StageCount.value stageCount)
@@ -75,11 +75,12 @@ type SorterPartsFixture () =
         let stageWindowSize = StageCount.fromInt 10
         let windowSize = 4
 
-        let buddyStages = Stage.buddyStages 
-                            List.Empty 
+        let buddyStages = Stage.makeBuddyStages 
                             stageWindowSize
+                            SwitchFrequency.max
                             degree
                             randy
+                            List.Empty 
                          |> Seq.take 100
                          |> Seq.toArray
 

@@ -14,7 +14,6 @@ module SortingOps =
              (_parallel:UseParallel) 
              (proc:sortingResult -> Result<'T, string>) =
              
-             let yab = 5
              match sortableSet with
              | Binary ssb -> 
                     result {

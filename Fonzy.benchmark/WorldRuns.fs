@@ -143,9 +143,11 @@ module RunBp64 =
         dex
 
 
-        
+  module PerfBinReports =
+
     let dirPerfBinReport (dex:int) =
-        let repDataDir = "C:\\testDirForDataSourceFixture\\20_stageGen"
+        let binResultsName = "sorterPerfBins"
+        let repDataDir =  "C:\\SimOut"
         let reportDataSource = new DirectoryDataSource(repDataDir) 
                                     :> IDataSource
         let repNs = reportDataSource.GetDataSourceIds()
@@ -186,6 +188,7 @@ module RunBp64 =
 
 
     let dirPerfBinBySorterGenReport (dex:int) =
+        let binResultsName = "sorterPerfBins"
         let repDataDir = "C:\\SimOut" // "C:\\runArch\\SorterGen\\16\\symVsT"
         let reportDataSource = new DirectoryDataSource(repDataDir) 
                                     :> IDataSource

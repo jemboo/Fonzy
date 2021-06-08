@@ -6,10 +6,10 @@ open BenchmarkDotNet.Running
 [<EntryPoint>]
 let main argv =
     /// ******* Benchmark ***********
-    Console.WriteLine("Starting Benchmark.main")
-    let summary = BenchmarkRunner.Run<BenchmarkSorterSetOnBp64>()
-    printfn "%A" summary
-    Console.Read() |> ignore
+    //Console.WriteLine("Starting Benchmark.main")
+    //let summary = BenchmarkRunner.Run<BenchmarkSorterSetOnBp64>()
+    //printfn "%A" summary
+    //Console.Read() |> ignore
    
      /// ******* Perfbins ***********
     //Console.WriteLine("Starting Perfbins.main")
@@ -30,8 +30,8 @@ let main argv =
 
 
      /// ******* PerfBinsReport ***********
-    //Console.WriteLine("Starting PerfBinsReport.main")
-    //let res2 =  RunW.dirPerfBinBySorterGenReport(33)
-    //Console.Read() |> ignore
+    Console.WriteLine("Starting PerfBinsReport.main")
+    let res2 =  PerfBinReports.dirPerfBinBySorterGenReport(33)
+    Console.Read() |> ignore
 
     0 // return an integer exit code

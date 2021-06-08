@@ -91,6 +91,7 @@ type SorterGen = | RandSwitches of SwitchCount * Degree
                  | RandCoComp of StageCount * Degree
                  | RandBuddies of StageCount * StageCount * Degree
                  | RandSymmetric of StageCount * Degree
+                 | RandSymmetricBuddies of StageCount * StageCount * Degree
 
 module SorterGen =
 
@@ -101,21 +102,26 @@ module SorterGen =
         | RandCoComp   (_, d) -> d
         | RandBuddies  (_, _, d) -> d
         | RandSymmetric   (_, d) -> d
+        | RandSymmetricBuddies  (_, _, d) -> d
 
 
     let reportString (sorterGen:SorterGen) =
         match sorterGen with
         | RandSwitches (wc, d) ->   
                         sprintf "RandSwitches\t@\t%d" (Degree.value d)
-        | RandStages   (tc, d) -> 
+        | RandStages (tc, d) -> 
                         sprintf "RandStages\t@\t%d" (Degree.value d)
-        | RandCoComp   (tc, d) ->   
+        | RandCoComp (tc, d) ->   
                         sprintf "RandCoComp\t@\t%d" (Degree.value d)
-        | RandBuddies  (tc, wc, d) -> 
+        | RandBuddies (tc, wc, d) -> 
                         sprintf "RandBuddies\t%d\t%d" (StageCount.value wc) 
                                                       (Degree.value d) 
-        | RandSymmetric   (tc, d) ->   
+        | RandSymmetric (tc, d) ->   
                         sprintf "RandSymmetric\t@\t%d" (Degree.value d)
+
+        | RandSymmetricBuddies (tc, wc, d) -> 
+                        sprintf "RandSymmetricBuddies\t%d\t%d" (StageCount.value wc) 
+                                                               (Degree.value d) 
 
 
     let fromTwoCycleArray (tc:TwoCyclePerm[]) =
@@ -138,7 +144,7 @@ module SorterGen =
 
     // IRando dependent
 
-    let createWithRandomStages (degree:Degree) 
+    let randomStages (degree:Degree) 
                                (stageCount:StageCount)
                                (switchFreq:SwitchFrequency) 
                                (rando:IRando) =
@@ -147,11 +153,18 @@ module SorterGen =
                         |> Seq.toArray
         Sorter.create degree switches
 
-    let createWithRandomStageBuddies (degree:Degree) 
-                               (stageCount:StageCount)
-                               (stageWindowSize:StageCount) 
-                               (rando:IRando) =
-        let switches = (Stage.buddyStages List.empty stageWindowSize degree rando)
+
+    let randomBuddies (degree:Degree) 
+                      (stageCount:StageCount)
+                      (stageWindowSize:StageCount) 
+                      (rando:IRando) =
+
+        let switches = (Stage.makeBuddyStages 
+                                stageWindowSize 
+                                SwitchFrequency.max  
+                                degree 
+                                rando
+                                List.empty)
                         |> Seq.take (StageCount.value stageCount)
                         |> Seq.collect(fun st -> st.switches |> List.toSeq)
                         |> Seq.toArray
@@ -159,9 +172,26 @@ module SorterGen =
         Sorter.create degree switches
 
 
-    let makeRandomConjugatesOfEvenOdd (degree:Degree) 
-                                      (stageCount:StageCount) 
-                                      (iRando:IRando) =
+    let randomReflSymmetricBuddies (degree:Degree) 
+                                   (stageCount:StageCount)
+                                   (stageWindowSize:StageCount) 
+                                   (rando:IRando) =
+
+        let switches = (Stage.reflSymmetricBuddyStages
+                                stageWindowSize
+                                degree 
+                                rando
+                                List.empty)
+                        |> Seq.take (StageCount.value stageCount)
+                        |> Seq.collect(fun st -> st.switches |> List.toSeq)
+                        |> Seq.toArray
+
+        Sorter.create degree switches
+
+
+    let randomConjugatesOfEvenOdd (degree:Degree) 
+                                  (stageCount:StageCount) 
+                                  (iRando:IRando) =
         result {
             let perms = List.init 
                             ((StageCount.value stageCount) / 2)
@@ -174,7 +204,7 @@ module SorterGen =
         }
 
 
-    let makeRandomSymmetric (degree:Degree) 
+    let randomSymmetric (degree:Degree) 
                             (stageCount:StageCount) 
                             (iRando:IRando) =
         result {
@@ -186,9 +216,9 @@ module SorterGen =
         }
 
 
-    let createWithRandomSwitches (degree:Degree) 
-                                 (switchCount:SwitchCount) 
-                                 (rnd:IRando) =
+    let randomSwitches (degree:Degree) 
+                       (switchCount:SwitchCount) 
+                       (rnd:IRando) =
         let switches = Switch.randomSwitchesOfDegree degree rnd
                     |> Seq.take (SwitchCount.value switchCount)
                     |> Seq.toArray
@@ -220,53 +250,60 @@ module SorterGen =
                      (randy:IRando) =
         match sorterGen with
         | SorterGen.RandSwitches  (switchCount, degree) -> 
-            createWithRandomSwitches 
+            randomSwitches 
                     degree 
                     switchCount 
                     randy
 
         | SorterGen.RandStages (stageCount, degree) ->
             let sc = SwitchFrequency.fromFloat 1.0
-            createWithRandomStages 
+            randomStages 
                     degree 
                     stageCount 
                     sc
                     randy
 
         | SorterGen.RandCoComp (stageCount, degree) ->
-            makeRandomConjugatesOfEvenOdd 
+            randomConjugatesOfEvenOdd 
                            degree 
                            stageCount
                            randy
             |> Result.ExtractOrThrow
 
         | SorterGen.RandBuddies (stageCount, windowSize, degree) ->
-            createWithRandomStageBuddies
+            randomBuddies
                            degree 
                            stageCount
                            windowSize
                            randy
 
         | SorterGen.RandSymmetric (stageCount, degree) ->
-            makeRandomSymmetric 
+            randomSymmetric 
                            degree 
                            stageCount
                            randy
             |> Result.ExtractOrThrow
 
+        | SorterGen.RandSymmetricBuddies (stageCount, windowSize, degree) ->
+            randomReflSymmetricBuddies
+                           degree 
+                           stageCount
+                           windowSize
+                           randy
+
 
 
     let createRandomArray (sorterGen:SorterGen)
-                               (sorterCount:SorterCount)
-                               (rnd:IRando) =
+                          (sorterCount:SorterCount)
+                          (rnd:IRando) =
             (seq {1 .. (SorterCount.value sorterCount)} 
                     |> Seq.map(fun _ -> (createRandom sorterGen rnd))
                     |> Seq.toArray)
 
 
     let createRandomArrayP (sorterGen:SorterGen)
-                          (sorterCount:SorterCount)
-                          (rnd:IRando) =
+                           (sorterCount:SorterCount)
+                           (rnd:IRando) =
         Array.init (SorterCount.value sorterCount)
                    (fun _ -> Rando.fromSeed RngType.Lcg rnd.NextPositiveInt)
                 |> Array.Parallel.map
