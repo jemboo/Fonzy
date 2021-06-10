@@ -162,6 +162,11 @@ module CollectionUtils =
     //    match LL with
     //    | [] -> Seq.singleton []
     //    | L::Ls -> seq {for x in L do for xs in cart1 Ls -> x::xs}
+    let rec cartesian = function
+    | ([],[]) -> []
+    | (xs,[]) -> []
+    | ([],ys) -> []
+    | (x::xs, ys) -> (List.map(fun y -> x,y) ys) @ (cartesian (xs,ys))
 
     //returns the last n items of the list in the original order
     let rec last n xs =

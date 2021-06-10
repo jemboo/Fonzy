@@ -3,10 +3,34 @@
 open System
 
 module RunW =
+
+    let nextRnGen(randy:IRando) =
+        RngGen.createLcg randy.NextPositiveInt
+
+    let makeCauseSpec 
+                    sorterGen 
+                    sorterCount 
+                    rndGen 
+                    switchUsePlan 
+                    sortableSet 
+                    useParallel 
+                    resultsName =
+
+        CauseSpecSorters.genToSorterPerfBins 
+                                ("sorterGen", sorterGen)
+                                ("sorterCount", sorterCount)
+                                ("rndGen", rndGen)
+                                ("switchUsePlan", switchUsePlan)
+                                ("sortableSet", sortableSet)
+                                ("useParallel", (UseParallel.value useParallel))
+                                ("resultsName", resultsName)
+
     let baseDataDir = "C:\\SimOut"
     let directoryDataSource = new DirectoryDataSource(baseDataDir) 
                                 :> IDataSource
     FileUtils.makeDirectory baseDataDir |> Result.ExtractOrThrow |> ignore
+
+
     let seed = DateTime.Now.Ticks |> int
     let degree = Degree.fromInt 16
 
@@ -15,23 +39,15 @@ module RunW =
 
     let rnGen = RngGen.createLcg seed
     let randy = Rando.fromRngGen rnGen
-    let binResultsName = "sorterPerfBins"
-    let nextRnGen() =
-        RngGen.createLcg randy.NextPositiveInt
-
-    let genMush sg sc rng sup sbset up resn =
-        CauseSpecSorters.genToSorterPerfBins 
-                                ("sorterGen", sg)
-                                ("sorterCount", sc)
-                                ("rndGen", rng)
-                                ("switchUsePlan", sup)
-                                ("sortableSet", sbset)
-                                ("useParallel", up)
-                                ("resultsName", resn)
 
 
-    let genToSorterPerfBins (dex:int) =
+    let genToSorterPerfBins (dex:int) (seed:int) =
+        let binResultsName = "sorterPerfBins"
+    
+        let srtbSetSpec = SortableSetGenerated.allBp64 degree
+                            |> SortableSetSpec.Generated
         let stageCount = StageCount.degreeTo999StageCount degree
+        let randy = RngGen.createLcg seed |> Rando.fromRngGen
         let switchCount = SwitchCount.degreeTo999SwitchCount degree
         let windowSize = StageCount.fromInt 3  //(10 + (dex % 4))
        // let sorterGen = SorterGen.RandCoComp (stageCount, degree)
@@ -43,14 +59,15 @@ module RunW =
         //                | _ ->  SorterGen.RandSymmetric (stageCount, degree)
 
         let sorterCount = SorterCount.fromInt 20
+
         let causeSpec = 
-                genMush
+                makeCauseSpec
                     sorterGen
                     sorterCount
-                    (nextRnGen())
+                    (nextRnGen(randy))
                     Sorting.SwitchUsePlan.All
-                    ssAllIntBits
-                    true
+                    srtbSetSpec
+                    (UseParallel.create true)
                     binResultsName
 
         let cause = causeSpec
@@ -73,6 +90,80 @@ module RunW =
 
 
 
+module RunBp64b = 
+
+
+    let runBatch (degree : Degree) 
+                 (seed : int) 
+                 (sorterGen: SorterGen) 
+                 (sorterCount : SorterCount) 
+                 (useParallel : UseParallel) =
+
+        let outputDir = "C:\\SimOut"
+        let binResultsName = "sorterPerfBins"
+        let outputDataSource = new DirectoryDataSource(outputDir) 
+                                    :> IDataSource
+        FileUtils.makeDirectory outputDir |> Result.ExtractOrThrow |> ignore
+
+
+
+
+
+        Console.WriteLine( sprintf "Time: %s Degree: %d SorterGen: %s SorterCount: %d" 
+                                    (System.DateTime.Now.ToLongTimeString())
+                                    (Degree.value degree) 
+                                    (sorterGen |> SorterGen.reportString) 
+                                    (SorterCount.value sorterCount))
+
+
+        let srtbSetSpec = SortableSetGenerated.allBp64 degree
+                            |> SortableSetSpec.Generated
+        let randy = RngGen.createLcg seed |> Rando.fromRngGen
+        let causeSpec = 
+                  RunW.makeCauseSpec
+                      sorterGen
+                      sorterCount
+                      (RunW.nextRnGen(randy))
+                      Sorting.SwitchUsePlan.All
+                      srtbSetSpec
+                      useParallel
+                      binResultsName
+
+        let cause = causeSpec
+                        |> Causes.fromCauseSpec
+                        |> Result.ExtractOrThrow
+
+        let binSpecWorld = 
+            World.createFromParent 
+                World.empty
+                cause
+            |> Result.ExtractOrThrow
+            |> WorldDto.toDto
+            |> DataStoreItem.WorldDto
+
+        let fp = RunW.directoryDataSource.AddNewDataStoreItem 
+                    binSpecWorld
+                 |> Result.ExtractOrThrow
+        seed
+
+
+    let makeBatchSpecs() =
+
+
+
+
+        let tup999Buddies ((degree:Degree), (st:StageCount)) =
+            degree |> SorterPerfBinGen.buddyStageWindows
+                   |> List.map (fun w -> (st, w, degree))
+
+        let randStagesOpts (degree:Degree) = 
+            degree |> tup999St // |> tup999Buddies
+
+        let sorterGens (degree:Degree) =
+            [SorterGen.RandSwitches (degree |> tup999Sw); SorterGen.RandSwitches (degree |> tup999Sw)]
+
+        None
+
 
 module RunBp64 =
     let baseDataDir = "C:\\SimOut"
@@ -91,15 +182,6 @@ module RunBp64 =
     let nextRnGen() =
         RngGen.createLcg randy.NextPositiveInt
 
-    let genMush sg sc rng sup sbset up resn =
-        CauseSpecSorters.genToSorterPerfBins 
-                                ("sorterGen", sg)
-                                ("sorterCount", sc)
-                                ("rndGen", rng)
-                                ("switchUsePlan", sup)
-                                ("sortableSet", sbset)
-                                ("useParallel", up)
-                                ("resultsName", resn)
 
 
     let genToSorterPerfBins (dex:int) =
@@ -116,13 +198,13 @@ module RunBp64 =
 
         let sorterCount = SorterCount.fromInt 100
         let causeSpec = 
-                genMush
+                RunW.makeCauseSpec
                     sorterGen
                     sorterCount
                     (nextRnGen())
                     Sorting.SwitchUsePlan.All
                     srtbSetSpec
-                    true
+                    (UseParallel.create true)
                     binResultsName
 
         let cause = causeSpec

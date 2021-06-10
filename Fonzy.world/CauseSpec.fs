@@ -9,6 +9,7 @@ module CauseSpec =
     let tupOp tup op =
         (fst tup, op (snd tup))
 
+
     //let lookupKeyedInt<'a> (key:string) 
     //                       (cs:CauseSpec) : Result<int, string> =
     //    match cs.prams.TryFind key with
@@ -71,7 +72,6 @@ module CauseSpec =
     let noOpCauseSpecId = Guid.Parse "00000000-0000-0000-0000-000000000000"
     let noOpCauseSpec = { CauseSpec.id = CauseSpecId.fromGuid noOpCauseSpecId; 
                           genus=["NoOp"]; prams=Map.empty;}
-
 
 
 module CauseSpecRandGen = 

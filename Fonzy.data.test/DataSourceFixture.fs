@@ -68,6 +68,14 @@ type DataSourceFixture () =
         this.tearDownDataSource() 
         Assert.AreEqual(ds |> DataStoreItem.getId, WorldId.value this.world1.id);
 
+    [<TestMethod>]
+    member this.assureDirectory() =
+        let dirDs = new DirectoryDataSource(this.testDir) :> IDataSource
+        let res = dirDs.AssureDirectory |> Result.ExtractOrThrow
+        let res2 = dirDs.AssureDirectory |> Result.ExtractOrThrow
+        this.tearDownDataSource() 
+        Assert.IsTrue(res);
+        Assert.IsTrue(res2);
 
     [<TestMethod>]
     member this.DirectoryDataSource_GetDsIds() =
@@ -89,7 +97,7 @@ type DataSourceFixture () =
         let res = dirDs.AddNewDataStoreItem (
                             this.world3 |> WorldDto.toDto |> DataStoreItem.WorldDto) 
                         |> Result.ExtractOrThrow 
-        Assert.IsTrue(res.Length > 0)
+        Assert.IsTrue(res)
         let ids2 = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow 
         this.tearDownDataSource()
         Assert.AreEqual(ids2.Length, 3)

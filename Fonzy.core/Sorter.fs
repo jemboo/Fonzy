@@ -89,9 +89,11 @@ module Sorter =
 type SorterGen = | RandSwitches of SwitchCount * Degree
                  | RandStages of StageCount * Degree
                  | RandCoComp of StageCount * Degree
-                 | RandBuddies of StageCount * StageCount * Degree
+                 | RandBuddies of StageCount * StageCount * Degree 
+                                    //2nd StageCount is window size
                  | RandSymmetric of StageCount * Degree
                  | RandSymmetricBuddies of StageCount * StageCount * Degree
+                                        //2nd StageCount is window size
 
 module SorterGen =
 

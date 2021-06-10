@@ -2,7 +2,7 @@
 open System
 
 
-type JobDto = {cat:string; value:string}
+//type JobDto = {cat:string; value:string}
 //module JobDto =
 //    let toDto (j:Job) =
 //         match j with

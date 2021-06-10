@@ -12,7 +12,8 @@
     <Compile Include="SortingBp64.fs" />
     <Compile Include="SortingOps.fs" />
     <Compile Include="Enviros.fs" />
-    <Compile Include="CauseSpecs.fs" />
+    <Compile Include="CauseSpec.fs" />
+    <Compile Include="CauseSpecGen.fs" />
     <Compile Include="Causes.fs" />
     <Compile Include="Worlds.fs" />
     <Compile Include="Jobs.fs" />

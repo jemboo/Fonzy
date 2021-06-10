@@ -6,7 +6,8 @@ open System.IO
 type IDataSource =
    abstract member GetDataSource: Guid -> Result<DataStoreItem, string>
    abstract member GetDataSourceIds: Unit -> Result<Guid[], string>
-   abstract member AddNewDataStoreItem : DataStoreItem -> Result<string, string>
+   abstract member AddNewDataStoreItem : DataStoreItem -> Result<bool, string>
+   abstract member AssureDirectory : Result<bool, string>
 
 type DirectoryDataSource(dirPath:string) =
     member this.DirectoryPath = dirPath
@@ -14,9 +15,13 @@ type DirectoryDataSource(dirPath:string) =
         Path.Combine(this.DirectoryPath, (string id) + ".txt")
 
     interface IDataSource with
+        member this.AssureDirectory = 
+            FileUtils.makeDirectory this.DirectoryPath
+
         member this.GetDataSource (id:Guid) =
             let filePath = this.GuidToFilePath id
             result {
+                let! assure = (this :> IDataSource).AssureDirectory
                 let! js = FileUtils.readFile filePath
                 let! dsi = js |> DataStoreItemDto.fromJson
                 return dsi
@@ -24,6 +29,7 @@ type DirectoryDataSource(dirPath:string) =
 
         member this.GetDataSourceIds() =
             result {
+                let! assure = (this :> IDataSource).AssureDirectory
                 let! files = FileUtils.getFilesInDirectory this.DirectoryPath "*.txt"
                 return  files |> Array.map(Path.GetFileNameWithoutExtension)
                               |> Array.map(GuidUtils.guidFromStringO)
@@ -32,7 +38,10 @@ type DirectoryDataSource(dirPath:string) =
             }
 
         member this.AddNewDataStoreItem (dsi:DataStoreItem) =
-            let fp = dsi |> DataStoreItem.getId |> this.GuidToFilePath
-            let cereal = dsi |> DataStoreItemDto.toDto 
-                             |> Json.serialize
-            FileUtils.writeFile fp cereal false
+            result {
+                let! assure = (this :> IDataSource).AssureDirectory
+                let fp = dsi |> DataStoreItem.getId |> this.GuidToFilePath
+                let cereal = dsi |> DataStoreItemDto.toDto 
+                                 |> Json.serialize
+                return! FileUtils.writeFile fp cereal false
+            }

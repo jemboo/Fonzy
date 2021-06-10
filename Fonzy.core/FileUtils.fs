@@ -12,10 +12,10 @@ module FileUtils =
 
     let makeDirectory (dirPath:string) = 
         try
-            Directory.CreateDirectory(dirPath)
-            |> ignore |> Ok
+            Directory.CreateDirectory(dirPath) |> ignore 
+            true |> Ok
         with
-            | ex -> ("error in readFile: " + ex.Message ) |> Result.Error
+            | ex -> ("error in makeDirectory: " + ex.Message ) |> Result.Error
 
     let clearDirectory (baseDir:string) =
         try
@@ -50,7 +50,7 @@ module FileUtils =
             //use sw = new StreamWriter(path, append)
             //fprintfn sw "%s" item
             //sw.Dispose()
-            path |> Ok
+            true |> Ok
         with
             | ex -> ("error in writeFile: " + ex.Message ) |> Result.Error
 
