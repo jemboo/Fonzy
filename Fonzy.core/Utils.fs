@@ -168,6 +168,9 @@ module CollectionUtils =
     | ([],ys) -> []
     | (x::xs, ys) -> (List.map(fun y -> x,y) ys) @ (cartesian (xs,ys))
 
+    let listLoop<'T> (a:'T list) = 
+        Seq.initInfinite (fun d -> a.[d % a.Length])
+
     //returns the last n items of the list in the original order
     let rec last n xs =
       if List.length xs <= n then xs

@@ -206,8 +206,6 @@ module SortingBp64 =
                 let sw = switches.[i]
                 let lv = uintArray.[sw.low]
                 let hv = uintArray.[sw.hi]
-                let nhv = (lv ||| hv)
-                let nlv = (lv &&& hv)
                 uintArray.[sw.hi] <- (lv ||| hv)
                 uintArray.[sw.low] <- (lv &&& hv)
                 lstRet <- newCase::lstRet

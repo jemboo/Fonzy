@@ -109,7 +109,7 @@ module SwitchFrequency =
 module StageCount =
     let value (StageCount v) = v
     let create fieldName v = 
-        ConstrainedType.createInt fieldName StageCount 0 1000 v
+        ConstrainedType.createInt fieldName StageCount 0 100000 v
     let ToSwitchCount (degree:Degree) (stageCount:StageCount) =
         SwitchCount.create "" ((Degree.value degree) * (value stageCount) / 2)
     let fromInt v = create "" v |> Result.ExtractOrThrow

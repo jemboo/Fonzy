@@ -75,7 +75,7 @@ module TestData =
                                         ("degree", d)
                                         ("sorterSetName", ssn)
                                         ("switchUsePlan", sup)
-                                        ("sortableSet", sbset)
+                                        ("sortableSetSpec", sbset)
                                         ("useParallel", up)
                                         ("resultsName", resn)
 
@@ -95,7 +95,7 @@ module TestData =
                                         ("sorterCount", sc)
                                         ("rndGen", rng)
                                         ("switchUsePlan", sup)
-                                        ("sortableSet", sbset)
+                                        ("sortableSetSpec", sbset)
                                         ("useParallel", up)
                                         ("resultsName", resn)
 

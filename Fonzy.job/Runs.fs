@@ -3,9 +3,11 @@ open System
 
 
 module Runs =
-    let RunCauseSpec(causeSpec:CauseSpec) 
-                    (causeSpecDescr:CauseSpec)
-                    (outputDir:string) =
+
+    let runCauseSpec 
+                    (causeSpecDescr:string)
+                    (outputDir:string) 
+                    (causeSpec:CauseSpec) =
         Console.WriteLine causeSpecDescr
         result {
     

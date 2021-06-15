@@ -179,12 +179,15 @@ module SorterGen =
                                    (stageWindowSize:StageCount) 
                                    (rando:IRando) =
 
-        let switches = (Stage.reflSymmetricBuddyStages
+        let stageTrials = ( (StageCount.value stageCount) * 100 ) |> StageCount.fromInt
+        let switches = (Stage.makeBuddyStages3
                                 stageWindowSize
+                                SwitchFrequency.max
                                 degree 
                                 rando
-                                List.empty)
-                        |> Seq.take (StageCount.value stageCount)
+                                List.empty
+                                stageTrials
+                                stageCount)
                         |> Seq.collect(fun st -> st.switches |> List.toSeq)
                         |> Seq.toArray
 

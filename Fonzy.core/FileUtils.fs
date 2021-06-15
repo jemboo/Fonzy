@@ -91,4 +91,18 @@ module Json =
 
 
 
-type LogFile = {cat:string; descr:string; header:string; records:string[]}
+type csvFile = {header:string; records:string[]; directory:string; fileName:string; }
+
+module CsvFile =
+
+    let writeCsvFile (csv:csvFile) =
+        try
+            Directory.CreateDirectory(csv.directory) |> ignore
+            let filePath = sprintf "%s\\%s" csv.directory csv.fileName
+            use sw = new StreamWriter(filePath, false)
+            fprintfn sw "%s" csv.header
+            csv.records |> Array.iter(fprintfn sw "%s")
+            sw.Dispose()
+            true |> Ok
+        with
+            | ex -> ("error in writeFile: " + ex.Message ) |> Result.Error

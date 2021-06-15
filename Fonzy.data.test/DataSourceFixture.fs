@@ -70,7 +70,7 @@ type DataSourceFixture () =
 
     [<TestMethod>]
     member this.assureDirectory() =
-        let dirDs = new DirectoryDataSource(this.testDir) :> IDataSource
+        let dirDs = new DirectoryDataSource(this.testDir)
         let res = dirDs.AssureDirectory |> Result.ExtractOrThrow
         let res2 = dirDs.AssureDirectory |> Result.ExtractOrThrow
         this.tearDownDataSource() 

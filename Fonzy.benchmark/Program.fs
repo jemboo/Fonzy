@@ -5,6 +5,39 @@ open BenchmarkDotNet.Running
 
 [<EntryPoint>]
 let main argv =
+
+    /// ******* Benchmark ***********
+    //Console.WriteLine("Starting RunBp64.runBatchSeq")
+    //RunBp64.runBatchSeq (DateTime.Now.Ticks |> int |> Math.Abs) 0 |> ignore
+    //Console.Read() |> ignore
+
+
+
+     /// ******* PerfBinsReport ***********
+    Console.WriteLine("Starting PerfBinsReport.main")
+    let res2 =  PerfBinReports.dirPerfBinBySorterGenReport ("C:\\SimOut") ("C:\\SimOutReports")
+    Console.WriteLine(res2)
+    Console.Read() |> ignore
+
+    0 // return an integer exit code
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //let summary = BenchmarkRunner.Run<BenchmarkSorterSetOnBp64>()
+    //printfn "%A" summary
+    //Console.Read() |> ignore
+
     /// ******* Benchmark ***********
     //Console.WriteLine("Starting Benchmark.main")
     //let summary = BenchmarkRunner.Run<BenchmarkSorterSetOnBp64>()
@@ -27,11 +60,3 @@ let main argv =
     //                   Console.WriteLine(i)
     //                   RunW.genToSorterPerfBins i)
     //Console.Read() |> ignore  
-
-
-     /// ******* PerfBinsReport ***********
-    Console.WriteLine("Starting PerfBinsReport.main")
-    let res2 =  PerfBinReports.dirPerfBinBySorterGenReport(33)
-    Console.Read() |> ignore
-
-    0 // return an integer exit code

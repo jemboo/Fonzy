@@ -122,6 +122,16 @@ module SorterGenDto =
                     ("degree", (Degree.value d) |> string);
                 ] |> Map.ofList
             {SorterGenDto.cat="RandSymmetric"; SorterGenDto.prams=prams} 
+        | SorterGen.RandSymmetricBuddies (tc, ws, d) -> 
+            let prams = 
+                [
+                    ("stageCount", (StageCount.value tc) |> string);
+                    ("windowSize", (StageCount.value ws) |> string);
+                    ("degree", (Degree.value d) |> string);
+                ] |> Map.ofList
+            {SorterGenDto.cat="RandSymmetricBuddies"; SorterGenDto.prams=prams} 
+
+
 
     let toJson (cs:SorterGen) =
         cs |> toDto |> Json.serialize
@@ -172,6 +182,17 @@ module SorterGenDto =
                                                       (fun d -> Degree.create "" d)
                             return SorterGen.RandSymmetric (stageCount, degree)
                            }
+                           
+            | "RandSymmetricBuddies" -> 
+                    result {
+                            let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
+                                                        (fun d -> Degree.create "" d)
+                            let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
+                                                        (fun d -> StageCount.create "" d) 
+                            let! windowSize = sgDto.prams |> ResultMap.procKeyedInt "windowSize" 
+                                                        (fun d -> StageCount.create "" d)
+                            return SorterGen.RandSymmetricBuddies (stageCount, windowSize, degree)
+                            }
 
             | _ -> Error (sprintf "no match for SorterGenDto.cat: %s" sgDto.cat)
 
