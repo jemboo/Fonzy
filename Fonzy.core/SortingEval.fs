@@ -55,6 +55,11 @@ module SortingEval =
                                     |> SortableRollout.intBitsHist
                                     |> Ok
 
+
+
+
+
+
         let getAllSortsWereComplete (switchEventRecords:switchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.sortableRollout 

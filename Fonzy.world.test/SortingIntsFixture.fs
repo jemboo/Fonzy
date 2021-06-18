@@ -85,7 +85,7 @@ type SortingIntsFixture () =
         let sortableSetBinary = SortableSetBinary.allIntBits degree
         
         let switchEventRecords = 
-                    SortingInts.evalSorter 
+                    SortingInts.evalSorterOnBinary 
                         sorter16 
                         sortableSetBinary
                         Sorting.SwitchUsePlan.All

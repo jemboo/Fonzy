@@ -59,8 +59,7 @@ module SortingBp64 =
 
         switchEventRecords.NoGrouping {
             noGrouping.switchEventRollout = seRollbp64 |> switchEventRollout.Bp64
-            noGrouping.sortableRollout = bPsRollCopy |> SortableRollout.Bp64 
-                                                
+            noGrouping.sortableRollout = bPsRollCopy |> SortableRollout.Bp64                                       
         }
 
 

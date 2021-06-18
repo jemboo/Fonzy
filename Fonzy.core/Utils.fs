@@ -40,6 +40,15 @@ module ByteUtils =
         tc
 
 
+    let trueBitIndexes64 (u64:uint64) =
+        seq {
+                for i in 0 .. 63 do
+                    let qua = (u64 &&& (1UL <<< i)) > 0UL
+                    if qua then
+                        yield i
+            }
+
+
     let stripeWrite (uBits:uint64[]) 
                     (intBits:int[]) 
                     (pos:int) = 

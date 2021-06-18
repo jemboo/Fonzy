@@ -792,3 +792,38 @@ module BitsP64 =
         (IntBits.createRandoms degree rnd) 
             |> Seq.take count
             |> fromIntBits
+
+
+
+type record64Array = { values: uint64[] }
+module Record64Array =
+
+    let make (degree:Degree) = 
+        let arrayLen = 1 <<< ( (Degree.value degree) - 6 )
+        {record64Array.values = Array.zeroCreate<uint64> arrayLen }
+
+
+    let recordPosition (records:record64Array) (pos:uint64) = 
+        let bitPos = pos % 64UL |> int
+        let recordPos = pos >>> 6 |> int
+        let stamp = 1UL <<< bitPos
+        let record = records.values.[recordPos] ||| stamp
+        records.values.[recordPos] <- record
+
+    let recordIntBits (records:record64Array) (intBits:IntBits) = 
+        let pos = intBits |> IntBits.toInteger
+        let bitPos = pos % 64
+        let recordPos = pos >>> 6 |> int
+        let stamp = 1UL <<< bitPos
+        let record = records.values.[recordPos] ||| stamp
+        records.values.[recordPos] <- record
+
+
+    let toIntArrays (degree:Degree) (records:record64Array)= 
+        seq {
+                for i in 0 .. ( records.values.Length - 1 ) do
+                    yield! ( records.values.[i] 
+                                |> ByteUtils.trueBitIndexes64 
+                                |> Seq.map(fun dx -> dx + i ) )
+        }  |> Seq.map(IntBits.fromInteger (Degree.value degree))
+

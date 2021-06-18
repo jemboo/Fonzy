@@ -134,7 +134,7 @@ module SortingInts =
                     sorter sortableSetRollout switchusePlan
 
 
-    let evalSorter (sorter:Sorter)
+    let evalSorterOnBinary (sorter:Sorter)
                    (sortableSet:SortableSetBinary)
                    (switchusePlan:Sorting.SwitchUsePlan) 
                    (switchEventAgg:Sorting.EventGrouping) =
@@ -142,6 +142,19 @@ module SortingInts =
             sortableSet.sortables
                 |> IntSetsRollout.fromIntBits
                         sorter.degree
+                |> Result.ExtractOrThrow
+        evalSorterOnIntSetsRollout
+            sorter sortableSetRollout switchusePlan switchEventAgg
+
+
+    let evalSorterOnInteger (sorter:Sorter)
+                            (sortableSet:SortableSetInteger)
+                            (switchusePlan:Sorting.SwitchUsePlan) 
+                            (switchEventAgg:Sorting.EventGrouping) =
+        let sortableSetRollout = 
+            sortableSet.sortables
+                |> IntSetsRollout.fromIntArrays
+                                    sorter.degree
                 |> Result.ExtractOrThrow
         evalSorterOnIntSetsRollout
             sorter sortableSetRollout switchusePlan switchEventAgg

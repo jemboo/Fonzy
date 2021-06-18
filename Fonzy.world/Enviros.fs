@@ -1,5 +1,4 @@
 ﻿namespace global
-open System
 
 
 type Enviro = 

@@ -79,12 +79,6 @@ module IntSetsRollout =
         intsRoll |> toIntBits 
                  |> Array.forall(IntBits.isSorted)
 
-    //let isSorted (ssRollout:IntSetsRollout) =
-    //    let d = (Degree.value ssRollout.degree)
-    //    seq {0 .. d .. (ssRollout.baseArray.Length - 1)}
-    //        |> Seq.forall(fun dex -> 
-    //                Combinatorics.isSortedOffset ssRollout.baseArray dex d)
-        
 
     let sortedCount (intsRoll:IntSetsRollout) =
         let d = (Degree.value intsRoll.degree)
@@ -104,6 +98,14 @@ module IntSetsRollout =
         intsRollout |> toIntBits
                     |> Seq.countBy id
                     |> Seq.toArray
+
+    
+    let removeDupes (intsRollout:IntSetsRollout) =
+        let records = Record64Array.make (intsRollout.degree)
+        intsRollout |> toIntBits
+                    |> Seq.map(IntBits.toUint64)
+                    |> Seq.iter(fun yak -> Record64Array.recordPosition records yak)
+        records |> Record64Array.toIntArrays intsRollout.degree
 
 
 
@@ -132,7 +134,8 @@ module BP64SetsRollout =
             let a = baseArrays |> Seq.map(fun a -> a.values)
                                |> Seq.collect(id)
                                |> Seq.toArray
-            return! create degree a (SortableCount.fromInt ((64 * a.Length) / (Degree.value degree)))
+            return! create degree a (SortableCount.fromInt 
+                                        ((64 * a.Length) / (Degree.value degree)))
         }
 
 
@@ -173,6 +176,14 @@ module BP64SetsRollout =
         create degree baseArray (degree |> Degree.binExp |> SortableCount.fromInt)
 
 
+    let removeDupes (bP64Roll:bP64SetsRollout) =
+        let records = Record64Array.make (bP64Roll.degree)
+        bP64Roll |> toIntBits
+                 |> Seq.map(IntBits.toUint64)
+                 |> Seq.iter(fun yak -> Record64Array.recordPosition records yak)
+        records |> Record64Array.toIntArrays bP64Roll.degree
+
+
 
 module SortableRollout =
 
@@ -192,3 +203,13 @@ module SortableRollout =
         match sortableRollout with
         | Int  isr ->    isr |> IntSetsRollout.intBitsHist
         | Bp64  bp64r -> bp64r |> BP64SetsRollout.intBitsHist
+
+
+    let removeDupes (sortableRollout:SortableRollout) =
+        match sortableRollout with
+        | Int  isr ->    isr |> IntSetsRollout.removeDupes
+        | Bp64  bp64r -> bp64r |> BP64SetsRollout.removeDupes
+
+
+    let sorterCompres (sortableRollout:SortableRollout) =
+        None

@@ -4,6 +4,36 @@ open SortingEval
 
 module SortingOps =
 
+    module Sorter =
+        let eval
+                (sorter:Sorter)
+                (sortableSet:SortableSet)
+                (switchusePlan:Sorting.SwitchUsePlan) 
+                (switchEventAgg:Sorting.EventGrouping) =
+
+            match sortableSet with
+            | Binary ssb -> 
+                   SortingInts.evalSorterOnBinary
+                                   sorter
+                                   ssb
+                                   switchusePlan
+                                   switchEventAgg
+
+            | Integer ssb -> 
+                   SortingInts.evalSorterOnInteger 
+                                   sorter
+                                   ssb
+                                   switchusePlan
+                                   switchEventAgg
+
+            | Bp64 ssb -> 
+                      SortingBp64.evalSorter
+                                  sorter
+                                  ssb
+                                  switchusePlan
+                                  switchEventAgg
+
+
     module SorterSet =
 
       let eval<'T> 
@@ -31,11 +61,11 @@ module SortingOps =
 
              | Integer ssb -> 
                     result {
-                        let! bp64SetsRollout = ssb.sortables |> IntSetsRollout.fromIntArrays
+                        let! intSetsRollout = ssb.sortables |> IntSetsRollout.fromIntArrays
                                                                sorterSet.degree
                         return! SortingInts.SorterSet.eval 
                                     sorterSet
-                                    bp64SetsRollout
+                                    intSetsRollout
                                     ssb.id
                                     switchusePlan
                                     switchEventAgg

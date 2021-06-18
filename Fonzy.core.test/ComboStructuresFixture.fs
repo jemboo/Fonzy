@@ -210,6 +210,30 @@ type ComboStructuresFixture () =
      let intBack = IntBits.toInteger converted
      Assert.AreEqual (testInt, intBack)
 
+     
+    [<TestMethod>]
+    member this.trueBitCount32() =
+        let gA = IntBits.create [|1;0;0;0;0;1;1;0;0;0;0;1;1;0;1;0;0;0;0;1|]
+        let gB = IntBits.toUint32 gA
+        let tc = ByteUtils.trueBitCount32 gB
+        Assert.AreEqual(tc, 7)
+
+
+    [<TestMethod>]
+    member this.trueBitCount64() =
+        let gA = IntBits.create [|1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1|]
+        let gB = IntBits.toUint64 gA
+        let tc = ByteUtils.trueBitCount64 gB
+        Assert.AreEqual(tc, 25)
+
+
+    [<TestMethod>]
+    member this.recordOn64() =
+        let degree = Degree.fromInt 7
+        let records = Record64Array.make degree
+        let ress = Record64Array.recordPosition records
+        Assert.AreEqual(1, 1)
+
 
     [<TestMethod>]
     member this.TwoCycleGen_evenDegree() =

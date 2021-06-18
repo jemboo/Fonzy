@@ -34,7 +34,7 @@ type BenchSorterOnInts() =
 
     [<Benchmark>]
     member this.evalSorter() =
-        let ssR = SortingInts.evalSorter 
+        let ssR = SortingInts.evalSorterOnBinary 
                             sorter16 
                             sortableSetBinary 
                             Sorting.SwitchUsePlan.All

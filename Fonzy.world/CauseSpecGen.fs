@@ -40,7 +40,7 @@ module SorterPerfBinGen =
         elif (Degree.value degree) = 20 then
              (SorterCount.fromInt 20000)
         elif (Degree.value degree) = 22 then
-             (SorterCount.fromInt 2000)
+             (SorterCount.fromInt 5000)
         else (SorterCount.fromInt 1000)
 
 
@@ -56,10 +56,10 @@ module SorterPerfBinGen =
             | 12 ->  [ 1; 2; 3; 4; 5;]
             | 14 ->  [ 1; 1; 1;]
             | 16 ->  [ 1;2;4;6;7]
-            | 18 ->  [ 1;2;4;5;6;7;8;]
-            | 20 ->  [7; 9;]
-            | 22 ->  [1; 3; 5; 7; 9;]
-            | _ ->   [1 .. 2 .. 11]
+            | 18 ->  [ 1;3;4;5;6;7;8;]
+            | 20 ->  [ 1; 3; 5; 7; 9; ]
+            | 22 ->  [ 1; 3; 5; 7; 9; ]
+            | _ ->   [1; 3; 5; 7; 9; 11;]
         awys |> List.map(StageCount.fromInt)
 
 
@@ -103,8 +103,8 @@ module SorterPerfBinGen =
             RngGen.createLcg randy.NextPositiveInt
 
         let degreesToTest = 
-            // [ 10 .. 2 .. 24 ]
-             [ 8; 8; 8; 8; 10; 10; 10; 10; 12; 12; 12; 12; 14; 16; 18; 20; 22; 24 ]
+            [ 10; 10; 12; 12; 12; 12; 12; 14; 16; 18; 20; 20; 22; 22; 24; 24;]
+           //  [ 8; 8; 8; 8; 10; 10; 10; 10; 12; 12; 12; 12; 14; 16; 18; 20; 22; 24 ]
              |> List.map (Degree.fromInt)
 
         let allSorterGens = 
@@ -112,8 +112,8 @@ module SorterPerfBinGen =
                  (makeRandStages degreesToTest) |> List.append
                  (makeRandCoComp degreesToTest) |> List.append
                  (makeRandSymmetric degreesToTest) |> List.append
-                 (makeRandBuddies degreesToTest) |> List.append
-                 (makeRandSymmetricBuddies degreesToTest)
+                 (makeRandSymmetricBuddies degreesToTest) |> List.append
+                 (makeRandBuddies degreesToTest)
 
 
         let mcsW (dex:int) (sorterGen:SorterGen) = 
