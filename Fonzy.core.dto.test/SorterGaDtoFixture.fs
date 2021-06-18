@@ -53,9 +53,7 @@ type SorterGaDtoFixture () =
 
     [<TestMethod>]
     member this.SorterTestResultsDto_Single() =
-        let switchUses = SwitchUses.create TestData.SorterParts.switchCount 
-                                           TestData.SorterParts.switchUseArray
-                            |> Result.ExtractOrThrow
+        let switchUses = SwitchUses.init TestData.SorterParts.switchUseArray
         let testRestultSingle = SorterTestResults.Singleton switchUses
         let dto = SorterTestResultsDto.toDto testRestultSingle
         let cereal = Json.serialize dto

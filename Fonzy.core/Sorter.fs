@@ -180,7 +180,7 @@ module SorterGen =
                                    (rando:IRando) =
 
         let stageTrials = ( (StageCount.value stageCount) * 100 ) |> StageCount.fromInt
-        let switches = (Stage.makeBuddyStages3
+        let switches = (Stage.makeSymmetricBuddyStages
                                 stageWindowSize
                                 SwitchFrequency.max
                                 degree 

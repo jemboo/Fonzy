@@ -93,33 +93,33 @@ type SorterPartsFixture () =
         Assert.AreEqual(count, 0);
 
 
-    [<TestMethod>]
-    member this.Stage_buddyStages2() =
-        let degree = Degree.fromInt 10
-        let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
-        let stageWindowSize = StageCount.fromInt 4
-        let maxStageTry = (StageCount.fromInt 10000)
-        let sampleCount = 1000
+    //[<TestMethod>]
+    //member this.Stage_buddyStages2() =
+    //    let degree = Degree.fromInt 10
+    //    let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
+    //    let stageWindowSize = StageCount.fromInt 4
+    //    let maxStageTry = (StageCount.fromInt 10000)
+    //    let sampleCount = 1000
 
-        let (occCum, totCum) = 
-                        Stage.makeReflBuddyStats
-                            stageWindowSize
-                            degree
-                            randy
-                            maxStageTry
-                            sampleCount
+    //    let (occCum, totCum) = 
+    //                    Stage.makeReflBuddyStats
+    //                        stageWindowSize
+    //                        degree
+    //                        randy
+    //                        maxStageTry
+    //                        sampleCount
                                  
 
-        let occCumTegral = occCum |> Seq.scan (fun c v -> c + (v |> float) / (sampleCount |> float) ) 0.0
-                                  |> Seq.toArray
+    //    let occCumTegral = occCum |> Seq.scan (fun c v -> c + (v |> float) / (sampleCount |> float) ) 0.0
+    //                              |> Seq.toArray
 
-        totCum |> Array.iteri(fun i v -> Console.WriteLine (
-                                                sprintf "%d\t%d\t%d\t%d"
-                                                    (Degree.value degree) 
-                                                    (StageCount.value stageWindowSize)
-                                                    i
-                                                    v))
-        Assert.AreEqual(1, 1);
+    //    totCum |> Array.iteri(fun i v -> Console.WriteLine (
+    //                                            sprintf "%d\t%d\t%d\t%d"
+    //                                                (Degree.value degree) 
+    //                                                (StageCount.value stageWindowSize)
+    //                                                i
+    //                                                v))
+    //    Assert.AreEqual(1, 1);
         
 
     [<TestMethod>]
@@ -130,7 +130,7 @@ type SorterPartsFixture () =
         let maxStageTry = (StageCount.fromInt 1200)
         let stageCount = (StageCount.fromInt 100)
         let buddyStages() = 
-            Stage.makeBuddyStages3
+            Stage.makeSymmetricBuddyStages
                             stageWindowSize
                             SwitchFrequency.max
                             degree

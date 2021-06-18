@@ -189,7 +189,6 @@ module Stage =
         seq { while true do yield! (aa rnd) }
 
 
-    
     let makeRandomReflSymmetricStages 
                              (degree:Degree) 
                              (rnd:IRando) =
@@ -207,72 +206,9 @@ module Stage =
                                                     rnd
                         mutateStage stage tcp
             | _ -> stage
-            
-
-    let toBuddyStages  (stagesPfx:Stage list)
-                       (stageWindowSize:StageCount)
-                       (stageSeq: seq<Stage>) =
-
-        let maxWindow = (StageCount.value stageWindowSize)
-        let mutable window = stagesPfx |> CollectionUtils.last maxWindow
-        let trim() =
-            if window.Length = maxWindow then
-               window |> CollectionUtils.first (maxWindow - 1)
-            else    
-               window
-
-        let buddyCount (stage:Stage) = 
-            let testWin = stage::window
-            let ahay = switchPairwiseIntersections testWin
-                                    |> Seq.toArray
-            let lenny = ahay |> Seq.length
-            System.Diagnostics.Debug.WriteLine lenny
-            lenny
-
-        seq { for stage in stageSeq do
-                    window <- trim()
-                    if (buddyCount stage) = 0 then
-                        window <- window |> List.append [stage]
-                        yield stage }
-                    |> Seq.append
-                           (stagesPfx |> List.toSeq)
 
 
-
-    let toBuddyStats  (stagesPfx:Stage list)
-                      (stageWindowSize:StageCount)
-                      (stageSeq: seq<Stage>) 
-                      (stageCount:StageCount) =
-
-        let maxWindow = (StageCount.value stageWindowSize)
-        let mutable window = stagesPfx |> CollectionUtils.last maxWindow
-        let pftTuple = stagesPfx |> List.mapi(fun i st -> (i, 1))
-        let trim() =
-            if window.Length = maxWindow then
-                window |> CollectionUtils.first (maxWindow - 1)
-            else    
-                window
-
-        let buddyCount (stage:Stage) = 
-            let testWin = stage::window
-            switchPairwiseIntersections testWin
-                            |> Seq.length
-        
-        let cappedStages = stageSeq |> Seq.take (StageCount.value stageCount)
-        let mutable dex = stagesPfx.Length
-        seq { for stage in cappedStages do
-                window <- trim()
-                if (buddyCount stage) = 0 then
-                    window <- window |> List.append [stage]
-                    yield (dex, 1)
-                else yield (dex, 0)
-                dex <- dex + 1
-            }
-            |> Seq.append (pftTuple |> List.toSeq)
-
-
-
-    let toBuddyStages2a  (stagesPfx: Stage list)
+    let toBuddyStages  (stagesPfx: Stage list)
                          (stageWindowSize: StageCount)
                          (stageSeq: seq<Stage>)
                          (targetStageCount: StageCount)
@@ -310,119 +246,40 @@ module Stage =
              }
 
 
-
-    let toBuddyStages2   (stagesPfx:Stage list)
-                         (stageWindowSize:StageCount)
-                         (stageSeq: seq<Stage>) 
-                         (trialStageCount:StageCount) =
-
-        let maxWindow = (StageCount.value stageWindowSize)
-        let mutable window = stagesPfx |> CollectionUtils.last maxWindow
-        let trim() =
-            if window.Length = maxWindow then
-                window |> CollectionUtils.first (maxWindow - 1)
-            else    
-                window
-
-        let buddyCount (stage:Stage) = 
-            let testWin = stage::window
-            switchPairwiseIntersections testWin
-                            |> Seq.length
-    
-        let cappedStages = stageSeq 
-                           |> Seq.take (StageCount.value trialStageCount)
-
-        seq { for stage in cappedStages do
-                window <- trim()
-                if (buddyCount stage) = 0 then
-                    window <- window |> List.append [stage]
-                    yield stage
-            } |> Seq.append (stagesPfx |> List.toSeq)
-
-
-
-    let makeReflBuddyStages (stageWindowSize:StageCount)
-                                 (degree:Degree) 
-                                 (rnd:IRando) 
-                                 (stagesPfx:Stage list) =
-        toBuddyStages stagesPfx
-                    stageWindowSize
-                    (makeRandomReflSymmetricStages degree rnd)
-
-
     let makeBuddyStages (stageWindowSize:StageCount)
                         (switchFreq:SwitchFrequency) 
                         (degree:Degree) 
                         (rnd:IRando) 
                         (stagesPfx:Stage list)  =
-        toBuddyStages stagesPfx
-                      stageWindowSize
-                      (makeRandomStagedSwitchSeq degree switchFreq  rnd 
-                         |> mergeSwitchesIntoStages degree)
+        let stageSeq = (makeRandomStagedSwitchSeq degree switchFreq  rnd 
+                        |> mergeSwitchesIntoStages degree)
+
+        let maxWindow = (StageCount.value stageWindowSize)
+        let mutable window = stagesPfx |> CollectionUtils.last maxWindow
+        let trim() =
+            if window.Length = maxWindow then
+               window |> CollectionUtils.first (maxWindow - 1)
+            else    
+               window
+
+        let buddyCount (stage:Stage) = 
+            let testWin = stage::window
+            let ahay = switchPairwiseIntersections testWin
+                                    |> Seq.toArray
+            let lenny = ahay |> Seq.length
+            System.Diagnostics.Debug.WriteLine lenny
+            lenny
+
+        seq { for stage in stageSeq do
+                    window <- trim()
+                    if (buddyCount stage) = 0 then
+                        window <- window |> List.append [stage]
+                        yield stage }
+                    |> Seq.append
+                           (stagesPfx |> List.toSeq)
 
 
-    let buddyStats (stageWindowSize:StageCount)
-                   (stagesPfx:Stage list)
-                   (stageCount:StageCount) 
-                   (sampleSize:int) 
-                   (stages:seq<Stage>)=
-
-        let accumStats (totalCum:int[]) 
-                       (occCum:int[]) 
-                       (buddyRes:(int*int)[]) =
-            let maxOcc = buddyRes |> Array.map(snd) |> Array.sum
-            totalCum.[maxOcc] <- totalCum.[maxOcc] + 1
-            buddyRes |> Array.iteri(fun dex tup -> 
-                                         if (snd tup = 1) then
-                                            occCum.[dex] <- occCum.[dex] + 1)
-  
-        let totalCum = Array.zeroCreate (StageCount.value stageCount)
-        let occCum = Array.zeroCreate (StageCount.value stageCount)
-        
-        Seq.initInfinite (fun _ -> 
-                    toBuddyStats 
-                                stagesPfx
-                                stageWindowSize
-                                stages
-                                stageCount 
-                    |> Seq.toArray)
-        |> Seq.take sampleSize
-        |> Seq.iter(fun tupArray -> accumStats totalCum occCum tupArray)
-        
-        occCum, totalCum
-
-
-    let makeReflBuddyStats (stageWindowSize:StageCount)
-                           (degree:Degree) 
-                           (rnd:IRando) 
-                           (stageCount:StageCount) 
-                           (sampleSize:int) =
-        buddyStats
-                stageWindowSize
-                []
-                stageCount
-                sampleSize
-                (makeRandomStagedReflSymmetricSwitchSeq degree rnd
-                 |> mergeSwitchesIntoStages degree)
-
-
-
-    let makeBuddyStats (stageWindowSize:StageCount)
-                       (degree:Degree) 
-                       (rnd:IRando) 
-                       (stageCount:StageCount) 
-                       (sampleSize:int) =
-        buddyStats
-                stageWindowSize
-                []
-                stageCount
-                sampleSize
-                (makeRandomStagedSwitchSeq degree SwitchFrequency.max rnd
-                 |> mergeSwitchesIntoStages degree)
-
-
-
-    let rec makeBuddyStages3 
+    let rec makeSymmetricBuddyStages 
                 (stageWindowSize:StageCount)
                 (switchFreq:SwitchFrequency) 
                 (degree:Degree) 
@@ -430,7 +287,7 @@ module Stage =
                 (stagesPfx:Stage list)
                 (trialStageCount:StageCount) 
                 (stageCount:StageCount) =
-         let trial =  toBuddyStages2a stagesPfx
+         let trial =  toBuddyStages stagesPfx
                         stageWindowSize
                         (makeRandomStagedReflSymmetricSwitchSeq degree rnd 
                            |> mergeSwitchesIntoStages degree)
@@ -439,7 +296,7 @@ module Stage =
                         |> Seq.toArray
          if (trial.Length >= (StageCount.value stageCount)) then
             trial |> Array.take (StageCount.value stageCount)
-         else makeBuddyStages3
+         else makeSymmetricBuddyStages
                     stageWindowSize
                     switchFreq
                     degree

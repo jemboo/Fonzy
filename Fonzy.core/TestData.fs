@@ -202,10 +202,7 @@ module TestData =
 
         let listOfSwitchUses = 
             List.init switchUsesListLength (fun _ -> 
-                        SwitchUses.create SorterParts.switchCount 
-                                          SorterParts.switchUseArray)
-                      |> Result.sequence 
-                      |> Result.ExtractOrThrow
+                        SwitchUses.init SorterParts.switchUseArray)
                       
         let sorterList = 
             List.init (SorterCount.value sorterCount)

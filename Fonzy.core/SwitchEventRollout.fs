@@ -31,6 +31,10 @@ module SwitchEventRolloutInt =
                         (SortableCount.value sortableCount))    
         }
 
+    let init (switchCount:SwitchCount) 
+             (sortableCount:SortableCount) = 
+        let zz = create switchCount sortableCount
+        zz
 
     let toSwitchUses (switchEvents:switchEventRolloutInt) =
         let swCt = (SwitchCount.value switchEvents.switchCount)

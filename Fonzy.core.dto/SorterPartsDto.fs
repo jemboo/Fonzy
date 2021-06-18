@@ -65,8 +65,7 @@ type SwitchUsesDto = {switchCount:int; weights:int[]}
 module SwitchUsesDto =
     let fromDto (dto:SwitchUsesDto) =
         result {
-            let! switchCount = SwitchCount.create "" dto.switchCount
-            return! SwitchUses.create switchCount dto.weights
+            return SwitchUses.init dto.weights
         }
 
     let fromJson (cereal:string) =

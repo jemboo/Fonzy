@@ -44,6 +44,7 @@ module SortingInts =
             match switchusePlan with
             | Sorting.SwitchUsePlan.All -> (0, switchCount)
             | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
+            | Sorting.SwitchUsePlan.Indexes (min, max, locs) -> (min, max)
         let ssRollCopy = IntSetsRollout.copy intSetsRollout
         let seRoll = SwitchEventRolloutInt.create
                                             sorter.switchCount
@@ -101,11 +102,15 @@ module SortingInts =
                     (ssRollout:IntSetsRollout) 
                     (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
-        let firstSwitchDex, lastSwitchDex = 
+        let firstSwitchDex, lastSwitchDex, switchUses = 
             match switchusePlan with
-            | Sorting.SwitchUsePlan.All -> (0, switchCount)
-            | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
-        let switchUses = SwitchUses.createEmpty sorter.switchCount
+            | Sorting.SwitchUsePlan.All -> 
+                (0, switchCount, (SwitchUses.createEmpty sorter.switchCount))
+            | Sorting.SwitchUsePlan.Range (min, max) -> 
+                (min, max, (SwitchUses.createEmpty sorter.switchCount))
+            | Sorting.SwitchUsePlan.Indexes (min, max, wgts) -> 
+                (min, max, SwitchUses.init wgts)
+
         let sortableSetRolloutCopy = (IntSetsRollout.copy ssRollout)
         let mutable sortableIndex=0
         while (sortableIndex < (SortableCount.value ssRollout.sortableCount)) do
@@ -119,7 +124,6 @@ module SortingInts =
                                                 sortableSetRolloutCopy
         }
         
-
     let evalSorterOnIntSetsRollout
                     (sorter:Sorter)
                     (sortableSetRollout:IntSetsRollout)

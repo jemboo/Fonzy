@@ -4,6 +4,7 @@
 type Enviro = 
     | Empty
     | ObjectMap of Map<string, string>
+    | RootDto of RootDto
 
 
 module Enviro =

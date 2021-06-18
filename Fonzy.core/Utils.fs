@@ -54,7 +54,7 @@ module ByteUtils =
                     (pos:int) = 
         let one = (1UL <<< pos)
         let proc dex =
-            if (intBits.[dex] = 1) then
+            if (intBits.[dex] > 0) then
                 uBits.[dex] <- 
                             uBits.[dex] ||| one
     
@@ -70,6 +70,7 @@ module ByteUtils =
                 1
             else 0
         uBits |> Array.mapi (proc)
+
 
 
 module GuidUtils = 

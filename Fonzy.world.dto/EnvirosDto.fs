@@ -10,7 +10,7 @@ module EnviroDto =
                         cat="ObjectMap"; 
                         value = Json.serialize objectMap}
         | Enviro.Empty -> {cat = "Empty"; value = Json.serialize None}
-        
+        | Enviro.RootDto dto -> {cat = "RootDto"; value = Json.serialize dto}
 
     let toJson (idt:Enviro) =
         idt |> toDto |> Json.serialize
@@ -25,6 +25,12 @@ module EnviroDto =
                 let! b = Json.deserialize<Map<string, string>> eDto.value
                 return Enviro.ObjectMap b
             }
+        else if eDto.cat = "RootDto" then
+            result {
+                let! b = Json.deserialize<RootDto> eDto.value
+                return Enviro.RootDto b
+            }
+
         else sprintf "cat: %s for EnviroDto not found"
                       eDto.cat |> Error
 
