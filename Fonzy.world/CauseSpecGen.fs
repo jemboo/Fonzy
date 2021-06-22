@@ -32,13 +32,13 @@ module SorterPerfBinGen =
         elif (Degree.value degree) = 12 then
              (SorterCount.fromInt 100000)
         elif (Degree.value degree) = 14 then
-             (SorterCount.fromInt 50000)
+             (SorterCount.fromInt 100000)
         elif (Degree.value degree) = 16 then
              (SorterCount.fromInt 50000)
         elif (Degree.value degree) = 18 then
-             (SorterCount.fromInt 50000)
+             (SorterCount.fromInt 25000)
         elif (Degree.value degree) = 20 then
-             (SorterCount.fromInt 20000)
+             (SorterCount.fromInt 10000)
         elif (Degree.value degree) = 22 then
              (SorterCount.fromInt 5000)
         else (SorterCount.fromInt 1000)
@@ -51,12 +51,12 @@ module SorterPerfBinGen =
     let buddyStageWindows (degree:Degree) =
         let awys =
             match (Degree.value degree) with
-            | 8 ->  [ 1; 2; 3;]
-            | 10 ->  [ 1; 2; 3; 4;]
+            | 8 ->  [ 1; 2; 3; ]
+            | 10 ->  [ 1; 2; 3; 4; ]
             | 12 ->  [ 1; 2; 3; 4; 5;]
-            | 14 ->  [ 1; 1; 1;]
-            | 16 ->  [ 1;2;4;6;7]
-            | 18 ->  [ 1;3;4;5;6;7;8;]
+            | 14 ->  [ 1; 2; 3; 4; 5; 6;]
+            | 16 ->  [ 1; 2; 3; 4; 5; 6; 7;]
+            | 18 ->  [ 1;2;3;4;5;6;7;8;]
             | 20 ->  [ 1; 3; 5; 7; 9; ]
             | 22 ->  [ 1; 3; 5; 7; 9; ]
             | _ ->   [1; 3; 5; 7; 9; 11;]
@@ -103,17 +103,17 @@ module SorterPerfBinGen =
             RngGen.createLcg randy.NextPositiveInt
 
         let degreesToTest = 
-            [ 10; 10; 12; 12; 12; 12; 12; 14; 16; 18; 20; 20; 22; 22; 24; 24;]
+            [ 8; 8; 10; 12; 14; 16; 18;] //10; 12; 14; 16; 18; 24;]
            //  [ 8; 8; 8; 8; 10; 10; 10; 10; 12; 12; 12; 12; 14; 16; 18; 20; 22; 24 ]
              |> List.map (Degree.fromInt)
 
         let allSorterGens = 
-                (makeRandSwitches degreesToTest) |> List.append
-                 (makeRandStages degreesToTest) |> List.append
-                 (makeRandCoComp degreesToTest) |> List.append
-                 (makeRandSymmetric degreesToTest) |> List.append
+                //(makeRandSwitches degreesToTest) |> List.append
+                // (makeRandStages degreesToTest) |> List.append
+                // (makeRandCoComp degreesToTest) |> List.append
+                // (makeRandSymmetric degreesToTest) |> List.append
                  (makeRandSymmetricBuddies degreesToTest) |> List.append
-                 (makeRandBuddies degreesToTest)
+                   (makeRandSymmetricBuddies degreesToTest)
 
 
         let mcsW (dex:int) (sorterGen:SorterGen) = 

@@ -104,6 +104,7 @@ module SortableSetBp64 =
                         |> Seq.toArray
          }
 
+
     let rndBits (degree:Degree) 
                 (rngGen:RngGen) 
                 (sortableCount:SortableCount) = 
@@ -125,9 +126,40 @@ module SortableSetBp64 =
         }
 
 
+    let fromIntBits (degree:Degree) (intBits: IntBits[]) = 
+        let id = seq { intBits:> obj; 
+                       degree:> obj;} 
+                        |> GuidUtils.guidFromObjs
+        {
+              SortableSetBp64.id = SortableSetId.fromGuid id;
+              SortableSetBp64.degree = degree;
+              SortableSetBp64.sortables = 
+                        (BitsP64.fromIntBits intBits)
+                        |> Seq.toArray
+         }
+
+
+
 module SortableSet = 
     let iD (ss:SortableSet) =
         match ss with
         | Binary  ss -> ss.id
         | Integer  ss -> ss.id
         | Bp64 ss -> ss.id
+
+
+type SortableSetGenerated = { id:SortableSetId; 
+cat:string; 
+prams:Map<string, string>; }
+
+
+type SortableSetSpec =
+    | Explicit of SortableSet
+    | Generated of SortableSetGenerated
+
+
+module SortableSetSpec = 
+    let getId (ss:SortableSetSpec) =
+        match ss with
+        | Explicit ess -> ess |> SortableSet.iD
+        | Generated gss -> gss.id

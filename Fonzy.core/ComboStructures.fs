@@ -810,6 +810,7 @@ module Record64Array =
         let record = records.values.[recordPos] ||| stamp
         records.values.[recordPos] <- record
 
+
     let recordIntBits (records:record64Array) (intBits:IntBits) = 
         let pos = intBits |> IntBits.toInteger
         let bitPos = pos % 64
@@ -824,6 +825,6 @@ module Record64Array =
                 for i in 0 .. ( records.values.Length - 1 ) do
                     yield! ( records.values.[i] 
                                 |> ByteUtils.trueBitIndexes64 
-                                |> Seq.map(fun dx -> dx + i ) )
+                                |> Seq.map(fun dx -> dx + i*64 ) )
         }  |> Seq.map(IntBits.fromInteger (Degree.value degree))
 

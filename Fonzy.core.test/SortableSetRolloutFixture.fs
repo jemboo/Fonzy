@@ -8,22 +8,33 @@ type SortableSetRolloutFixture() =
 
     [<TestMethod>]
     member this.SortableSetRollout_IsSorted() =
-      let unSortedRollout = TestData.SorterActionRecords.intSetsRolloutAllBinary
-      Assert.IsFalse(IntSetsRollout.isSorted unSortedRollout)
-      let sortedRollout = TestData.SorterActionRecords.rolloutOfAllSortedBinary
-      Assert.IsTrue(IntSetsRollout.isSorted sortedRollout)
+      let unSortedIntsRollout = TestData.SorterActionRecords.intSetsRolloutOfAll
+                                |> sortableSetRollout.Int
+      Assert.IsFalse(SortableSetRollout.isSorted unSortedIntsRollout)
+      let sortedIntsRollout = TestData.SorterActionRecords.intSetsRolloutOfAllSorted
+                                |> sortableSetRollout.Int
+      Assert.IsTrue(SortableSetRollout.isSorted sortedIntsRollout)
+
+      let unSortedBp64Rollout = TestData.SorterActionRecords.bP64SetsRolloutOfAll
+                                |> sortableSetRollout.Bp64
+      Assert.IsFalse(SortableSetRollout.isSorted unSortedBp64Rollout)
+      let sortedBp64Rollout = TestData.SorterActionRecords.bp64SetsRolloutOfAllSorted
+                                |> sortableSetRollout.Bp64
+      Assert.IsTrue(SortableSetRollout.isSorted sortedBp64Rollout)
+
 
 
     [<TestMethod>]
-    member this.SortableSetRollout_distinctResults() =
-      let unsortedRollout = TestData.SorterActionRecords.rolloutOfAllSortedBinary
-      let drs = unsortedRollout |> IntSetsRollout.intBitsDistinct
+    member this.IntSetsRollout_distinctResults() =
+      let unsortedIntsRollout = TestData.SorterActionRecords.intSetsRolloutOfAllSorted
+      let drs = unsortedIntsRollout |> IntSetsRollout.intBitsDistinct
       Assert.IsTrue(drs.Length = (Degree.value TestData.degree) + 1)
+
 
 
     [<TestMethod>]
     member this.SortableSetRollout_histogramOfSortableSets() =
-      let unSortedRollout = TestData.SorterActionRecords.intSetsRolloutAllBinary
+      let unSortedRollout = TestData.SorterActionRecords.intSetsRolloutOfAll
       let sortableCount = SortableCount.value unSortedRollout.sortableCount
       let histo = unSortedRollout |> IntSetsRollout.intBitsHist
       let totalCount = histo |> Array.sumBy(snd)
@@ -31,6 +42,19 @@ type SortableSetRolloutFixture() =
 
 
     [<TestMethod>]
-    member this.SwitchUseB32_toSwitchUses() =
+    member this.removeDupesFromNoDupes() =
+  
+      let unSortedBp64Rollout = TestData.SorterActionRecords.bP64SetsRolloutOfAll
+                                  |> sortableSetRollout.Bp64
 
+      let intBitsFromBp =  unSortedBp64Rollout 
+                            |> SortableSetRollout.toIntBits
+
+      
+      let intBitsBpUnique =  unSortedBp64Rollout 
+                                |> SortableSetRollout.removeDupes
+                                |> Seq.toArray
+
+      Assert.AreEqual(intBitsFromBp.Length, intBitsBpUnique.Length)
       Assert.IsTrue(true)
+

@@ -14,13 +14,13 @@ type SortingIntsFixture () =
         let resGroupBySwitch = 
             SortingInts.sorterMakeSwitchUses
                 TestData.SorterParts.goodRefSorter 
-                TestData.SorterActionRecords.intSetsRolloutAllBinary
+                TestData.SorterActionRecords.intSetsRolloutOfAll
                 Sorting.SwitchUsePlan.All
 
         let resNoGrouping = 
             SortingInts.sorterWithNoSAG 
                 TestData.SorterParts.goodRefSorter 
-                TestData.SorterActionRecords.intSetsRolloutAllBinary
+                TestData.SorterActionRecords.intSetsRolloutOfAll
                 Sorting.SwitchUsePlan.All
         
         let switchUsesGrouping = 
@@ -48,7 +48,7 @@ type SortingIntsFixture () =
         let switchEventRecordsNoSAG = 
             SortingInts.sorterWithNoSAG 
                 refSorter 
-                TestData.SorterActionRecords.intSetsRolloutAllBinary
+                TestData.SorterActionRecords.intSetsRolloutOfAll
                 Sorting.SwitchUsePlan.All
    
 
@@ -63,7 +63,7 @@ type SortingIntsFixture () =
         let switchEventRecordsMakeSwitchUses = 
             SortingInts.sorterMakeSwitchUses 
                 refSorter 
-                TestData.SorterActionRecords.intSetsRolloutAllBinary
+                TestData.SorterActionRecords.intSetsRolloutOfAll
                 Sorting.SwitchUsePlan.All
    
 

@@ -129,13 +129,13 @@ module RefSorter =
         | 13 -> RefSorter.Degree13 |> Ok  | 14 -> RefSorter.Degree14 |> Ok
         | 15 -> RefSorter.Degree15 |> Ok  | 16 -> RefSorter.Degree16 |> Ok
         | 17 -> RefSorter.Degree17 |> Ok  | 18 -> RefSorter.Degree18 |> Ok
-        | 19 -> RefSorter.Degree19 |> Ok  | 20 -> RefSorter.Degree19 |> Ok
-        | 21 -> RefSorter.Degree21 |> Ok  | 22 -> RefSorter.Degree21 |> Ok
-        | 23 -> RefSorter.Degree23 |> Ok  | 24 -> RefSorter.Degree23 |> Ok
-        | 25 -> RefSorter.Degree25 |> Ok  | 26 -> RefSorter.Degree25 |> Ok
-        | 27 -> RefSorter.Degree27 |> Ok  | 28 -> RefSorter.Degree27 |> Ok
-        | 29 -> RefSorter.Degree29 |> Ok  | 30 -> RefSorter.Degree29 |> Ok
-        | 31 -> RefSorter.Degree31 |> Ok  | 32 -> RefSorter.Degree31 |> Ok
+        | 19 -> RefSorter.Degree19 |> Ok  | 20 -> RefSorter.Degree20 |> Ok
+        | 21 -> RefSorter.Degree21 |> Ok  | 22 -> RefSorter.Degree22 |> Ok
+        | 23 -> RefSorter.Degree23 |> Ok  | 24 -> RefSorter.Degree24 |> Ok
+        | 25 -> RefSorter.Degree25 |> Ok  | 26 -> RefSorter.Degree26 |> Ok
+        | 27 -> RefSorter.Degree27 |> Ok  | 28 -> RefSorter.Degree28 |> Ok
+        | 29 -> RefSorter.Degree29 |> Ok  | 30 -> RefSorter.Degree30 |> Ok
+        | 31 -> RefSorter.Degree31 |> Ok  | 32 -> RefSorter.Degree32 |> Ok
         | _ -> "no match found in RefSorterForDegree" |> Error
 
 

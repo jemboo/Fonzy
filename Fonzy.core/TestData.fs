@@ -19,6 +19,26 @@ module TestData =
         let goodRefSorter = RefSorter.goodRefSorterForDegree degree
                             |> Result.ExtractOrThrow
 
+        let twoStageSorter = Sorter.create 
+                                goodRefSorter.degree
+                                (goodRefSorter.switches
+                                    |> Seq.take (Degree.value goodRefSorter.degree)
+                                    |> Seq.toArray)
+
+        let fourStageSorter = Sorter.create 
+                                goodRefSorter.degree
+                                (goodRefSorter.switches
+                                    |> Seq.take ((Degree.value goodRefSorter.degree) * 2)
+                                    |> Seq.toArray)
+
+        let sorterSegment = Sorter.create 
+                                goodRefSorter.degree
+                                (goodRefSorter.switches
+                                    |> Seq.skip (Degree.value goodRefSorter.degree)
+                                    |> Seq.take (Degree.value goodRefSorter.degree)
+                                    |> Seq.toArray)
+
+
         let permSwitchDensity = 0.5
         let sorterLength = degree |> SwitchOrStageCount.toMediocreRandomPerfLength 
                                                     SwitchOrStage.Stage 
@@ -91,21 +111,30 @@ module TestData =
 
     module SorterActionRecords =
 
-        let intSetsRolloutAllBinary = IntSetsRollout.allBinary degree
-                                      |> Result.ExtractOrThrow
+        let intSetsRolloutOfAll = IntSetsRollout.allBinary degree
+                                |> Result.ExtractOrThrow
 
-        let bP64SetsRolloutAllBinary = BP64SetsRollout.allBinary degree
-                                       |> Result.ExtractOrThrow
+        let bP64SetsRolloutOfAll = BP64SetsRollout.allBinary degree
+                                 |> Result.ExtractOrThrow
 
-
-
-        let rolloutOfAllSortedBinary = 
+        let intSetsRolloutOfAllSorted = 
                 let ia = IntBits.sorted_0_1_Sequences degree
                             |> Seq.map(fun ia -> {IntBits.values = ia.values })
                 IntSetsRollout.fromIntBits 
                                degree
                                ia
                 |> Result.ExtractOrThrow
+
+
+        let bp64SetsRolloutOfAllSorted = 
+                let ia = IntBits.sorted_0_1_Sequences degree
+                            |> Seq.map(fun ia -> {IntBits.values = ia.values })
+                BP64SetsRollout.fromIntBits
+                                degree
+                                ia
+                |> Result.ExtractOrThrow
+
+
 
     open SortingEval
     module SortingEvalT = 

@@ -14,7 +14,7 @@ type bP64SetsRollout =
             sortableCount:SortableCount  }
 
 
-type SortableRollout =
+type sortableSetRollout =
     | Int of IntSetsRollout
     | Bp64 of bP64SetsRollout
 
@@ -131,11 +131,11 @@ module BP64SetsRollout =
     let fromBitsP64 (degree:Degree)
                     (baseArrays:bitsP64 seq) =
         result {
-            let a = baseArrays |> Seq.map(fun a -> a.values)
-                               |> Seq.collect(id)
-                               |> Seq.toArray
-            return! create degree a (SortableCount.fromInt 
-                                        ((64 * a.Length) / (Degree.value degree)))
+            let a64 = baseArrays |> Seq.map(fun a -> a.values)
+                                 |> Seq.collect(id)
+                                 |> Seq.toArray
+            return! create degree a64 (SortableCount.fromInt 
+                                        ((64 * a64.Length) / (Degree.value degree)))
         }
 
 
@@ -145,10 +145,16 @@ module BP64SetsRollout =
                             |> Seq.map(fun a -> {bitsP64.values = a})
 
 
+    let fromIntBits (degree:Degree)
+                    (intBits:seq<IntBits>) =
+        intBits |> BitsP64.fromIntBits
+                |> fromBitsP64 degree
+
+
     let toIntBits (ssRollout:bP64SetsRollout) =
         ssRollout |> toBitsP64
                   |> BitsP64.toIntBits
-
+                  |> Seq.toArray
 
     let isSorted (bp64Roll:bP64SetsRollout) =
         bp64Roll |> toIntBits 
@@ -185,31 +191,37 @@ module BP64SetsRollout =
 
 
 
-module SortableRollout =
+module SortableSetRollout =
 
-    let copy (sortableRollout:SortableRollout) =
+    let copy (sortableRollout:sortableSetRollout) =
         match sortableRollout with
-        | Int  isr ->    isr |> IntSetsRollout.copy |> SortableRollout.Int
-        | Bp64  bp64r -> bp64r |> BP64SetsRollout.copy |> SortableRollout.Bp64
+        | Int  isr ->    isr |> IntSetsRollout.copy |> sortableSetRollout.Int
+        | Bp64  bp64r -> bp64r |> BP64SetsRollout.copy |> sortableSetRollout.Bp64
 
 
-    let isSorted (sortableRollout:SortableRollout) =
+    let isSorted (sortableRollout:sortableSetRollout) =
         match sortableRollout with
         | Int  isr ->    isr |> IntSetsRollout.isSorted
         | Bp64  bp64r -> bp64r |> BP64SetsRollout.isSorted
 
 
-    let intBitsHist (sortableRollout:SortableRollout) =
+    let toIntBits (sortableRollout:sortableSetRollout) =
+        match sortableRollout with
+        | Int  isr ->    isr |> IntSetsRollout.toIntBits
+        | Bp64  bp64r -> bp64r |> BP64SetsRollout.toIntBits
+
+
+    let intBitsHist (sortableRollout:sortableSetRollout) =
         match sortableRollout with
         | Int  isr ->    isr |> IntSetsRollout.intBitsHist
         | Bp64  bp64r -> bp64r |> BP64SetsRollout.intBitsHist
 
 
-    let removeDupes (sortableRollout:SortableRollout) =
+    let removeDupes (sortableRollout:sortableSetRollout) =
         match sortableRollout with
         | Int  isr ->    isr |> IntSetsRollout.removeDupes
         | Bp64  bp64r -> bp64r |> BP64SetsRollout.removeDupes
 
 
-    let sorterCompres (sortableRollout:SortableRollout) =
+    let sorterCompres (sortableRollout:sortableSetRollout) =
         None

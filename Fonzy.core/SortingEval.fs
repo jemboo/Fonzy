@@ -5,13 +5,13 @@ module SortingEval =
     type noGrouping  = 
         {
             switchEventRollout:switchEventRollout; 
-            sortableRollout:SortableRollout;
+            sortableRollout:sortableSetRollout;
         }
 
     type groupBySwitch = 
         {
             switchUses:SwitchUses; 
-            sortableRollout:SortableRollout;
+            sortableRollout:sortableSetRollout;
         }
 
     type switchEventRecords =
@@ -35,7 +35,14 @@ module SortingEval =
             failCount:int;
         }
 
+
     module SwitchEventRecords =
+
+        let getSortableSetRollout (switchEventRecords:switchEventRecords) =
+            match switchEventRecords with
+            | NoGrouping seNg -> seNg.sortableRollout
+            | BySwitch seGs -> seGs.sortableRollout
+
 
         let getSwitchUses (switchEventRecords:switchEventRecords) =
             match switchEventRecords with
@@ -49,24 +56,20 @@ module SortingEval =
         let getHistogramOfSortedSortables (switchEventRecords:switchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.sortableRollout 
-                                    |> SortableRollout.intBitsHist
+                                    |> SortableSetRollout.intBitsHist
                                     |> Ok
             | BySwitch seGs ->  seGs.sortableRollout 
-                                    |> SortableRollout.intBitsHist
+                                    |> SortableSetRollout.intBitsHist
                                     |> Ok
-
-
-
-
 
 
         let getAllSortsWereComplete (switchEventRecords:switchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.sortableRollout 
-                                    |> SortableRollout.isSorted
+                                    |> SortableSetRollout.isSorted
                                     |> Ok
             | BySwitch seGs ->  seGs.sortableRollout
-                                    |> SortableRollout.isSorted
+                                    |> SortableSetRollout.isSorted
                                     |> Ok
 
         let getUsedSwitchCount (switchEventRecords:switchEventRecords) =
@@ -74,6 +77,8 @@ module SortingEval =
                 let! switchUses = getSwitchUses switchEventRecords
                 return switchUses |> SwitchUses.usedSwitchCount
             }
+
+
 
     type sortingResult =
         {
@@ -124,16 +129,16 @@ module SortingEval =
         let fromSorterCoverage (coverage:sorterCoverage seq) =
 
             let extractSorterPerfBin ((stc, swc), (scs:sorterCoverage[])) =
-                let succ = scs |> Array.filter(fun sc -> sc.sorterPerf.successful = (Some true))
-                               |> Array.length
-                let fayl = scs |> Array.filter(fun sc -> sc.sorterPerf.successful = (Some false))
-                               |> Array.length
+                let sct = scs |> Array.filter(fun sc -> sc.sorterPerf.successful = (Some true))
+                              |> Array.length
+                let fct = scs |> Array.filter(fun sc -> sc.sorterPerf.successful = (Some false))
+                              |> Array.length
                 {
                     sorterPerfBin.sorterCount = SorterCount.fromInt scs.Length
                     usedStageCount = stc;
                     usedSwitchCount = swc;
-                    successCount = succ;
-                    failCount = fayl;
+                    successCount = sct;
+                    failCount = fct;
                 }
 
             coverage

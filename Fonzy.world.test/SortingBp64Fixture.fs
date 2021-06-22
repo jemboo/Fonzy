@@ -15,13 +15,13 @@ type SortingBp64Fixture () =
         let resGroupBySwitch = 
             SortingBp64.sorterMakeSwitchUses
                 refSorter
-                TestData.SorterActionRecords.bP64SetsRolloutAllBinary
+                TestData.SorterActionRecords.bP64SetsRolloutOfAll
                 Sorting.SwitchUsePlan.All
 
         let resNoGrouping = 
             SortingBp64.sorterWithNoSAG 
                 refSorter
-                TestData.SorterActionRecords.bP64SetsRolloutAllBinary
+                TestData.SorterActionRecords.bP64SetsRolloutOfAll
                 Sorting.SwitchUsePlan.All
 
         let switchUsesGrouping = 
@@ -50,7 +50,7 @@ type SortingBp64Fixture () =
         let switchEventRecordsNoSAG = 
             SortingBp64.sorterWithNoSAG 
                 refSorter 
-                TestData.SorterActionRecords.bP64SetsRolloutAllBinary
+                TestData.SorterActionRecords.bP64SetsRolloutOfAll
                 Sorting.SwitchUsePlan.All
    
         let sortedSortablesNoSAG = 
@@ -65,7 +65,7 @@ type SortingBp64Fixture () =
         let switchEventRecordsMakeSwitchUses = 
             SortingBp64.sorterMakeSwitchUses 
                 refSorter 
-                TestData.SorterActionRecords.bP64SetsRolloutAllBinary
+                TestData.SorterActionRecords.bP64SetsRolloutOfAll
                 Sorting.SwitchUsePlan.All
    
         let sortedSortablesMakeSwitchUses = 

@@ -80,7 +80,7 @@ type UtilsFixture () =
     [<TestMethod>]
     member this.iterateCircular() =
         let ts = [|1; 2; 3|]
-        let reppy = CollectionUtils.iterateCircular 10 ts  |> Seq.toArray
+        let reppy = CollectionUtils.arrayLoop 10 ts  |> Seq.toArray
         Assert.IsTrue(reppy.Length = 10)
 
 

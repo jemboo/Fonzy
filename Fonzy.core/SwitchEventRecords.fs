@@ -48,6 +48,7 @@ module SwitchUses =
            |> Seq.filter(fun tup -> (snd tup) > 0)
            |> Seq.maxBy(fst) |> fst
 
+
    let lastUsedIndexes (switchCount:SwitchCount) 
                        (stseq:seq<SwitchUses>) =            
        let stRet = createEmpty switchCount
@@ -57,6 +58,7 @@ module SwitchUses =
            stRec.[lui]<-stRec.[lui] + 1
        stseq |> Seq.iter(fun st -> Recordo wgts st)
        stRet
+
 
    let usedSwitchCount (switchUses:SwitchUses) = 
        getWeights switchUses |> Array.filter(fun i-> i > 0) 
@@ -77,6 +79,7 @@ module SwitchUses =
            return! Stage.getStageCount degree usedSwitches
        }
 
+
    let getRefinedSorter (switchUses:SwitchUses) 
                         (sorter:Sorter) =
        result {
@@ -87,6 +90,7 @@ module SwitchUses =
            return Sorter.create degree switches
        }
 
+
    let getSwitchAndStageUses (sorter:Sorter) 
                              (switchUses:SwitchUses) =
        result
@@ -95,6 +99,7 @@ module SwitchUses =
                let switchUseCount = (usedSwitchCount switchUses)
                return switchUseCount, refinedStageCount
            }
+
 
    let reportResultStats stats =
        StringUtils.printArrayf 
@@ -124,13 +129,9 @@ module SwitchUseB64 =
         weights=Array.init (SwitchCount.value switchCount) (fun i -> 0UL)}
 
    let init (switchCount:SwitchCount) (weights:int[]) =
-
-       if  (SwitchCount.value switchCount) = weights.Length then
-            let zz = createEmpty switchCount
-            ByteUtils.stripeWrite zz.weights weights 0
-            zz |> Ok
-       else Error (sprintf "switchCount: %d is not equal to weights length: %d" 
-                            (SwitchCount.value switchCount) weights.Length) 
+       let zz = createEmpty switchCount
+       ByteUtils.stripeWrite zz.weights weights 0
+       zz
 
    let getWeights switchUses = switchUses.weights
    let switchCount switchUses = (SwitchCount.value switchUses.switchCount)

@@ -19,7 +19,6 @@ module ByteUtils =
 
     let structHash (o:obj) =
         let md5 = MD5.Create();
-        let bs = bytesForObj o
         md5.ComputeHash(bytesForObj o)
 
 
@@ -43,8 +42,7 @@ module ByteUtils =
     let trueBitIndexes64 (u64:uint64) =
         seq {
                 for i in 0 .. 63 do
-                    let qua = (u64 &&& (1UL <<< i)) > 0UL
-                    if qua then
+                    if (u64 &&& (1UL <<< i)) > 0UL then
                         yield i
             }
 
@@ -180,6 +178,10 @@ module CollectionUtils =
 
     let listLoop<'T> (a:'T list) = 
         Seq.initInfinite (fun d -> a.[d % a.Length])
+        
+    let arrayLoop (count:int) (ofWhat:'a[]) =
+        seq { for i in 0..(count-1) 
+                    do yield ofWhat.[i%ofWhat.Length] }
 
     //returns the last n items of the list in the original order
     let rec last n xs =
@@ -237,19 +239,16 @@ module CollectionUtils =
                         do yield! Seq.replicate count (f items.[i]) }
         seq { while true do yield! tt }
 
-    let iterateCircular (count:int) (ofWhat:'a[]) =
-        seq { for i in 0..(count-1) 
-                    do yield ofWhat.[i%ofWhat.Length] }
 
     // Converts seq of key - value pairs to mutable Dictionary
     let dictFromSeqOfTuples(src:seq<'a * 'b>) = 
-       let dictionary = new Dictionary<'a, 'b>()
+       let dictionary = new Dictionary<'a,'b>()
        for (k,v) in src do
            dictionary.Add(k,v)
        dictionary
 
     // returns a list of the items that were added
-    let addDictionary (dBase:Dictionary<'a, 'b>) (dAdd:Dictionary<'a, 'b>) =
+    let addDictionary (dBase:Dictionary<'a,'b>) (dAdd:Dictionary<'a,'b>) =
         let mutable lstRet = []
         dAdd.Keys |> Seq.iter(fun k-> 
             if (not (dBase.ContainsKey(k))) then  

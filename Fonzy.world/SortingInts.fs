@@ -8,7 +8,8 @@ module SortingInts =
     // Action Grouping)
     let private switchRangeWithNoSAG 
                 (sorter:Sorter) 
-                (mindex:int) (maxdex:int) 
+                (mindex:int) 
+                (maxdex:int) 
                 (intSetsRoll:IntSetsRollout) 
                 (useTrack:int[])
                 (sortableIndex:int) =
@@ -40,15 +41,27 @@ module SortingInts =
                     (intSetsRollout:IntSetsRollout) 
                     (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
-        let firstSwitchDex, lastSwitchDex = 
+
+        let emptyRollout () = 
+            SwitchEventRolloutInt.create
+                            sorter.switchCount
+                            intSetsRollout.sortableCount
+
+        let switchPlanRollout (weights:int[]) = 
+            SwitchEventRolloutInt.init
+                            weights
+                            intSetsRollout.sortableCount
+                            
+        let firstSwitchDex, lastSwitchDex, seRollout = 
             match switchusePlan with
-            | Sorting.SwitchUsePlan.All -> (0, switchCount)
-            | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
-            | Sorting.SwitchUsePlan.Indexes (min, max, locs) -> (min, max)
+            | Sorting.SwitchUsePlan.All -> 
+                (0, switchCount, emptyRollout())
+            | Sorting.SwitchUsePlan.Range (min, max) -> 
+                (min, max, emptyRollout())
+            | Sorting.SwitchUsePlan.Indexes (min, max, weights) -> 
+                (min, max, switchPlanRollout weights)
         let ssRollCopy = IntSetsRollout.copy intSetsRollout
-        let seRoll = SwitchEventRolloutInt.create
-                                            sorter.switchCount
-                                            intSetsRollout.sortableCount
+
         let mutable sortableIndex=0
         while (sortableIndex < (SortableCount.value intSetsRollout.sortableCount)) do
                 switchRangeWithNoSAG 
@@ -56,13 +69,13 @@ module SortingInts =
                         firstSwitchDex 
                         lastSwitchDex 
                         ssRollCopy 
-                        seRoll.useRoll.values 
+                        seRollout.useRoll.values 
                         sortableIndex
 
                 sortableIndex <- sortableIndex + 1
         switchEventRecords.NoGrouping {
-            noGrouping.switchEventRollout = seRoll |> switchEventRollout.Int
-            noGrouping.sortableRollout = ssRollCopy |> SortableRollout.Int 
+            noGrouping.switchEventRollout = seRollout |> switchEventRollout.Int
+            noGrouping.sortableRollout = ssRollCopy |> sortableSetRollout.Int 
                                                 
         }
 
@@ -71,7 +84,8 @@ module SortingInts =
     // switch uses
     let private switchRangeMakeSwitchUses 
                     (sorter:Sorter) 
-                    (mindex:int) (maxdex:int) 
+                    (mindex:int) 
+                    (maxdex:int) 
                     (switchUses:SwitchUses) 
                     (sortableSetRollout:IntSetsRollout) 
                     (sortableIndex:int) =
@@ -115,12 +129,16 @@ module SortingInts =
         let mutable sortableIndex=0
         while (sortableIndex < (SortableCount.value ssRollout.sortableCount)) do
                 switchRangeMakeSwitchUses 
-                    sorter firstSwitchDex lastSwitchDex 
-                    switchUses sortableSetRolloutCopy sortableIndex
+                    sorter 
+                    firstSwitchDex 
+                    lastSwitchDex 
+                    switchUses 
+                    sortableSetRolloutCopy 
+                    sortableIndex
                 sortableIndex <- sortableIndex + 1
         switchEventRecords.BySwitch {
             groupBySwitch.switchUses = switchUses; 
-            groupBySwitch.sortableRollout = SortableRollout.Int 
+            groupBySwitch.sortableRollout = sortableSetRollout.Int 
                                                 sortableSetRolloutCopy
         }
         

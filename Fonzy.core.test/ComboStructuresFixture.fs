@@ -284,7 +284,6 @@ type ComboStructuresFixture () =
      let pos = 11
      let intBits = IntBits.fromInteger (Degree.value degree)
                                        encodedVal
-     let yab = Array.init 50 (fun i -> (i + 10 - 1) / 10)
      let blank = BitsP32.zeroCreate (Degree.value degree)
      BitsP32.stripeWrite blank
                          intBits
@@ -295,3 +294,17 @@ type ComboStructuresFixture () =
      let decoded = IntBits.toInteger bitsBack
 
      Assert.AreEqual (encodedVal, decoded)
+
+
+    [<TestMethod>]
+     member this.Record64Array_recordIntBiy() =
+      let degree = Degree.fromInt 16
+      let encodedVal = 8675
+      let rec64Array = Record64Array.make degree
+
+      let intBits = IntBits.fromInteger (Degree.value degree)
+                                         encodedVal
+      Record64Array.recordIntBits rec64Array intBits
+      let intBitsBack = Record64Array.toIntArrays degree rec64Array
+                        |> Seq.head
+      Assert.AreEqual (intBits, intBitsBack)

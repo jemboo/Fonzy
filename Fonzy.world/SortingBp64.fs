@@ -35,16 +35,28 @@ module SortingBp64 =
                 (switchusePlan:Sorting.SwitchUsePlan) =
 
         let switchCount = (SwitchCount.value sorter.switchCount)
-        let firstSwitchDex, lastSwitchDex = 
+
+        let emptyRollout () = 
+            SwitchEventRolloutBp64.create
+                sorter.switchCount
+                bP64SetsRollout.sortableCount
+
+        let switchPlanRollout (weights:int[]) = 
+            SwitchEventRolloutBp64.init
+                            bP64SetsRollout.sortableCount
+                            weights
+                            
+
+        let firstSwitchDex, lastSwitchDex, seRollbp64 = 
             match switchusePlan with
-            | Sorting.SwitchUsePlan.All -> (0, switchCount)
-            | Sorting.SwitchUsePlan.Range (min, max) -> (min, max)
-            | Sorting.SwitchUsePlan.Indexes (min, max, locs) -> (min, max)
+            | Sorting.SwitchUsePlan.All -> 
+                (0, switchCount, emptyRollout ())
+            | Sorting.SwitchUsePlan.Range (min, max) -> 
+                (min, max, emptyRollout ())
+            | Sorting.SwitchUsePlan.Indexes (min, max, weights) -> 
+                (min, max, switchPlanRollout weights)
         
         let bPsRollCopy = BP64SetsRollout.copy bP64SetsRollout
-        let seRollbp64 = SwitchEventRolloutBp64.create
-                                sorter.switchCount
-                                bPsRollCopy.sortableCount
 
         let mutable sortableBlockDex = 0
         while (sortableBlockDex < seRollbp64.sortableBlockCount) do
@@ -60,7 +72,7 @@ module SortingBp64 =
 
         switchEventRecords.NoGrouping {
             noGrouping.switchEventRollout = seRollbp64 |> switchEventRollout.Bp64
-            noGrouping.sortableRollout = bPsRollCopy |> SortableRollout.Bp64                                       
+            noGrouping.sortableRollout = bPsRollCopy |> sortableSetRollout.Bp64                                       
         }
 
 
@@ -97,9 +109,12 @@ module SortingBp64 =
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex, switchUseB64 =
             match switchusePlan with
-            | Sorting.SwitchUsePlan.All -> (0, switchCount, (SwitchUseB64.createEmpty sorter.switchCount))
-            | Sorting.SwitchUsePlan.Range (min, max) -> (min, max, (SwitchUseB64.createEmpty sorter.switchCount))
-            | Sorting.SwitchUsePlan.Indexes (min, max, locs) -> (min, max, (SwitchUseB64.createEmpty sorter.switchCount))
+            | Sorting.SwitchUsePlan.All -> 
+                (0, switchCount, (SwitchUseB64.createEmpty sorter.switchCount))
+            | Sorting.SwitchUsePlan.Range (min, max) -> 
+                (min, max, (SwitchUseB64.createEmpty sorter.switchCount))
+            | Sorting.SwitchUsePlan.Indexes (min, max, weights) -> 
+                (min, max, (SwitchUseB64.init sorter.switchCount weights))
 
         let switchUseB64 = (SwitchUseB64.createEmpty sorter.switchCount)
         let bp64SetsRolloutCopy = (BP64SetsRollout.copy bp64SetsRollout)
@@ -118,7 +133,7 @@ module SortingBp64 =
         let switchUses = SwitchUseB64.toSwitchUses switchUseB64
         switchEventRecords.BySwitch {
             groupBySwitch.switchUses = switchUses; 
-            groupBySwitch.sortableRollout = SortableRollout.Bp64
+            groupBySwitch.sortableRollout = sortableSetRollout.Bp64
                                                 bp64SetsRolloutCopy
         }
 

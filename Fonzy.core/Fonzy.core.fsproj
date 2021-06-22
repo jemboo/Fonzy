@@ -21,13 +21,11 @@
     <Compile Include="SortingTypes.fs" />
     <Compile Include="SorterParts.fs" />
     <Compile Include="Sorter.fs" />
-    <Compile Include="SorterGen.fs" />
     <Compile Include="SorterSet.fs" />
-    <Compile Include="Sortables.fs" />
+    <Compile Include="SortableSet.fs" />
     <Compile Include="SwitchEventRecords.fs" />
-    <Compile Include="SortableRollout.fs" />
+    <Compile Include="SortableSetRollout.fs" />
     <Compile Include="SwitchEventRollout.fs" />
-    <Compile Include="SortableSetSpec.fs" />
     <Compile Include="SortingEval.fs" />
     <Compile Include="Sorting.fs" />
     <Compile Include="GaTypes.fs" />

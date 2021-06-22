@@ -31,9 +31,10 @@ module SwitchEventRolloutInt =
                         (SortableCount.value sortableCount))    
         }
 
-    let init (switchCount:SwitchCount) 
+    let init (weights:int[])
              (sortableCount:SortableCount) = 
-        let zz = create switchCount sortableCount
+        let zz = create (SwitchCount.fromInt weights.Length) sortableCount
+        weights |> Array.iteri(fun i _ -> zz.useRoll.values.[i] <- weights.[i])
         zz
 
     let toSwitchUses (switchEvents:switchEventRolloutInt) =
@@ -66,10 +67,17 @@ module SwitchEventRolloutBp64 =
             useRoll = ur 
         }
 
+    let init (sortableCount:SortableCount)
+             (weights:int[]) =
+        let zz = create (SwitchCount.fromInt weights.Length) 
+                        sortableCount
+        weights |> Array.iteri(fun i _ -> 
+                    zz.useRoll.values.[i] <- weights.[i] |> uint64)
+        zz
+
 
     let toSwitchUses (switchEvents:switchEventRolloutBp64) =
         let switchCt = (SwitchCount.value switchEvents.switchCount)
-
         let weights = switchEvents.useRoll.values
                        |> Array.map(fun l -> ByteUtils.trueBitCount64 l )
                        |> CollectionUtils.chunkAndSum switchCt
