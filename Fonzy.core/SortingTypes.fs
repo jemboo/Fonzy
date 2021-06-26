@@ -9,7 +9,9 @@ type SortableSetId = private SortableSetId of Guid
 type SorterCount = private SorterCount of int
 type SorterSetId = private SorterSetId of Guid
 type StageCount = private StageCount of int
+type StageWindowSize = private StageWindowSize of int
 type SwitchCount = private SwitchCount of int
+type SwitchPrefixCount = private SwitchPrefixCount of int
 type SwitchFrequency = private SwitchFrequency of float
 type SwitchOrStage = | Switch | Stage
 type SwitchOrStageCount = | Switch of SwitchCount
@@ -94,6 +96,18 @@ module SwitchCount =
         create "" ct |> Result.ExtractOrThrow
 
 
+module SwitchPrefixCount =
+    let value (SwitchPrefixCount v) = v
+    let create fieldName v = 
+        ConstrainedType.createInt fieldName SwitchPrefixCount 0 10000 v
+    let fromInt v = create "" v |> Result.ExtractOrThrow
+    let fromKey (m:Map<'a, obj>) (key:'a) =
+        result {
+            let! gv = ResultMap.read key m
+            return! create "" (gv:?>int)
+        }
+
+
 module SwitchFrequency =
     let value (SwitchFrequency v) = v
     let create fieldName v = 
@@ -141,10 +155,24 @@ module StageCount =
         let ct = match d with
                     | 8 | 9 -> 140
                     | 10 | 11 | 12 | 13 | 14 | 15 -> 160
-                    | 16 | 17 | 18 | 19 | 20 | 21 -> 200
-                    | 22 | 23 | 24 | 25 -> 220
+                    | 16 | 17 | 18 | 19 | 20 | 21 -> 220
+                    | 22 | 23 | 24 | 25 -> 240
                     | _ -> 0
         create "" ct |> Result.ExtractOrThrow
+
+
+module StageWindowSize =
+    let value (StageWindowSize v) = v
+    let create fieldName v = 
+        ConstrainedType.createInt fieldName StageWindowSize 0 100000 v
+    let ToSwitchCount (degree:Degree) (stageWindowSize:StageWindowSize) =
+        SwitchCount.create "" ((Degree.value degree) * (value stageWindowSize) / 2)
+    let fromInt v = create "" v |> Result.ExtractOrThrow
+    let fromKey (m:Map<'a, obj>) (key:'a) =
+        result {
+            let! gv = ResultMap.read key m
+            return! create "" (gv:?>int)
+        }
 
 
 module SwitchOrStageCount =

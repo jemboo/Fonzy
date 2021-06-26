@@ -6,6 +6,7 @@ type SorterSet = { id:SorterSetId;
                    sorterCount:SorterCount; 
                    sorters:Map<SorterId,Sorter> }
 module SorterSet =
+
     let fromSorters (sorterSetId:SorterSetId)
                     (degree:Degree) 
                     (sorters:seq<Sorter>) =

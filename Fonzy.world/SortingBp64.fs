@@ -225,7 +225,7 @@ module SortingBp64 =
                 uintArray.[sw.hi] <- (lv ||| hv)
                 uintArray.[sw.low] <- (lv &&& hv)
                 lstRet <- newCase::lstRet
-                i <- i+1
+                i <- i + 1
             lstRet |> List.rev
 
 

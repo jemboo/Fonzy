@@ -5,9 +5,18 @@ open System.Collections.Generic
 
 [<TestClass>]
 type UtilsFixture () =
+    // SeqUtils
+    [<TestMethod>]
+    member this.join() =
+        let seqFirst = seq {1;2;3}
+        let seqSecond = seq {4;5;6}
+        let expectedJoin = [1;2;3;4;5;6]
+        let theJoin = seqFirst 
+                          |> SeqUtils.join seqSecond 
+                          |> Seq.toList
+        Assert.AreEqual(expectedJoin, theJoin)
 
     // ByteUtils
-    
     [<TestMethod>]
     member this.structHash() =
         let gA = ByteUtils.structHash(1 :> obj) |> Array.toList

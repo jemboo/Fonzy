@@ -186,6 +186,19 @@ module Combinatorics =
 
     let isReflSymmetric (degree:int) (pair:int*int) =
         (reflect degree (fst pair)) = (snd pair)
+
+
+
+
+
+    let buddyStage (degree:Degree) 
+                   (availableFlags:(bool*int[])) =
+        
+        None
+
+
+
+
     
     // returns a random symmetric pairs
     let reflectivePairs (degree:int)
@@ -204,8 +217,7 @@ module Combinatorics =
             |> Seq.filter (fun (ndx,f) -> f)
 
         let canContinue() =
-            availableFlags() |> Seq.length
-                > 1
+            availableFlags() |> Seq.length > 1
 
         let nextItem() =
             let nItem = rndmx (availableFlags() |> Seq.length)     
@@ -237,7 +249,7 @@ module Combinatorics =
                 let res = getReflection nItemA nItemB
                 match res with
                 | Some (reflA, reflB) ->
-                     [|(nItemA, nItemB); (reflA, reflB)|]
+                          [|(nItemA, nItemB); (reflA, reflB)|]
                 | None -> [|(nItemA, nItemB)|]
 
         seq { while canContinue() do yield nextItems() }

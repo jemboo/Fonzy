@@ -70,7 +70,6 @@ module ByteUtils =
         uBits |> Array.mapi (proc)
 
 
-
 module GuidUtils = 
 
     let makeGuid (g1:uint64) (g2:uint64) (g3:uint64) (g4:uint64) =
@@ -162,6 +161,12 @@ module ParseUtils =
             sprintf "1 param expected, not %d" pcs.Length |> Error
         else
             MakeFloat pcs.[0]
+
+module SeqUtils =
+
+    let join<'T> (second:seq<'T>)
+                 (first:seq<'T>) = 
+        seq { yield! first; yield! second }
 
 
 module CollectionUtils =

@@ -46,51 +46,51 @@ type SorterPartsFixture () =
         Assert.IsTrue(hist.Count > 0);
 
 
-    [<TestMethod>]
-    member this.Stage_windowBuddies() =
-        let degree = Degree.fromInt 16
-        let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
-        let stageCount = StageCount.fromInt 10
-        let windowSize = 4
+    //[<TestMethod>]
+    //member this.Stage_windowBuddies() =
+    //    let degree = Degree.fromInt 16
+    //    let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
+    //    let stageCount = StageCount.fromInt 10
+    //    let windowSize = 4
 
-        let startingStages = 
-            Stage.makeRandomReflSymmetricStages
-                        degree
-                        randy
-                |> Seq.take (StageCount.value stageCount)
-                |> Seq.toArray
+    //    let startingStages = 
+    //        Stage.makeRandomReflSymmetricStages
+    //                    degree
+    //                    randy
+    //            |> Seq.take (StageCount.value stageCount)
+    //            |> Seq.toArray
 
-        let stageWindows = 
-            startingStages 
-                |> Stage.windowBuddies windowSize
-                |> Seq.toArray
+    //    let stageWindows = 
+    //        startingStages 
+    //            |> Stage.windowBuddies windowSize
+    //            |> Seq.toArray
 
-        Assert.IsTrue(stageWindows.Length > 0);
+    //    Assert.IsTrue(stageWindows.Length > 0);
 
 
-    [<TestMethod>]
-    member this.Stage_buddyStages() =
-        let degree = Degree.fromInt 16
-        let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
-        let stageWindowSize = StageCount.fromInt 10
-        let windowSize = 4
+    //[<TestMethod>]
+    //member this.Stage_buddyStages() =
+    //    let degree = Degree.fromInt 16
+    //    let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
+    //    let stageWindowSize = StageCount.fromInt 10
+    //    let windowSize = 4
 
-        let buddyStages = Stage.makeBuddyStages 
-                            stageWindowSize
-                            SwitchFrequency.max
-                            degree
-                            randy
-                            List.Empty 
-                         |> Seq.take 100
-                         |> Seq.toArray
+    //    let buddyStages = Stage.makeBuddyStages 
+    //                        stageWindowSize
+    //                        SwitchFrequency.max
+    //                        degree
+    //                        randy
+    //                        List.Empty 
+    //                     |> Seq.take 100
+    //                     |> Seq.toArray
 
-        let buddySwitches = 
-            buddyStages 
-                |> Stage.windowBuddies windowSize
-                |> Seq.toArray
-        let count = buddySwitches |> Array.sumBy(List.length)
+    //    let buddySwitches = 
+    //        buddyStages 
+    //            |> Stage.windowBuddies windowSize
+    //            |> Seq.toArray
+    //    let count = buddySwitches |> Array.sumBy(List.length)
 
-        Assert.AreEqual(count, 0);
+    //    Assert.AreEqual(count, 0);
 
 
     //[<TestMethod>]

@@ -77,13 +77,7 @@ module TestData =
                              |> Result.sequence
                              |> Result.ExtractOrThrow
 
-
-        let sM () = 
-            RefSorter.createRefSorter RefSorter.Green16m
-
-        //let sorterEndM = RefSorter.createRefSorter RefSorter.End16m
-        //                 |> Result.ExtractOrThrow
-        let sorterGreenM = sM ()
+        let sorterGreenM = RefSorter.createRefSorter RefSorter.Green16m
                            |> Result.ExtractOrThrow
 
 

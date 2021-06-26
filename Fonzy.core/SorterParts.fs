@@ -4,6 +4,7 @@ open System
 [<Struct>]
 type Switch = {low:int; hi:int}
 module Switch =
+
     let switchMap = 
         [for hi=0 to 64 
             do for low=0 to hi do yield {Switch.low=low; Switch.hi=hi}]
@@ -76,11 +77,11 @@ module Stage =
         seq { for stage in stages do yield! stage.switches }
         |> CollectionUtils.itemsOccuringMoreThanOnce
 
-    // returns a sequence of switches found more than once
-    let windowBuddies (windowSize:int) 
-                      (stages:Stage seq) =
-        stages |> CollectionUtils.maxWindowed windowSize
-               |> Seq.map(switchPairwiseIntersections >> Seq.toList)
+    //// returns a sequence of switches found more than once
+    //let windowBuddies (windowSize:int) 
+    //                  (stages:Stage seq) =
+    //    stages |> CollectionUtils.maxWindowed windowSize
+    //           |> Seq.map(switchPairwiseIntersections >> Seq.toList)
 
 
     let mergeSwitchesIntoStages (degree:Degree) 
@@ -209,10 +210,10 @@ module Stage =
 
 
     let toBuddyStages  (stagesPfx: Stage list)
-                         (stageWindowSize: StageCount)
-                         (stageSeq: seq<Stage>)
-                         (targetStageCount: StageCount)
-                         (trialStageCount: StageCount) =
+                       (stageWindowSize: StageCount)
+                       (stageSeq: seq<Stage>)
+                       (targetStageCount: StageCount)
+                       (trialStageCount: StageCount) =
 
         let maxWindow = (StageCount.value stageWindowSize)
         let mutable window = stagesPfx |> CollectionUtils.last maxWindow
@@ -267,7 +268,6 @@ module Stage =
             let ahay = switchPairwiseIntersections testWin
                                     |> Seq.toArray
             let lenny = ahay |> Seq.length
-            System.Diagnostics.Debug.WriteLine lenny
             lenny
 
         seq { for stage in stageSeq do

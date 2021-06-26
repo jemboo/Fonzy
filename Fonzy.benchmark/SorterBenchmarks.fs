@@ -143,13 +143,13 @@ type BenchmarkSorterOnBp64() =
     let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
     let rollout = BP64SetsRollout.allBinary degree |> Result.ExtractOrThrow
     
-    [<Benchmark>]
-    member this.sorterWithNoSAG() =
-        let ssR = SortingBp64.sorterWithNoSAG
-                              sorter16 
-                              rollout 
-                              Sorting.SwitchUsePlan.All
-        ssR 
+    //[<Benchmark>]
+    //member this.sorterWithNoSAG() =
+    //    let ssR = SortingBp64.sorterWithNoSAG
+    //                          sorter16 
+    //                          rollout 
+    //                          Sorting.SwitchUsePlan.All
+    //    ssR 
 
 
     [<Benchmark>]
@@ -161,14 +161,14 @@ type BenchmarkSorterOnBp64() =
         ssR
 
 
-    [<Benchmark>]
-    member this.evalSorter() =
-        let ssR = SortingBp64.evalSorter 
-                            sorter16 
-                            sortableSetbp64 
-                            Sorting.SwitchUsePlan.All
-                            Sorting.EventGrouping.BySwitch
-        ssR
+    //[<Benchmark>]
+    //member this.evalSorter() =
+    //    let ssR = SortingBp64.evalSorter 
+    //                        sorter16 
+    //                        sortableSetbp64 
+    //                        Sorting.SwitchUsePlan.All
+    //                        Sorting.EventGrouping.BySwitch
+    //    ssR
 
 
 
@@ -207,16 +207,16 @@ type BenchmarkSorterSetOnBp64() =
                              |> Result.ExtractOrThrow 
 
                             
-    [<Benchmark>]
-    member this.getSorterCoverage50_Parallel_NoGrouping() =
-        let ssR = SortingOps.SorterSet.eval
-                        mediocreSorterSet 
-                        sortableSetAllBits
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.NoGrouping
-                        (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
-        ssR 
+    //[<Benchmark>]
+    //member this.getSorterCoverage50_Parallel_NoGrouping() =
+    //    let ssR = SortingOps.SorterSet.eval
+    //                    mediocreSorterSet 
+    //                    sortableSetAllBits
+    //                    Sorting.SwitchUsePlan.All
+    //                    Sorting.EventGrouping.NoGrouping
+    //                    (UseParallel.create true)
+    //                    (SortingEval.SortingRecords.getSorterCoverage true)
+    //    ssR 
 
 
 
@@ -234,25 +234,25 @@ type BenchmarkSorterSetOnBp64() =
 
 
 
-    [<Benchmark>]
-    member this.getSorterCoverage50_Serial_NoGrouping() =
-        let ssR = SortingOps.SorterSet.eval
-                        mediocreSorterSet 
-                        sortableSetAllBits
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.NoGrouping
-                        (UseParallel.create false)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
-        ssR 
+    //[<Benchmark>]
+    //member this.getSorterCoverage50_Serial_NoGrouping() =
+    //    let ssR = SortingOps.SorterSet.eval
+    //                    mediocreSorterSet 
+    //                    sortableSetAllBits
+    //                    Sorting.SwitchUsePlan.All
+    //                    Sorting.EventGrouping.NoGrouping
+    //                    (UseParallel.create false)
+    //                    (SortingEval.SortingRecords.getSorterCoverage true)
+    //    ssR 
 
 
-    [<Benchmark>]
-    member this.getSorterCoverage50_Serial_GroupBySwitch() =
-        let ssR = SortingOps.SorterSet.eval
-                        mediocreSorterSet 
-                        sortableSetAllBits 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
-                        (UseParallel.create false)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
-        ssR 
+    //[<Benchmark>]
+    //member this.getSorterCoverage50_Serial_GroupBySwitch() =
+    //    let ssR = SortingOps.SorterSet.eval
+    //                    mediocreSorterSet 
+    //                    sortableSetAllBits 
+    //                    Sorting.SwitchUsePlan.All
+    //                    Sorting.EventGrouping.BySwitch
+    //                    (UseParallel.create false)
+    //                    (SortingEval.SortingRecords.getSorterCoverage true)
+    //    ssR 
