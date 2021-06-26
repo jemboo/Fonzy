@@ -14,10 +14,10 @@ let main argv =
 
 
      /// ******* PerfBinsReport ***********
-    Console.WriteLine("Starting PerfBinsReport.main")
-    let res2 =  PerfBinReports.dirPerfBinBySorterGenReport ("C:\\SimOut") ("C:\\SimOutReports")
-    Console.WriteLine(res2)
-    Console.Read() |> ignore
+    ////Console.WriteLine("Starting PerfBinsReport.main")
+    ////let res2 =  PerfBinReports.dirPerfBinBySorterGenReport ("C:\\SimOut") ("C:\\SimOutReports")
+    ////Console.WriteLine(res2)
+    ////Console.Read() |> ignore
 
     0 // return an integer exit code
 
@@ -39,11 +39,12 @@ let main argv =
     //Console.Read() |> ignore
 
     /// ******* Benchmark ***********
-    //Console.WriteLine("Starting Benchmark.main")
-    //let summary = BenchmarkRunner.Run<BenchmarkSorterSetOnBp64>()
-    //printfn "%A" summary
-    //Console.Read() |> ignore
-   
+    Console.WriteLine("Starting Benchmark.main")
+    let summary = BenchmarkRunner.Run<BenchmarkSorterSetOnBp64>()
+    printfn "%A" summary
+    Console.Read() |> ignore
+    0
+
      /// ******* Perfbins ***********
     //Console.WriteLine("Starting Perfbins.main")
     //let res = Array.init 10000 
