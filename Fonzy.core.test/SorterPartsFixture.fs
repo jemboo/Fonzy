@@ -13,7 +13,7 @@ type SorterPartsFixture () =
         let stageCount = StageCount.fromInt 2
 
         let startingStages() = 
-            Stage.randomSymmetric
+            Stage.rndSymmetric
                         degree
                         randy
                 |> Seq.take (StageCount.value stageCount)
@@ -33,7 +33,7 @@ type SorterPartsFixture () =
         let stageCount = StageCount.fromInt 4
 
         let startingStages() = 
-            Stage.randomSymmetric
+            Stage.rndSymmetric
                         degree
                         randy
                 |> Seq.take (StageCount.value stageCount)
@@ -130,7 +130,7 @@ type SorterPartsFixture () =
         let maxStageTry = (StageCount.fromInt 1200)
         let stageCount = (StageCount.fromInt 100)
         let buddyStages() = 
-            Stage.makeSymmetricBuddyStages
+            Stage.rndSymmetricBuddyStages
                             stageWindowSize
                             SwitchFrequency.max
                             degree

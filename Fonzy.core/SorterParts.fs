@@ -111,6 +111,7 @@ module Stage =
                         degree = degree}
              }
 
+
     let getStageIndexesFromSwitches (degree:Degree) 
                                     (switches:seq<Switch>) =
         let mutable stageTracker = Array.init (Degree.value degree) 
@@ -166,30 +167,38 @@ module Stage =
         {switches=sA; degree=stage.degree}
         
     // IRando dependent
-    let createRandom (degree:Degree) 
-                     (rnd:IRando) =
-        let switches = (TwoCyclePerm.makeRandomFullTwoCycle degree rnd )
-                        |> Switch.fromTwoCyclePerm
-        {switches=switches |> Seq.toList; degree=degree}
+    let rndSeq (degree:Degree) 
+               (switchFreq:SwitchFrequency) 
+               (rnd:IRando) =
 
-
-    let rndSwitchSeq (degree:Degree) 
-                     (switchFreq:SwitchFrequency) 
-                     (rnd:IRando) =
         let aa (rnd:IRando)  = 
-            (TwoCyclePerm.makeRandomTwoCycle 
-                                degree 
-                                rnd 
-                                (SwitchFrequency.value switchFreq))
-                    |> Switch.fromTwoCyclePerm
-        seq { while true do yield! (aa rnd) }
+            {
+                switches = TwoCyclePerm.rndTwoCycle 
+                    degree
+                    (SwitchFrequency.value switchFreq)
+                    rnd
+                               |> Switch.fromTwoCyclePerm
+                               |> Seq.toList;
+                degree=degree
+            }
+        seq { while true do yield (aa rnd) }
 
 
-    let randomSymmetric 
+    let rndSymmetric 
                 (degree:Degree) 
                 (rnd:IRando) =
-        Switch.rndSymmetric degree rnd
-        |> fromSwitches degree
+        let aa (rnd:IRando)  = 
+            { 
+                Stage.switches = 
+                    TwoCyclePerm.rndSymmetric 
+                            degree
+                            rnd
+                    |> Switch.fromTwoCyclePerm
+                    |> Seq.toList
+                degree = degree
+            }
+
+        seq { while true do yield (aa rnd) }
 
 
     let randomMutate (rnd:IRando) 
@@ -242,14 +251,12 @@ module Stage =
              }
 
 
-    let makeBuddyStages (stageWindowSize:StageCount)
+    let rndBuddyStages (stageWindowSize:StageCount)
                         (switchFreq:SwitchFrequency) 
                         (degree:Degree) 
                         (rnd:IRando) 
                         (stagesPfx:Stage list)  =
-        let stageSeq = (rndSwitchSeq degree switchFreq  rnd 
-                        |> fromSwitches degree)
-
+        let stageSeq = rndSeq degree switchFreq rnd
         let maxWindow = (StageCount.value stageWindowSize)
         let mutable window = stagesPfx |> CollectionUtils.last maxWindow
         let trim() =
@@ -274,7 +281,7 @@ module Stage =
                            (stagesPfx |> List.toSeq)
 
 
-    let rec makeSymmetricBuddyStages 
+    let rec rndSymmetricBuddyStages 
                 (stageWindowSize:StageCount)
                 (switchFreq:SwitchFrequency) 
                 (degree:Degree) 
@@ -285,13 +292,13 @@ module Stage =
 
          let trial = toBuddyStages stagesPfx
                         stageWindowSize
-                        (randomSymmetric degree rnd)
+                        (rndSymmetric degree rnd)
                         stageCount
                         trialStageCount
                         |> Seq.toArray
          if (trial.Length >= (StageCount.value stageCount)) then
             trial |> Array.take (StageCount.value stageCount)
-         else makeSymmetricBuddyStages
+         else rndSymmetricBuddyStages
                     stageWindowSize
                     switchFreq
                     degree

@@ -39,7 +39,7 @@ module SortingOps =
         let switchReduce (sSet:sortableSet) 
                          (switches:seq<Switch>) = 
             let degree = sSet |> SortableSet.degree
-            let sorter = Sorter.create 
+            let sorter = Sorter.fromSwitches 
                             degree
                             switches
 

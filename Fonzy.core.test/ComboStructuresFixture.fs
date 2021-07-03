@@ -122,7 +122,7 @@ type ComboStructuresFixture () =
        let rnd = Rando.LcgFromSeed 424
        let id = TwoCyclePerm.identity degree
        for i in {0 .. 20} do
-                let tcp = TwoCyclePerm.makeRandomFullTwoCycle degree rnd
+                let tcp = TwoCyclePerm.rndFullTwoCycle degree rnd
                 Assert.IsTrue(tcp |> TwoCyclePerm.toPermutation |> Permutation.isTwoCycle)
 
 
@@ -133,7 +133,7 @@ type ComboStructuresFixture () =
        let switchFreq = 0.5
        let id = TwoCyclePerm.identity degree
        for i in {0 .. 20} do
-                let tcp = TwoCyclePerm.makeRandomTwoCycle degree rnd switchFreq
+                let tcp = TwoCyclePerm.rndTwoCycle degree switchFreq rnd 
                 Assert.IsTrue(tcp |> TwoCyclePerm.toPermutation |> Permutation.isTwoCycle)
 
 
@@ -188,9 +188,7 @@ type ComboStructuresFixture () =
         let switchFreq = SwitchFrequency.fromFloat 0.5
         let degree = Degree.fromInt 16
         let switchCount = SwitchCount.fromInt 8
-        let stageTupes = Stage.rndSwitchSeq degree switchFreq rndy
-                         |> Seq.map(fun s -> (s.low, s.hi))
-                         |> Seq.take (SwitchCount.value switchCount)
+        let stageTupes = seq {(0,1)}
         let twoCycle = TwoCyclePerm.makeFromTupleSeq degree stageTupes
         Assert.IsTrue (true)
 

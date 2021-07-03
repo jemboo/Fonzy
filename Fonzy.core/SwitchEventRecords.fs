@@ -91,7 +91,7 @@ module SwitchUses =
            let degree = sorter.degree
            let stages = Stage.fromSwitches degree usedSwitches |> Seq.toArray
            let switches = seq {for i in 0 .. (stages.Length - 1) do yield! stages.[i].switches}
-           return Sorter.create degree switches
+           return Sorter.fromSwitches degree switches
        }
 
 

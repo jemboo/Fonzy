@@ -19,19 +19,19 @@ module TestData =
         let goodRefSorter = RefSorter.goodRefSorterForDegree degree
                             |> Result.ExtractOrThrow
 
-        let twoStageSorter = Sorter.create 
+        let twoStageSorter = Sorter.fromSwitches 
                                 goodRefSorter.degree
                                 (goodRefSorter.switches
                                     |> Seq.take (Degree.value goodRefSorter.degree)
                                     |> Seq.toArray)
 
-        let fourStageSorter = Sorter.create 
+        let fourStageSorter = Sorter.fromSwitches 
                                 goodRefSorter.degree
                                 (goodRefSorter.switches
                                     |> Seq.take ((Degree.value goodRefSorter.degree) * 2)
                                     |> Seq.toArray)
 
-        let sorterSegment = Sorter.create 
+        let sorterSegment = Sorter.fromSwitches 
                                 goodRefSorter.degree
                                 (goodRefSorter.switches
                                     |> Seq.skip (Degree.value goodRefSorter.degree)
@@ -51,8 +51,10 @@ module TestData =
                 SorterGen.createRandom sorterGen iRando
 
         let makeRandomTwoCycle = 
-                TwoCyclePerm.makeRandomTwoCycle 
-                                degree iRando permSwitchDensity
+                TwoCyclePerm.rndTwoCycle 
+                                degree 
+                                permSwitchDensity
+                                iRando 
 
         let randomIntBits = 
             IntBits.createRandom degree iRando

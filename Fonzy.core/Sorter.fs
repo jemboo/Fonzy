@@ -11,7 +11,9 @@ module Sorter =
         let gu = [s :> obj] |> GuidUtils.guidFromObjList
         SorterId.fromGuid gu
 
-    let create (degree:Degree) (switches:seq<Switch>) =
+
+    let fromSwitches (degree:Degree) 
+                     (switches:seq<Switch>) =
         let switchArray = switches |> Seq.toArray
         let switchCount = SwitchCount.fromInt switchArray.Length
         {
@@ -19,14 +21,29 @@ module Sorter =
             switchCount=switchCount;
             switches = switchArray
         }
+
+
+    let fromStages (degree:Degree) 
+                   (stages:seq<Stage>) =
+        let switchArray = stages |> Seq.map(fun st->st.switches)
+                                    |> Seq.concat
+                                    |> Seq.toArray
+        let switchCount = SwitchCount.fromInt switchArray.Length
+        {
+            Sorter.degree=degree;
+            switchCount=switchCount;
+            switches = switchArray
+        }
    
+
     let appendSwitches (switches:seq<Switch>) (sorter:Sorter) =
         let newSwitches = (switches |> Seq.toArray) |> Array.append sorter.switches
         let newSwitchCount = SwitchCount.create "" newSwitches.Length |> Result.toOption
         {
             Sorter.degree = sorter.degree;
             switchCount=newSwitchCount.Value;
-            switches = (switches |> Seq.toArray) |> Array.append sorter.switches
+            switches = (switches |> Seq.toArray) 
+                       |> Array.append sorter.switches
         }
 
     let trimLength (sorter:Sorter) (newLength:SwitchCount) =

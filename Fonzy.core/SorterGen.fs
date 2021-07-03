@@ -58,7 +58,7 @@ module SorterGen =
     let fromTwoCycleArray (tc:TwoCyclePerm[]) =
         let switches = tc |> Seq.map(fun tc-> Switch.fromTwoCyclePerm tc)
                           |> Seq.concat |> Seq.toArray
-        Sorter.create tc.[0].degree switches
+        Sorter.fromSwitches tc.[0].degree switches
             
          
     let makeAltEvenOdd (degree:Degree) 
@@ -79,10 +79,9 @@ module SorterGen =
                      (stageCount:StageCount)
                      (switchFreq:SwitchFrequency) 
                      (rando:IRando) =
-        let switches = (Stage.rndSwitchSeq degree switchFreq rando)
-                        |> Seq.take ((StageCount.value stageCount) * (Degree.value degree) / 2)
-                        |> Seq.toArray
-        Sorter.create degree switches
+        let stages = Stage.rndSeq degree switchFreq rando
+                        |> Seq.take (StageCount.value stageCount)
+        Sorter.fromStages degree stages
 
 
     let randomBuddies (degree:Degree) 
@@ -90,7 +89,7 @@ module SorterGen =
                       (stageWindowSize:StageCount) 
                       (rando:IRando) =
 
-        let switches = (Stage.makeBuddyStages 
+        let switches = (Stage.rndBuddyStages 
                                 stageWindowSize 
                                 SwitchFrequency.max  
                                 degree 
@@ -100,7 +99,7 @@ module SorterGen =
                         |> Seq.collect(fun st -> st.switches |> List.toSeq)
                         |> Seq.toArray
 
-        Sorter.create degree switches
+        Sorter.fromSwitches degree switches
 
 
     let randomReflSymmetricBuddies (degree:Degree) 
@@ -110,7 +109,7 @@ module SorterGen =
 
         let stageTrials = ( (StageCount.value stageCount) * 100 ) 
                           |> StageCount.fromInt
-        let switches = (Stage.makeSymmetricBuddyStages
+        let switches = (Stage.rndSymmetricBuddyStages
                                 stageWindowSize
                                 SwitchFrequency.max
                                 degree 
@@ -121,7 +120,7 @@ module SorterGen =
                         |> Seq.collect(fun st -> st.switches |> List.toSeq)
                         |> Seq.toArray
 
-        Sorter.create degree switches
+        Sorter.fromSwitches degree switches
 
 
     let randomConjugatesOfEvenOdd (degree:Degree) 
@@ -130,7 +129,7 @@ module SorterGen =
         result {
             let perms = List.init 
                             ((StageCount.value stageCount) / 2)
-                            (fun _ -> TwoCyclePerm.makeRandomFullTwoCycle degree iRando)
+                            (fun _ -> TwoCyclePerm.rndFullTwoCycle degree iRando)
                         |> List.map (TwoCyclePerm.toPermutation)
 
             let! stp = perms |> TwoCycleGen.makeCoConjugateEvenOdd
@@ -157,7 +156,7 @@ module SorterGen =
         let switches = Switch.randomSwitchesOfDegree degree rnd
                     |> Seq.take (SwitchCount.value switchCount)
                     |> Seq.toArray
-        Sorter.create degree switches
+        Sorter.fromSwitches degree switches
 
 
     let mutateBySwitch 
@@ -310,7 +309,7 @@ module SorterRndGen =
                     yield! wSfx
                 }
             |> Seq.toArray
-        Sorter.create degree switches
+        Sorter.fromSwitches degree switches
             
 
     let fromTwoCyclePerms 
@@ -343,9 +342,10 @@ module SorterRndGen =
                      (stageCount:StageCount)
                      (switchFreq:SwitchFrequency) 
                      (rando:IRando) =
-        let switches = (Stage.rndSwitchSeq degree switchFreq rando)
-                        |> Seq.take ((StageCount.value stageCount) * 
-                                    (Degree.value degree) / 2)
+        let switches = (Stage.rndSeq degree switchFreq rando)
+                        |> Seq.take (StageCount.value stageCount)
+                        |> Seq.map (fun st -> st.switches)
+                        |> Seq.concat
         fromSwitchesAndPrefix degree wPfx switches
 
 
@@ -356,7 +356,7 @@ module SorterRndGen =
                       (rando:IRando) =
         
         let sc = (StageCount.fromInt (StageWindowSize.value stageWindowSize))
-        let switches = (Stage.makeBuddyStages 
+        let switches = (Stage.rndBuddyStages 
                                 sc 
                                 SwitchFrequency.max  
                                 degree 
@@ -375,7 +375,7 @@ module SorterRndGen =
 
         let stageTrials = ( (StageCount.value stageCount) * 100 ) |> StageCount.fromInt
         let sc = (StageCount.fromInt (StageWindowSize.value stageWindowSize))
-        let switches = (Stage.makeSymmetricBuddyStages
+        let switches = (Stage.rndSymmetricBuddyStages
                                 sc
                                 SwitchFrequency.max
                                 degree 
@@ -396,7 +396,7 @@ module SorterRndGen =
         result {
             let perms = List.init 
                             ((StageCount.value stageCount) / 2)
-                            (fun _ -> TwoCyclePerm.makeRandomFullTwoCycle degree iRando)
+                            (fun _ -> TwoCyclePerm.rndFullTwoCycle degree iRando)
                         |> List.map (TwoCyclePerm.toPermutation)
 
             let! stp = perms |> TwoCycleGen.makeCoConjugateEvenOdd

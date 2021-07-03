@@ -16,7 +16,7 @@ module SorterDto =
             let! switches = dto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
                                          |> Array.toList
                                          |> Result.sequence
-            return Sorter.create degree switches
+            return Sorter.fromSwitches degree switches
         }
     let fromJson (cereal:string) =
         result {

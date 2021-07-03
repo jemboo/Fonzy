@@ -228,7 +228,7 @@ type SortingIntsFixture () =
 
             let perms = List.init 
                             (StageCount.value stageCount)
-                            (fun _ -> TwoCyclePerm.makeRandomFullTwoCycle degree iRando)
+                            (fun _ -> TwoCyclePerm.rndFullTwoCycle degree iRando)
                         |> List.map (TwoCyclePerm.toPermutation)
             let perms2 = List.init 
                             (StageCount.value stageCount)

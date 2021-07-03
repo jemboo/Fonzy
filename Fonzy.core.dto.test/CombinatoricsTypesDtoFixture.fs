@@ -18,7 +18,7 @@ type CombinatoricsTypesDtoFixture () =
     member this.TwoCyclePermDto() =
         let randy = Rando.fromRngGen (RngGen.createLcg 321)
         let degree = Degree.fromInt 8
-        let perm = TwoCyclePerm.makeRandomTwoCycle degree randy 0.85
+        let perm = TwoCyclePerm.rndTwoCycle degree 0.85 randy 
         let dto = TwoCyclePermDto.toDto perm
         let permBack = TwoCyclePermDto.fromDto dto |> Result.ExtractOrThrow
         Assert.AreEqual(perm, permBack)

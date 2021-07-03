@@ -152,9 +152,9 @@ module TwoCyclePerm =
                         rnd 
         }
         
-    let makeRandomTwoCycle (degree:Degree) 
-                           (rnd:IRando) 
-                           (switchFreq:float) =
+    let rndTwoCycle (degree:Degree)
+                    (switchFreq:float) 
+                    (rnd:IRando) =
         let switchCount = Rando.multiDraw 
                             rnd 
                             switchFreq 
@@ -167,7 +167,9 @@ module TwoCyclePerm =
                             switchCount 
          }
     
-    let makeRandomFullTwoCycle (degree:Degree) (rnd:IRando) =
+
+    let rndFullTwoCycle (degree:Degree) 
+                        (rnd:IRando) =
         { 
             degree = degree; 
             values = Combinatorics.rndFullTwoCycleArray 
@@ -175,16 +177,20 @@ module TwoCyclePerm =
                             (Degree.value degree)
         }
 
+
     let reflect (twoCyclePerm:TwoCyclePerm) =
         let deg = (Degree.value twoCyclePerm.degree)
         let refV pos = Combinatorics.reflect deg
                                              pos
         let refl = Array.init 
-                        deg
-                        (fun dex -> 
-         twoCyclePerm.values.[refV dex] |> refV)
-        { degree = twoCyclePerm.degree; 
-          values = refl }
+                    deg
+                    (fun dex -> 
+         twoCyclePerm.values.[refV dex] 
+         |> refV)
+        {
+            degree = twoCyclePerm.degree; 
+            values = refl 
+        }
 
 
     let rndSymmetric (degree:Degree) 
