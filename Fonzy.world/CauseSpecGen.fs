@@ -2,6 +2,7 @@
 open System
 
 module SorterPerfBinGen =
+
     let rndSortersBaseId = Guid.Parse "00000000-0000-0000-0000-000000000002"
 
     let makeCauseSpec
@@ -40,8 +41,8 @@ module SorterPerfBinGen =
         elif (Degree.value degree) = 20 then
              (SorterCount.fromInt 10000)
         elif (Degree.value degree) = 22 then
-             (SorterCount.fromInt 1000)
-        else (SorterCount.fromInt 1)
+             (SorterCount.fromInt 4000)
+        else (SorterCount.fromInt 1000)
 
 
     let sorterCountForDegreeTest (degree:Degree) = 
@@ -59,43 +60,76 @@ module SorterPerfBinGen =
             | 18 ->  [ 1; 2; 3; 4; 5; 6; 7; 8; ]
             | 20 ->  [ 1; 3; 5; 7; 9; ]
             | 22 ->  [ 1; 3; 5; 7; 9; ]
-            | _ ->   [ 1; 3; 5; 7; 9; 11; ]
+            | _ ->   [ 1; 3; 5; 7; 9; 11;]
         awys |> List.map(StageCount.fromInt)
+
+
+    let makeBuddyArgs degreesToTest (stageCtr:Degree->StageCount) = 
+        let wNd = degreesToTest 
+                    |> List.map(fun d -> 
+                        (buddyStageWindows d) |> List.map(fun tc -> (tc, d)))
+                    |> List.concat
+        wNd |> List.map(fun (wc, d) -> ((d |> stageCtr), wc, d))
+
+
+    let tup900Switches (degree:Degree) =
+        ((degree |> SwitchCount.degreeTo900SwitchCount), degree)
+
+    let tup900Stages (degree:Degree) =
+        ((degree |> StageCount.degreeTo900StageCount), degree)
+
+    let makeBuddyArgs900 degreesToTest = 
+        makeBuddyArgs degreesToTest 
+                      StageCount.degreeTo900StageCount
+
+    let makeRandSwitches900 degreesToTest =
+        degreesToTest |> List.map(tup900Switches >> SorterGen.RandSwitches)
+
+    let makeRandStages900 degreesToTest =
+        degreesToTest |> List.map(tup900Stages >> SorterGen.RandStages)
+
+    let makeRandCoComp900 degreesToTest =
+        degreesToTest |> List.map(tup900Stages >> SorterGen.RandCoComp)
+
+    let makeRandSymmetric900 degreesToTest =
+        degreesToTest |> List.map(tup900Stages >> SorterGen.RandSymmetric)
+
+    let makeRandBuddies900 degreesToTest =
+        (makeBuddyArgs900 degreesToTest) |> List.map(SorterGen.RandBuddies)
+
+    let makeRandSymmetricBuddies900 degreesToTest =
+        (makeBuddyArgs900 degreesToTest) |> List.map(SorterGen.RandSymmetricBuddies)
+
 
 
     let tup999Switches (degree:Degree) =
         ((degree |> SwitchCount.degreeTo999SwitchCount), degree)
 
-
     let tup999Stages (degree:Degree) =
         ((degree |> StageCount.degreeTo999StageCount), degree)
 
+    let makeBuddyArgs999 degreesToTest = 
+        makeBuddyArgs degreesToTest 
+                      StageCount.degreeTo999StageCount
+        
+    let makeRandSwitches999 degreesToTest =
+        degreesToTest |> List.map(tup999Switches >> SorterGen.RandSwitches)
 
-    let makeBuddyArgs degreesToTest = 
-        let wNd = degreesToTest 
-                    |> List.map(fun d -> 
-                        (buddyStageWindows d) |> List.map(fun tc -> (tc, d)))
-                    |> List.concat
-        wNd |> List.map(fun (wc, d) -> ((d |> StageCount.degreeTo999StageCount), wc, d))
+    let makeRandStages999 degreesToTest =
+        degreesToTest |> List.map(tup999Stages >> SorterGen.RandStages)
 
+    let makeRandCoComp999 degreesToTest =
+        degreesToTest |> List.map(tup999Stages >> SorterGen.RandCoComp)
 
-    let makeRandSwitches degreesToTest =
-        degreesToTest |> List.map(fun d -> SorterGen.RandSwitches (d |> tup999Switches))
+    let makeRandSymmetric999 degreesToTest =
+        degreesToTest |> List.map(tup999Stages >> SorterGen.RandSymmetric)
 
-    let makeRandStages degreesToTest =
-        degreesToTest |> List.map(fun d -> SorterGen.RandStages (d |> tup999Stages))
+    let makeRandBuddies999 degreesToTest =
+        (makeBuddyArgs999 degreesToTest) |> List.map(SorterGen.RandBuddies)
 
-    let makeRandCoComp degreesToTest =
-        degreesToTest |> List.map(fun d -> SorterGen.RandCoComp (d |> tup999Stages))
+    let makeRandSymmetricBuddies999 degreesToTest =
+        (makeBuddyArgs999 degreesToTest) |> List.map(SorterGen.RandSymmetricBuddies)
 
-    let makeRandSymmetric degreesToTest =
-        degreesToTest |> List.map(fun d -> SorterGen.RandSymmetric (d |> tup999Stages))
-
-    let makeRandBuddies degreesToTest =
-        (makeBuddyArgs degreesToTest) |> List.map(SorterGen.RandBuddies )
-
-    let makeRandSymmetricBuddies degreesToTest = 
-        (makeBuddyArgs degreesToTest) |> List.map(SorterGen.RandSymmetricBuddies)
 
     let makeRunBatchSeq (seed:int) (outputDir:string)= 
         let randy = RngGen.createLcg seed |> Rando.fromRngGen
@@ -103,7 +137,7 @@ module SorterPerfBinGen =
             RngGen.createLcg randy.NextPositiveInt
 
         let degreesToTest = 
-            [ 24; 20;] //14; 16; 22; 24;]
+            [ 8; 10; 12; 14; 16; 18; 20; 22; 24;] //14; 16; 22; 24;]
             //   [ 14; 16; 18; 24;]
              |> List.map (Degree.fromInt)
 
@@ -112,9 +146,9 @@ module SorterPerfBinGen =
                 // (makeRandStages degreesToTest) |> List.append
                 // (makeRandCoComp degreesToTest) |> List.append
                 // (makeRandSymmetric degreesToTest) |> List.append
-                 //(makeRandSymmetricBuddies degreesToTest) |> List.append
-                 //  (makeRandBuddies degreesToTest)
-                 (makeRandBuddies degreesToTest)
+                 //(makeRandStages999 degreesToTest) |> List.append
+                 // (makeRandStages900 degreesToTest) |> List.append
+                  (makeRandSymmetric900 degreesToTest)
 
         let mcsW (dex:int) (sorterGen:SorterGen) = 
             let degree = sorterGen |> SorterGen.getDegree

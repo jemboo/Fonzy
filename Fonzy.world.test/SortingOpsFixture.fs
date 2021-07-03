@@ -233,7 +233,6 @@ type SortingOpsFixture () =
          Assert.AreEqual(intBitsFourStage, intBitsTwoStep)
 
 
-
     [<TestMethod>]
     member this.removeDupesBP64ByStage() =
   

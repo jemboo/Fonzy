@@ -116,7 +116,6 @@ module SortingBp64 =
             | Sorting.SwitchUsePlan.Indexes (min, max, weights) -> 
                 (min, max, (SwitchUseB64.init sorter.switchCount weights))
 
-        let switchUseB64 = (SwitchUseB64.createEmpty sorter.switchCount)
         let bp64SetsRolloutCopy = (BP64SetsRollout.copy bp64SetsRollout)
         let mutable sortableIndex = 0
         while (sortableIndex < bp64SetsRollout.baseArray.Length) do

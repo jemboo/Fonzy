@@ -5,6 +5,9 @@ open System
 type Switch = {low:int; hi:int}
 module Switch =
 
+    let toString (sw:Switch) =
+        sprintf "(%d, %d)" sw.low sw.hi
+
     let switchMap = 
         [for hi=0 to 64 
             do for low=0 to hi do yield {Switch.low=low; Switch.hi=hi}]
@@ -29,9 +32,6 @@ module Switch =
     let fromTwoCyclePerm (p:TwoCyclePerm) =
         fromIntArray (TwoCyclePerm.arrayValues p)
     
-    let toString (sw:Switch) =
-        sprintf "(%d, %d)" sw.low sw.hi
-
     let switchCountForDegree (order:Degree)  =
         uint32 ((Degree.value order)*(Degree.value order + 1) / 2)
 
@@ -42,6 +42,16 @@ module Switch =
         seq { while true do 
                     let p = (int (rnd.NextUInt % maxDex))
                     yield switchMap.[p] }
+    
+
+    let rndSymmetric (degree:Degree)
+                     (rnd:IRando) =
+        let aa (rnd:IRando)  = 
+            (TwoCyclePerm.rndSymmetric 
+                                degree 
+                                rnd )
+                    |> fromTwoCyclePerm
+        seq { while true do yield! (aa rnd) }
 
 
     let mutateSwitches (order:Degree) 
@@ -63,7 +73,9 @@ module Switch =
           Switch.hi = sw.low |> Combinatorics.reflect deg; }
 
 
+
 type Stage = {switches:Switch list; degree:Degree}
+
 module Stage =
 
     // returns a list of switches found in all of the stages
@@ -77,15 +89,9 @@ module Stage =
         seq { for stage in stages do yield! stage.switches }
         |> CollectionUtils.itemsOccuringMoreThanOnce
 
-    //// returns a sequence of switches found more than once
-    //let windowBuddies (windowSize:int) 
-    //                  (stages:Stage seq) =
-    //    stages |> CollectionUtils.maxWindowed windowSize
-    //           |> Seq.map(switchPairwiseIntersections >> Seq.toList)
 
-
-    let mergeSwitchesIntoStages (degree:Degree) 
-                                (switches:seq<Switch>) =
+    let fromSwitches (degree:Degree) 
+                     (switches:seq<Switch>) =
         let mutable stageTracker = Array.init (Degree.value degree) 
                                               (fun _ -> false)
         let switchesForStage = new ResizeArray<Switch>()
@@ -125,7 +131,7 @@ module Stage =
 
     let getStageCount (degree:Degree) 
                       (switches:seq<Switch>) =
-            mergeSwitchesIntoStages degree switches 
+            fromSwitches degree switches 
                     |> Seq.length
                     |> StageCount.create ""
 
@@ -167,9 +173,9 @@ module Stage =
         {switches=switches |> Seq.toList; degree=degree}
 
 
-    let makeRandomStagedSwitchSeq (degree:Degree) 
-                                  (switchFreq:SwitchFrequency) 
-                                  (rnd:IRando) =
+    let rndSwitchSeq (degree:Degree) 
+                     (switchFreq:SwitchFrequency) 
+                     (rnd:IRando) =
         let aa (rnd:IRando)  = 
             (TwoCyclePerm.makeRandomTwoCycle 
                                 degree 
@@ -179,22 +185,11 @@ module Stage =
         seq { while true do yield! (aa rnd) }
 
 
-    let makeRandomStagedReflSymmetricSwitchSeq 
-                                  (degree:Degree)
-                                  (rnd:IRando) =
-        let aa (rnd:IRando)  = 
-            (TwoCyclePerm.makeReflSymmetric 
-                                degree 
-                                rnd )
-                    |> Switch.fromTwoCyclePerm
-        seq { while true do yield! (aa rnd) }
-
-
-    let makeRandomReflSymmetricStages 
-                             (degree:Degree) 
-                             (rnd:IRando) =
-        makeRandomStagedReflSymmetricSwitchSeq degree rnd
-        |> mergeSwitchesIntoStages degree
+    let randomSymmetric 
+                (degree:Degree) 
+                (rnd:IRando) =
+        Switch.rndSymmetric degree rnd
+        |> fromSwitches degree
 
 
     let randomMutate (rnd:IRando) 
@@ -252,8 +247,8 @@ module Stage =
                         (degree:Degree) 
                         (rnd:IRando) 
                         (stagesPfx:Stage list)  =
-        let stageSeq = (makeRandomStagedSwitchSeq degree switchFreq  rnd 
-                        |> mergeSwitchesIntoStages degree)
+        let stageSeq = (rndSwitchSeq degree switchFreq  rnd 
+                        |> fromSwitches degree)
 
         let maxWindow = (StageCount.value stageWindowSize)
         let mutable window = stagesPfx |> CollectionUtils.last maxWindow
@@ -287,10 +282,10 @@ module Stage =
                 (stagesPfx:Stage list)
                 (trialStageCount:StageCount) 
                 (stageCount:StageCount) =
-         let trial =  toBuddyStages stagesPfx
+
+         let trial = toBuddyStages stagesPfx
                         stageWindowSize
-                        (makeRandomStagedReflSymmetricSwitchSeq degree rnd 
-                           |> mergeSwitchesIntoStages degree)
+                        (randomSymmetric degree rnd)
                         stageCount
                         trialStageCount
                         |> Seq.toArray

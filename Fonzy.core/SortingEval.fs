@@ -1,5 +1,7 @@
 ﻿namespace global
 
+open System
+
 module SortingEval =
 
     type noGrouping  = 

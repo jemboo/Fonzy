@@ -84,6 +84,19 @@ module SwitchCount =
                     | 31 -> 180 | 32 -> 185 | _ -> 0
         create "" ct |> Result.ExtractOrThrow
 
+
+    let degreeTo900SwitchCount (degree:Degree) =
+        let d = (Degree.value degree)
+        let ct = match d with
+                    | 6  | 7 -> 100     | 8  | 9 -> 160
+                    | 10 | 11 -> 300    | 12 | 13 -> 400
+                    | 14 | 15 -> 500    | 16 | 17 -> 800
+                    | 18 | 19 -> 1000   | 20 | 21 -> 1300
+                    | 22 | 23 -> 1600   | 24 | 25 -> 1900
+                    | _ -> 0
+        create "" ct |> Result.ExtractOrThrow
+
+
     let degreeTo999SwitchCount (degree:Degree) =
         let d = (Degree.value degree)
         let ct = match d with
@@ -159,6 +172,33 @@ module StageCount =
                     | 22 | 23 | 24 | 25 -> 240
                     | _ -> 0
         create "" ct |> Result.ExtractOrThrow
+
+    let degreeTo900StageCount (degree:Degree) =
+        let d = (Degree.value degree)
+        let ct = match d with
+                    | 8 | 9 -> 35
+                    | 10 | 11 -> 50
+                    | 12 | 13 -> 60
+                    | 14 | 15 -> 65
+                    | 16 | 17 -> 95
+                    | 18 | 19 -> 110
+                    | 20 | 21 -> 120
+                    | 22 | 23 -> 130
+                    | 24 | 25 -> 140
+                    | _ -> 0
+        create "" ct |> Result.ExtractOrThrow
+
+    //let degreeTo500StageCount (degree:Degree) =
+    //    let d = (Degree.value degree)
+    //    let ct = match d with
+    //                | 8 | 9 -> 50
+    //                | 10 | 11 | 12 | 13 | 14 | 15 -> 70
+    //                | 16 | 17 | 18 | 19 | 20 | 21 -> 110
+    //                | 22 | 23 | 24 | 25 -> 120
+    //                | _ -> 0
+    //    create "" ct |> Result.ExtractOrThrow
+
+
 
 
 module StageWindowSize =

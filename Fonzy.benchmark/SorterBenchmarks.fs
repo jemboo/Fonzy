@@ -138,7 +138,7 @@ type BenchSorterSetOnInts() =
 type BenchmarkSorterOnBp64() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
-    let sortableSetbp64 = SortableSetBp64.allIntBits degree
+    let sortableSetbp64 = SortableSetBp64.allBp64 degree
 
     let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
     let rollout = BP64SetsRollout.allBinary degree |> Result.ExtractOrThrow

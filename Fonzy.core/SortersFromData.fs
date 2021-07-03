@@ -51,7 +51,7 @@ module SorterWriter =
         myPrint"]\n"
 
     let private _formatSwitches (degree:Degree) (switches:seq<Switch>) =
-        let stages = Stage.mergeSwitchesIntoStages degree switches
+        let stages = Stage.fromSwitches degree switches
         stages |> Seq.iter(_formatStage)
         myPrint"\n"
 
@@ -92,22 +92,22 @@ module RefSorter =
             qua.Value
 
         match refSorter with
-        | Degree3 -> (SorterData.Degree3Str, d 3) |> Ok        | Degree4 -> (SorterData.Degree4Str, d 4) |> Ok 
-        | Degree4Prefix2 -> (SorterData.Degree4Prefix2Str, d 4) |> Ok 
-        | Degree5 -> (SorterData.Degree5Str, d 5) |> Ok         | Degree6 -> (SorterData.Degree6Str, d 6) |> Ok 
-        | Degree7 -> (SorterData.Degree7Str, d 7) |> Ok         | Degree8 -> (SorterData.Degree8Str, d 8) |> Ok         
-        | Degree9 -> (SorterData.Degree9Str, d 9) |> Ok         | Degree8Prefix3 -> (SorterData.Degree8Prefix3Str, d 8) |> Ok 
-        | Degree10 -> (SorterData.Degree10Str, d 10) |> Ok      | Degree11 -> (SorterData.Degree11Str, d 11) |> Ok 
-        | Degree12 -> (SorterData.Degree12Str, d 12) |> Ok     | Degree13 -> (SorterData.Degree13Str, d 13) |> Ok 
-        | Degree14 -> (SorterData.Degree14Str, d 14) |> Ok     | Degree15 -> (SorterData.Degree15Str, d 15) |> Ok 
+        | Degree3 -> (SorterData.Degree3Str, d 3) |> Ok          | Degree4 -> (SorterData.Degree4Str, d 4) |> Ok 
+        | Degree4Prefix2 -> (SorterData.Degree4Prefix2Str, d 4)  |> Ok 
+        | Degree5 -> (SorterData.Degree5Str, d 5) |> Ok          | Degree6 -> (SorterData.Degree6Str, d 6) |> Ok 
+        | Degree7 -> (SorterData.Degree7Str, d 7) |> Ok          | Degree8 -> (SorterData.Degree8Str, d 8) |> Ok         
+        | Degree9 -> (SorterData.Degree9Str, d 9) |> Ok          | Degree8Prefix3 -> (SorterData.Degree8Prefix3Str, d 8) |> Ok 
+        | Degree10 -> (SorterData.Degree10Str, d 10) |> Ok       | Degree11 -> (SorterData.Degree11Str, d 11) |> Ok 
+        | Degree12 -> (SorterData.Degree12Str, d 12) |> Ok       | Degree13 -> (SorterData.Degree13Str, d 13) |> Ok 
+        | Degree14 -> (SorterData.Degree14Str, d 14) |> Ok       | Degree15 -> (SorterData.Degree15Str, d 15) |> Ok 
         | Degree16 -> (SorterData.Degree16Str, d 16) |> Ok 
-        | Green16 -> (SorterData.Degree16_Green, d 16) |> Ok    | End16 -> (SorterData.Degree16_END, d 16) |> Ok 
+        | Green16 -> (SorterData.Degree16_Green, d 16) |> Ok     | End16 -> (SorterData.Degree16_END, d 16) |> Ok 
         | Green16m -> (SorterData.Degree16_GreenM, d 16) |> Ok   | End16m -> (SorterData.Degree16_ENDM, d 16) |> Ok
-        | Degree17 -> (SorterData.Degree17Str, d 17) |> Ok      | Degree18 -> (SorterData.Degree18Str, d 18) |> Ok 
-        | Degree20 -> (SorterData.Degree20Str, d 20) |> Ok      | Degree22 -> (SorterData.Degree22Str, d 22) |> Ok 
-        | Degree23 -> (SorterData.Degree23Str, d 23) |> Ok      | Degree24 -> (SorterData.Degree24aStr, d 24) |> Ok 
-        | Degree25 -> (SorterData.Degree25Str, d 25) |> Ok      | Degree26 -> (SorterData.Degree26Str, d 26) |> Ok 
-        | Degree28 -> (SorterData.Degree28Str, d 28) |> Ok      | Degree32 -> (SorterData.Degree32Str, d 32) |> Ok 
+        | Degree17 -> (SorterData.Degree17Str, d 17) |> Ok       | Degree18 -> (SorterData.Degree18Str, d 18) |> Ok 
+        | Degree20 -> (SorterData.Degree20Str, d 20) |> Ok       | Degree22 -> (SorterData.Degree22Str, d 22) |> Ok 
+        | Degree23 -> (SorterData.Degree23Str, d 23) |> Ok       | Degree24 -> (SorterData.Degree24aStr, d 24) |> Ok 
+        | Degree25 -> (SorterData.Degree25Str, d 25) |> Ok       | Degree26 -> (SorterData.Degree26Str, d 26) |> Ok 
+        | Degree28 -> (SorterData.Degree28Str, d 28) |> Ok       | Degree32 -> (SorterData.Degree32Str, d 32) |> Ok 
         | _ -> "no match found in GetStringAndDegree" |> Error
 
 

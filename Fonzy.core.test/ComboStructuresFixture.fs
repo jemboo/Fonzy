@@ -164,7 +164,7 @@ type ComboStructuresFixture () =
        let degree = Degree.fromInt 16
        let rnd = Rando.LcgFromSeed 424
        let refSyms = Array.init 100 (fun _ ->
-           TwoCyclePerm.makeReflSymmetric
+           TwoCyclePerm.rndSymmetric
                                         degree
                                         rnd)
        let smyr = refSyms |> Array.toSeq
@@ -188,7 +188,7 @@ type ComboStructuresFixture () =
         let switchFreq = SwitchFrequency.fromFloat 0.5
         let degree = Degree.fromInt 16
         let switchCount = SwitchCount.fromInt 8
-        let stageTupes = Stage.makeRandomStagedSwitchSeq degree switchFreq rndy
+        let stageTupes = Stage.rndSwitchSeq degree switchFreq rndy
                          |> Seq.map(fun s -> (s.low, s.hi))
                          |> Seq.take (SwitchCount.value switchCount)
         let twoCycle = TwoCyclePerm.makeFromTupleSeq degree stageTupes
@@ -290,9 +290,7 @@ type ComboStructuresFixture () =
                          pos
      let bitsBack = BitsP32.stripeRead blank 
                                        pos
-
      let decoded = IntBits.toInteger bitsBack
-
      Assert.AreEqual (encodedVal, decoded)
 
 

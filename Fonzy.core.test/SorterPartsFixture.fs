@@ -13,7 +13,7 @@ type SorterPartsFixture () =
         let stageCount = StageCount.fromInt 2
 
         let startingStages() = 
-            Stage.makeRandomReflSymmetricStages
+            Stage.randomSymmetric
                         degree
                         randy
                 |> Seq.take (StageCount.value stageCount)
@@ -33,7 +33,7 @@ type SorterPartsFixture () =
         let stageCount = StageCount.fromInt 4
 
         let startingStages() = 
-            Stage.makeRandomReflSymmetricStages
+            Stage.randomSymmetric
                         degree
                         randy
                 |> Seq.take (StageCount.value stageCount)

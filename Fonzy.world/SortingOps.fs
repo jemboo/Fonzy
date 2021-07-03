@@ -7,7 +7,7 @@ module SortingOps =
     module Sorter =
         let eval
                 (sorter:Sorter)
-                (sortableSet:SortableSet)
+                (sortableSet:sortableSet)
                 (switchusePlan:Sorting.SwitchUsePlan) 
                 (switchEventAgg:Sorting.EventGrouping) =
 
@@ -34,11 +34,46 @@ module SortingOps =
                                   switchEventAgg
 
 
+    module SortableSet =
+
+        let switchReduce (sSet:sortableSet) 
+                         (switches:seq<Switch>) = 
+            let degree = sSet |> SortableSet.degree
+            let sorter = Sorter.create 
+                            degree
+                            switches
+
+            let res = Sorter.eval
+                            sorter
+                            sSet
+                            Sorting.SwitchUsePlan.All
+                            Sorting.EventGrouping.BySwitch
+
+            let uniBts = res |> SwitchEventRecords.getSortableSetRollout
+                             |> SortableSetRollout.removeDupes
+                             |> Seq.toArray
+
+            match sSet with
+            | sortableSet.Binary _ -> 
+                uniBts
+                    |> SortableSetBinary.fromIntBits degree
+                    |> sortableSet.Binary
+            | sortableSet.Bp64 _ -> 
+                uniBts
+                    |> SortableSetBp64.fromIntBits degree
+                    |> sortableSet.Bp64
+            | sortableSet.Integer _ -> 
+                uniBts
+                    |> SortableSetInteger.fromIntBits degree
+                    |> sortableSet.Integer
+
+
+
     module SorterSet =
 
       let eval<'T> 
              (sorterSet:SorterSet)
-             (sortableSet:SortableSet)
+             (sortableSet:sortableSet)
              (switchusePlan:Sorting.SwitchUsePlan) 
              (switchEventAgg:Sorting.EventGrouping) 
              (_parallel:UseParallel) 
@@ -57,7 +92,7 @@ module SortingOps =
                                     switchEventAgg
                                     _parallel
                                     proc
-                    } 
+                    }
 
              | Integer ssb -> 
                     result {
@@ -90,7 +125,7 @@ module SortingOps =
 
       let getSorterCoverageBins 
             (sorterSet:SorterSet)
-            (sortableSet:SortableSet)
+            (sortableSet:sortableSet)
             (switchusePlan:Sorting.SwitchUsePlan)
             (checkSuccess:bool)
             (_parallel:UseParallel) =

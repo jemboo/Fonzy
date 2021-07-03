@@ -148,7 +148,7 @@ module Combinatorics =
         if aBit < bBit then aBit, bBit
         else bBit, aBit
 
-    let makeRandomMonoTwoCycle (degree:Degree) 
+    let rndMonoTwoCycle (degree:Degree) 
                                (rnd:IRando) =
         let tup = drawTwoWithoutRep degree rnd
         makeMonoTwoCycle degree (fst tup) (snd tup)
@@ -263,7 +263,7 @@ module Combinatorics =
                            (degree:int) =
          Seq.initInfinite (fun n -> randomPermutation rnd degree)
 
-    let makeRandomTwoCycleIntArray (rnd:IRando) 
+    let rndTwoCycleArray (rnd:IRando) 
                                    (arraysize:int) 
                                    (cycleCount:int) =
         let initialList = [|0 .. arraysize-1|]
@@ -275,14 +275,9 @@ module Combinatorics =
             arrayRet.[rndTupes.[i].[1]] <- rndTupes.[i].[0]
         arrayRet
 
-    let makeRandomFullTwoCycleIntArray (rnd:IRando) 
+    let rndFullTwoCycleArray (rnd:IRando) 
                                        (arraysize:int) =
-        makeRandomTwoCycleIntArray rnd arraysize (arraysize/2)
+        rndTwoCycleArray rnd arraysize (arraysize/2)
 
-    let MakeRandomFullTwoCycleIntArrays (rnd:IRando) 
-                                        (arraysize:int) 
-                                        (count:int) =
-        seq {1 .. count} |> Seq.map (fun i -> 
-            makeRandomFullTwoCycleIntArray rnd arraysize)
 
 

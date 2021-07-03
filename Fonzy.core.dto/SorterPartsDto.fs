@@ -26,7 +26,7 @@ module SorterDto =
     let toDto (sorter:Sorter) =
         {
             SorterDto.degree = (Degree.value sorter.degree); 
-            switches = sorter.switches |> Array.map(fun sw -> SwitchDto.toDto sw)
+            switches = sorter.switches |> Array.map(SwitchDto.toDto)
         }
     let toJson (sorter:Sorter) =
         sorter |> toDto |> Json.serialize
@@ -217,7 +217,7 @@ module SorterRndGenDto =
             let switchListDto = switchList |> List.toArray 
                                 |> Array.map(fun sw -> SwitchDto.toDto sw)
             {SorterRndGenDto.cat="RandSwitches"; prams=prams; switches=switchListDto; } 
-        | sorterRndGen.RandStages (switchList, tc, d) -> 
+        | sorterRndGen.RandStages (switchList, tc, d) ->
             let prams = 
                 [
                     ("stageCount", (StageCount.value tc) |> string);
@@ -225,8 +225,8 @@ module SorterRndGenDto =
                 ] |> Map.ofList                
             let switchListDto = switchList |> List.toArray 
                                     |> Array.map(fun sw -> SwitchDto.toDto sw)
-            {SorterRndGenDto.cat="RandStages"; prams=prams; switches=switchListDto; } 
-        | sorterRndGen.RandBuddies (switchList, tc, ws, d) -> 
+            { SorterRndGenDto.cat="RandStages"; prams=prams; switches=switchListDto; } 
+        | sorterRndGen.RandBuddies (switchList, tc, ws, d) ->
             let prams = 
                 [
                     ("stageCount", (StageCount.value tc) |> string);
@@ -235,8 +235,8 @@ module SorterRndGenDto =
                 ] |> Map.ofList
             let switchListDto = switchList |> List.toArray 
                                 |> Array.map(fun sw -> SwitchDto.toDto sw)
-            {SorterRndGenDto.cat="RandBuddies"; prams=prams; switches=switchListDto; } 
-        | sorterRndGen.RandSymmetric (switchList, tc, d) -> 
+            { SorterRndGenDto.cat="RandBuddies"; prams=prams; switches=switchListDto; } 
+        | sorterRndGen.RandSymmetric (switchList, tc, d) ->
             let prams = 
                 [
                     ("stageCount", (StageCount.value tc) |> string);
@@ -244,9 +244,9 @@ module SorterRndGenDto =
                 ] |> Map.ofList            
             let switchListDto = switchList |> List.toArray 
                                 |> Array.map(fun sw -> SwitchDto.toDto sw)
-            {SorterRndGenDto.cat="RandSymmetric"; prams=prams; switches=switchListDto; } 
-        | sorterRndGen.RandSymmetricBuddies (switchList, tc, ws, d) -> 
-            let prams = 
+            { SorterRndGenDto.cat="RandSymmetric"; prams=prams; switches=switchListDto; } 
+        | sorterRndGen.RandSymmetricBuddies (switchList, tc, ws, d) ->
+            let prams =
                 [
                     ("stageCount", (StageCount.value tc) |> string);
                     ("windowSize", (StageWindowSize.value ws) |> string);
@@ -254,7 +254,7 @@ module SorterRndGenDto =
                 ] |> Map.ofList
             let switchListDto = switchList |> List.toArray 
                                 |> Array.map(fun sw -> SwitchDto.toDto sw)
-            {SorterRndGenDto.cat="RandSymmetricBuddies"; prams=prams; switches=switchListDto; } 
+            { SorterRndGenDto.cat="RandSymmetricBuddies"; prams=prams; switches=switchListDto; } 
 
 
 

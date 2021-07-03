@@ -57,8 +57,8 @@ module IntSetsRollout =
 
     let toIntBits (intsRoll:IntSetsRollout) =
         let d = (Degree.value intsRoll.degree)
-        intsRoll.baseArray |> Array.chunkBySize d
-                            |> Array.map(fun a -> {IntBits.values = a})
+        intsRoll.baseArray |> Seq.chunkBySize d
+                           |> Seq.map(fun a -> {IntBits.values = a})
 
 
     let copy (intsRoll:IntSetsRollout) =
@@ -77,7 +77,7 @@ module IntSetsRollout =
 
     let isSorted (intsRoll:IntSetsRollout) =
         intsRoll |> toIntBits 
-                 |> Array.forall(IntBits.isSorted)
+                 |> Seq.forall(IntBits.isSorted)
 
 
     let sortedCount (intsRoll:IntSetsRollout) =
@@ -154,7 +154,7 @@ module BP64SetsRollout =
     let toIntBits (ssRollout:bP64SetsRollout) =
         ssRollout |> toBitsP64
                   |> BitsP64.toIntBits
-                  |> Seq.toArray
+                 // |> Seq.toArray
 
     let isSorted (bp64Roll:bP64SetsRollout) =
         bp64Roll |> toIntBits 

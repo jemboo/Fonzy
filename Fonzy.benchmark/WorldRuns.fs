@@ -1,14 +1,17 @@
 ﻿namespace global
 open System
 
-module RunBp64 =
+module RunBatch =
 
     let runBatchSeq (outputDir:string) 
                     (seed:int) 
                     (firstDex:int) =
 
         let runBatch (causeSpecDescr, outputDir, causeSpec) =
-            let res = Runs.runCauseSpec causeSpecDescr outputDir causeSpec
+            
+            Console.WriteLine(string causeSpecDescr)
+
+            let res = Runs.runCauseSpec outputDir causeSpec
             match res with
             | Ok b -> b |> ignore
             | Error m -> Console.WriteLine m
@@ -58,13 +61,14 @@ module RunBp64 =
             }
 
         let formatPerfBinTotal (bt:(string*SortingEval.sorterPerfBin)*int) = 
-            let sorterGenInfo = (fst >> fst) bt
+            let sorterGenInfo, perfBin = fst bt
             let binCount = snd bt
-            let perfBin = (fst >> snd) bt
-            sprintf "%s\t%d\t%d\t%d" sorterGenInfo
-                                     (SwitchCount.value perfBin.usedSwitchCount) 
-                                     (StageCount.value perfBin.usedStageCount) 
-                                     binCount
+            //let perfBin = (fst >> snd) bt
+            sprintf "%s\t%d\t%d\t%d" 
+                        sorterGenInfo
+                        (SwitchCount.value perfBin.usedSwitchCount) 
+                        (StageCount.value perfBin.usedStageCount) 
+                        binCount
 
         let perfBinsInfo = repNs |> List.map(perfBinsFromGuid)
                                 |> Result.sequence
@@ -83,7 +87,7 @@ module RunBp64 =
                                             (fst k, (snd k) |> Array.sumBy(snd)))
 
         let rep = perfBinTotals |> Array.map(formatPerfBinTotal)
-        let header = "Gen win degree switch stage count"
+        let header = "Gen len win degree switch stage count"
         let fileName = sprintf "%s.txt"  (System.DateTime.Now.Ticks |> string)
         let csvFile = { csvFile.header = header; 
                         csvFile.directory = reportDir;

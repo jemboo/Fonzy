@@ -35,7 +35,7 @@ type CombinatoricsFixture () =
       let degree = Degree.create "" 5 |> Result.ExtractOrThrow
       let rnd = Rando.LcgFromSeed 424 
       let ts = seq {0 .. 10} 
-                    |> Seq.map(fun _ -> Combinatorics.makeRandomMonoTwoCycle degree rnd)
+                    |> Seq.map(fun _ -> Combinatorics.rndMonoTwoCycle degree rnd)
                     |> Seq.toArray
       Assert.IsTrue (ts.Length = 11)
 
@@ -150,7 +150,7 @@ type CombinatoricsFixture () =
         let randy = Rando.LcgFromSeed 123
         let mutable i = 0
         while i<100 do
-            let tc = Combinatorics.makeRandomFullTwoCycleIntArray randy (Degree.value degree)
+            let tc = Combinatorics.rndFullTwoCycleArray randy (Degree.value degree)
             let conjer = Combinatorics.randomPermutation randy (Degree.value degree)
             let conj = Combinatorics.conjugateIntArrays tc conjer
             Assert.IsTrue(Combinatorics.isTwoCycle conj)
@@ -172,10 +172,10 @@ type CombinatoricsFixture () =
         let randy = Rando.LcgFromSeed 123
         let arraySize = 16
         let cycleCount = 2
-        let block = Combinatorics.makeRandomTwoCycleIntArray randy arraySize cycleCount
+        let block = Combinatorics.rndTwoCycleArray randy arraySize cycleCount
         Assert.IsTrue (Combinatorics.isTwoCycle block)
         let cycleCount = 8
-        let block2 = Combinatorics.makeRandomTwoCycleIntArray randy arraySize cycleCount
+        let block2 = Combinatorics.rndTwoCycleArray randy arraySize cycleCount
         Assert.IsTrue (Combinatorics.isTwoCycle block2)
 
 

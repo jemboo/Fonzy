@@ -27,6 +27,7 @@ module SwitchUses =
                weights = weightsSum;
            } |> Ok
 
+
    let getUsedSwitches (switchUses:SwitchUses) (sorter:Sorter) =
        let useCount = SwitchCount.value switchUses.switchCount
        let switches = sorter.switches
@@ -65,11 +66,14 @@ module SwitchUses =
                              |> Array.length
                              |> SwitchCount.fromInt
 
+
    let getSwitchActionTotal (switchUses:SwitchUses) =
        (getWeights switchUses) |> Array.sum
 
+
    let entropyBits (switchUses:SwitchUses) =
        (getWeights switchUses) |> Combinatorics.entropyBits
+
 
    let getRefinedStageCount (switchUses:SwitchUses) 
                             (sorter:Sorter) =
@@ -85,7 +89,7 @@ module SwitchUses =
        result {
            let! usedSwitches = getUsedSwitches switchUses sorter
            let degree = sorter.degree
-           let stages = Stage.mergeSwitchesIntoStages degree usedSwitches |> Seq.toArray
+           let stages = Stage.fromSwitches degree usedSwitches |> Seq.toArray
            let switches = seq {for i in 0 .. (stages.Length - 1) do yield! stages.[i].switches}
            return Sorter.create degree switches
        }
@@ -111,6 +115,7 @@ module SwitchUses =
                                            (StageCount.value d)
            | Error msg -> sprintf "%s" msg ) 
            stats
+
 
    let reportStats stats =
        StringUtils.printArrayf 

@@ -48,7 +48,7 @@ module SortableSetIntsDto =
                             SortableSetBinary.degree = degree
                             SortableSetBinary.sortables =sias
                         }
-                        |> SortableSet.Binary
+                        |> sortableSet.Binary
              }
         else
             result {
@@ -59,7 +59,7 @@ module SortableSetIntsDto =
                             SortableSetInteger.degree = degree
                             SortableSetInteger.sortables = dto.sortableIntArrays
                         }
-                        |> SortableSet.Integer
+                        |> sortableSet.Integer
              }
 
     let fromJson (cereal:string) =
@@ -98,7 +98,7 @@ module SortableSetBpDto =
                         SortableSetBp64.degree = degree
                         SortableSetBp64.sortables = sias
                     }
-                    |> SortableSet.Bp64
+                    |> sortableSet.Bp64
         }
 
     let fromJson (cereal:string) =
@@ -112,7 +112,7 @@ type SortableSetDto = {cat:string; value:string}
 
 module SortableSetDto =
     
-    let toDto (sortableSet:SortableSet) =
+    let toDto (sortableSet:sortableSet) =
          match sortableSet with
          | Binary ssb -> { cat="Binary"; value = ssb |> SortableSetIntsDto.toJsonBinary }
          | Integer ssi -> { cat="Integer"; value = ssi |> SortableSetIntsDto.toJsonInteger }
@@ -135,7 +135,7 @@ module SortableSetDto =
                       eDto.cat |> Error
 
 
-    let toJson (sortableSet:SortableSet) =
+    let toJson (sortableSet:sortableSet) =
         sortableSet |> toDto |> Json.serialize
 
 

@@ -27,25 +27,37 @@ module SorterGen =
     let reportString (sorterGen:SorterGen) =
         match sorterGen with
         | RandSwitches (wc, d) ->   
-                        sprintf "RandSwitches\t@\t%d" (Degree.value d)
+                        sprintf "RandSwitches\t%d\t@\t%d" 
+                            (SwitchCount.value wc) 
+                            (Degree.value d)
         | RandStages (tc, d) -> 
-                        sprintf "RandStages\t@\t%d" (Degree.value d)
+                        sprintf "RandStages\t%d\t@\t%d" 
+                            (StageCount.value tc) 
+                            (Degree.value d)
         | RandCoComp (tc, d) ->   
-                        sprintf "RandCoComp\t@\t%d" (Degree.value d)
+                        sprintf "RandCoComp\t%d\t@\t%d" 
+                            (StageCount.value tc) 
+                            (Degree.value d)
         | RandBuddies (tc, wc, d) -> 
-                        sprintf "RandBuddies\t%d\t%d" (StageCount.value wc) 
-                                                      (Degree.value d) 
+                        sprintf "RandBuddies\t%d\t%d\t%d" 
+                            (StageCount.value tc) 
+                            (StageCount.value wc) 
+                            (Degree.value d) 
         | RandSymmetric (tc, d) ->   
-                        sprintf "RandSymmetric\t@\t%d" (Degree.value d)
+                        sprintf "RandSymmetric\t%d\t@\t%d"
+                            (StageCount.value tc) 
+                            (Degree.value d)
 
         | RandSymmetricBuddies (tc, wc, d) -> 
-                        sprintf "RandSymmetricBuddies\t%d\t%d" (StageCount.value wc) 
-                                                               (Degree.value d) 
+                        sprintf "RandSymmetricBuddies\t%d\t%d\t%d" 
+                            (StageCount.value tc) 
+                            (StageCount.value wc) 
+                            (Degree.value d) 
 
 
     let fromTwoCycleArray (tc:TwoCyclePerm[]) =
         let switches = tc |> Seq.map(fun tc-> Switch.fromTwoCyclePerm tc)
-                            |> Seq.concat |> Seq.toArray
+                          |> Seq.concat |> Seq.toArray
         Sorter.create tc.[0].degree switches
             
          
@@ -64,10 +76,10 @@ module SorterGen =
     // IRando dependent
 
     let randomStages (degree:Degree) 
-                               (stageCount:StageCount)
-                               (switchFreq:SwitchFrequency) 
-                               (rando:IRando) =
-        let switches = (Stage.makeRandomStagedSwitchSeq degree switchFreq rando)
+                     (stageCount:StageCount)
+                     (switchFreq:SwitchFrequency) 
+                     (rando:IRando) =
+        let switches = (Stage.rndSwitchSeq degree switchFreq rando)
                         |> Seq.take ((StageCount.value stageCount) * (Degree.value degree) / 2)
                         |> Seq.toArray
         Sorter.create degree switches
@@ -128,12 +140,12 @@ module SorterGen =
 
 
     let randomSymmetric (degree:Degree) 
-                            (stageCount:StageCount) 
-                            (iRando:IRando) =
+                        (stageCount:StageCount) 
+                        (iRando:IRando) =
         result {
             let tcas = Array.init 
                             (StageCount.value stageCount)
-                            (fun _ -> TwoCyclePerm.makeReflSymmetric degree iRando)
+                            (fun _ -> TwoCyclePerm.rndSymmetric degree iRando)
 
             return fromTwoCycleArray tcas
         }
@@ -148,7 +160,10 @@ module SorterGen =
         Sorter.create degree switches
 
 
-    let mutateBySwitch (mutationRate:MutationRate) (rnd:IRando) (sorter:Sorter) =
+    let mutateBySwitch 
+            (mutationRate:MutationRate) 
+            (rnd:IRando) 
+            (sorter:Sorter) =
         {
             Sorter.degree = sorter.degree;
             Sorter.switchCount = sorter.switchCount;
@@ -156,11 +171,14 @@ module SorterGen =
                         |> Seq.toArray
         }
 
+
     let mutateByStage (mutationRate:MutationRate) 
                       (rnd:IRando) 
                       (sorter:Sorter) =
-        let stages = Stage.mergeSwitchesIntoStages sorter.degree sorter.switches |> Seq.toArray
-        let newStages = stages |> Array.map(fun st -> st |> Stage.randomMutate rnd mutationRate)
+        let newStages = Stage.fromSwitches sorter.degree sorter.switches 
+                        |> Seq.toArray
+                        |> Array.map(Stage.randomMutate rnd mutationRate)
+
         let newSwitches = [| for stage in newStages do yield! stage.switches |]
         {
             Sorter.degree=sorter.degree;
@@ -168,6 +186,7 @@ module SorterGen =
                             |> Result.ExtractOrThrow;
             switches = newSwitches
         }
+
 
     let createRandom (sorterGen:SorterGen) 
                      (randy:IRando) =
@@ -294,7 +313,7 @@ module SorterRndGen =
         Sorter.create degree switches
             
 
-    let fromTwoCycleArray 
+    let fromTwoCyclePerms 
                 (wPfx: Switch seq) 
                 (tc:TwoCyclePerm[]) =
         let switches = tc |> Seq.map(fun tc-> Switch.fromTwoCyclePerm tc)
@@ -306,12 +325,14 @@ module SorterRndGen =
                        (stageCount:StageCount) 
                        (wPfx: Switch seq) =
         result {
-            let! twoCycles = TwoCycleGen.makeAltEvenOdd degree (Permutation.identity degree)
-                                |> Seq.take (StageCount.value stageCount)
-                                |> Seq.toList
-                                |> Result.sequence
+            let! twoCycles = TwoCycleGen.makeAltEvenOdd 
+                                    degree 
+                                    (Permutation.identity degree)
+                            |> Seq.take (StageCount.value stageCount)
+                            |> Seq.toList
+                            |> Result.sequence
 
-            return fromTwoCycleArray wPfx (twoCycles |> List.toArray)
+            return fromTwoCyclePerms wPfx (twoCycles |> List.toArray)
         }
 
 
@@ -322,8 +343,9 @@ module SorterRndGen =
                      (stageCount:StageCount)
                      (switchFreq:SwitchFrequency) 
                      (rando:IRando) =
-        let switches = (Stage.makeRandomStagedSwitchSeq degree switchFreq rando)
-                        |> Seq.take ((StageCount.value stageCount) * (Degree.value degree) / 2)
+        let switches = (Stage.rndSwitchSeq degree switchFreq rando)
+                        |> Seq.take ((StageCount.value stageCount) * 
+                                    (Degree.value degree) / 2)
         fromSwitchesAndPrefix degree wPfx switches
 
 
@@ -379,7 +401,7 @@ module SorterRndGen =
 
             let! stp = perms |> TwoCycleGen.makeCoConjugateEvenOdd
             let atp = stp |> Seq.toArray
-            return fromTwoCycleArray wPfx atp
+            return fromTwoCyclePerms wPfx atp
         }
 
 
@@ -390,9 +412,9 @@ module SorterRndGen =
         result {
             let tcas = Array.init 
                             (StageCount.value stageCount)
-                            (fun _ -> TwoCyclePerm.makeReflSymmetric degree iRando)
+                            (fun _ -> TwoCyclePerm.rndSymmetric degree iRando)
 
-            return fromTwoCycleArray wPfx tcas
+            return fromTwoCyclePerms wPfx tcas
         }
 
     let randomSwitches (degree:Degree) 
@@ -417,7 +439,7 @@ module SorterRndGen =
     let mutateByStage (mutationRate:MutationRate) 
                       (rnd:IRando) 
                       (sorter:Sorter) =
-        let stages = Stage.mergeSwitchesIntoStages sorter.degree sorter.switches |> Seq.toArray
+        let stages = Stage.fromSwitches sorter.degree sorter.switches |> Seq.toArray
         let newStages = stages |> Array.map(fun st -> st |> Stage.randomMutate rnd mutationRate)
         let newSwitches = [| for stage in newStages do yield! stage.switches |]
         {

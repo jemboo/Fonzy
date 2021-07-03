@@ -4,11 +4,9 @@ open System
 
 module Runs =
 
-    let runCauseSpec 
-                    (causeSpecDescr:string)
+    let runCauseSpec
                     (outputDir:string) 
                     (causeSpec:CauseSpec) =
-        Console.WriteLine causeSpecDescr
         result {
     
             let directoryDataSource = new DirectoryDataSource(outputDir) 
@@ -23,5 +21,3 @@ module Runs =
 
             return! dataStore |> directoryDataSource.AddNewDataStoreItem         
         }
-
-

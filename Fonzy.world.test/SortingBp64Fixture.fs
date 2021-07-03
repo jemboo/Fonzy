@@ -83,7 +83,7 @@ type SortingBp64Fixture () =
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
         let sorter16 = RefSorter.goodRefSorterForDegree degree 
                         |> Result.ExtractOrThrow
-        let sortableSetBp64 = SortableSetBp64.allIntBits degree
+        let sortableSetBp64 = SortableSetBp64.allBp64 degree
 
         let switchEventRecords = 
                         SortingBp64.evalSorter 

@@ -4,7 +4,7 @@ open System
 module TestData = 
     let seed = 12374
     let iRando = Rando.fromRngGen (RngGen.createNet seed)
-    let degree = Degree.fromInt 8
+    let degree = Degree.fromInt 16
 
     module ComboStructures =
         let permutation = Permutation.rotate degree 1
@@ -42,7 +42,7 @@ module TestData =
         let permSwitchDensity = 0.5
         let sorterLength = degree |> SwitchOrStageCount.toMediocreRandomPerfLength 
                                                     SwitchOrStage.Stage 
-        let sorterCount = SorterCount.fromInt 50
+        let sorterCount = SorterCount.fromInt 20
         let sorterGen = SorterGen.RandSwitches 
                                     ((SwitchCount.degreeTo999SwitchCount degree),
                                     degree)
@@ -83,7 +83,7 @@ module TestData =
 
     module SortableSet =
         let ssBinary = SortableSetBinary.allIntBits degree
-        let sortableSet =  ssBinary |> SortableSet.Binary
+        let sortableSet =  ssBinary |> sortableSet.Binary
                                     |> SortableSetSpec.Explicit
 
     module SorterSet = 

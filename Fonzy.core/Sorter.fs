@@ -4,7 +4,9 @@ open System
 type Sorter = {degree:Degree; 
                switches:array<Switch>; 
                switchCount:SwitchCount}
+
 module Sorter =
+
     let makeId (s:Sorter) = 
         let gu = [s :> obj] |> GuidUtils.guidFromObjList
         SorterId.fromGuid gu

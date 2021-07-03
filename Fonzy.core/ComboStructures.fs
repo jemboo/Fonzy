@@ -145,22 +145,35 @@ module TwoCyclePerm =
     // IRando dependent
     
     let makeRandomMonoCycle (degree:Degree) (rnd:IRando) =
-        { degree=degree; 
-            values=Combinatorics.makeRandomMonoTwoCycle degree rnd }
+        { 
+            degree = degree; 
+            values = Combinatorics.rndMonoTwoCycle 
+                        degree 
+                        rnd 
+        }
         
-    let makeRandomTwoCycle (degree:Degree) (rnd:IRando) (switchFreq:float) =
-        let switchCount = Rando.multiDraw rnd switchFreq ((Degree.value degree) / 2)
-        { degree=degree; 
-            values=Combinatorics.makeRandomTwoCycleIntArray 
-                                    rnd 
-                                    (Degree.value degree) 
-                                    switchCount }
+    let makeRandomTwoCycle (degree:Degree) 
+                           (rnd:IRando) 
+                           (switchFreq:float) =
+        let switchCount = Rando.multiDraw 
+                            rnd 
+                            switchFreq 
+                            ((Degree.value degree) / 2)
+        { 
+           degree = degree; 
+           values = Combinatorics.rndTwoCycleArray 
+                            rnd 
+                            (Degree.value degree) 
+                            switchCount 
+         }
     
     let makeRandomFullTwoCycle (degree:Degree) (rnd:IRando) =
-        { degree=degree; 
-            values=Combinatorics.makeRandomFullTwoCycleIntArray 
-                                            rnd 
-                                            (Degree.value degree)}
+        { 
+            degree = degree; 
+            values = Combinatorics.rndFullTwoCycleArray 
+                            rnd 
+                            (Degree.value degree)
+        }
 
     let reflect (twoCyclePerm:TwoCyclePerm) =
         let deg = (Degree.value twoCyclePerm.degree)
@@ -174,7 +187,7 @@ module TwoCyclePerm =
           values = refl }
 
 
-    let makeReflSymmetric (degree:Degree) 
+    let rndSymmetric (degree:Degree) 
                           (rnd:IRando) =
         let deg = (Degree.value degree)
         let aRet = Array.init deg (id)

@@ -43,18 +43,16 @@ type SortableSetRolloutFixture() =
 
     [<TestMethod>]
     member this.removeDupesFromNoDupes() =
-  
       let unSortedBp64Rollout = TestData.SorterActionRecords.bP64SetsRolloutOfAll
                                   |> sortableSetRollout.Bp64
 
       let intBitsFromBp =  unSortedBp64Rollout 
                             |> SortableSetRollout.toIntBits
-
+                            |> Seq.toArray
       
       let intBitsBpUnique =  unSortedBp64Rollout 
                                 |> SortableSetRollout.removeDupes
                                 |> Seq.toArray
 
       Assert.AreEqual(intBitsFromBp.Length, intBitsBpUnique.Length)
-      Assert.IsTrue(true)
 

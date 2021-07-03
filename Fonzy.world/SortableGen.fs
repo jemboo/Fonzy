@@ -58,7 +58,7 @@ module SortableSetGenerated =
                                                            (RngGenDto.fromJson)
                       let! sortableCount = ssg.prams |> ResultMap.procKeyedInt "sortableCount" 
                                                            (SortableCount.create "")
-                      return (SortableSetBinary.rndBits degree rngGen sortableCount) |> SortableSet.Binary
+                      return (SortableSetBinary.rndBits degree rngGen sortableCount) |> sortableSet.Binary
                    }
 
         //| "rndPerms" -> 
@@ -77,7 +77,7 @@ module SortableSetGenerated =
                         let! degree = ssg.prams |> ResultMap.procKeyedInt "degree" 
                                                             (fun d -> Degree.create "" d)
 
-                        return  ( SortableSetBinary.allIntBits degree ) |> SortableSet.Binary
+                        return  ( SortableSetBinary.allIntBits degree ) |> sortableSet.Binary
                     }
 
         | "allBp64" -> 
@@ -85,7 +85,7 @@ module SortableSetGenerated =
                         let! degree = ssg.prams |> ResultMap.procKeyedInt "degree" 
                                                             (fun d -> Degree.create "" d)
 
-                        return ( SortableSetBinary.allBp64 degree ) |> SortableSet.Bp64
+                        return ( SortableSetBp64.allBp64 degree ) |> sortableSet.Bp64
                     }
 
 
