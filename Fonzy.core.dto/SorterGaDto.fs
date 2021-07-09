@@ -1,7 +1,7 @@
 ﻿namespace global
 open System
 
-type SorterGenomeDto = {cat:string; value:string}
+type sorterGenomeDto = {cat:string; value:string}
 module SorterGenomeDto =
     let fromDto dto =
         if dto.cat = "Permutaions" then
@@ -32,18 +32,18 @@ module SorterGenomeDto =
                          |> Array.map(fun p-> p |> TwoCyclePermDto.toDto
                                                 |> Json.serialize)
             {
-                SorterGenomeDto.cat = "Permutaions"; 
+                sorterGenomeDto.cat = "Permutaions"; 
                 value = dsf |> Json.serialize       
             }
         | SorterGenome.Switches sw ->
             {
-                SorterGenomeDto.cat = "Switches"; 
+                sorterGenomeDto.cat = "Switches"; 
                 value = sw |> List.toArray 
                            |> Array.map(SwitchDto.toDto)
                            |> Json.serialize
             }
 
-type SorterPhenotypeDto = {cat:string; value:string}
+type sorterPhenotypeDto = {cat:string; value:string}
 module SorterPhenotypeDto =
     let fromDto dto =
         if dto.cat = "Singleton" then
@@ -63,7 +63,7 @@ module SorterPhenotypeDto =
                         dto.cat |> Error
     let fromJson (cereal:string) =
             result {
-                let! dto = Json.deserialize<SorterPhenotypeDto> cereal
+                let! dto = Json.deserialize<sorterPhenotypeDto> cereal
                 return! fromDto dto
             }
 
@@ -71,21 +71,21 @@ module SorterPhenotypeDto =
         match sorterPhenotype with
         | SorterPhenotype.Singleton s ->
             {
-                SorterPhenotypeDto.cat = "Singleton"; 
+                sorterPhenotypeDto.cat = "Singleton"; 
                 value = s |> SorterDto.toDto |> Json.serialize
             }
         | SorterPhenotype.Multiple sList ->
             {
-                SorterPhenotypeDto.cat = "Multiple"; 
+                sorterPhenotypeDto.cat = "Multiple"; 
                 value = sList |> List.toArray 
                               |> Array.map(SorterDto.toJson)
                               |> Json.serialize
             }
 
 
-type SorterTestResultsDto = {cat:string; value:string}
+type sorterTestResultsDto = {cat:string; value:string}
 module SorterTestResultsDto =
-    let fromDto (dto:SorterTestResultsDto) =
+    let fromDto (dto:sorterTestResultsDto) =
         if dto.cat = "Singleton" then
             result {
                 let! switchUses =  SwitchUsesDto.fromJson dto.value
@@ -103,7 +103,7 @@ module SorterTestResultsDto =
                         dto.cat |> Error
     let fromJson (cereal:string) =
             result {
-                let! dto = Json.deserialize<SorterTestResultsDto> cereal
+                let! dto = Json.deserialize<sorterTestResultsDto> cereal
                 return! fromDto dto
             }
 
@@ -111,21 +111,21 @@ module SorterTestResultsDto =
         match sorterPhenotype with
         | SorterTestResults.Singleton s ->
             {
-                SorterTestResultsDto.cat = "Singleton";
+                sorterTestResultsDto.cat = "Singleton";
                 value = s |> SwitchUsesDto.toDto |> Json.serialize
             }
         | SorterTestResults.Multiple sList ->
             {
-                SorterTestResultsDto.cat = "Multiple";
+                sorterTestResultsDto.cat = "Multiple";
                 value = sList |> List.toArray 
                               |> Array.map(SwitchUsesDto.toJson)
                               |> Json.serialize
             }
 
 
-type SorterPhenotypeEvalDto = {cat:string; value:string}
+type sorterPhenotypeEvalDto = {cat:string; value:string}
 module SorterPhenotypeEvalDto =
-    let fromDto (dto:SorterPhenotypeEvalDto) =
+    let fromDto (dto:sorterPhenotypeEvalDto) =
         if dto.cat = "Singleton" then
             result {
                 let eval = float dto.value
@@ -140,7 +140,7 @@ module SorterPhenotypeEvalDto =
                         dto.cat |> Error
     let fromJson (cereal:string) =
             result {
-                let! dto = Json.deserialize<SorterPhenotypeEvalDto> cereal
+                let! dto = Json.deserialize<sorterPhenotypeEvalDto> cereal
                 return! fromDto dto
             }
 
@@ -148,12 +148,12 @@ module SorterPhenotypeEvalDto =
         match sorterPhenotype with
         | SorterPhenotypeEval.Singleton s ->
             {
-                SorterPhenotypeEvalDto.cat = "Singleton";
+                sorterPhenotypeEvalDto.cat = "Singleton";
                 value = s.ToString()
             }
         | SorterPhenotypeEval.Multiple sList ->
             {
-                SorterPhenotypeEvalDto.cat = "Multiple";
+                sorterPhenotypeEvalDto.cat = "Multiple";
                 value = sList |> List.toArray 
                               |> Json.serialize
             }

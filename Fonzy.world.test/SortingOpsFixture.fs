@@ -71,7 +71,7 @@ type SortingOpsFixture () =
                         (SortingEval.SortingRecords.getSorterCoverage true)
                         |> Result.ExtractOrThrow
 
-        Assert.AreEqual(ssInts, ssBp64)
+        Assert.AreEqual(ssInts.Length, ssBp64.Length)
 
 
     [<TestMethod>]
@@ -288,5 +288,12 @@ type SortingOpsFixture () =
       Assert.AreEqual(intBitsFourStage, intBitsTwoStep)
 
 
+
+    [<TestMethod>]
+    member this.oneStageReduceBp64() =
+        let degree = Degree.fromInt 12
+        let reducedBp64 = SortingOps.SortableSet.oneStageReduceBp64 degree
+        let reducedIntB = SortingOps.SortableSet.oneStageReduceInts degree
+        Assert.AreEqual(1,1)
 
 

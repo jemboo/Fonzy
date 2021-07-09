@@ -135,14 +135,16 @@ module BP64SetsRollout =
                                  |> Seq.collect(id)
                                  |> Seq.toArray
             return! create degree a64 (SortableCount.fromInt 
-                                        ((64 * a64.Length) / (Degree.value degree)))
+                                        ((64 * a64.Length) 
+                                        / 
+                                        (Degree.value degree)))
         }
 
 
-    let toBitsP64 (ssRollout:bP64SetsRollout) =
-        let d = (Degree.value ssRollout.degree)
-        ssRollout.baseArray |> Seq.chunkBySize d
-                            |> Seq.map(fun a -> {bitsP64.values = a})
+    let toBitsP64 (bP64Roll:bP64SetsRollout) =
+        let d = (Degree.value bP64Roll.degree)
+        bP64Roll.baseArray |> Seq.chunkBySize d
+                           |> Seq.map(fun a -> {bitsP64.values = a})
 
 
     let fromIntBits (degree:Degree)
@@ -151,9 +153,9 @@ module BP64SetsRollout =
                 |> fromBitsP64 degree
 
 
-    let toIntBits (ssRollout:bP64SetsRollout) =
-        ssRollout |> toBitsP64
-                  |> BitsP64.toIntBits
+    let toIntBits (bP64Roll:bP64SetsRollout) =
+        bP64Roll |> toBitsP64
+                 |> BitsP64.toIntBits
                  // |> Seq.toArray
 
     let isSorted (bp64Roll:bP64SetsRollout) =

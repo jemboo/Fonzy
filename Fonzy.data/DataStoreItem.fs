@@ -2,9 +2,9 @@
 
 
 type DataStoreItem =
-      | WorldDto of WorldDto
-      | WorldActionDto of WorldActionDto
-      | WorldMergeDto of WorldMergeDto
+      | WorldDto of worldDto
+      | WorldActionDto of worldActionDto
+      | WorldMergeDto of worldMergeDto
 
 module DataStoreItem =
 
@@ -70,19 +70,19 @@ module DataStoreItemDto =
     let fromDto (eDto:DataStoreItemDto) =
         if eDto.cat = "WorldDto" then
             result {
-                let! b = Json.deserialize<WorldDto> eDto.value
+                let! b = Json.deserialize<worldDto> eDto.value
                 return DataStoreItem.WorldDto b
             }
 
         else if eDto.cat = "WorldActionDto" then
             result {
-                let! b = Json.deserialize<WorldActionDto> eDto.value
+                let! b = Json.deserialize<worldActionDto> eDto.value
                 return DataStoreItem.WorldActionDto b
             }
 
         else if eDto.cat = "WorldMergeDto" then
             result {
-                let! b = Json.deserialize<WorldMergeDto> eDto.value
+                let! b = Json.deserialize<worldMergeDto> eDto.value
                 return DataStoreItem.WorldMergeDto b
                 }
 

@@ -5,6 +5,7 @@ open System
 open System.Security.Cryptography
 open System.Runtime.Serialization.Formatters.Binary
 open System.IO
+open System.Numerics
 
 
 module ByteUtils =
@@ -161,6 +162,7 @@ module ParseUtils =
             sprintf "1 param expected, not %d" pcs.Length |> Error
         else
             MakeFloat pcs.[0]
+
 
 module SeqUtils =
 

@@ -68,6 +68,33 @@ module SortingOps =
                     |> sortableSet.Integer
 
 
+        let reduce (srg:sorterRndGen) 
+                   (sSet:sortableSet) = 
+            let pfx = srg |> SorterRndGen.getSwitchPrefix
+            if pfx.Length = 0 then
+                sSet 
+            else switchReduce sSet pfx
+                
+
+        let oneStageReduceBp64 (degree:Degree) = 
+            
+            let wholeSet = SortableSetBp64.allBp64 degree
+                           |> sortableSet.Bp64
+
+            let switches = degree |> TwoCycleGen.evenMode
+                                  |> Switch.fromTwoCyclePerm
+            switchReduce wholeSet switches
+
+        let oneStageReduceInts (degree:Degree) = 
+    
+            let wholeSet = SortableSetBinary.allIntBits degree
+                           |> sortableSet.Binary
+
+            let switches = degree |> TwoCycleGen.evenMode
+                                  |> Switch.fromTwoCyclePerm
+            switchReduce wholeSet switches
+
+
 
     module SorterSet =
 

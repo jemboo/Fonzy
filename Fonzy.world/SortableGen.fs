@@ -7,9 +7,9 @@ module SortableSetGenerated =
                     |> Map.ofList
         let id = ([("allIntBits" :> obj); (m :> obj)]) |> GuidUtils.guidFromObjList
         {
-            SortableSetGenerated.id = id |> SortableSetId.fromGuid;
-            SortableSetGenerated.cat = "allIntBits";
-            SortableSetGenerated.prams = m
+            sortableSetGen.id = id |> SortableSetId.fromGuid;
+            sortableSetGen.cat = "allIntBits";
+            sortableSetGen.prams = m
         }
 
     let allBp64 (degree:Degree) = 
@@ -17,9 +17,9 @@ module SortableSetGenerated =
                     |> Map.ofList
         let id = ([("allBp64" :> obj); (m :> obj)]) |> GuidUtils.guidFromObjList
         {
-            SortableSetGenerated.id = id |> SortableSetId.fromGuid;
-            SortableSetGenerated.cat = "allBp64";
-            SortableSetGenerated.prams = m
+            sortableSetGen.id = id |> SortableSetId.fromGuid;
+            sortableSetGen.cat = "allBp64";
+            sortableSetGen.prams = m
         }
 
     let rndBits (id:SortableSetId) 
@@ -32,9 +32,9 @@ module SortableSetGenerated =
                  ("rngGen", rngGen |> RngGenDto.toJson )] |> Map.ofList
         let id = ([("rndBits" :> obj); (m :> obj)]) |> GuidUtils.guidFromObjList
         {
-            SortableSetGenerated.id = id |> SortableSetId.fromGuid;
-            SortableSetGenerated.cat = "rndBits";
-            SortableSetGenerated.prams = m
+            sortableSetGen.id = id |> SortableSetId.fromGuid;
+            sortableSetGen.cat = "rndBits";
+            sortableSetGen.prams = m
         }
 
     //let rndPerms (degree:Degree) (sortableCount:SortableCount) (rngGen:RngGen) = 
@@ -48,7 +48,7 @@ module SortableSetGenerated =
     //        SortableSetGenerated.prams = m
     //    }
 
-    let generate (ssg:SortableSetGenerated) = 
+    let generate (ssg:sortableSetGen) = 
         match ssg.cat with
         | "rndBits" -> 
             result {

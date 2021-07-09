@@ -38,7 +38,7 @@ type WorldsFixture () =
         let newWorld = WorldAction.createWorld worldAction 
                     |> Result.ExtractOrThrow
         let genSorterSetDto, meta = 
-            Enviro.getDtoAndMetaFromEnviro<SorterSetDto>
+            Enviro.getDtoAndMetaFromEnviro<sorterSetDto>
                                  newWorld.enviro
                                  TestData.CauseSpec.SorterSet.rndSorterSetName
             |> Result.ExtractOrThrow

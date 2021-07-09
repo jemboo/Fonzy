@@ -60,6 +60,7 @@ module SortableSetBinary =
         }
     
 
+
 module SortableSetInteger = 
 
     let rndPermsId = SorterSetId.fromGuid (Guid.Parse "73000000-0000-0000-0000-000000000222")
@@ -94,6 +95,7 @@ module SortableSetInteger =
                 |> Array.map(fun ib -> ib.values)
          }
      
+
 
 module SortableSetBp64 = 
 
@@ -164,14 +166,14 @@ module SortableSet =
 
 
 
-type SortableSetGenerated = { id:SortableSetId; 
+type sortableSetGen = { id:SortableSetId; 
 cat:string; 
 prams:Map<string, string>; }
 
 
 type SortableSetSpec =
     | Explicit of sortableSet
-    | Generated of SortableSetGenerated
+    | Generated of sortableSetGen
 
 
 module SortableSetSpec = 

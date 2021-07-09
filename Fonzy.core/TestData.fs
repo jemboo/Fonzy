@@ -2,9 +2,9 @@
 open System
 
 module TestData = 
-    let seed = 12374
+    let seed = 123
     let iRando = Rando.fromRngGen (RngGen.createNet seed)
-    let degree = Degree.fromInt 16
+    let degree = Degree.fromInt 10
 
     module ComboStructures =
         let permutation = Permutation.rotate degree 1

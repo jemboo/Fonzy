@@ -1,8 +1,8 @@
 ﻿namespace global
 
-type RngGenDto = {rngType:string; seed:int}
+type rngGenDto = {rngType:string; seed:int}
 module RngGenDto =
-    let fromDto (dto:RngGenDto) =
+    let fromDto (dto:rngGenDto) =
         result {
             let! typ = RngType.create dto.rngType
             let! rs = RandomSeed.create "" dto.seed
@@ -11,7 +11,7 @@ module RngGenDto =
 
     let fromJson (jstr:string) =
         result {
-            let! dto = Json.deserialize<RngGenDto> jstr
+            let! dto = Json.deserialize<rngGenDto> jstr
             return! fromDto dto
         }
 

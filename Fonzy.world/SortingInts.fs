@@ -123,7 +123,8 @@ module SortingInts =
             | Sorting.SwitchUsePlan.Range (min, max) -> 
                 (min, max, (SwitchUses.createEmpty sorter.switchCount))
             | Sorting.SwitchUsePlan.Indexes (min, max, wgts) -> 
-                (min, max, SwitchUses.init wgts)
+                let cpyWgts = wgts |> Array.copy
+                (min, max, SwitchUses.init cpyWgts)
 
         let sortableSetRolloutCopy = (IntSetsRollout.copy ssRollout)
         let mutable sortableIndex=0

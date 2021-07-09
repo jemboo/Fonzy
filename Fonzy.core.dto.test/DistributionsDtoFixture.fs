@@ -13,7 +13,7 @@ type MathDataDtoFixture () =
         let intD = IntDist.makeRandom idt rndy 10
         let intDDto = IntDistDto.toDto intD
         let cereal = Json.serialize intDDto
-        let intDtoBack = Json.deserialize<IntDistDto> cereal |> Result.ExtractOrThrow
+        let intDtoBack = Json.deserialize<intDistDto> cereal |> Result.ExtractOrThrow
         let intDBack = IntDistDto.fromDto intDtoBack  |> Result.ExtractOrThrow
         Assert.AreEqual(intD, intDBack)
 
@@ -26,6 +26,6 @@ type MathDataDtoFixture () =
         let l2dD = Int2dDist.makeRandom l2dDist rndy 10
         let l2dDDto = Int2dDistDto.toDto l2dD
         let cereal = Json.serialize l2dDDto
-        let l2dDistDtoBack = Json.deserialize<Int2dDistDto> cereal |> Result.ExtractOrThrow
+        let l2dDistDtoBack = Json.deserialize<int2dDistDto> cereal |> Result.ExtractOrThrow
         let l2dDDistBack = Int2dDistDto.fromDto l2dDistDtoBack  |> Result.ExtractOrThrow
         Assert.AreEqual(l2dD, l2dDDistBack)

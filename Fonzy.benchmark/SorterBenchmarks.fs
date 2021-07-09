@@ -161,14 +161,14 @@ type BenchmarkSorterOnBp64() =
         ssR
 
 
-    //[<Benchmark>]
-    //member this.evalSorter() =
-    //    let ssR = SortingBp64.evalSorter 
-    //                        sorter16 
-    //                        sortableSetbp64 
-    //                        Sorting.SwitchUsePlan.All
-    //                        Sorting.EventGrouping.BySwitch
-    //    ssR
+    [<Benchmark>]
+    member this.evalSorter() =
+        let ssR = SortingBp64.evalSorter 
+                            sorter16 
+                            sortableSetbp64 
+                            Sorting.SwitchUsePlan.All
+                            Sorting.EventGrouping.BySwitch
+        ssR
 
 
 

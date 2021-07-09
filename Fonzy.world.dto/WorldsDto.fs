@@ -1,19 +1,19 @@
 ﻿namespace global
 open System
 
-type WorldDto = {id:Guid; parentId:Guid; causeSpecDto:CauseSpecDto; 
-                 enviroDto:EnviroDto}
+type worldDto = {id:Guid; parentId:Guid; causeSpecDto:causeSpecDto; 
+                 enviroDto:enviroDto}
 module WorldDto = 
     let toDto (w:World) =
-        {WorldDto.id = WorldId.value w.id;
-         WorldDto.parentId = WorldId.value w.parentId;
-         WorldDto.causeSpecDto = w.cause.causeSpec |> CauseSpecDto.toDto;
-         WorldDto.enviroDto = w.enviro |> EnviroDto.toDto}
+        {worldDto.id = WorldId.value w.id;
+         worldDto.parentId = WorldId.value w.parentId;
+         worldDto.causeSpecDto = w.cause.causeSpec |> CauseSpecDto.toDto;
+         worldDto.enviroDto = w.enviro |> EnviroDto.toDto}
 
     let toJson (w:World) =
         w |> toDto |> Json.serialize
 
-    let fromDto (wDto:WorldDto) =
+    let fromDto (wDto:worldDto) =
            result {
              let worldId = WorldId.fromGuid wDto.id
              let parentId = WorldId.fromGuid wDto.parentId
@@ -30,24 +30,24 @@ module WorldDto =
 
     let fromJson (js:string) =
         result {
-            let! dto = Json.deserialize<WorldDto> js
+            let! dto = Json.deserialize<worldDto> js
             return! fromDto dto
         }
             
-type WorldActionDto = {childId:Guid; parentWorldDto:WorldDto; 
-                       causeSpecDto:CauseSpecDto;}
+type worldActionDto = {childId:Guid; parentWorldDto:worldDto; 
+                       causeSpecDto:causeSpecDto;}
 module WorldActionDto = 
     let toDto (w:WorldAction) =
         {
-          WorldActionDto.childId = WorldId.value w.childId;
-          WorldActionDto.parentWorldDto = w.parentWorld |> WorldDto.toDto;
-          WorldActionDto.causeSpecDto = w.cause.causeSpec |> CauseSpecDto.toDto;
+          worldActionDto.childId = WorldId.value w.childId;
+          worldActionDto.parentWorldDto = w.parentWorld |> WorldDto.toDto;
+          worldActionDto.causeSpecDto = w.cause.causeSpec |> CauseSpecDto.toDto;
         }
 
     let toJson (w:WorldAction) =
         w |> toDto |> Json.serialize
 
-    let fromDto (waDto:WorldActionDto) =
+    let fromDto (waDto:worldActionDto) =
            result {
              let! pw = waDto.parentWorldDto |> WorldDto.fromDto
              let! cs = waDto.causeSpecDto |> CauseSpecDto.fromDto;
@@ -61,25 +61,25 @@ module WorldActionDto =
 
     let fromJson (js:string) =
         result {
-            let! dto = Json.deserialize<WorldActionDto> js
+            let! dto = Json.deserialize<worldActionDto> js
             return! fromDto dto
         }
 
-type WorldMergeDto = {id:Guid; sourceNameMap: Map<string,Guid>; 
-                      mergeMapItems:MergeMapItem[]; enviroDto:EnviroDto}
+type worldMergeDto = {id:Guid; sourceNameMap: Map<string,Guid>; 
+                      mergeMapItems:MergeMapItem[]; enviroDto:enviroDto}
 module WorldMergeDto = 
     let toDto (w:WorldMerge) =
         {
-          WorldMergeDto.id = WorldMergeId.value w.id;
-          WorldMergeDto.sourceNameMap = w.sourceNameMap;
-          WorldMergeDto.mergeMapItems = w.mergeMapItems |> List.toArray
-          WorldMergeDto.enviroDto = w.enviro |> EnviroDto.toDto
+          worldMergeDto.id = WorldMergeId.value w.id;
+          worldMergeDto.sourceNameMap = w.sourceNameMap;
+          worldMergeDto.mergeMapItems = w.mergeMapItems |> List.toArray
+          worldMergeDto.enviroDto = w.enviro |> EnviroDto.toDto
         }
 
     let toJson (w:WorldMerge) =
         w |> toDto |> Json.serialize
 
-    let fromDto (waDto:WorldMergeDto) =
+    let fromDto (waDto:worldMergeDto) =
            result {
              let mergeMapItems = waDto.mergeMapItems |> Array.toList
              let! worldMergeId = WorldMergeId.create waDto.id
@@ -94,6 +94,6 @@ module WorldMergeDto =
 
     let fromJson (js:string) =
         result {
-            let! dto = Json.deserialize<WorldMergeDto> js
+            let! dto = Json.deserialize<worldMergeDto> js
             return! fromDto dto
         }

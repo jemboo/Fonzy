@@ -5,6 +5,7 @@ open System.Collections.Generic
 
 [<TestClass>]
 type UtilsFixture () =
+
     // SeqUtils
     [<TestMethod>]
     member this.join() =

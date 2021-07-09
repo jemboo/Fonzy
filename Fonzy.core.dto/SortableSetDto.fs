@@ -2,31 +2,31 @@
 open System
 
 
-type SortableSetIntsDto = {id:Guid; cat:string; degree:int; sortableIntArrays:int[][]}
+type sortableSetIntsDto = {id:Guid; cat:string; degree:int; sortableIntArrays:int[][]}
 
 module SortableSetIntsDto =
     let yab = None
     
     let toDtoBinary (sortableSetBinary:SortableSetBinary) =
         {
-            SortableSetIntsDto.id = 
+            sortableSetIntsDto.id = 
                            (SortableSetId.value sortableSetBinary.id)
-            SortableSetIntsDto.cat = "binary"
-            SortableSetIntsDto.degree = 
+            sortableSetIntsDto.cat = "binary"
+            sortableSetIntsDto.degree = 
                            (Degree.value sortableSetBinary.degree)
-            SortableSetIntsDto.sortableIntArrays = 
+            sortableSetIntsDto.sortableIntArrays = 
                             sortableSetBinary.sortables
                             |> Array.map(fun avs -> avs.values)
         }
 
     let toDtoInteger (sortableSetBinary:SortableSetInteger) =
         {
-            SortableSetIntsDto.id = 
+            sortableSetIntsDto.id = 
                            (SortableSetId.value sortableSetBinary.id)
-            SortableSetIntsDto.cat = "integer"
-            SortableSetIntsDto.degree = 
+            sortableSetIntsDto.cat = "integer"
+            sortableSetIntsDto.degree = 
                            (Degree.value sortableSetBinary.degree)
-            SortableSetIntsDto.sortableIntArrays = 
+            sortableSetIntsDto.sortableIntArrays = 
                             sortableSetBinary.sortables
         }
 
@@ -36,7 +36,7 @@ module SortableSetIntsDto =
     let toJsonInteger (sortableSetInteger:SortableSetInteger) =
         sortableSetInteger |> toDtoInteger |> Json.serialize
 
-    let fromDto (dto:SortableSetIntsDto) =
+    let fromDto (dto:sortableSetIntsDto) =
         if dto.cat = "binary" then
             result {
                 let! id = SortableSetId.create dto.id
@@ -64,22 +64,22 @@ module SortableSetIntsDto =
 
     let fromJson (cereal:string) =
         result {
-            let! dto = cereal |> Json.deserialize<SortableSetIntsDto>
+            let! dto = cereal |> Json.deserialize<sortableSetIntsDto>
             return! dto |> fromDto
         }
 
 
-type SortableSetBpDto = {id:Guid; degree:int; sortableUintArrays:uint64[][]}
+type sortableSetBpDto = {id:Guid; degree:int; sortableUintArrays:uint64[][]}
 
 module SortableSetBpDto =
 
     let toDto (sortableSetBp64:SortableSetBp64) =
         {
-            SortableSetBpDto.id = 
+            sortableSetBpDto.id = 
                            (SortableSetId.value sortableSetBp64.id)
-            SortableSetBpDto.degree = 
+            sortableSetBpDto.degree = 
                            (Degree.value sortableSetBp64.degree)
-            SortableSetBpDto.sortableUintArrays = 
+            sortableSetBpDto.sortableUintArrays = 
                             sortableSetBp64.sortables
                             |> Array.map(fun avs -> avs.values)
         }
@@ -87,7 +87,7 @@ module SortableSetBpDto =
     let toJson (sortableSetBp64:SortableSetBp64) =
         sortableSetBp64 |> toDto |> Json.serialize
 
-    let fromDto (dto:SortableSetBpDto) =
+    let fromDto (dto:sortableSetBpDto) =
         result {
             let! id = SortableSetId.create dto.id
             let! degree = Degree.create "" dto.degree
@@ -103,12 +103,12 @@ module SortableSetBpDto =
 
     let fromJson (cereal:string) =
         result {
-            let! dto = cereal |> Json.deserialize<SortableSetBpDto>
+            let! dto = cereal |> Json.deserialize<sortableSetBpDto>
             return! dto |> fromDto
         }
 
 
-type SortableSetDto = {cat:string; value:string}
+type sortableSetDto = {cat:string; value:string}
 
 module SortableSetDto =
     
@@ -118,7 +118,7 @@ module SortableSetDto =
          | Integer ssi -> { cat="Integer"; value = ssi |> SortableSetIntsDto.toJsonInteger }
          | Bp64 ssbp -> { cat="Bp64"; value = ssbp |> SortableSetBpDto.toJson }
 
-    let fromDto (eDto:SortableSetDto) =
+    let fromDto (eDto:sortableSetDto) =
         if eDto.cat = "Binary" then
             result {
                 return! eDto.value |> SortableSetIntsDto.fromJson
@@ -141,45 +141,44 @@ module SortableSetDto =
 
     let fromJson (cereal:string) =
         result {
-            let! dto = cereal |> Json.deserialize<SortableSetDto>
+            let! dto = cereal |> Json.deserialize<sortableSetDto>
             return! dto |> fromDto
         }
 
 
 
-type SortableSetGeneratedDto = {id:Guid; cat:string; prams:Map<string, string>}
+type sortableSetGenDto = {id:Guid; cat:string; prams:Map<string, string>}
 
 module SortableSetGeneratedDto =
     
-    let toDto (sortableSetGenerated:SortableSetGenerated) =
+    let toDto (ssGen:sortableSetGen) =
         {
-            SortableSetGeneratedDto.id = 
-                           (SortableSetId.value sortableSetGenerated.id)
-            SortableSetGeneratedDto.cat =  sortableSetGenerated.cat
-            SortableSetGeneratedDto.prams = 
-                            sortableSetGenerated.prams
+            sortableSetGenDto.id = 
+                           (SortableSetId.value ssGen.id)
+            sortableSetGenDto.cat =  ssGen.cat
+            sortableSetGenDto.prams = ssGen.prams
         }
 
-    let toJson (sortableSetGenerated:SortableSetGenerated) =
-        sortableSetGenerated |> toDto |> Json.serialize
+    let toJson (ssGen:sortableSetGen) =
+        ssGen |> toDto |> Json.serialize
 
-    let fromDto (dto:SortableSetGeneratedDto) =
+    let fromDto (dto:sortableSetGenDto) =
         result {
             let! id = SortableSetId.create dto.id
             return  {
-                        SortableSetGenerated.id = id
-                        SortableSetGenerated.cat = dto.cat
-                        SortableSetGenerated.prams = dto.prams
+                        sortableSetGen.id = id
+                        sortableSetGen.cat = dto.cat
+                        sortableSetGen.prams = dto.prams
                     }
         }
 
     let fromJson (cereal:string) =
         result {
-            let! dto = cereal |> Json.deserialize<SortableSetGeneratedDto>
+            let! dto = cereal |> Json.deserialize<sortableSetGenDto>
             return! dto |> fromDto
         }
 
-type SortableSetSpecDto = {cat:string; value:string;}
+type sortableSetSpecDto = {cat:string; value:string;}
 
 module SortableSetSpecDto =
 
@@ -197,7 +196,7 @@ module SortableSetSpecDto =
         sortableSetSpec |> toDto |> Json.serialize
 
 
-    let fromDto (dto:SortableSetSpecDto) =
+    let fromDto (dto:sortableSetSpecDto) =
             match dto.cat with
             | "Explicit" -> 
                     result {
@@ -215,6 +214,6 @@ module SortableSetSpecDto =
 
     let fromJson (cereal:string) =
         result {
-            let! dto = cereal |> Json.deserialize<SortableSetSpecDto>
+            let! dto = cereal |> Json.deserialize<sortableSetSpecDto>
             return! dto |> fromDto
         }

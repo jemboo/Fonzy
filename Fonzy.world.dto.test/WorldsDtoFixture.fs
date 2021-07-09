@@ -16,7 +16,7 @@ type WorldDtoFixture () =
         let cause = Causes.fromCauseSpec csIntGen |> Result.ExtractOrThrow
         let w = World.create (WorldId.fromGuid (Guid.NewGuid())) cause Enviro.Empty
         let dto = w |> WorldDto.toDto
-        let dtoBack = dto |> Json.serialize |> Json.deserialize<WorldDto> |> Result.ExtractOrThrow
+        let dtoBack = dto |> Json.serialize |> Json.deserialize<worldDto> |> Result.ExtractOrThrow
         Assert.AreEqual(dto, dtoBack);
 
 

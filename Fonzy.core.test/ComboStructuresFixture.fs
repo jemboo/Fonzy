@@ -48,45 +48,6 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
-    member this.stack() =
-        let dd = Degree.fromInt 2
-        let aL = [|0;1|]
-        let aR = [|1;0|]
-        let aS = [|0;1;3;2|]
-        let aSl = aS |> Array.toList
-        let tcpS =  TwoCycleGen.stack aL aR
-                    |> Array.toList
-        Assert.AreEqual (aSl, tcpS)
-
-
-    [<TestMethod>]
-    member this.quad() =
-        let tAvs = [|0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;|]
-        let pp = tAvs |> TwoCycleGen.t4
-                      |> Seq.toList
-        Assert.AreEqual(pp.Length, tAvs.Length)
-
-
-    [<TestMethod>]
-    member this.qStack() =
-        let avsL = [|0;1;|]
-        let avsR = [|0;1;|]
-        let pp = TwoCycleGen.qStack 1 avsL avsR
-                 |> Array.toList
-        Assert.AreEqual(pp.Length, avsL.Length + avsR.Length)
-
-
-    [<TestMethod>]
-    member this.rndQStack() =
-        let ys = Array.init 100 (fun _ -> 
-                TwoCycleGen.rndQstack TestData.iRando)
-
-        let chk = ys |> Array.map(TwoCyclePerm.toPermutation)
-                     |> Array.map(Permutation.isTwoCycle)
-
-        Assert.AreEqual(1, 1)
-
-    [<TestMethod>]
     member this.TestInversePermutation() =
 
        let inv = Permutation.inverse TestData.ComboStructures.permutation
@@ -140,8 +101,8 @@ type ComboStructuresFixture () =
     [<TestMethod>]
     member this.TwoCyclePerm_makeMode1() =
        let degree = Degree.fromInt 10
-       let aa = TwoCycleGen.makeOddMode degree
-       let ac = TwoCycleGen.makeOddModeWithCap degree
+       let aa = TwoCycleGen.oddMode degree
+       let ac = TwoCycleGen.oddModeWithCap degree
        let acv = TwoCyclePerm.arrayValues ac
 
        Assert.IsTrue(acv.Length > 0)
@@ -234,11 +195,13 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
-    member this.TwoCycleGen_evenDegree() =
-     let degree = Degree.fromInt 16
-     let res = TwoCycleGen.evenDegree degree 4
-
-     Assert.IsTrue ((TwoCyclePerm.arrayValues res).Length = (Degree.value degree))
+    member this.TwoCycleGen_evenMode() =
+     let evenDegree = Degree.fromInt 16
+     let resE = TwoCycleGen.evenMode evenDegree
+     Assert.IsTrue ((TwoCyclePerm.arrayValues resE).Length = (Degree.value evenDegree))
+     let oddDegree = Degree.fromInt 15
+     let resO = TwoCycleGen.evenMode oddDegree
+     Assert.IsTrue ((TwoCyclePerm.arrayValues resO).Length = (Degree.value oddDegree))
 
 
     [<TestMethod>]
@@ -304,3 +267,15 @@ type ComboStructuresFixture () =
       let intBitsBack = Record64Array.toIntArrays degree rec64Array
                         |> Seq.head
       Assert.AreEqual (intBits, intBitsBack)
+
+
+
+    [<TestMethod>]
+     member this.VecP64() =
+      let lhs = [|0UL .. 9UL|]
+      let rhs = [|2048UL .. 2057UL|]
+      let vot = Array.zeroCreate 100
+
+      VecP64.aOr2 lhs rhs vot |> ignore
+
+      Assert.AreEqual (1, 1)

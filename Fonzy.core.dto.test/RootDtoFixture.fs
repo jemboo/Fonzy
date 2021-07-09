@@ -10,7 +10,7 @@ type RootDtoFixture () =
     member this.RootDtoForSorterDto() =
         let testDto = TestData.SorterParts.makeRandomSorter() |> SorterDto.toDto
         let cereal =  RootDto.toJson testDto Map.empty
-        let testDataBack = cereal |> RootDto.extractFromJson<SorterDto>
+        let testDataBack = cereal |> RootDto.extractFromJson<sorterDto>
                                   |> Result.ExtractOrThrow
         let testDtoBack = fst testDataBack
         Assert.AreEqual(testDto, testDtoBack);

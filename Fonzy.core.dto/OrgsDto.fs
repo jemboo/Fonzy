@@ -57,7 +57,7 @@ module GenomeDto =
             }
         else if eDto.cat = "Sorter" then
             result {
-                let! sgDto = eDto.value |> Json.deserialize<SorterGenomeDto>
+                let! sgDto = eDto.value |> Json.deserialize<sorterGenomeDto>
                 let! sg = sgDto |> SorterGenomeDto.fromDto
                 return Genome.Sorter sg
             }

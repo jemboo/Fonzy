@@ -2,9 +2,9 @@
 open System
 
 
-type IntDistTypeDto = {cat:string; value:string}
+type intDistTypeDto = {cat:string; value:string}
 module IntDistTypeDto =
-    let fromDto (dto:IntDistTypeDto) =
+    let fromDto (dto:intDistTypeDto) =
         if dto.cat = "Uniform" then
             result {
                 let! b = Json.deserialize<UniformIntegerDistParams> dto.value
@@ -20,24 +20,24 @@ module IntDistTypeDto =
 
     let fromJson (jstr:string) =
         result {
-            let! dto = Json.deserialize<IntDistTypeDto> jstr
+            let! dto = Json.deserialize<intDistTypeDto> jstr
             return! fromDto dto
         }
 
     let toDto (idt:IntDistType) =
         match idt with
-        | IntDistType.Uniform up -> {IntDistTypeDto.cat="Uniform"; 
+        | IntDistType.Uniform up -> {intDistTypeDto.cat="Uniform"; 
                                     value=Json.serialize up}
-        | IntDistType.Normal np -> {IntDistTypeDto.cat="Normal"; 
+        | IntDistType.Normal np -> {intDistTypeDto.cat="Normal"; 
                                     value=Json.serialize np}
 
     let toJson (idt:IntDistType) =
         idt |> toDto |> Json.serialize
 
             
-type Int2dDistTypeDto = {cat:string; value:string}
+type int2dDistTypeDto = {cat:string; value:string}
 module Int2dDistTypeDto =
-    let fromDto (dto:Int2dDistTypeDto) =
+    let fromDto (dto:int2dDistTypeDto) =
         if dto.cat = "Uniform" then
             result {
                 let! b = Json.deserialize<UniformInt2dDistParams> dto.value
@@ -53,15 +53,15 @@ module Int2dDistTypeDto =
 
     let fromJson (jstr:string) =
         result {
-            let! dto = Json.deserialize<Int2dDistTypeDto> jstr
+            let! dto = Json.deserialize<int2dDistTypeDto> jstr
             return! fromDto dto
         }
 
     let toDto (idt:Int2dDistType) =
         match idt with
-        | Int2dDistType.Uniform up -> {Int2dDistTypeDto.cat="Uniform"; 
+        | Int2dDistType.Uniform up -> {int2dDistTypeDto.cat="Uniform"; 
                                             value = Json.serialize up}
-        | Int2dDistType.Normal np -> {Int2dDistTypeDto.cat="Normal";
+        | Int2dDistType.Normal np -> {int2dDistTypeDto.cat="Normal";
                                             value = Json.serialize np}
 
     let toJson (idt:Int2dDistType) =
@@ -69,9 +69,9 @@ module Int2dDistTypeDto =
 
 
 
-type IntDistDto = {intDistTypeDto:IntDistTypeDto; values:int[]}
+type intDistDto = {intDistTypeDto:intDistTypeDto; values:int[]}
 module IntDistDto =
-    let fromDto (dto:IntDistDto) =
+    let fromDto (dto:intDistDto) =
         result {
             let! idt = IntDistTypeDto.fromDto dto.intDistTypeDto
             return {IntDist.intDistType = idt; 
@@ -80,25 +80,25 @@ module IntDistDto =
 
     let fromJson (js:string) =
         result {
-            let! dto = Json.deserialize<IntDistDto> js
+            let! dto = Json.deserialize<intDistDto> js
             return! fromDto dto
         }
 
     let toDto (intD:IntDist) =
         {
-            IntDistDto.intDistTypeDto = intD.intDistType 
+            intDistDto.intDistTypeDto = intD.intDistType 
                                                  |> IntDistTypeDto.toDto;
-            IntDistDto.values = intD.vals
+            intDistDto.values = intD.vals
         }
 
     let toJson (idt:IntDist) =
         idt |> toDto |> Json.serialize
 
 
-type Int2dDistDto = {lattice2dDistTypeDto:Int2dDistTypeDto; 
+type int2dDistDto = {lattice2dDistTypeDto:int2dDistTypeDto; 
                                  values:Int2d[]}
 module Int2dDistDto =
-    let fromDto (dto:Int2dDistDto) =
+    let fromDto (dto:int2dDistDto) =
         result {
             let! ldt = Int2dDistTypeDto.fromDto dto.lattice2dDistTypeDto
             return {Int2dDist.lattice2dDistType = ldt; 
@@ -107,15 +107,15 @@ module Int2dDistDto =
 
     let fromJson (js:string) =
         result {
-            let! dto = Json.deserialize<Int2dDistDto> js
+            let! dto = Json.deserialize<int2dDistDto> js
             return! fromDto dto
         }
 
     let toDto (l2dD:Int2dDist) =
         {
-            Int2dDistDto.lattice2dDistTypeDto = l2dD.lattice2dDistType 
+            int2dDistDto.lattice2dDistTypeDto = l2dD.lattice2dDistType 
                                                         |> Int2dDistTypeDto.toDto;
-            Int2dDistDto.values = l2dD.vals;
+            int2dDistDto.values = l2dD.vals;
          }
 
     let toJson (idt:Int2dDist) =

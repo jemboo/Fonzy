@@ -8,9 +8,9 @@ module SwitchDto =
         (switch.hi * (switch.hi + 1)) / 2 + switch.low
      
 
-type SorterDto = {degree:int; switches:int[]}
+type sorterDto = {degree:int; switches:int[]}
 module SorterDto =
-    let fromDto (dto:SorterDto) =
+    let fromDto (dto:sorterDto) =
         result {
             let! degree = Degree.create "" dto.degree
             let! switches = dto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
@@ -20,21 +20,21 @@ module SorterDto =
         }
     let fromJson (cereal:string) =
         result {
-            let! sorterDto = cereal |> Json.deserialize<SorterDto>
+            let! sorterDto = cereal |> Json.deserialize<sorterDto>
             return! fromDto sorterDto
         }
     let toDto (sorter:Sorter) =
         {
-            SorterDto.degree = (Degree.value sorter.degree); 
+            sorterDto.degree = (Degree.value sorter.degree); 
             switches = sorter.switches |> Array.map(SwitchDto.toDto)
         }
     let toJson (sorter:Sorter) =
         sorter |> toDto |> Json.serialize
 
 
-type SorterSetDto = {id:Guid; degree:int; sorterDtos:SorterDto[]}
+type sorterSetDto = {id:Guid; degree:int; sorterDtos:sorterDto[]}
 module SorterSetDto =
-    let fromDto (dto:SorterSetDto) =
+    let fromDto (dto:sorterSetDto) =
         result {
             let! sorterSetId = dto.id |> SorterSetId.create
             let! degree = dto.degree |> Degree.create ""
@@ -45,44 +45,44 @@ module SorterSetDto =
         }
     let fromJson (cereal:string) =
         result {
-            let! sorterDto = cereal |> Json.deserialize<SorterSetDto>
+            let! sorterDto = cereal |> Json.deserialize<sorterSetDto>
             return! fromDto sorterDto
         }
     let toDto (sorterSet:SorterSet) =
         {
-            SorterSetDto.id = (SorterSetId.value sorterSet.id)
-            SorterSetDto.sorterDtos = sorterSet.sorters 
+            sorterSetDto.id = (SorterSetId.value sorterSet.id)
+            sorterSetDto.sorterDtos = sorterSet.sorters 
                                         |> Map.toArray
                                         |> Array.map(fun kvp -> 
                             (kvp |> snd |> SorterDto.toDto))
-            SorterSetDto.degree = (Degree.value sorterSet.degree)
+            sorterSetDto.degree = (Degree.value sorterSet.degree)
         }
     let toJson (sorters:SorterSet) =
         sorters |> toDto |> Json.serialize
 
 
-type SwitchUsesDto = {switchCount:int; weights:int[]}
+type switchUsesDto = {switchCount:int; weights:int[]}
 module SwitchUsesDto =
-    let fromDto (dto:SwitchUsesDto) =
+    let fromDto (dto:switchUsesDto) =
         result {
             return SwitchUses.init dto.weights
         }
 
     let fromJson (cereal:string) =
         result {
-            let! sorterDto = cereal |> Json.deserialize<SwitchUsesDto>
+            let! sorterDto = cereal |> Json.deserialize<switchUsesDto>
             return! fromDto sorterDto
         }
 
     let toDto (switchUses:SwitchUses) =
-        {SwitchUsesDto.switchCount= (SwitchUses.switchCount switchUses); 
+        {switchUsesDto.switchCount= (SwitchUses.switchCount switchUses); 
          weights = (SwitchUses.getWeights switchUses)}
 
     let toJson (switchUses:SwitchUses) =
         switchUses |> toDto |> Json.serialize
 
 
-type SorterGenDto = {cat:string; prams:Map<string,string>} 
+type sorterGenDto = {cat:string; prams:Map<string,string>} 
 module SorterGenDto =
     let toDto (sg:SorterGen) =
         match sg with
@@ -92,21 +92,21 @@ module SorterGenDto =
                     ("switchCount", (SwitchCount.value wc) |> string);
                     ("degree", (Degree.value d) |> string);
                 ] |> Map.ofList
-            {SorterGenDto.cat="RandSwitches"; SorterGenDto.prams=prams} 
+            {sorterGenDto.cat="RandSwitches"; sorterGenDto.prams=prams} 
         | SorterGen.RandStages (tc, d) -> 
             let prams = 
                 [
                     ("stageCount", (StageCount.value tc) |> string);
                     ("degree", (Degree.value d) |> string);
                 ] |> Map.ofList
-            {SorterGenDto.cat="RandStages"; SorterGenDto.prams=prams} 
+            {sorterGenDto.cat="RandStages"; sorterGenDto.prams=prams} 
         | SorterGen.RandCoComp (tc, d) -> 
             let prams = 
                 [
                     ("stageCount", (StageCount.value tc) |> string);
                     ("degree", (Degree.value d) |> string);
                 ] |> Map.ofList
-            {SorterGenDto.cat="RandCoComp"; SorterGenDto.prams=prams}
+            {sorterGenDto.cat="RandCoComp"; sorterGenDto.prams=prams}
         | SorterGen.RandBuddies (tc, ws, d) -> 
             let prams = 
                 [
@@ -114,14 +114,14 @@ module SorterGenDto =
                     ("windowSize", (StageCount.value ws) |> string);
                     ("degree", (Degree.value d) |> string);
                 ] |> Map.ofList
-            {SorterGenDto.cat="RandBuddies"; SorterGenDto.prams=prams} 
+            {sorterGenDto.cat="RandBuddies"; sorterGenDto.prams=prams} 
         | SorterGen.RandSymmetric (tc, d) -> 
             let prams = 
                 [
                     ("stageCount", (StageCount.value tc) |> string);
                     ("degree", (Degree.value d) |> string);
                 ] |> Map.ofList
-            {SorterGenDto.cat="RandSymmetric"; SorterGenDto.prams=prams} 
+            {sorterGenDto.cat="RandSymmetric"; sorterGenDto.prams=prams} 
         | SorterGen.RandSymmetricBuddies (tc, ws, d) -> 
             let prams = 
                 [
@@ -129,14 +129,14 @@ module SorterGenDto =
                     ("windowSize", (StageCount.value ws) |> string);
                     ("degree", (Degree.value d) |> string);
                 ] |> Map.ofList
-            {SorterGenDto.cat="RandSymmetricBuddies"; SorterGenDto.prams=prams} 
+            {sorterGenDto.cat="RandSymmetricBuddies"; sorterGenDto.prams=prams} 
 
 
 
     let toJson (cs:SorterGen) =
         cs |> toDto |> Json.serialize
 
-    let fromDto (sgDto:SorterGenDto) =
+    let fromDto (sgDto:sorterGenDto) =
             match sgDto.cat with
             | "RandSwitches" -> 
                     result {
@@ -199,12 +199,12 @@ module SorterGenDto =
 
     let fromJson (js:string) =
         result {
-            let! dto = Json.deserialize<SorterGenDto> js
+            let! dto = Json.deserialize<sorterGenDto> js
             return! fromDto dto
         }
 
 
-type SorterRndGenDto = {cat:string; prams:Map<string,string>; switches:int[]} 
+type sorterRndGenDto = {cat:string; prams:Map<string,string>; switches:int[]} 
 module SorterRndGenDto =
     let toDto (sg:sorterRndGen) =
         match sg with
@@ -216,7 +216,7 @@ module SorterRndGenDto =
                 ] |> Map.ofList
             let switchListDto = switchList |> List.toArray 
                                 |> Array.map(fun sw -> SwitchDto.toDto sw)
-            {SorterRndGenDto.cat="RandSwitches"; prams=prams; switches=switchListDto; } 
+            {sorterRndGenDto.cat="RandSwitches"; prams=prams; switches=switchListDto; } 
         | sorterRndGen.RandStages (switchList, tc, d) ->
             let prams = 
                 [
@@ -225,7 +225,7 @@ module SorterRndGenDto =
                 ] |> Map.ofList                
             let switchListDto = switchList |> List.toArray 
                                     |> Array.map(fun sw -> SwitchDto.toDto sw)
-            { SorterRndGenDto.cat="RandStages"; prams=prams; switches=switchListDto; } 
+            { sorterRndGenDto.cat="RandStages"; prams=prams; switches=switchListDto; } 
         | sorterRndGen.RandBuddies (switchList, tc, ws, d) ->
             let prams = 
                 [
@@ -235,7 +235,7 @@ module SorterRndGenDto =
                 ] |> Map.ofList
             let switchListDto = switchList |> List.toArray 
                                 |> Array.map(fun sw -> SwitchDto.toDto sw)
-            { SorterRndGenDto.cat="RandBuddies"; prams=prams; switches=switchListDto; } 
+            { sorterRndGenDto.cat="RandBuddies"; prams=prams; switches=switchListDto; } 
         | sorterRndGen.RandSymmetric (switchList, tc, d) ->
             let prams = 
                 [
@@ -244,7 +244,7 @@ module SorterRndGenDto =
                 ] |> Map.ofList            
             let switchListDto = switchList |> List.toArray 
                                 |> Array.map(fun sw -> SwitchDto.toDto sw)
-            { SorterRndGenDto.cat="RandSymmetric"; prams=prams; switches=switchListDto; } 
+            { sorterRndGenDto.cat="RandSymmetric"; prams=prams; switches=switchListDto; } 
         | sorterRndGen.RandSymmetricBuddies (switchList, tc, ws, d) ->
             let prams =
                 [
@@ -254,14 +254,14 @@ module SorterRndGenDto =
                 ] |> Map.ofList
             let switchListDto = switchList |> List.toArray 
                                 |> Array.map(fun sw -> SwitchDto.toDto sw)
-            { SorterRndGenDto.cat="RandSymmetricBuddies"; prams=prams; switches=switchListDto; } 
+            { sorterRndGenDto.cat="RandSymmetricBuddies"; prams=prams; switches=switchListDto; } 
 
 
 
     let toJson (cs:sorterRndGen) =
         cs |> toDto |> Json.serialize
 
-    let fromDto (sgDto:SorterRndGenDto) =
+    let fromDto (sgDto:sorterRndGenDto) =
             match sgDto.cat with
             | "RandSwitches" -> 
                     result {
@@ -334,6 +334,6 @@ module SorterRndGenDto =
 
     let fromJson (js:string) =
         result {
-            let! dto = Json.deserialize<SorterRndGenDto> js
+            let! dto = Json.deserialize<sorterRndGenDto> js
             return! fromDto dto
         }

@@ -1,17 +1,17 @@
 ﻿namespace global
 open System
 
-type CauseSpecDto = {id:Guid; genus:string[]; prams:Map<string,string>;}
+type causeSpecDto = {id:Guid; genus:string[]; prams:Map<string,string>;}
 module CauseSpecDto =
     let toDto (cs:CauseSpec) =
-        {CauseSpecDto.id = CauseSpecId.value cs.id;
-         CauseSpecDto.genus = cs.genus|> List.toArray;
-         CauseSpecDto.prams = cs.prams;}
+        {causeSpecDto.id = CauseSpecId.value cs.id;
+         causeSpecDto.genus = cs.genus|> List.toArray;
+         causeSpecDto.prams = cs.prams;}
 
     let toJson (cs:CauseSpec) =
         cs |> toDto |> Json.serialize
 
-    let fromDto (csDto:CauseSpecDto) =
+    let fromDto (csDto:causeSpecDto) =
             {CauseSpec.id = CauseSpecId.fromGuid csDto.id;
              CauseSpec.genus = csDto.genus |> Array.toList;
              CauseSpec.prams = csDto.prams;
@@ -19,7 +19,7 @@ module CauseSpecDto =
 
     let fromJson (js:string) =
         result {
-            let! dto = Json.deserialize<CauseSpecDto> js
+            let! dto = Json.deserialize<causeSpecDto> js
             return! fromDto dto
         }
 

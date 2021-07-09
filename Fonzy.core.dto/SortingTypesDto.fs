@@ -1,6 +1,6 @@
 ﻿namespace global
 
-type SwitchOrStageCountDto = {wOrT:string; value:int;}
+type switchOrStageCountDto = {wOrT:string; value:int;}
 module SwitchOrStageCountDto =
     
     let toDto (sorterLength:SwitchOrStageCount) =
@@ -11,7 +11,7 @@ module SwitchOrStageCountDto =
     let toJson (sorterLength:SwitchOrStageCount) =
         sorterLength |> toDto |> Json.serialize
 
-    let fromDto (dto:SwitchOrStageCountDto) =
+    let fromDto (dto:switchOrStageCountDto) =
         let parseCat cat count =
             match cat with
             | "Switch" -> SwitchOrStageCount.Switch 
@@ -25,6 +25,6 @@ module SwitchOrStageCountDto =
 
     let fromJson (cereal:string) =
         result {
-            let! dto = cereal |> Json.deserialize<SwitchOrStageCountDto>
+            let! dto = cereal |> Json.deserialize<switchOrStageCountDto>
             return! dto |> fromDto
         }

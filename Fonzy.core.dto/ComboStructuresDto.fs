@@ -1,8 +1,8 @@
 ﻿namespace global
 
-type PermutationDto = {degree:int; values:int[] }
+type permutationDto = {degree:int; values:int[] }
 module PermutationDto =
-    let fromDto (dto:PermutationDto) =
+    let fromDto (dto:permutationDto) =
         result {
             let! degree = Degree.create "" dto.degree
             return! Permutation.createR degree dto.values
@@ -13,15 +13,15 @@ module PermutationDto =
         
     let fromJson (cereal:string) =
         result {
-            let! dto = Json.deserialize<PermutationDto> cereal
+            let! dto = Json.deserialize<permutationDto> cereal
             let! degree = Degree.create "" dto.degree
             return! Permutation.createR degree dto.values
         }
 
 
-type TwoCyclePermDto =  {degree:int; values:int[] }
+type twoCyclePermDto =  {degree:int; values:int[] }
 module TwoCyclePermDto =
-    let fromDto (dto:TwoCyclePermDto) =
+    let fromDto (dto:twoCyclePermDto) =
         result {
             let! degree = Degree.create "" dto.degree
             return! TwoCyclePerm.create degree dto.values
@@ -32,7 +32,7 @@ module TwoCyclePermDto =
 
     let fromJson (cereal:string) =
         result {
-            let! dto = Json.deserialize<TwoCyclePermDto> cereal
+            let! dto = Json.deserialize<twoCyclePermDto> cereal
             let! degree = Degree.create "" dto.degree
             return! TwoCyclePerm.create degree dto.values
         }

@@ -44,7 +44,7 @@ module SorterSetId =
 module SorterCount =
     let value (SorterCount v) = v
     let create fieldName v = 
-        ConstrainedType.createInt fieldName SorterCount 1 100000 v
+        ConstrainedType.createInt fieldName SorterCount 1 1000000 v
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
@@ -137,8 +137,8 @@ module StageCount =
     let value (StageCount v) = v
     let create fieldName v = 
         ConstrainedType.createInt fieldName StageCount 0 100000 v
-    let ToSwitchCount (degree:Degree) (stageCount:StageCount) =
-        SwitchCount.create "" ((Degree.value degree) * (value stageCount) / 2)
+    let toSwitchCount (degree:Degree) (stageCount:StageCount) =
+        SwitchCount.fromInt ((Degree.value degree) * (value stageCount) / 2)
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {

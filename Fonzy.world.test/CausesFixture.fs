@@ -13,7 +13,7 @@ type CausesFixture () =
         let env = Enviro.Empty
         let newEnv = cause.op env |> Result.ExtractOrThrow
         let causedProd, causedMeta =  
-            Enviro.getDtoAndMetaFromEnviro<IntDistDto> 
+            Enviro.getDtoAndMetaFromEnviro<intDistDto> 
                                 newEnv 
                                 TestData.CauseSpec.IntDist.arrayName
             |> Result.ExtractOrThrow
@@ -29,7 +29,7 @@ type CausesFixture () =
         let env = Enviro.Empty
         let newEnv = cause.op env |> Result.ExtractOrThrow
         let causedProd, causedMeta =  
-            Enviro.getDtoAndMetaFromEnviro<Int2dDistDto> 
+            Enviro.getDtoAndMetaFromEnviro<int2dDistDto> 
                                 newEnv 
                                 TestData.CauseSpec.IntDist.arrayName2d
             |> Result.ExtractOrThrow
@@ -44,7 +44,7 @@ type CausesFixture () =
         let env = Enviro.Empty
         let newEnv = cause.op env |> Result.ExtractOrThrow
         let causedProd, causedMeta =  
-            Enviro.getDtoAndMetaFromEnviro<SorterSetDto> 
+            Enviro.getDtoAndMetaFromEnviro<sorterSetDto> 
                                 newEnv 
                                 TestData.CauseSpec.SorterSet.rndSorterSetName
             |> Result.ExtractOrThrow
@@ -92,3 +92,26 @@ type CausesFixture () =
                                 TestData.CauseSpec.SorterSet.sorterEvalResultsName
             |> Result.ExtractOrThrow
         Assert.IsTrue(sorterEvalResults.Length > 0)
+
+
+
+    [<TestMethod>]
+    member this.CauseRndGenToPerfBins() =
+
+        let causeEval = Causes.fromCauseSpec 
+                                TestData.CauseSpec.SorterSet.rndGenToSorterPerfBins 
+                                |> Result.ExtractOrThrow
+
+        let resWrld = World.createFromParent World.empty
+                                  causeEval
+                      |> Result.ExtractOrThrow
+
+        let envEvalRes = resWrld.enviro
+
+        let sorterEvalResults, unusedMeta =  
+             Enviro.getDtoAndMetaFromEnviro<sorterPerfBinDto[]> 
+                                envEvalRes
+                                TestData.CauseSpec.SorterSet.sorterEvalResultsName
+            |> Result.ExtractOrThrow
+        let sbins = sorterEvalResults |> Array.sortByDescending(fun ia -> ia.[2])
+        Assert.IsTrue(true)

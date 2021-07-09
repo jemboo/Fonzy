@@ -1,6 +1,8 @@
 ﻿namespace global
 open System
+open FSharpx.Collections
 
+type yab = {b:PersistentVector<Switch>}
 type Sorter = {degree:Degree; 
                switches:array<Switch>; 
                switchCount:SwitchCount}

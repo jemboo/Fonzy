@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +25,7 @@
     <Compile Include="SorterGen.fs" />
     <Compile Include="SorterSet.fs" />
     <Compile Include="SortableSet.fs" />
+    <Compile Include="SortableVec.fs" />
     <Compile Include="SwitchEventRecords.fs" />
     <Compile Include="SortableSetRollout.fs" />
     <Compile Include="SwitchEventRollout.fs" />
@@ -39,11 +41,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="FSharpx.Collections" Version="2.1.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="5.0.1" />
+    <PackageReference Update="FSharp.Core" Version="5.0.2" />
   </ItemGroup>
 
 </Project>

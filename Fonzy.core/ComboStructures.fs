@@ -1,5 +1,7 @@
 ﻿namespace global
 
+open System.Numerics
+
 
 // a permutation of the set {0, 1,.. (degree-1)}
 type Permutation = private {degree:Degree; values:int[] }
@@ -194,7 +196,7 @@ module TwoCyclePerm =
 
 
     let rndSymmetric (degree:Degree) 
-                          (rnd:IRando) =
+                     (rnd:IRando) =
         let deg = (Degree.value degree)
         let aRet = Array.init deg (id)
         let chunkProc (ch:(int*int)[]) =
@@ -218,227 +220,8 @@ module TwoCyclePerm =
 
 
 module TwoCycleGen =
-    let stack (lhs:int[]) (rhs:int[]) =
-        let d = lhs.Length
-        let aa = Array.init (d*2) (fun dex -> 
-            if (dex < d) then lhs.[dex]
-            else rhs.[dex-d] + d)
-        aa
 
-    let quad (qDex:int) (avs:int[])  =
-        let qLen = avs.Length/4
-        let qStart = qLen*qDex
-        let qEnd = qStart + qLen - 1
-        seq {for i=qStart to qEnd do yield avs.[i] }
-
-    let t0 (avs:int[]) =
-        avs
-
-    let t1 (avs:int[]) =
-        quad 3 avs
-        |> Seq.append (quad 1 avs)
-        |> Seq.append (quad 2 avs)
-        |> Seq.append (quad 0 avs)
-        |> Seq.toArray
-
-    let t2 (avs:int[]) =
-        quad 3 avs
-        |> Seq.append (quad 0 avs)
-        |> Seq.append (quad 1 avs)
-        |> Seq.append (quad 2 avs)
-        |> Seq.toArray
-
-    let t3 (avs:int[]) =
-        quad 0 avs
-        |> Seq.append (quad 2 avs)
-        |> Seq.append (quad 1 avs)
-        |> Seq.append (quad 3 avs)
-        |> Seq.toArray
-
-    let t4 (avs:int[]) =
-        quad 1 avs
-        |> Seq.append (quad 2 avs)
-        |> Seq.append (quad 3 avs)
-        |> Seq.append (quad 0 avs)
-        |> Seq.toArray
-
-    let qStack (dex:int) (avsL:int[]) (avsR:int[]) =
-        let avs = stack avsL avsR
-        match dex with
-        | 0 -> t0 avs
-        | 1 -> t1 avs
-        | 2 -> t2 avs
-        | 3 -> t3 avs
-        | _ -> t4 avs
-
-    let qSeed (randy:IRando) =
-        let rv = randy.NextPositiveInt % 2
-        match rv with
-        | 0 -> [|0;1|]
-        | _ -> [|1;0|]
-
-    let rndQstack (randy:IRando) =
-        let q0 = qStack (randy.NextPositiveInt % 5)
-                        (qSeed randy)
-                        (qSeed randy)
-        let q1 = qStack (randy.NextPositiveInt % 5)
-                        (qSeed randy)
-                        (qSeed randy)
-
-        let q2 = qStack (randy.NextPositiveInt % 5)
-                        (qSeed randy)
-                        (qSeed randy)
-
-        let q3 = qStack (randy.NextPositiveInt % 5)
-                        (qSeed randy)
-                        (qSeed randy)
-
-        let h1 = qStack (randy.NextPositiveInt % 5)
-                        q0
-                        q1
-
-        let h2 = qStack (randy.NextPositiveInt % 5)
-                        q2
-                        q3
-
-        let res = qStack (randy.NextPositiveInt % 5)
-                        h1
-                        h2
-        let conj = Combinatorics.composeMapIntArrays res
-                        (Combinatorics.inverseMapArray res)
-        {TwoCyclePerm.degree = Degree.fromInt 16; 
-                    TwoCyclePerm.values = conj; }
-
-
-    let evenDegree (degree:Degree) (offset:int) =
-        let d = (Degree.value degree)
-        let shoof v =
-            if (v%2 = 0) then (v + d + offset) % d
-            else (v + d - offset) % d
-        let arr = Array.init d (shoof)
-        {TwoCyclePerm.degree = degree; TwoCyclePerm.values = arr}
-        
-
-    let eightBlock0 (d:Degree) = 
-        let _eightBlock0 (src:int) = 
-            let mm = src % 8
-            let mb = src - mm
-            if mm = 0      then mb + 2
-            else if mm = 1 then mb + 3
-            else if mm = 2 then mb + 0
-            else if mm = 3 then mb + 1
-            else if mm = 4 then mb + 6
-            else if mm = 5 then mb + 7
-            else if mm = 6 then mb + 4
-            else                mb + 5
-        let aa = Array.init (Degree.value d) (_eightBlock0)
-        { degree=d; values=aa }
-
-    let eightBlock1 (d:Degree) = 
-        let _eightBlock1 (src:int) = 
-            let mm = src % 8
-            let mb = src - mm
-            if mm = 0      then mb + 4
-            else if mm = 1 then mb + 5
-            else if mm = 2 then mb + 6
-            else if mm = 3 then mb + 7
-            else if mm = 4 then mb + 0
-            else if mm = 5 then mb + 1
-            else if mm = 6 then mb + 2
-            else                mb + 3
-        let aa = Array.init (Degree.value d) (_eightBlock1)
-        { degree=d; values=aa }
-
-    let eightBlock2 (d:Degree) = 
-        let _eightBlock2 (src:int) = 
-            let mm = src % 8
-            let mb = src - mm
-            if mm = 0      then mb + 1
-            else if mm = 1 then mb + 0
-            else if mm = 2 then mb + 3
-            else if mm = 3 then mb + 2
-            else if mm = 4 then mb + 5
-            else if mm = 5 then mb + 4
-            else if mm = 6 then mb + 7
-            else                mb + 6
-        let aa = Array.init (Degree.value d) (_eightBlock2)
-        { degree=d; values=aa }
-
-    let make2EightBlocks (conj:Permutation list) =
-        let coes (conj:Permutation) =
-            result {
-                        let! b0 = TwoCyclePerm.conjugate (eightBlock0 conj.degree) conj
-                        let! b1 = TwoCyclePerm.conjugate (eightBlock1 conj.degree) conj
-                        return seq { yield b0; yield b1; }
-                   }
-        result {
-                    let! rOf = conj |> List.map(fun c -> coes c)
-                                    |> Result.sequence
-                    return rOf |> Seq.concat
-               }
-
-    let make3EightBlocks (conj:Permutation list) =
-        let coes (conj:Permutation) =
-            result {
-                        let! b0 = TwoCyclePerm.conjugate (eightBlock0 conj.degree) conj
-                        let! b1 = TwoCyclePerm.conjugate (eightBlock1 conj.degree) conj
-                        let! b2 = TwoCyclePerm.conjugate (eightBlock2 conj.degree) conj
-                        return seq { yield b0; yield b1; yield b2; }
-                   }
-        result {
-                    let! rOf = conj |> List.map(fun c -> coes c)
-                                    |> Result.sequence
-                    return rOf |> Seq.concat
-               }
-
-    let fourBlock0 (d:Degree) = 
-        let _fourBlock0 (src:int) = 
-            let mm = src % 4
-            let mb = src - mm
-            if mm = 0 then mb + 1
-            else if mm = 1 then mb
-            else if mm = 2 then mb + 3
-            else mb + 2
-        let aa = Array.init (Degree.value d) (_fourBlock0)
-        { degree=d; values=aa }
-
-    let fourBlock1 (d:Degree)  = 
-        let _fourBlock1 (src:int) = 
-            let mm = src % 4
-            let mb = src - mm
-            if mm = 0 then mb + 3
-            else if mm = 1 then mb + 2
-            else if mm = 2 then mb + 1
-            else mb
-        let aa = Array.init (Degree.value d) (_fourBlock1)
-        { degree=d; values=aa }
-
-    let fourBlock2 (d:Degree) = 
-        let _fourBlock2 (src:int) = 
-            let mm = src % 4
-            let mb = src - mm
-            if mm = 0 then mb + 2
-            else if mm = 1 then mb + 3
-            else if mm = 2 then mb
-            else mb + 1
-        let aa = Array.init (Degree.value d) (_fourBlock2)
-        { degree=d; values=aa }
-
-    let make3FourBlocks (conj:Permutation list) =
-        let coes (conj:Permutation) =
-            result {
-                        let! b0 = TwoCyclePerm.conjugate (fourBlock0 conj.degree) conj
-                        let! b1 = TwoCyclePerm.conjugate (fourBlock1 conj.degree) conj
-                        let! b2 = TwoCyclePerm.conjugate (fourBlock2 conj.degree) conj
-                        return seq { yield b0; yield b1; yield b2; }
-                   }
-        result {
-                    let! rOf = conj |> List.map(fun c -> coes c)
-                                    |> Result.sequence
-                    return rOf |> Seq.concat
-               }
-
-    let makeEvenMode (degree:Degree) =
+    let evenMode (degree:Degree) =
         let d = (Degree.value degree)
         let dm =
             if (d%2 > 0) then d-1
@@ -450,7 +233,8 @@ module TwoCycleGen =
             else p - 1
         { degree=degree; values=Array.init d (yak) }
 
-    let makeOddMode (degree:Degree) =
+
+    let oddMode (degree:Degree) =
         let d = (Degree.value degree)
         let dm =
             if (d%2 = 0) then d-1
@@ -463,11 +247,9 @@ module TwoCycleGen =
             else p + 1
         { degree=degree; values=Array.init d (yak) }
 
-    let makeOddModeFromEvenDegreeWithCap (degree:Degree) =
+
+    let oddModeFromEvenDegreeWithCap (degree:Degree) =
         let d = (Degree.value degree)
-        let dm =
-            if (d%2 = 0) then d-1
-            else d
         let yak p =
             if p = 0 then d-1
             else if p = d-1 then 0
@@ -476,26 +258,29 @@ module TwoCycleGen =
             else p + 1
         { degree=degree; values=Array.init d (yak) }
 
-    let makeOddModeWithCap (degree:Degree) =
+
+    let oddModeWithCap (degree:Degree) =
         let d = (Degree.value degree)
-        if (d%2 = 0) then makeOddModeFromEvenDegreeWithCap degree
-        else makeOddMode degree
+        if (d%2 = 0) then oddModeFromEvenDegreeWithCap degree
+        else oddMode degree
+
 
     let makeAltEvenOdd (degree:Degree) (conj:Permutation) =
         seq {while true do 
-                    yield TwoCyclePerm.conjugate 
-                            (makeEvenMode degree) conj; 
-                    yield TwoCyclePerm.conjugate 
-                            (makeOddModeWithCap degree) conj; }
+                yield TwoCyclePerm.conjugate 
+                        (evenMode degree) conj; 
+                yield TwoCyclePerm.conjugate 
+                        (oddModeWithCap degree) conj; }
+
 
     let makeCoConjugateEvenOdd (conj:Permutation list) =
         let coes (conj:Permutation) =
             result {
-                        let! eve = TwoCyclePerm.conjugate 
-                                    (makeEvenMode conj.degree) conj
-                        let! odd = TwoCyclePerm.conjugate 
-                                    (makeOddModeWithCap conj.degree) conj
-                        return seq { yield eve; yield odd; }
+                    let! eve = TwoCyclePerm.conjugate 
+                                (evenMode conj.degree) conj
+                    let! odd = TwoCyclePerm.conjugate 
+                                (oddModeWithCap conj.degree) conj
+                    return seq { yield eve; yield odd; }
                    }
         result {
                     let! rOf = conj |> List.map(fun c -> coes c)
@@ -625,7 +410,8 @@ module IntBits =
         {IntBits.values = perm }
 
 
-    let createRandoms (degree:Degree) (rnd:IRando) =
+    let createRandoms (degree:Degree) 
+                      (rnd:IRando) =
         seq { while true do 
                 yield createRandom degree rnd }
 
@@ -846,4 +632,70 @@ module Record64Array =
                                 |> ByteUtils.trueBitIndexes64 
                                 |> Seq.map(fun dx -> dx + i*64 ) )
         }  |> Seq.map(IntBits.fromInteger (Degree.value degree))
+
+
+type vecP64 = { values: uint64[] }
+
+type vecP64b = { values: Vector<uint64> }
+    
+    
+//type sortableVecb = { degree:Degree; vecLines:Vector<uint64>[] }
+
+
+module VecP64 = 
+    
+    //let makeVec (ofw:vecP64) = 
+    //    let lowVec = Vector(ofw.values)
+
+    //    None
+    
+    //let fromBitsP64 (degree:Degree)
+    //                (bitsP64:seq<bitsP64>) =
+    //    let fromRz (rz:ResizeArray<uint64>) = 
+    //        Vector( rz |> Seq.toArray)
+            
+    //    let rszFv = Array.init (Degree.value degree)
+    //                           (fun _ -> new ResizeArray<uint64>())
+    //    let rszAppend (bp:bitsP64) = 
+    //        bp.values |> Array.iteri(fun i ui64 -> rszFv.[i].Add ui64)
+
+    //    bitsP64 |> Seq.iter(rszAppend)
+    //    {
+    //        sortableVecb.degree = degree;
+    //        vecLines = 
+    //            Array.init
+    //                (Degree.value degree)
+    //                (fun i -> fromRz rszFv.[i] )
+    //    }
+
+
+    //let fromIntBits (degree:Degree)
+    //                (intBits:seq<IntBits>) =
+    //    intBits |> BitsP64.fromIntBits
+    //            |> fromBitsP64 degree
+
+
+    let aOr (lhs:uint64[]) 
+            (rhs:uint64[]) 
+            (res:uint64[]) =
+        let mutable i = 0
+        while i < lhs.Length - 3 do
+            let vlhs = Vector<uint64>(lhs, i)
+            let vrhs = Vector<uint64>(rhs, i)
+            let vres = vlhs ||| vrhs
+            vres.CopyTo(res, i)
+            i <- i + 4
+        while i < lhs.Length do
+            res.[i] <- lhs.[i] ||| rhs.[i]
+            i <- i + 1
+
+
+    let aOr2 (lhs:uint64[]) 
+             (rhs:uint64[]) 
+             (res:uint64[]) =
+        let mutable i = 0
+        while i < lhs.Length do
+            res.[i] <- lhs.[i] ||| rhs.[i]
+            i <- i + 1
+       
 

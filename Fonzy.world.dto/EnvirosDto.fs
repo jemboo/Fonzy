@@ -2,7 +2,7 @@
 open System
 
 
-type EnviroDto = {cat:string; value:string}
+type enviroDto = {cat:string; value:string}
 module EnviroDto =
     let toDto (env:Enviro) =
         match env with
@@ -15,7 +15,7 @@ module EnviroDto =
     let toJson (idt:Enviro) =
         idt |> toDto |> Json.serialize
 
-    let fromDto (eDto:EnviroDto) =
+    let fromDto (eDto:enviroDto) =
         if eDto.cat = "Empty" then
             result {
                 return Enviro.Empty
@@ -36,6 +36,6 @@ module EnviroDto =
 
     let fromJson (js:string) =
         result {
-            let! dto = Json.deserialize<EnviroDto> js
+            let! dto = Json.deserialize<enviroDto> js
             return! fromDto dto
         }

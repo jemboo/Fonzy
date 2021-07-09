@@ -9,7 +9,7 @@ type SorterGen =
                     //2nd StageCount is window size
     | RandSymmetric of StageCount * Degree
     | RandSymmetricBuddies of StageCount * StageCount * Degree
-                        //2nd StageCount is window size
+                    //2nd StageCount is window size
 
 
 module SorterGen =
@@ -195,7 +195,6 @@ module SorterGen =
                     degree 
                     switchCount 
                     randy
-
         | SorterGen.RandStages (stageCount, degree) ->
             let sc = SwitchFrequency.fromFloat 1.0
             randomStages 
@@ -203,35 +202,30 @@ module SorterGen =
                     stageCount 
                     sc
                     randy
-
         | SorterGen.RandCoComp (stageCount, degree) ->
             randomConjugatesOfEvenOdd 
                            degree 
                            stageCount
                            randy
             |> Result.ExtractOrThrow
-
         | SorterGen.RandBuddies (stageCount, windowSize, degree) ->
             randomBuddies
                            degree 
                            stageCount
                            windowSize
                            randy
-
         | SorterGen.RandSymmetric (stageCount, degree) ->
             randomSymmetric 
                            degree 
                            stageCount
                            randy
             |> Result.ExtractOrThrow
-
         | SorterGen.RandSymmetricBuddies (stageCount, windowSize, degree) ->
             randomReflSymmetricBuddies
                            degree 
                            stageCount
                            windowSize
                            randy
-
 
 
     let createRandomArray (sorterGen:SorterGen)
@@ -270,6 +264,15 @@ module SorterRndGen =
         | RandSymmetricBuddies  (_, _, _, d) -> d
 
 
+    let getSwitchPrefix (srg:sorterRndGen) =
+        match srg with
+        | RandSwitches (swl, _, _) -> swl
+        | RandStages   (swl, _, _) -> swl
+        | RandBuddies  (swl, _, _, _) -> swl
+        | RandSymmetric   (swl, _, _) -> swl
+        | RandSymmetricBuddies  (swl, _, _, _) -> swl
+
+
     let reportString (sorterGen:sorterRndGen) (pfxDescr:string) =
         match sorterGen with
         | RandSwitches (pfxc, wc, d) ->   
@@ -299,14 +302,18 @@ module SorterRndGen =
                                         (Degree.value d)
 
 
+    // shorten the length of wSfx by the length of wPfx
     let fromSwitchesAndPrefix
             (degree:Degree)
             (wPfx: Switch seq)
             (wSfx: Switch seq) =
         let switches = 
+            let aPfx = wPfx |> Seq.toArray
+            let aSfx = wSfx |> Seq.toArray
+            let aTrim = aSfx |> Array.take(aSfx.Length - aPfx.Length)
             seq { 
-                    yield! wPfx
-                    yield! wSfx
+                    yield! aPfx
+                    yield! aTrim
                 }
             |> Seq.toArray
         Sorter.fromSwitches degree switches
@@ -336,7 +343,6 @@ module SorterRndGen =
 
 
     // IRando dependent
-
     let randomStages (degree:Degree) 
                      (wPfx: Switch seq) 
                      (stageCount:StageCount)
@@ -492,18 +498,18 @@ module SorterRndGen =
                            windowSize
                            randy
 
-    let createRandomArray (sorterGen:sorterRndGen)
+    let createRandomArray (sorterRndGen:sorterRndGen)
                           (sorterCount:SorterCount)
                           (rnd:IRando) =
             (seq {1 .. (SorterCount.value sorterCount)} 
-                    |> Seq.map(fun _ -> (createRandom sorterGen rnd))
+                    |> Seq.map(fun _ -> (createRandom sorterRndGen rnd))
                     |> Seq.toArray)
 
-    let createRandomArrayP (sorterGen:sorterRndGen)
+    let createRandomArrayP (sorterRndGen:sorterRndGen)
                            (sorterCount:SorterCount)
                            (rnd:IRando) =
         Array.init (SorterCount.value sorterCount)
                    (fun _ -> Rando.fromSeed RngType.Lcg rnd.NextPositiveInt)
                 |> Array.Parallel.map
-                            (fun r -> createRandom sorterGen r)
+                            (fun r -> createRandom sorterRndGen r)
 

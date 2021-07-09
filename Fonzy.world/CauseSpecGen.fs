@@ -27,22 +27,22 @@ module SorterPerfBinGen =
     let sorterCountForDegree (degree:Degree) = 
 
         if (Degree.value degree) = 8 then
-             (SorterCount.fromInt 100000)
+             (SorterCount.fromInt 200000)
         elif (Degree.value degree) = 10 then
-             (SorterCount.fromInt 100000)
+             (SorterCount.fromInt 200000)
         elif (Degree.value degree) = 12 then
-             (SorterCount.fromInt 100000)
+             (SorterCount.fromInt 200000)
         elif (Degree.value degree) = 14 then
-             (SorterCount.fromInt 50000)
+             (SorterCount.fromInt 200000)
         elif (Degree.value degree) = 16 then
-             (SorterCount.fromInt 50000)
+             (SorterCount.fromInt 100000)
         elif (Degree.value degree) = 18 then
-             (SorterCount.fromInt 25000)
+             (SorterCount.fromInt 50000)
         elif (Degree.value degree) = 20 then
-             (SorterCount.fromInt 10000)
+             (SorterCount.fromInt 20000)
         elif (Degree.value degree) = 22 then
              (SorterCount.fromInt 4000)
-        else (SorterCount.fromInt 1000)
+        else (SorterCount.fromInt 2000)
 
 
     let sorterCountForDegreeTest (degree:Degree) = 
@@ -131,7 +131,8 @@ module SorterPerfBinGen =
         (makeBuddyArgs999 degreesToTest) |> List.map(SorterGen.RandSymmetricBuddies)
 
 
-    let makeRunBatchSeq (seed:int) (outputDir:string)= 
+    let makeRunBatchSeq (seed:int) 
+                        (outputDir:string)= 
         let randy = RngGen.createLcg seed |> Rando.fromRngGen
         let nextRnGen(randy:IRando) =
             RngGen.createLcg randy.NextPositiveInt
@@ -148,7 +149,7 @@ module SorterPerfBinGen =
                 // (makeRandSymmetric degreesToTest) |> List.append
                  //(makeRandStages999 degreesToTest) |> List.append
                  // (makeRandStages900 degreesToTest) |> List.append
-                  (makeRandSymmetric900 degreesToTest)
+                  (makeRandSwitches900 degreesToTest)
 
         let mcsW (dex:int) (sorterGen:SorterGen) = 
             let degree = sorterGen |> SorterGen.getDegree
