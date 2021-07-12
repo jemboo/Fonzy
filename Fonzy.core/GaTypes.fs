@@ -2,10 +2,11 @@
 open System
 
 // Ga
-type InitialConditionCount = private InitialConditionCount of int
 type EnviroId = private EnviroId of Guid
-type GenerationNumber = private GenerationNumber of int
 type EnviroUpdateParamsId = private EnviroUpdateParamsId of Guid
+type Fitness = private Fitness of float
+type GenerationNumber = private GenerationNumber of int
+type InitialConditionCount = private InitialConditionCount of int
 type OrgId = private OrgId of Guid
 type OrgsId = private OrgsId of Guid
 type OrgUpdateParamsId = private OrgUpdateParamsId of Guid
@@ -27,6 +28,54 @@ module EnviroId =
     let value (EnviroId v) = v
     let create id = Ok (EnviroId id)
     let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
+
+
+module Fitness =
+    let value (Fitness v) = v
+    let create fieldName v = 
+        ConstrainedType.createFloat fieldName Fitness 0.0 10.0 v
+    let fromFloat v = create "" v |> Result.ExtractOrThrow
+    let repStr v = match v with
+                          |Some r -> sprintf "%.4f" (value r)
+                          |None -> ""
+    let fromKey (m:Map<'a, obj>) (key:'a) =
+        result {
+            let! gv = ResultMap.read key m
+            return! create "" (gv:?>float)
+        }
+
+    let failure = 
+        0.0 |> fromFloat
+
+    let switchBased (degree:Degree) 
+                    (switchCount:SwitchCount) = 
+        let bestSwitch = SwitchCount.degreeToRecordSwitchCount degree 
+                          |> SwitchCount.value |> float
+        let scv = switchCount |> SwitchCount.value |> float
+        (bestSwitch) / (scv) |> fromFloat
+
+
+    let stageBased (degree:Degree) 
+                   (stageCount:StageCount) = 
+        let bestStage = StageCount.degreeToRecordStageCount degree 
+                            |> StageCount.value |> float
+        let scv = stageCount |> StageCount.value |> float
+        (bestStage) / (scv) |> fromFloat
+
+
+    let fromSorterPerf (perf:SortingEval.sorterPerf) 
+                       (degree:Degree) =
+        let pv =
+            let wV = switchBased degree perf.usedSwitchCount
+                        |> value
+            let tV = stageBased degree perf.usedStageCount
+                        |> value
+            ((wV + tV) / 2.0) |> fromFloat
+
+        match perf.successful with
+        | Some v -> if v then pv else failure
+        | None -> pv
+
 
 module InitialConditionCount =
     let value (InitialConditionCount v) = v

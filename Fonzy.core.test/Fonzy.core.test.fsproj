@@ -16,10 +16,11 @@
     <Compile Include="CombinatoricsFixture.fs" />
     <Compile Include="ComboStructuresFixture.fs" />
     <Compile Include="SorterPartsFixture.fs" />
-    <Compile Include="SoringEvalFixture.fs" />
+    <Compile Include="SorterGenFixture.fs" />
+    <Compile Include="SortingEvalFixture.fs" />
     <Compile Include="SortableSetRolloutFixture.fs" />
     <Compile Include="SortableVecFixture.fs" />
-    <Compile Include="SorterGaFixture.fs" />
+    <Compile Include="GaTypesFixture.fs" />
     <Compile Include="SorterGaOpsFixture.fs" />
     <Compile Include="OrgsFixture.fs" />
     <Compile Include="Program.fs" />

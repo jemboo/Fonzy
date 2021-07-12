@@ -179,35 +179,35 @@ module TestData =
                 { 
                     sorterCoverage.sorterId = sorterId1;
                     sortableSetId = sortableSetId1;
-                    sorterPerf = sorterPerf1
+                    perf = sorterPerf1
                 }
 
             let sorterCoverage2 =
                 { 
                     sorterCoverage.sorterId = sorterId2;
                     sortableSetId = sortableSetId1;
-                    sorterPerf = sorterPerf2
+                    perf = sorterPerf2
                 }
 
             let sorterCoverage3 =
                 { 
                     SortingEval.sorterCoverage.sorterId = sorterId3;
                     SortingEval.sorterCoverage.sortableSetId = sortableSetId1;
-                    SortingEval.sorterCoverage.sorterPerf = sorterPerf3
+                    SortingEval.sorterCoverage.perf = sorterPerf3
                 }
 
             let sorterCoverage4 =
                 { 
                     SortingEval.sorterCoverage.sorterId = sorterId4;
                     SortingEval.sorterCoverage.sortableSetId = sortableSetId1;
-                    SortingEval.sorterCoverage.sorterPerf = sorterPerf4
+                    SortingEval.sorterCoverage.perf = sorterPerf4
                 }
 
             let sorterCoverage5 =
                 { 
                     SortingEval.sorterCoverage.sorterId = sorterId5;
                     SortingEval.sorterCoverage.sortableSetId = sortableSetId1;
-                    SortingEval.sorterCoverage.sorterPerf = sorterPerf4
+                    SortingEval.sorterCoverage.perf = sorterPerf4
                 }
 
 

@@ -81,24 +81,3 @@ module FastUtils =
       fast cmp array 0
 
 
-    let mushBits (value: uint64) (array: uint64[]) =
-      //let wak = Vector.
-      //let chunkSize = Vector<uint64>.Count
-      ///// ' Use SIMD registers to compare chunks of array at once
-      //let rec fast (cmp: Vector<uint64>) (array: uint64[]) (i: int) =
-      //  if i > array.Length - chunkSize then slow value array i
-      //  elif Vector.BitwiseOr(cmp, Vector(array, i)) then true // compare entire chunk at once
-      //  else fast cmp array (i+chunkSize)
-        
-      ///// if array remainer size doesn't fit into SIMD register
-      ///// fallback to check array items one by one
-      //and slow (value: uint64) (array: uint64[]) (i: int) =
-      //  if i >= array.Length then false
-      //  elif array.[i] = value then true
-      //  else slow value array (i+1)
-        
-      //// create vector of 't filled with value copies on all positions
-      //let cmp = Vector(value)
-      //fast cmp array 0
-      None
-

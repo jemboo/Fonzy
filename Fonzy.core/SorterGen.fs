@@ -153,36 +153,52 @@ module SorterGen =
     let randomSwitches (degree:Degree) 
                        (switchCount:SwitchCount) 
                        (rnd:IRando) =
-        let switches = Switch.randomSwitchesOfDegree degree rnd
+        let switches = Switch.rndNonDegenSwitchesOfDegree degree rnd
                     |> Seq.take (SwitchCount.value switchCount)
                     |> Seq.toArray
         Sorter.fromSwitches degree switches
 
 
-    let mutateBySwitch 
-            (mutationRate:MutationRate) 
-            (rnd:IRando) 
+    let mutateBySwitch
+            (mutationRate:MutationRate)
+            (skipPrefix:SwitchCount)
+            (rnd:IRando)
             (sorter:Sorter) =
+        let prefix = sorter.switches
+                     |> Array.take (SwitchCount.value skipPrefix)
+        let mutatedPart = sorter.switches
+                           |> Array.toSeq
+                           |> Seq.skip (SwitchCount.value skipPrefix)
+                           |> Switch.mutateSwitches sorter.degree mutationRate rnd
+                           |> Seq.toArray
         {
             Sorter.degree = sorter.degree;
             Sorter.switchCount = sorter.switchCount;
-            switches = (Switch.mutateSwitches sorter.degree mutationRate rnd sorter.switches) 
-                        |> Seq.toArray
+            switches = mutatedPart |> Array.append prefix
         }
 
 
-    let mutateByStage (mutationRate:MutationRate) 
-                      (rnd:IRando) 
+    let mutateByStage (mutationRate:MutationRate)
+                      (skipPrefix:SwitchCount)
+                      (rnd:IRando)
                       (sorter:Sorter) =
-        let newStages = Stage.fromSwitches sorter.degree sorter.switches 
-                        |> Seq.toArray
-                        |> Array.map(Stage.randomMutate rnd mutationRate)
-
+        let prefixStages = 
+                  sorter.switches
+                     |> Array.take (SwitchCount.value skipPrefix)
+                     |> Stage.fromSwitches sorter.degree
+                     |> Seq.toArray
+        let mutantStages = 
+                  sorter.switches
+                     |> Array.toSeq
+                     |> Seq.skip (SwitchCount.value skipPrefix)
+                     |> Stage.fromSwitches sorter.degree
+                     |> Seq.toArray
+                     |> Array.map(Stage.randomMutate rnd mutationRate)
+        let newStages = mutantStages |> Array.append prefixStages
         let newSwitches = [| for stage in newStages do yield! stage.switches |]
         {
             Sorter.degree=sorter.degree;
-            switchCount = (SwitchCount.create "" newSwitches.Length) 
-                            |> Result.ExtractOrThrow;
+            switchCount = (SwitchCount.fromInt newSwitches.Length);
             switches = newSwitches
         }
 
@@ -427,7 +443,7 @@ module SorterRndGen =
                        (wPfx: Switch seq) 
                        (switchCount:SwitchCount) 
                        (rnd:IRando) =
-        let switches = Switch.randomSwitchesOfDegree degree rnd
+        let switches = Switch.rndNonDegenSwitchesOfDegree degree rnd
                     |> Seq.take (SwitchCount.value switchCount)
                     |> Seq.toArray
         fromSwitchesAndPrefix degree wPfx switches

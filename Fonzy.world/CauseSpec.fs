@@ -150,7 +150,11 @@ module CauseSpecSorters =
                      (CauseSpec.tupOp rndGen RngGenDto.toJson);
                      sorterSetName
                      ] |> Map.ofList
-        {CauseSpec.id = CauseSpecId.fromGuid id; genus=["Sorters"; "rndGen"]; prams=prams;}
+        {
+            CauseSpec.id = CauseSpecId.fromGuid id; 
+            genus=["Sorters"; "rndGen"]; 
+            prams=prams;
+        }
 
     
     let evalSortersBaseId = Guid.Parse "00000000-0000-0000-0000-000000000003"
@@ -211,9 +215,11 @@ module CauseSpecSorters =
                      (CauseSpec.tupOp useParallel Json.serialize);
                      resultsName
                      ] |> Map.ofList
-        {CauseSpec.id = CauseSpecId.fromGuid id; genus=["Sorters"; "genToSorterPerfBins"]; prams=prams;}
-
-
+        {
+            CauseSpec.id = CauseSpecId.fromGuid id; 
+            genus=["Sorters"; "genToSorterPerfBins"]; 
+            prams=prams;
+        }
 
 
     let rndGenToPerfBinsBaseId = Guid.Parse "00000000-0000-0000-0000-000000000005"
@@ -244,4 +250,8 @@ module CauseSpecSorters =
                      (CauseSpec.tupOp useParallel Json.serialize);
                      resultsName
                      ] |> Map.ofList
-        {CauseSpec.id = CauseSpecId.fromGuid id; genus=["Sorters"; "rndGenToPerfBins"]; prams=prams;}
+        {
+            CauseSpec.id = CauseSpecId.fromGuid id; 
+            genus=["Sorters"; "rndGenToPerfBins"]; 
+            prams=prams;
+        }

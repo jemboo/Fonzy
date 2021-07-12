@@ -2,6 +2,7 @@
 
 type SorterGenome = 
     | Permutaions of List<TwoCyclePerm>
+    | DualPerm of List<TwoCyclePerm * TwoCyclePerm * int>
     | Switches of List<Switch>
 
 type SorterPhenotype = 

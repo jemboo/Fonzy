@@ -2,10 +2,12 @@
 open System
 open FSharpx.Collections
 
-type yab = {b:PersistentVector<Switch>}
-type Sorter = {degree:Degree; 
-               switches:array<Switch>; 
-               switchCount:SwitchCount}
+type Sorter = 
+    { 
+        degree:Degree; 
+        switches:array<Switch>; 
+        switchCount:SwitchCount
+    }
 
 module Sorter =
 
@@ -44,8 +46,7 @@ module Sorter =
         {
             Sorter.degree = sorter.degree;
             switchCount=newSwitchCount.Value;
-            switches = (switches |> Seq.toArray) 
-                       |> Array.append sorter.switches
+            switches = newSwitches
         }
 
     let trimLength (sorter:Sorter) (newLength:SwitchCount) =

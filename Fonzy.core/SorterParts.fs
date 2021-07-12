@@ -1,7 +1,8 @@
 ﻿namespace global
 open System
+open System.Runtime.CompilerServices
 
-[<Struct>]
+[<Struct;>]
 type Switch = {low:int; hi:int}
 module Switch =
 
@@ -23,7 +24,7 @@ module Switch =
     let fromIntArray (pArray:int[]) =
             seq { for i = 0 to pArray.Length - 1 do
                     let j = pArray.[i]
-                    if ((j >= i ) && (i = pArray.[j]) ) then
+                    if ((j > i ) && (i = pArray.[j]) ) then
                             yield {Switch.low=i; Switch.hi=j} }
 
     let fromPermutation (p:Permutation) =
@@ -36,13 +37,22 @@ module Switch =
         uint32 ((Degree.value order)*(Degree.value order + 1) / 2)
 
     // IRando dependent
-    let randomSwitchesOfDegree (degree:Degree) 
+    let rndNonDegenSwitchesOfDegree (degree:Degree) 
                                (rnd:IRando) =
         let maxDex = switchCountForDegree degree
         seq { while true do 
                     let p = (int (rnd.NextUInt % maxDex))
-                    yield switchMap.[p] }
+                    let sw = switchMap.[p] 
+                    if (sw.low <> sw.hi) then
+                        yield sw }
     
+    let rndSwitchesOfDegree (degree:Degree) 
+                            (rnd:IRando) =
+        let maxDex = switchCountForDegree degree
+        seq { while true do 
+                    let p = (int (rnd.NextUInt % maxDex))
+                    yield switchMap.[p] }
+
 
     let rndSymmetric (degree:Degree)
                      (rnd:IRando) =
@@ -97,15 +107,16 @@ module Stage =
         let switchesForStage = new ResizeArray<Switch>()
         seq { 
               for sw in switches do
-                 if (stageTracker.[sw.hi] || stageTracker.[sw.low] ) then
-                    yield { Stage.switches = switchesForStage |> Seq.toList; 
-                            Stage.degree = degree}
-                    stageTracker <- Array.init (Degree.value degree) 
-                                                (fun _ -> false)
-                    switchesForStage.Clear()
-                 stageTracker.[sw.hi] <- true
-                 stageTracker.[sw.low] <- true
-                 switchesForStage.Add sw
+                 if (sw.hi <> sw.low) then
+                     if (stageTracker.[sw.hi] || stageTracker.[sw.low] ) then
+                        yield { Stage.switches = switchesForStage |> Seq.toList; 
+                                Stage.degree = degree}
+                        stageTracker <- Array.init (Degree.value degree) 
+                                                    (fun _ -> false)
+                        switchesForStage.Clear()
+                     stageTracker.[sw.hi] <- true
+                     stageTracker.[sw.low] <- true
+                     switchesForStage.Add sw
               if switchesForStage.Count > 0 then
                 yield { Stage.switches=switchesForStage |> Seq.toList; 
                         degree = degree}
@@ -174,9 +185,9 @@ module Stage =
         let aa (rnd:IRando)  = 
             {
                 switches = TwoCyclePerm.rndTwoCycle 
-                    degree
-                    (SwitchFrequency.value switchFreq)
-                    rnd
+                                    degree
+                                    (SwitchFrequency.value switchFreq)
+                                    rnd
                                |> Switch.fromTwoCyclePerm
                                |> Seq.toList;
                 degree=degree
