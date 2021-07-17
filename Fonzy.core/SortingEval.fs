@@ -50,33 +50,27 @@ module SortingEval =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.switchEventRollout 
                                     |> SwitchEventRollout.toSwitchUses
-                                    |> Ok
-            | BySwitch seGs -> seGs.switchUses 
-                                    |> Ok
+            | BySwitch seGs -> seGs.switchUses
 
 
         let getHistogramOfSortedSortables (switchEventRecords:switchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.sortableRollout 
                                     |> SortableSetRollout.intBitsHist
-                                    |> Ok
             | BySwitch seGs ->  seGs.sortableRollout 
                                     |> SortableSetRollout.intBitsHist
-                                    |> Ok
 
 
         let getAllSortsWereComplete (switchEventRecords:switchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.sortableRollout 
                                     |> SortableSetRollout.isSorted
-                                    |> Ok
             | BySwitch seGs ->  seGs.sortableRollout
                                     |> SortableSetRollout.isSorted
-                                    |> Ok
 
         let getUsedSwitchCount (switchEventRecords:switchEventRecords) =
             result {
-                let! switchUses = getSwitchUses switchEventRecords
+                let switchUses = getSwitchUses switchEventRecords
                 return switchUses |> SwitchUses.usedSwitchCount
             }
 
@@ -102,22 +96,24 @@ module SortingEval =
         let fromSwitchEventRecords (checkSuccess:bool)
                                    (r:sortingResult) =
             result {
-                    let! switchUses = 
+                    let switchUses = 
                             r.switchEventRecords |> SwitchEventRecords.getSwitchUses
-                    let! usedSwitchArray = 
+                    let usedSwitchArray = 
                             r.sorter |> SwitchUses.getUsedSwitches switchUses
                     let! usedSwitchCount = SwitchCount.create "" usedSwitchArray.Length
-                    let! usedStageCount = Stage.getStageCount r.sorter.degree usedSwitchArray
-                    let! success = 
+                    let usedStageCount = Stage.getStageCount r.sorter.degree usedSwitchArray
+                    let success = 
                         match checkSuccess with
                         | true -> r.switchEventRecords 
                                   |> SwitchEventRecords.getAllSortsWereComplete
-                                  |> Result.map Some
-                        | false -> None |> Ok
+                                  |> Some
+                        | false -> None
 
-                    let perfBin = {sorterPerf.usedStageCount = usedStageCount;
-                                   successful = success;
-                                   usedSwitchCount=usedSwitchCount }
+                    let perfBin = {
+                                    sorterPerf.usedStageCount = usedStageCount;
+                                    successful = success;
+                                    usedSwitchCount=usedSwitchCount 
+                                   }
                     return {
                             sorterCoverage.perf = perfBin; 
                             sorterId = r.sorterId;

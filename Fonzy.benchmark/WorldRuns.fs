@@ -3,29 +3,48 @@ open System
 
 module RunBatch =
 
-    let runBatchSeq (outputDir:string) 
-                    (seed:int) 
-                    (firstDex:int) =
+    let runBatchSeq 
+            (rndCauseSpecGen : RandomSeed -> FilePath -> 
+                seq<string*FilePath*CauseSpec>)
+            (outputDir:FilePath) 
+            (seed:RandomSeed) 
+            (firstDex:int)  =
 
         let runBatch (causeSpecDescr, outputDir, causeSpec) =
-            
             Console.WriteLine(string causeSpecDescr)
-
             let res = Runs.runCauseSpec outputDir causeSpec
             match res with
             | Ok b -> b |> ignore
             | Error m -> Console.WriteLine m
 
-        SorterPerfBinGen.makeRunBatchSeq seed outputDir
+        rndCauseSpecGen seed outputDir
             |> Seq.skip firstDex
             |> Seq.iter(runBatch)
+
+    
+    let runPerfBinBatchSeq 
+                    (outputDir:FilePath) 
+                    (seed:RandomSeed) 
+                    (firstDex:int) =
+
+        runBatchSeq SorterPbCauseSpecGen.makeRunBatchSeq 
+                    outputDir seed firstDex
+
+
+    let runPerfBinBatchSeq2 
+                    (outputDir:FilePath) 
+                    (seed:RandomSeed) 
+                    (firstDex:int) =
+
+        runBatchSeq SorterPbCauseSpecGen2.makeRunBatchSeq 
+                    outputDir seed firstDex
 
 
 
   module PerfBinReports =
 
-    let dirPerfBinBySorterGenReport (outputDir:string) 
-                                    (reportDir:string) =
+    let dirPerfBinBySorterGenReport (outputDir:FilePath) 
+                                    (reportDir:FilePath) =
 
         let binResultsName = "sorterPerfBins"
         let reportDataSource = new DirectoryDataSource(outputDir) 
@@ -95,4 +114,4 @@ module RunBatch =
                         csvFile.records = rep}
 
         let res = CsvFile.writeCsvFile csvFile |> Result.ExtractOrThrow
-        sprintf "%s\\%s" outputDir fileName
+        sprintf "%s\\%s" (FilePath.value outputDir) fileName

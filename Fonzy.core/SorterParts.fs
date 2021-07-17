@@ -145,7 +145,7 @@ module Stage =
                       (switches:seq<Switch>) =
             fromSwitches degree switches 
                     |> Seq.length
-                    |> StageCount.create ""
+                    |> StageCount.fromInt
 
     let convertToTwoCycle (stage:Stage) =
         stage.switches |> Seq.map(fun s -> (s.low, s.hi))

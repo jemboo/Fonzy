@@ -4,10 +4,10 @@ open System
 module TestData =
     let seed = 123
     //let degreeW = Degree.fromInt 8
-    let rnGen = RngGen.createLcg seed
+    let rnGen = RngGen.createLcg (RandomSeed.fromInt seed)
     let randy = Rando.fromRngGen rnGen
     let nextRnGen() =
-        RngGen.createLcg randy.NextPositiveInt
+        RngGen.createLcg (RandomSeed.fromInt randy.NextPositiveInt)
 
     module SortableSet =
         let sorterSetGenId1 = SortableSetId.fromGuid (Guid.Parse "20000000-0000-0000-0000-000000000222")
@@ -50,9 +50,12 @@ module TestData =
             let intDistType = IntDistType.Normal (NormalIntegerDistParams.zeroCentered 1.0)
             let stageCount = StageCount.degreeTo999StageCount TestData.degree
             let switchCount = stageCount |>  StageCount.toSwitchCount TestData.degree
-            let switchPrefixCount = (Degree.value TestData.degree) / 2
-            let switchUseIndexes = Array.init (SwitchCount.value switchCount)
-                                              (fun dx -> if dx < switchPrefixCount then 1 else 0)
+            let switchPrefixCount = (Degree.value TestData.degree) / 2 
+                                     |> SwitchCount.fromInt
+            let switchUsePlanIndexes = Sorting.SwitchUsePlan.makeIndexes 
+                                        switchPrefixCount
+                                        switchCount
+
             let sorterGen = SorterGen.RandStages (stageCount, TestData.degree)
             let swPfx = TestData.degree |> TwoCycleGen.evenMode |> Switch.fromTwoCyclePerm |> Seq.toList
             let sorterRndGen = sorterRndGen.RandStages (swPfx, stageCount, TestData.degree)
@@ -76,10 +79,6 @@ module TestData =
                              sorterCount (nextRnGen()) rndSorterSetName
 
             let switchUsePlan = Sorting.SwitchUsePlan.All
-            let switchUsePlanPfx = Sorting.SwitchUsePlan.Indexes 
-                                            (switchPrefixCount, 
-                                            (SwitchCount.value switchCount),
-                                            switchUseIndexes)
 
             let evalMush d ssn sup sbset up resn =
                 CauseSpecSorters.evalToSorterPerfBins 
@@ -137,7 +136,7 @@ module TestData =
                             sorterRndGen
                             sorterCount
                             (nextRnGen())
-                            switchUsePlanPfx 
+                            switchUsePlanIndexes 
                             TestData.SortableSet.sortableSet
                             useParallel
                             sorterEvalResultsName

@@ -65,12 +65,10 @@ type RandomLcg(seed:RandomSeed) =
 module Rando =
     
     let NetFromSeed seed =
-        let seed = RandomSeed.create "" seed |> Result.ExtractOrThrow
         new RandomNet(seed) :> IRando
 
 
     let LcgFromSeed seed =
-        let seed = RandomSeed.create "" seed |> Result.ExtractOrThrow
         new RandomLcg(seed) :> IRando
 
 
@@ -97,7 +95,7 @@ module Rando =
 
 
     let fromGuid rngType (gu:Guid) =
-        fromSeed rngType (gu.GetHashCode())
+        fromSeed rngType (gu.GetHashCode() |> RandomSeed.fromInt)
 
 
     let getSeed = 
@@ -106,8 +104,8 @@ module Rando =
 
     let fromRngGen (rngGen:RngGen) =
         match rngGen.rngType with
-        | RngType.Lcg -> LcgFromSeed (RandomSeed.value rngGen.seed)
-        | RngType.Net -> NetFromSeed (RandomSeed.value rngGen.seed)
+        | RngType.Lcg -> LcgFromSeed rngGen.seed
+        | RngType.Net -> NetFromSeed rngGen.seed
 
 
     let multiDraw (rnd:IRando) (freq:float) (numDraws:int)  =

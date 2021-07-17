@@ -6,22 +6,24 @@ open BenchmarkDotNet.Running
 [<EntryPoint>]
 let main argv =
 
-    /// ******* Batch ***********
-    //Console.WriteLine("Starting RunBp64.runBatchSeq")
+    /// ******* runPerfBinBatchSeq ***********
+    Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq2")
 
-    //RunBatch.runBatchSeq ("C:\\SimOut")
-    //                    (DateTime.Now.Ticks |> int |> Math.Abs) 
-    //                    0
-    //                    |> ignore
-    //Console.Read() |> ignore
+    RunBatch.runPerfBinBatchSeq2 (FilePath.fromString "C:\\SimOut2") 
+                                 RandomSeed.fromNow
+                                0
+                                |> ignore
+    Console.Read() |> ignore
 
 
 
      /// ******* PerfBinsReport ***********
-    Console.WriteLine("Starting PerfBinsReport.main")
-    let res2 =  PerfBinReports.dirPerfBinBySorterGenReport ("C:\\SimOut") ("C:\\SimOutReports")
-    Console.WriteLine(res2)
-    Console.Read() |> ignore
+    //Console.WriteLine("Starting PerfBinsReport.main")
+    //let res2 =  PerfBinReports.dirPerfBinBySorterGenReport 
+    //                    (FilePath.fromString "C:\\SimOut") 
+    //                    (FilePath.fromString "C:\\SimOutReports")
+    //Console.WriteLine(res2)
+    //Console.Read() |> ignore
     0 // return an integer exit code
 
 

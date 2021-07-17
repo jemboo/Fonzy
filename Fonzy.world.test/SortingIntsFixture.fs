@@ -26,16 +26,13 @@ type SortingIntsFixture () =
         let switchUsesGrouping = 
                 resGroupBySwitch
                     |> SortingEval.SwitchEventRecords.getSwitchUses
-                    |> Result.ExtractOrThrow
 
         let switchUsesNoGrouping = 
                 resNoGrouping
                     |> SortingEval.SwitchEventRecords.getSwitchUses
-                    |> Result.ExtractOrThrow
 
         let usedSwitchCount = refSorter  
                                 |> SwitchUses.getUsedSwitches switchUsesGrouping
-                                |> Result.ExtractOrThrow
 
         Assert.AreEqual(switchUsesGrouping, switchUsesNoGrouping)
         Assert.AreEqual(usedSwitchCount.Length, (SwitchCount.value refSorter.switchCount))
@@ -55,7 +52,6 @@ type SortingIntsFixture () =
         let sortedSortablesNoSAG = 
                 switchEventRecordsNoSAG
                     |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
-                    |> Result.ExtractOrThrow
                     |> Array.toList
 
         Assert.AreEqual(sortedSortablesNoSAG.Length, (Degree.value refSorter.degree) + 1)
@@ -70,7 +66,6 @@ type SortingIntsFixture () =
         let sortedSortablesMakeSwitchUses = 
                 switchEventRecordsMakeSwitchUses
                     |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
-                    |> Result.ExtractOrThrow
                     |> Array.toList
 
         Assert.AreEqual(sortedSortablesMakeSwitchUses.Length, (Degree.value refSorter.degree) + 1)
@@ -146,7 +141,7 @@ type SortingIntsFixture () =
         
     [<TestMethod>]
     member this.getSorterEff_Parallel_NoGrouping() =
-        let seed = 1234
+        let seed = 1234 |> RandomSeed.fromInt
         let rngGen = (RngGen.createLcg seed)
         let iRando = Rando.fromRngGen rngGen
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
@@ -205,7 +200,7 @@ type SortingIntsFixture () =
 
     [<TestMethod>]
     member this.makeTreeSorter() =
-        let seed = 12345
+        let seed = 12345 |> RandomSeed.fromInt
         let iRando = Rando.fromRngGen (RngGen.createLcg seed)
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
         let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())

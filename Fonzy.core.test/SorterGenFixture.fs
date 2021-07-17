@@ -6,6 +6,26 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 [<TestClass>]
 type SorterGenFixture () =
 
+    [<TestMethod>]
+    member this.oddeven_merge_sort() =
+        seq {8 .. 64 } 
+        |> Seq.iter (fun v -> 
+            let ws = SorterGen.oddeven_merge_sort v
+            let ts = ws |> Stage.fromSwitches (Degree.fromInt v)
+                        |> Seq.toList
+            Console.WriteLine (sprintf "%d\t%d\t%d" v ts.Length ws.Length))
+        Assert.AreEqual(1, 1)
+
+
+    [<TestMethod>]
+    member this.oddeven_merge_sort2() =
+        seq {8 .. 64 } 
+        |> Seq.iter (fun v -> 
+            let ts = SorterGen.oddeven_merge_sort2 v
+            let ws = ts |> List.concat
+            Console.WriteLine (sprintf "%d %d" ts.Length  ws.Length))
+        Assert.AreEqual(1, 1)
+
 
     [<TestMethod>]
     member this.randomSwitches() =
@@ -51,7 +71,7 @@ type SorterGenFixture () =
                                         mutationRate
                                         skipPfx
                                         randy
-        Assert.AreEqual(sorter.switches.Length, mutantSorter.switches.Length)
+        Assert.AreEqual(sorter.degree, mutantSorter.degree)
 
 
     [<TestMethod>]

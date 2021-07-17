@@ -9,7 +9,8 @@ type SorterPartsFixture () =
     [<TestMethod>]
     member this.Stage_switchIntersection() =
         let degree = Degree.fromInt 16
-        let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
+        let randy = RngGen.createLcg (RandomSeed.fromInt 1234) 
+                        |> Rando.fromRngGen
         let stageCount = StageCount.fromInt 2
 
         let startingStages() = 
@@ -29,7 +30,7 @@ type SorterPartsFixture () =
     [<TestMethod>]
     member this.Stage_switchPairwiseIntersections() =
         let degree = Degree.fromInt 16
-        let randy = RngGen.createLcg 1234 |> Rando.fromRngGen
+        let randy = RngGen.createLcg (RandomSeed.fromInt 1234) |> Rando.fromRngGen
         let stageCount = StageCount.fromInt 4
 
         let startingStages() = 
@@ -125,7 +126,7 @@ type SorterPartsFixture () =
     [<TestMethod>]
     member this.Stage_buddyStages3() =
         let degree = Degree.fromInt 10
-        let randy = RngGen.createLcg 7234 |> Rando.fromRngGen
+        let randy = RngGen.createLcg (RandomSeed.fromInt 7234) |> Rando.fromRngGen
         let stageWindowSize = StageCount.fromInt 4
         let maxStageTry = (StageCount.fromInt 1200)
         let stageCount = (StageCount.fromInt 100)

@@ -35,6 +35,7 @@ module MutationRate =
 // Common
 type EntityId = private EntityId of Guid
 type JsonString = private JsonString of string
+type FilePath = private FilePath of string
 type ReportingFrequency = private ReportingFrequency of int
 type String50 = private String50 of string
 type UseEagerProc = private UseEagerProc of bool
@@ -51,6 +52,14 @@ module JsonString =
         ConstrainedType.createString fieldName JsonString 100000000 str
     let createOption fieldName str = 
         ConstrainedType.createStringOption fieldName JsonString 50 str
+
+module FilePath =
+    let value (FilePath str) = str
+    let create fieldName str = 
+        ConstrainedType.createString fieldName FilePath 100 str
+    let createOption fieldName str = 
+        ConstrainedType.createStringOption fieldName FilePath 50 str
+    let fromString v = create "" v |> Result.ExtractOrThrow
 
 module ReportingFrequency =
     let value (ReportingFrequency freq) = freq

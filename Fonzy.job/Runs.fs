@@ -5,7 +5,7 @@ open System
 module Runs =
 
     let runCauseSpec
-                    (outputDir:string) 
+                    (outputDir:FilePath) 
                     (causeSpec:CauseSpec) =
         result {
     

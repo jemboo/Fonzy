@@ -8,12 +8,14 @@ type IDataSource =
    abstract member GetDataSourceIds: Unit -> Result<Guid[], string>
    abstract member AddNewDataStoreItem : DataStoreItem -> Result<bool, string>
 
-type DirectoryDataSource(dirPath:string) =
+type DirectoryDataSource(dirPath:FilePath) =
     member this.DirectoryPath = dirPath
     member this.GuidToFilePath (id:Guid) =
-        Path.Combine(this.DirectoryPath, (string id) + ".txt")
+        Path.Combine(
+            (FilePath.value this.DirectoryPath), 
+            (string id) + ".txt")
     member this.AssureDirectory = 
-            FileUtils.makeDirectory this.DirectoryPath
+            FileUtils.makeDirectory (FilePath.value this.DirectoryPath)
 
     interface IDataSource with
 

@@ -10,19 +10,20 @@ module Sorting =
 
     module SwitchUsePlan = 
 
-        let OneInit (degree:Degree) 
-                    (stageCount:StageCount)  
-                    (switchCount:SwitchCount)=
-            let usedSwitchCt = (Degree.value degree) *
-                               (StageCount.value stageCount)
+        let makeIndexes (prefixCount:SwitchCount) 
+                        (totalCount:SwitchCount) =
+
             let scArray = 
                 Array.init 
-                    (SwitchCount.value switchCount)
-                    (fun dex -> if (dex < usedSwitchCt) then 1 else 0)               
+                    (SwitchCount.value totalCount)
+                    (fun dex -> 
+                            if (dex < (SwitchCount.value prefixCount)) 
+                                    then 1 else 0)               
 
-            (usedSwitchCt, (SwitchCount.value switchCount), scArray)
-                |> SwitchUsePlan.Indexes
-
+            ((SwitchCount.value prefixCount), 
+             (SwitchCount.value totalCount), 
+              scArray)
+            |> SwitchUsePlan.Indexes
 
 
     type EventGrouping =

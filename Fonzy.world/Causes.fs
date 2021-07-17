@@ -155,9 +155,10 @@ module CauseSorters =
     let rndGenToPerfBins (causeSpec:CauseSpec) =
         let causer = fun (e:Enviro) ->
             result {
+
                 let! sorterRndGen = 
                         causeSpec.prams 
-                            |> ResultMap.procKeyedString "rndSorterGen" 
+                            |> ResultMap.procKeyedString "sorterRndGen" 
                                                             (SorterRndGenDto.fromJson)
                 let! sorterCount = 
                         causeSpec.prams 
@@ -214,6 +215,7 @@ module CauseSorters =
                                     perfBinsDto 
                                     Map.empty
             }
+
         {Cause.causeSpec=causeSpec; op=causer}
     
     

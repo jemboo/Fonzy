@@ -20,6 +20,8 @@ module RandomSeed =
         let mSeed = Math.Abs(seed) % 2147483647
         ConstrainedType.createInt fieldName RandomSeed 1 2147483647 mSeed
     let fromInt v = create "" v |> Result.ExtractOrThrow
+    let fromNow = 
+        DateTime.Now.Ticks |> int |> Math.Abs |> fromInt
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
             let! gv = ResultMap.read key m 
@@ -27,13 +29,11 @@ module RandomSeed =
         }
 
 module RngGen =
-    let createLcg (seed:int) =
-        let rnd = (RandomSeed.create "" seed) |> Result.ExtractOrThrow
-        {rngType=RngType.Lcg; seed=rnd}
+    let createLcg (seed:RandomSeed) =
+        {rngType=RngType.Lcg; seed=seed}
 
-    let createNet (seed:int) =
-        let rnd = (RandomSeed.create "" seed) |> Result.ExtractOrThrow
-        {rngType=RngType.Net; seed=rnd}
+    let createNet (seed:RandomSeed) =
+        {rngType=RngType.Net; seed=seed}
 
 module RngType =
     let toDto (rngt: RngType) =

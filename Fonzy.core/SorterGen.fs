@@ -73,6 +73,52 @@ module SorterGen =
         }
 
 
+    let oddeven_merge_sort (length:int) = 
+        let mutable lret = List.Empty
+        let t = Math.Ceiling (Math.Log2 (length |> float))
+        let cxp = Math.Pow(2.0, t - 1.0) |> int
+        let mutable p = cxp
+        while (p > 0) do
+            let mutable q = cxp
+            let mutable r = 0
+            let mutable d = p
+            while (d > 0) do
+                seq {0 .. (length - d - 1) }
+                |> Seq.filter (fun v -> (v &&& p) = r)
+                |> Seq.iter (fun v -> 
+                    lret <- { Switch.low = v; Switch.hi = v + d} :: lret )
+                d <- q - p
+                q <- q /2
+                r <- p
+            p <- p / 2
+        lret |> List.rev
+
+
+
+    let oddeven_merge_sort2 (length:int) = 
+        let mutable lret = List.Empty
+        let t = Math.Ceiling (Math.Log2 (length |> float))
+        let cxp = Math.Pow(2.0, t - 1.0) |> int
+        let mutable p = cxp
+        while (p > 0) do
+            let mutable q = cxp
+            let mutable r = 0
+            let mutable d = p
+            while (d > 0) do
+                let mutable lstage = List.Empty
+                seq {0 .. (length - d - 1) }
+                |> Seq.filter (fun v -> (v &&& p) = r)
+                |> Seq.iter (fun v -> 
+                    lstage <- { Switch.low = v; Switch.hi = v + d} :: lstage )
+                d <- q - p
+                q <- q /2
+                r <- p
+                lret <- lstage :: lret
+            p <- p / 2
+        lret |> List.rev
+
+
+
     // IRando dependent
 
     let randomStages (degree:Degree) 
@@ -256,7 +302,7 @@ module SorterGen =
                            (sorterCount:SorterCount)
                            (rnd:IRando) =
         Array.init (SorterCount.value sorterCount)
-                   (fun _ -> Rando.fromSeed RngType.Lcg rnd.NextPositiveInt)
+                   (fun _ -> Rando.fromSeed RngType.Lcg (RandomSeed.fromInt rnd.NextPositiveInt))
                 |> Array.Parallel.map
                             (fun r -> createRandom sorterGen r)
 
@@ -289,8 +335,18 @@ module SorterRndGen =
         | RandSymmetricBuddies  (swl, _, _, _) -> swl
 
 
-    let reportString (sorterGen:sorterRndGen) (pfxDescr:string) =
-        match sorterGen with
+    let getSwitchCount (srg:sorterRndGen) =
+        match srg with
+        | RandSwitches (_, w, _) -> w
+        | RandStages   (_, t, d) -> t |> StageCount.toSwitchCount d
+        | RandBuddies  (_, t, _, d) -> t |> StageCount.toSwitchCount d
+        | RandSymmetric   (_, t, d) -> t |> StageCount.toSwitchCount d
+        | RandSymmetricBuddies  (_, t, _, d) -> t |> StageCount.toSwitchCount d
+
+
+    let reportString (pfxDescr:string) 
+                     (sorterRndGen:sorterRndGen) =
+        match sorterRndGen with
         | RandSwitches (pfxc, wc, d) ->   
                 sprintf "RandSwitches\t%s\t@\t%d"
                             pfxDescr
@@ -525,7 +581,7 @@ module SorterRndGen =
                            (sorterCount:SorterCount)
                            (rnd:IRando) =
         Array.init (SorterCount.value sorterCount)
-                   (fun _ -> Rando.fromSeed RngType.Lcg rnd.NextPositiveInt)
+                   (fun _ -> Rando.fromSeed RngType.Lcg (RandomSeed.fromInt rnd.NextPositiveInt))
                 |> Array.Parallel.map
                             (fun r -> createRandom sorterRndGen r)
 

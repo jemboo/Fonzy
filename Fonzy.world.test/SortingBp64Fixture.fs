@@ -27,12 +27,10 @@ type SortingBp64Fixture () =
         let switchUsesGrouping = 
                 resGroupBySwitch
                     |> SortingEval.SwitchEventRecords.getSwitchUses
-                    |> Result.ExtractOrThrow
 
         let switchUsesNoGrouping = 
                 resNoGrouping
                     |> SortingEval.SwitchEventRecords.getSwitchUses
-                    |> Result.ExtractOrThrow
 
         let usedSwitchCountGrouping = switchUsesGrouping 
                                       |> SwitchUses.usedSwitchCount
@@ -56,7 +54,6 @@ type SortingBp64Fixture () =
         let sortedSortablesNoSAG = 
                 switchEventRecordsNoSAG
                     |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
-                    |> Result.ExtractOrThrow
                     |> Array.toList
 
         Assert.AreEqual(sortedSortablesNoSAG.Length, (Degree.value refSorter.degree))
@@ -71,7 +68,6 @@ type SortingBp64Fixture () =
         let sortedSortablesMakeSwitchUses = 
                 switchEventRecordsMakeSwitchUses
                     |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
-                    |> Result.ExtractOrThrow
                     |> Array.toList
 
         Assert.AreEqual(sortedSortablesMakeSwitchUses.Length, (Degree.value refSorter.degree))

@@ -51,7 +51,7 @@ type BenchSorterOnInts() =
 //|   getSorterCoverage50_Serial_GroupBySwitch | 14.823 s | 0.0582 s | 0.0545 s |
         
 type BenchSorterSetOnInts() =
-    let seed = 1234
+    let seed = 1234 |> RandomSeed.fromInt
     let iRando = Rando.fromRngGen (RngGen.createLcg seed)
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
@@ -181,7 +181,7 @@ type BenchmarkSorterOnBp64() =
 //|   getSorterCoverage50_Serial_GroupBySwitch | 1,043.5 ms |  12.37 ms |  10.96 ms |
 
 type BenchmarkSorterSetOnBp64() =
-    let seed = 1234
+    let seed = 1234 |> RandomSeed.fromInt
     let iRando = Rando.fromRngGen (RngGen.createLcg seed)
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())

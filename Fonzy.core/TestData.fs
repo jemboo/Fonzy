@@ -2,7 +2,7 @@
 open System
 
 module TestData = 
-    let seed = 123
+    let seed = 123 |> RandomSeed.fromInt
     let iRando = Rando.fromRngGen (RngGen.createNet seed)
     let degree = Degree.fromInt 10
 

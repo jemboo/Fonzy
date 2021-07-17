@@ -28,18 +28,15 @@ module SwitchUses =
            } |> Ok
 
 
-   let getUsedSwitches (switchUses:SwitchUses) (sorter:Sorter) =
+   let getUsedSwitches (switchUses:SwitchUses) 
+                       (sorter:Sorter) =
        let useCount = SwitchCount.value switchUses.switchCount
        let switches = sorter.switches
        let weights = (getWeights switchUses)
-       if (switches.Length <> useCount) then
-           sprintf "useCount=%d, SwitchCount=%d" useCount switches.Length |> Error
-       else
-           let res = weights |> Seq.mapi(fun i w -> i,w)
-                             |> Seq.filter(fun t -> (snd t) > 0 )
-                             |> Seq.map(fun t -> switches.[(fst t)])
-                             |> Seq.toArray
-           res |> Ok
+       weights |> Seq.mapi(fun i w -> i,w)
+       |> Seq.filter(fun t -> (snd t) > 0 )
+       |> Seq.map(fun t -> switches.[(fst t)])
+       |> Seq.toArray
 
 
    let lastUsedIndex (st:SwitchUses) =
@@ -78,7 +75,7 @@ module SwitchUses =
    let getRefinedStageCount (switchUses:SwitchUses) 
                             (sorter:Sorter) =
        result {
-           let! usedSwitches = getUsedSwitches switchUses sorter
+           let usedSwitches = getUsedSwitches switchUses sorter
            let degree = sorter.degree
            return! Stage.getStageCount degree usedSwitches
        }
@@ -87,7 +84,7 @@ module SwitchUses =
    let getRefinedSorter (switchUses:SwitchUses) 
                         (sorter:Sorter) =
        result {
-           let! usedSwitches = getUsedSwitches switchUses sorter
+           let usedSwitches = getUsedSwitches switchUses sorter
            let degree = sorter.degree
            let stages = Stage.fromSwitches degree usedSwitches |> Seq.toArray
            let switches = seq {for i in 0 .. (stages.Length - 1) do yield! stages.[i].switches}
@@ -99,7 +96,7 @@ module SwitchUses =
                              (switchUses:SwitchUses) =
        result
            {
-               let! refinedStageCount = (getRefinedStageCount switchUses sorter)
+               let refinedStageCount = (getRefinedStageCount switchUses sorter)
                let switchUseCount = (usedSwitchCount switchUses)
                return switchUseCount, refinedStageCount
            }
@@ -153,7 +150,7 @@ module SortableUses =
     let createEmpty (sortableCount:SortableCount) =
         {
             sortableCount=sortableCount; 
-            weights=Array.init (SortableCount.value sortableCount) (fun i -> 0)
+            weights=Array.zeroCreate (SortableCount.value sortableCount)
         }
     let getWeights sortableUses = sortableUses.weights
     let sortableCount sortableUses = (SortableCount.value sortableUses.sortableCount)

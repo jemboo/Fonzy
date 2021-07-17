@@ -17,7 +17,12 @@ type FileUtilsFixture() =
 
     [<TestMethod>]
     member this.writeCsvFile() =
-        let csv = {csvFile.header="cat"; directory="c:\\testFileUtils"; fileName="fileName.txt"; records=[|"a"; "b"|]}
+        let csv = {
+                    csvFile.header = "cat"; 
+                    directory = FilePath.fromString "c:\\testFileUtils"; 
+                    fileName = "fileName.txt"; 
+                    records = [|"a"; "b"|]
+                  }
         let res = CsvFile.writeCsvFile csv |> Result.ExtractOrThrow
         Assert.IsTrue(res)
 

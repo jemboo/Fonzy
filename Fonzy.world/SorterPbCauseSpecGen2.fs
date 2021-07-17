@@ -1,12 +1,10 @@
 ﻿namespace global
 open System
 
-module SorterPerfBinGen =
-
-    let rndSortersBaseId = Guid.Parse "00000000-0000-0000-0000-000000000002"
+module SorterPbCauseSpecGen2 =
 
     let makeCauseSpec
-                sorterGen
+                sorterRndGen
                 sorterCount
                 rndGen
                 switchUsePlan
@@ -14,8 +12,8 @@ module SorterPerfBinGen =
                 useParallel
                 resultsName =
 
-        CauseSpecSorters.genToSorterPerfBins 
-                ("sorterGen", sorterGen)
+        CauseSpecSorters.rndGenToPerfBins
+                ("sorterRndGen", sorterRndGen)
                 ("sorterCount", sorterCount)
                 ("rndGen", rndGen)
                 ("switchUsePlan", switchUsePlan)
@@ -23,26 +21,31 @@ module SorterPerfBinGen =
                 ("useParallel", (UseParallel.value useParallel))
                 ("resultsName", resultsName)
 
+    let makeRandomSwitches (degree:Degree) = 
+        let randy = Rando.LcgFromSeed (RandomSeed.fromNow)
+        Switch.rndSwitchesOfDegree degree randy
+                |> Seq.take (Degree.value degree)
+                |> Seq.toList
     
     let sorterCountForDegree (degree:Degree) = 
 
         if (Degree.value degree) = 8 then
-             (SorterCount.fromInt 200000)
+             (SorterCount.fromInt 2000000)
         elif (Degree.value degree) = 10 then
-             (SorterCount.fromInt 200000)
+             (SorterCount.fromInt 2000000)
         elif (Degree.value degree) = 12 then
-             (SorterCount.fromInt 200000)
+             (SorterCount.fromInt 2000000)
         elif (Degree.value degree) = 14 then
-             (SorterCount.fromInt 200000)
+             (SorterCount.fromInt 2000000)
         elif (Degree.value degree) = 16 then
-             (SorterCount.fromInt 100000)
+             (SorterCount.fromInt 1000000)
         elif (Degree.value degree) = 18 then
-             (SorterCount.fromInt 50000)
+             (SorterCount.fromInt 500000)
         elif (Degree.value degree) = 20 then
-             (SorterCount.fromInt 20000)
+             (SorterCount.fromInt 200000)
         elif (Degree.value degree) = 22 then
-             (SorterCount.fromInt 4000)
-        else (SorterCount.fromInt 2000)
+             (SorterCount.fromInt 40000)
+        else (SorterCount.fromInt 20000)
 
 
     let sorterCountForDegreeTest (degree:Degree) = 
@@ -61,88 +64,55 @@ module SorterPerfBinGen =
             | 20 ->  [ 1; 3; 5; 7; 9; ]
             | 22 ->  [ 1; 3; 5; 7; 9; ]
             | _ ->   [ 1; 3; 5; 7; 9; 11;]
-        awys |> List.map(StageCount.fromInt)
+        awys |> List.map(StageWindowSize.fromInt)
 
 
-    let makeBuddyArgs degreesToTest (stageCtr:Degree->StageCount) = 
+    let makeBuddyArgs (prefix: Switch list) degreesToTest (stageCtr:Degree->StageCount) = 
         let wNd = degreesToTest 
                     |> List.map(fun d -> 
                         (buddyStageWindows d) |> List.map(fun tc -> (tc, d)))
                     |> List.concat
-        wNd |> List.map(fun (wc, d) -> ((d |> stageCtr), wc, d))
+        wNd |> List.map(fun (wc, d) -> (prefix, (d |> stageCtr), wc, d))
 
 
-    let tup900Switches (degree:Degree) =
-        ((degree |> SwitchCount.degreeTo900SwitchCount), degree)
+    let tup900Switches (switchList: Switch list) (degree:Degree) =
+        (switchList, (degree |> SwitchCount.degreeTo900SwitchCount), degree)
 
-    let tup900Stages (degree:Degree) =
-        ((degree |> StageCount.degreeTo900StageCount), degree)
+    let tup900Stages (switchList: Switch list) (degree:Degree) =
+        (switchList, (degree |> StageCount.degreeTo900StageCount), degree)
 
-    let makeBuddyArgs900 degreesToTest = 
-        makeBuddyArgs degreesToTest 
+    let makeBuddyArgs900 (prefix: Switch list) degreesToTest = 
+        makeBuddyArgs prefix
+                      degreesToTest 
                       StageCount.degreeTo900StageCount
 
     let makeRandSwitches900 degreesToTest =
-        degreesToTest |> List.map(tup900Switches >> SorterGen.RandSwitches)
+        degreesToTest |> List.map(fun d -> tup900Switches (makeRandomSwitches d) d
+                                            |> sorterRndGen.RandSwitches)
 
     let makeRandStages900 degreesToTest =
-        degreesToTest |> List.map(tup900Stages >> SorterGen.RandStages)
-
-    let makeRandCoComp900 degreesToTest =
-        degreesToTest |> List.map(tup900Stages >> SorterGen.RandCoComp)
+        degreesToTest |> List.map((tup900Stages []) >> sorterRndGen.RandStages)
 
     let makeRandSymmetric900 degreesToTest =
-        degreesToTest |> List.map(tup900Stages >> SorterGen.RandSymmetric)
+        degreesToTest |> List.map((tup900Stages []) >> sorterRndGen.RandSymmetric)
 
     let makeRandBuddies900 degreesToTest =
-        (makeBuddyArgs900 degreesToTest) |> List.map(SorterGen.RandBuddies)
+        (makeBuddyArgs900 [] degreesToTest) |> List.map(sorterRndGen.RandBuddies)
 
     let makeRandSymmetricBuddies900 degreesToTest =
-        (makeBuddyArgs900 degreesToTest) |> List.map(SorterGen.RandSymmetricBuddies)
+        (makeBuddyArgs900 [] degreesToTest) |> List.map(sorterRndGen.RandSymmetricBuddies)
 
 
 
-    let tup999Switches (degree:Degree) =
-        ((degree |> SwitchCount.degreeTo999SwitchCount), degree)
-
-    let tup999Stages (degree:Degree) =
-        ((degree |> StageCount.degreeTo999StageCount), degree)
-
-    let makeBuddyArgs999 degreesToTest = 
-        makeBuddyArgs degreesToTest 
-                      StageCount.degreeTo999StageCount
-        
-    let makeRandSwitches999 degreesToTest =
-        degreesToTest |> List.map(tup999Switches >> SorterGen.RandSwitches)
-
-    let makeRandStages999 degreesToTest =
-        degreesToTest |> List.map(tup999Stages >> SorterGen.RandStages)
-
-    let makeRandCoComp999 degreesToTest =
-        degreesToTest |> List.map(tup999Stages >> SorterGen.RandCoComp)
-
-    let makeRandSymmetric999 degreesToTest =
-        degreesToTest |> List.map(tup999Stages >> SorterGen.RandSymmetric)
-
-    let makeRandBuddies999 degreesToTest =
-        (makeBuddyArgs999 degreesToTest) |> List.map(SorterGen.RandBuddies)
-
-    let makeRandSymmetricBuddies999 degreesToTest =
-        (makeBuddyArgs999 degreesToTest) |> List.map(SorterGen.RandSymmetricBuddies)
-
-
-    let makeRunBatchSeq (seed:int) 
-                        (outputDir:string)= 
-        let randy = RngGen.createLcg seed |> Rando.fromRngGen
-        let nextRnGen(randy:IRando) =
-            RngGen.createLcg randy.NextPositiveInt
+    let makeRunBatchSeq (seed:RandomSeed) 
+                        (outputDir:FilePath)= 
 
         let degreesToTest = 
             [ 8; 10; 12; 14; 16; 18; 20; 22; 24;] //14; 16; 22; 24;]
             //   [ 14; 16; 18; 24;]
              |> List.map (Degree.fromInt)
 
-        let allSorterGens = 
+        let allSorterRndGens = 
                 //(makeRandSwitches degreesToTest) |> List.append
                 // (makeRandStages degreesToTest) |> List.append
                 // (makeRandCoComp degreesToTest) |> List.append
@@ -151,24 +121,37 @@ module SorterPerfBinGen =
                  // (makeRandStages900 degreesToTest) |> List.append
                   (makeRandSwitches900 degreesToTest)
 
-        let mcsW (dex:int) (sorterGen:SorterGen) = 
-            let degree = sorterGen |> SorterGen.getDegree
+
+
+        let randy = RngGen.createLcg seed |> Rando.fromRngGen
+        let nextRnGen(randy:IRando) =
+            RngGen.createLcg (RandomSeed.fromInt randy.NextPositiveInt)
+
+        let sorterRndGenToCauseSpec (dex:int) (sorterRndGen:sorterRndGen) = 
+            let degree = sorterRndGen |> SorterRndGen.getDegree
             let sorterCount = degree |> sorterCountForDegree
             let rndGen = (nextRnGen(randy))
-            let switchUsePlan = Sorting.SwitchUsePlan.All
+            let pfxSwitchCt = sorterRndGen 
+                                     |> SorterRndGen.getSwitchPrefix
+                                     |> List.length
+                                     |> SwitchCount.fromInt
+            let totalSwitchCt = sorterRndGen |> SorterRndGen.getSwitchCount
+            let switchUsePlan = Sorting.SwitchUsePlan.makeIndexes 
+                                        pfxSwitchCt 
+                                        totalSwitchCt
             let sortableSetSpec = SortableSetGenerated.allBp64 degree
                                     |> SortableSetSpec.Generated
             let useParallel = UseParallel.create true
             let resultsName = "sorterPerfBins"
-
+            let pfxDescr = "pfxDescr"
             let causeSpecDescr = sprintf "%d: Time: %s SorterGen: %s SorterCount: %d" 
                                     dex
                                     (System.DateTime.Now.ToLongTimeString())
-                                    (sorterGen |> SorterGen.reportString) 
+                                    (sorterRndGen |> SorterRndGen.reportString pfxDescr) 
                                     (SorterCount.value sorterCount)
 
             let causeSpec = makeCauseSpec
-                                sorterGen 
+                                sorterRndGen 
                                 sorterCount 
                                 rndGen 
                                 switchUsePlan 
@@ -178,5 +161,5 @@ module SorterPerfBinGen =
 
             (causeSpecDescr, outputDir, causeSpec)
 
-        allSorterGens |> CollectionUtils.listLoop
-                      |> Seq.mapi(fun dex sg -> mcsW dex sg)
+        allSorterRndGens |> CollectionUtils.listLoop
+                         |> Seq.mapi(fun dex sg -> sorterRndGenToCauseSpec dex sg)

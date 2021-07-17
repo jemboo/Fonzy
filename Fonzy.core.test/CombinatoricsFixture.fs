@@ -7,7 +7,7 @@ type CombinatoricsFixture () =
     [<TestMethod>]
     member this.TestFisherYatesShuffleFromSeed() =
       let starting = [|2; 4; 6; 8; 10; 12; 14 |]
-      let rnd = Rando.LcgFromSeed 424 
+      let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
       let seededFY = Combinatorics.fisherYatesShuffle rnd
       let actual =  seededFY [|2; 4; 6; 8; 10; 12; 14 |] |> Seq.toArray
       Assert.AreEqual(starting.Length, actual.Length)
@@ -16,7 +16,7 @@ type CombinatoricsFixture () =
     [<TestMethod>]
     member this.TestReflectivePairs() =
       let degree = 8
-      let rnd = Rando.LcgFromSeed 424 
+      let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424) 
       let pairs1 = Combinatorics.reflectivePairs 
                                     degree
                                     rnd          
@@ -33,7 +33,7 @@ type CombinatoricsFixture () =
     [<TestMethod>]
     member this.MakeRandomMonoTwoCycle() =
       let degree = Degree.create "" 5 |> Result.ExtractOrThrow
-      let rnd = Rando.LcgFromSeed 424 
+      let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424) 
       let ts = seq {0 .. 10} 
                     |> Seq.map(fun _ -> Combinatorics.rndMonoTwoCycle degree rnd)
                     |> Seq.toArray
@@ -43,7 +43,7 @@ type CombinatoricsFixture () =
     [<TestMethod>]
     member this.MakeTwoCycle() =
       let degree = Degree.create "" 7 |> Result.ExtractOrThrow
-      let rnd = Rando.LcgFromSeed 4242 
+      let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 4324) 
       let ts = seq {0 .. 1000} 
                     |> Seq.map(fun _ -> Combinatorics.drawTwoWithoutRep degree rnd)
                     |> Seq.groupBy(id)
@@ -117,7 +117,7 @@ type CombinatoricsFixture () =
     [<TestMethod>]
     member this.InverseMapArray() =
         let degree = Degree.create "" 8 |> Result.ExtractOrThrow
-        let randy = Rando.LcgFromSeed 123
+        let randy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let mutable i = 0
         while i<100 do
             let bloke = Combinatorics.randomPermutation randy (Degree.value degree)
@@ -129,7 +129,7 @@ type CombinatoricsFixture () =
     [<TestMethod>]
     member this.TestConjugateIntArrays() =
         let degree = Degree.create "" 8 |> Result.ExtractOrThrow
-        let randy = Rando.LcgFromSeed 123
+        let randy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let mutable i = 0
         while i<100 do
             let conjer = Combinatorics.randomPermutation randy (Degree.value degree)
@@ -147,7 +147,7 @@ type CombinatoricsFixture () =
     [<TestMethod>]
     member this.TestConjugateIntArrays2() =
         let degree = Degree.create "" 8 |> Result.ExtractOrThrow
-        let randy = Rando.LcgFromSeed 123
+        let randy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let mutable i = 0
         while i<100 do
             let tc = Combinatorics.rndFullTwoCycleArray randy (Degree.value degree)
@@ -169,7 +169,7 @@ type CombinatoricsFixture () =
 
     [<TestMethod>]
     member this.makeRandomTwoCycleIntArray() =
-        let randy = Rando.LcgFromSeed 123
+        let randy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let arraySize = 16
         let cycleCount = 2
         let block = Combinatorics.rndTwoCycleArray randy arraySize cycleCount
@@ -205,7 +205,7 @@ type CombinatoricsFixture () =
     [<TestMethod>]
     member this.drawFromWeightedDistribution() =
         let testArray = [|2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0; 10.0; |]
-        let rndy = Rando.LcgFromSeed 44
+        let rndy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let mutable log = []
         let LogRes s =
             log <- s::log

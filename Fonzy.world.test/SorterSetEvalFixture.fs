@@ -8,7 +8,7 @@ type SortingEvalFixture () =
 
     [<TestMethod>]
     member this.testBp64NoGrouping() =
-        let seed = 1234
+        let seed = 1234 |> RandomSeed.fromInt
         let iRando = Rando.fromRngGen (RngGen.createLcg seed)
         let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
         let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())

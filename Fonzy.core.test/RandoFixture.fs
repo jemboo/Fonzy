@@ -35,7 +35,7 @@ type RandoFixture () =
 
     [<TestMethod>]
     member this.normalDistRandom() =
-        let randy = Rando.fromRngGen (RngGen.createLcg 123)
+        let randy = Rando.fromRngGen (RngGen.createLcg (RandomSeed.fromInt 123))
         let ave = Rando.normalDistRandomSeq 0.0 1.0 randy
                     |> Seq.take(1000)
                     |> Seq.average
@@ -44,7 +44,7 @@ type RandoFixture () =
 
     [<TestMethod>]
     member this.normalDistRandomInts() =
-        let randy = Rando.fromRngGen (RngGen.createLcg 123)
+        let randy = Rando.fromRngGen (RngGen.createLcg (RandomSeed.fromInt 123))
         let normInt() = 
             float (fst (Rando.normalDistInt2d 0.0 1.0 0.0 100.0 randy))
         let lst = seq {0 .. 1000} |> Seq.map(fun _ -> normInt())

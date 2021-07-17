@@ -60,7 +60,7 @@ type ComboStructuresFixture () =
     [<TestMethod>]
     member this.TestMakeMonoCycle() =
        let degree = Degree.create "" 6 |> Result.ExtractOrThrow
-       let rnd = Rando.LcgFromSeed 424
+       let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
        let tcp = TwoCyclePerm.makeMonoCycle degree 2 3 |> Result.ExtractOrThrow
        Assert.IsTrue(tcp |> TwoCyclePerm.toPermutation |> Permutation.isTwoCycle)
 
@@ -68,7 +68,7 @@ type ComboStructuresFixture () =
     [<TestMethod>]
     member this.TestMakeAllMonoCycles() =
        let degree = Degree.create "" 6 |> Result.ExtractOrThrow
-       let rnd = Rando.LcgFromSeed 424
+       let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
        let tcA = TwoCyclePerm.makeAllMonoCycles degree |> Seq.toArray
        let tcASq = tcA |> Array.map (fun tcp -> 
                 tcp |> TwoCyclePerm.toPermutation |> Permutation.isTwoCycle)
@@ -80,7 +80,7 @@ type ComboStructuresFixture () =
     [<TestMethod>]
     member this.TestMakeMakeRandomFullPolyCycle() =
        let degree = Degree.create "" 9 |> Result.ExtractOrThrow
-       let rnd = Rando.LcgFromSeed 424
+       let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
        let id = TwoCyclePerm.identity degree
        for i in {0 .. 20} do
                 let tcp = TwoCyclePerm.rndFullTwoCycle degree rnd
@@ -90,7 +90,7 @@ type ComboStructuresFixture () =
     [<TestMethod>]
     member this.TestMakeMakeRandomPolyCycle() =
        let degree = Degree.create "" 9 |> Result.ExtractOrThrow
-       let rnd = Rando.LcgFromSeed 424
+       let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
        let switchFreq = 0.5
        let id = TwoCyclePerm.identity degree
        for i in {0 .. 20} do
@@ -123,7 +123,7 @@ type ComboStructuresFixture () =
     [<TestMethod>]
     member this.TwoCyclePerm_makeReflSymmetric() =
        let degree = Degree.fromInt 16
-       let rnd = Rando.LcgFromSeed 424
+       let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
        let refSyms = Array.init 100 (fun _ ->
            TwoCyclePerm.rndSymmetric
                                         degree
@@ -145,7 +145,7 @@ type ComboStructuresFixture () =
 
     [<TestMethod>]
     member this.makeFromTupleSeq() =        
-        let rndy = Rando.LcgFromSeed 44
+        let rndy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let switchFreq = SwitchFrequency.fromFloat 0.5
         let degree = Degree.fromInt 16
         let switchCount = SwitchCount.fromInt 8
