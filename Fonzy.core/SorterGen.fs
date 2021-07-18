@@ -344,32 +344,38 @@ module SorterRndGen =
         | RandSymmetricBuddies  (_, t, _, d) -> t |> StageCount.toSwitchCount d
 
 
-    let reportString (pfxDescr:string) 
-                     (sorterRndGen:sorterRndGen) =
+    let reportString (sorterRndGen:sorterRndGen) =
+
         match sorterRndGen with
         | RandSwitches (pfxc, wc, d) ->   
-                sprintf "RandSwitches\t%s\t@\t%d"
-                            pfxDescr
+                sprintf "RandSwitches\t%s\t%d\t@\t%d"
+                            (pfxc.Length |> string)
+                            (SwitchCount.value wc) 
                             (Degree.value d)
+
         | RandStages (pfxc, tc, d) -> 
-                sprintf "RandStages\t%s\t@\t%d"
-                            pfxDescr
+                sprintf "RandStages\t%s\t%d\t@\t%d"
+                            (pfxc.Length |> string)
+                            (StageCount.value tc) 
                             (Degree.value d)
   
         | RandBuddies (pfxc, tc, wc, d) ->
-                sprintf "RandBuddies\t%s\t%d\t%d"
-                            pfxDescr
+                sprintf "RandBuddies\t%s\t%d\t%d\t%d"
+                            (pfxc.Length |> string)
+                            (StageCount.value tc) 
                             (StageWindowSize.value wc)
                             (Degree.value d)
 
         | RandSymmetric (pfxc, tc, d) ->
-                        sprintf "RandSymmetric\t%s\t@\t%d"
-                                    pfxDescr
-                                    (Degree.value d)
+                sprintf "RandSymmetric\t%s\t%d\t@\t%d"
+                            (pfxc.Length |> string)
+                            (StageCount.value tc) 
+                            (Degree.value d)
 
         | RandSymmetricBuddies (pfxc, tc, wc, d) ->
-                sprintf "RandSymmetricBuddies\t%s\t%d\t%d"
-                                        pfxDescr
+                sprintf "RandSymmetricBuddies\t%s\t%d\t%d\t%d"
+                                        (pfxc.Length |> string)
+                                        (StageCount.value tc) 
                                         (StageWindowSize.value wc)
                                         (Degree.value d)
 

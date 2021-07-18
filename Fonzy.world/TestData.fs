@@ -52,8 +52,10 @@ module TestData =
             let switchCount = stageCount |>  StageCount.toSwitchCount TestData.degree
             let switchPrefixCount = (Degree.value TestData.degree) / 2 
                                      |> SwitchCount.fromInt
+            let prefixSwitchUses = SwitchUses.createOnes switchPrefixCount
+    
             let switchUsePlanIndexes = Sorting.SwitchUsePlan.makeIndexes 
-                                        switchPrefixCount
+                                        prefixSwitchUses
                                         switchCount
 
             let sorterGen = SorterGen.RandStages (stageCount, TestData.degree)
@@ -65,6 +67,7 @@ module TestData =
 
 
             let srgPr ssid sg sc rng ssn =
+
                 CauseSpecSorters.rndGen ("sorterSetId", ssid)
                                         ("sorterGen", sg)
                                         ("sorterCount", sc)
@@ -111,7 +114,7 @@ module TestData =
 
             let rndGenMush rsg sc rng sup sbset up resn =
                 CauseSpecSorters.rndGenToPerfBins 
-                                        ("rndSorterGen", rsg)
+                                        ("sorterRndGen", rsg)
                                         ("sorterCount", sc)
                                         ("rndGen", rng)
                                         ("switchUsePlan", sup)

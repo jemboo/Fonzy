@@ -36,16 +36,16 @@ module SorterPbCauseSpecGen2 =
         elif (Degree.value degree) = 12 then
              (SorterCount.fromInt 2000000)
         elif (Degree.value degree) = 14 then
-             (SorterCount.fromInt 2000000)
-        elif (Degree.value degree) = 16 then
              (SorterCount.fromInt 1000000)
-        elif (Degree.value degree) = 18 then
+        elif (Degree.value degree) = 16 then
              (SorterCount.fromInt 500000)
+        elif (Degree.value degree) = 18 then
+             (SorterCount.fromInt 250000)
         elif (Degree.value degree) = 20 then
              (SorterCount.fromInt 200000)
         elif (Degree.value degree) = 22 then
-             (SorterCount.fromInt 40000)
-        else (SorterCount.fromInt 20000)
+             (SorterCount.fromInt 150000)
+        else (SorterCount.fromInt 100000)
 
 
     let sorterCountForDegreeTest (degree:Degree) = 
@@ -67,7 +67,10 @@ module SorterPbCauseSpecGen2 =
         awys |> List.map(StageWindowSize.fromInt)
 
 
-    let makeBuddyArgs (prefix: Switch list) degreesToTest (stageCtr:Degree->StageCount) = 
+    let makeBuddyArgs (prefix: Switch list) 
+                      degreesToTest 
+                      (stageCtr:Degree->StageCount) = 
+
         let wNd = degreesToTest 
                     |> List.map(fun d -> 
                         (buddyStageWindows d) |> List.map(fun tc -> (tc, d)))
@@ -127,27 +130,41 @@ module SorterPbCauseSpecGen2 =
         let nextRnGen(randy:IRando) =
             RngGen.createLcg (RandomSeed.fromInt randy.NextPositiveInt)
 
-        let sorterRndGenToCauseSpec (dex:int) (sorterRndGen:sorterRndGen) = 
+        let sorterRndGenToCauseSpec (dex:int) 
+                                    (sorterRndGen:sorterRndGen) =
+
             let degree = sorterRndGen |> SorterRndGen.getDegree
             let sorterCount = degree |> sorterCountForDegree
             let rndGen = (nextRnGen(randy))
-            let pfxSwitchCt = sorterRndGen 
-                                     |> SorterRndGen.getSwitchPrefix
-                                     |> List.length
-                                     |> SwitchCount.fromInt
-            let totalSwitchCt = sorterRndGen |> SorterRndGen.getSwitchCount
-            let switchUsePlan = Sorting.SwitchUsePlan.makeIndexes 
-                                        pfxSwitchCt 
-                                        totalSwitchCt
+
+
             let sortableSetSpec = SortableSetGenerated.allBp64 degree
                                     |> SortableSetSpec.Generated
+
+            //let sortableSetSpec = SortableSetGenerated.allIntBits degree
+            //                        |> SortableSetSpec.Generated
+
+            let sortableSetEx = sortableSetSpec 
+                                    |> SortableSetSpec.getSortableSetExplicit
+                                    |> Result.ExtractOrThrow
+
+            let (sortableSetTrim, switchUses) = 
+                        sortableSetEx |> SortingOps.SortableSet.reduce 
+                                                        sorterRndGen
+
+
+            let totalSwitchCt = sorterRndGen |> SorterRndGen.getSwitchCount
+            let switchUsePlan = Sorting.SwitchUsePlan.makeIndexes 
+                                        switchUses
+                                        totalSwitchCt
+
             let useParallel = UseParallel.create true
             let resultsName = "sorterPerfBins"
             let pfxDescr = "pfxDescr"
             let causeSpecDescr = sprintf "%d: Time: %s SorterGen: %s SorterCount: %d" 
                                     dex
                                     (System.DateTime.Now.ToLongTimeString())
-                                    (sorterRndGen |> SorterRndGen.reportString pfxDescr) 
+                                    (sorterRndGen |> SorterRndGen.reportString) 
                                     (SorterCount.value sorterCount)
 
             let causeSpec = makeCauseSpec

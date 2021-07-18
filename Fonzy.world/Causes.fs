@@ -190,15 +190,18 @@ module CauseSorters =
                                                 sorterRndGen 
                                                 sorterCount 
                                                 randy
+
                 let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
                 let sorterSet = SorterSet.fromSorters 
                                             sorterSetId
                                             (sorterRndGen |> SorterRndGen.getDegree)
                                             sorterArray
     
-                let! sortableSetEx = sortableSetSpec |> SortableSetSpec.getSortableSetExplicit
+                let! sortableSetEx = sortableSetSpec 
+                                        |> SortableSetSpec.getSortableSetExplicit
 
-                let sortableSetTrim = sortableSetEx |> SortingOps.SortableSet.reduce 
+                let (sortableSetTrim, switchUses) = 
+                            sortableSetEx |> SortingOps.SortableSet.reduce 
                                                             sorterRndGen
 
                 let! perfBins = SortingOps.SorterSet.getSorterCoverageBins

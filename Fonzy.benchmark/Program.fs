@@ -19,9 +19,9 @@ let main argv =
 
      /// ******* PerfBinsReport ***********
     //Console.WriteLine("Starting PerfBinsReport.main")
-    //let res2 =  PerfBinReports.dirPerfBinBySorterGenReport 
-    //                    (FilePath.fromString "C:\\SimOut") 
-    //                    (FilePath.fromString "C:\\SimOutReports")
+    //let res2 =  PerfBinReports.dirPerfBinBySorterGenReport2 
+    //                    (FilePath.fromString "C:\\SimOut3") 
+    //                    (FilePath.fromString "C:\\SimOutReports3")
     //Console.WriteLine(res2)
     //Console.Read() |> ignore
     0 // return an integer exit code

@@ -3,9 +3,18 @@ open System
 
 type SwitchUses = {switchCount:SwitchCount; weights:int[]}
 module SwitchUses =
+   let createNone = 
+       {switchCount=SwitchCount.fromInt 0; weights=[||]}
+
    let createEmpty (switchCount:SwitchCount) =
        {switchCount=switchCount; 
         weights=Array.init (SwitchCount.value switchCount) (fun i -> 0)}
+
+   let createOnes (switchCount:SwitchCount) =
+        {
+            switchCount=switchCount; 
+            weights=Array.init (SwitchCount.value switchCount) (fun i -> 1)
+        }
 
    let init (weights:int[]) =
            {

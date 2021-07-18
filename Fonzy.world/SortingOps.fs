@@ -49,30 +49,34 @@ module SortingOps =
                             Sorting.SwitchUsePlan.All
                             Sorting.EventGrouping.BySwitch
 
+            let switchUses = res |> SwitchEventRecords.getSwitchUses
+
             let uniBts = res |> SwitchEventRecords.getSortableSetRollout
                              |> SortableSetRollout.removeDupes
                              |> Seq.toArray
 
-            match sSet with
-            | sortableSet.Binary _ -> 
-                uniBts
-                    |> SortableSetBinary.fromIntBits degree
-                    |> sortableSet.Binary
-            | sortableSet.Bp64 _ -> 
-                uniBts
-                    |> SortableSetBp64.fromIntBits degree
-                    |> sortableSet.Bp64
-            | sortableSet.Integer _ -> 
-                uniBts
-                    |> SortableSetInteger.fromIntBits degree
-                    |> sortableSet.Integer
+            let reducedSSet = 
+                match sSet with
+                | sortableSet.Binary _ -> 
+                    uniBts
+                        |> SortableSetBinary.fromIntBits degree
+                        |> sortableSet.Binary
+                | sortableSet.Bp64 _ -> 
+                    uniBts
+                        |> SortableSetBp64.fromIntBits degree
+                        |> sortableSet.Bp64
+                | sortableSet.Integer _ -> 
+                    uniBts
+                        |> SortableSetInteger.fromIntBits degree
+                        |> sortableSet.Integer
 
+            (reducedSSet, switchUses)
 
         let reduce (srg:sorterRndGen) 
                    (sSet:sortableSet) = 
             let pfx = srg |> SorterRndGen.getSwitchPrefix
             if pfx.Length = 0 then
-                sSet 
+                (sSet, SwitchUses.createNone)
             else switchReduce sSet pfx
                 
 
@@ -84,6 +88,7 @@ module SortingOps =
             let switches = degree |> TwoCycleGen.evenMode
                                   |> Switch.fromTwoCyclePerm
             switchReduce wholeSet switches
+
 
         let oneStageReduceInts (degree:Degree) = 
     

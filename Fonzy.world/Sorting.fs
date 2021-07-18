@@ -10,19 +10,20 @@ module Sorting =
 
     module SwitchUsePlan = 
 
-        let makeIndexes (prefixCount:SwitchCount) 
+        let makeIndexes (prefixUses:SwitchUses) 
                         (totalCount:SwitchCount) =
 
+            let prefixCount = prefixUses.weights.Length
             let scArray = 
                 Array.init 
                     (SwitchCount.value totalCount)
                     (fun dex -> 
-                            if (dex < (SwitchCount.value prefixCount)) 
-                                    then 1 else 0)               
+                            if (dex < prefixCount) 
+                                    then prefixUses.weights.[dex] else 0)               
 
-            ((SwitchCount.value prefixCount), 
-             (SwitchCount.value totalCount), 
-              scArray)
+            (  prefixCount, 
+              (SwitchCount.value totalCount), 
+               scArray)
             |> SwitchUsePlan.Indexes
 
 

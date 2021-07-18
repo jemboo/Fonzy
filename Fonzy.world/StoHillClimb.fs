@@ -92,13 +92,14 @@ module sorterSHC =
         let pfxArray = switchPfx |> Seq.toArray
         let ssAll = SortableSetBp64.allBp64 degree
                     |> sortableSet.Bp64
-        let ssOp = SortingOps.SortableSet.switchReduce
-                        ssAll
-                        pfxArray
+
+        let ssOp, switchUses = SortingOps.SortableSet.switchReduce
+                                    ssAll
+                                    pfxArray
 
         fun (step:StepNumber) (sorter:Sorter) ->
             let suPlan = Sorting.SwitchUsePlan.makeIndexes
-                            (pfxArray.Length |> SwitchCount.fromInt)
+                            switchUses
                             (sorter.switches.Length |> SwitchCount.fromInt)
             let swEvRecs = SortingOps.Sorter.eval sorter
                                    ssOp
