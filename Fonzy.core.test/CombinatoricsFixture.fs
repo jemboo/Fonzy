@@ -14,18 +14,35 @@ type CombinatoricsFixture () =
 
 
     [<TestMethod>]
-    member this.TestReflectivePairs() =
-      let degree = 8
+    member this.ReflectivePairsCanMakeAFullStage() =
+      let degree = Degree.fromInt 16
       let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424) 
-      let pairs1 = Combinatorics.reflectivePairs 
-                                    degree
-                                    rnd          
-                     |> Seq.toArray
+      let pairs1 = ReflectiveIndexes.reflectivePairs 
+                                      degree
+                                      rnd          
+                       |> Seq.toArray
 
-      let pairs2 = Combinatorics.reflectivePairs 
+      let pairs2 = ReflectiveIndexes.reflectivePairs 
                                   degree
                                   rnd 
                        |> Seq.toArray
+
+      Assert.AreEqual(degree, degree)
+
+
+    [<TestMethod>]
+    member this.TestReflectivePairs() =
+      let degree = Degree.fromInt 31
+      let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424) 
+
+      let runTest () =
+          let pairs1 = ReflectiveIndexes.reflectivePairs 
+                                         degree
+                                         rnd          
+                           |> Seq.toArray
+          let res = pairs1 |> Array.forall (ReflectiveIndexes.isGood)
+          (pairs1, res)
+      let qua = Array.init 100 (fun _ -> runTest())
 
       Assert.AreEqual(degree, degree)
 

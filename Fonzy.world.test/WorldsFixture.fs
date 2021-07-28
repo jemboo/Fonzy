@@ -32,18 +32,18 @@ type WorldsFixture () =
                         CauseSpecId.value TestData.CauseSpec.IntDist.rndUniform.id);
 
 
-    [<TestMethod>]
-    member this.worldActionGenSorterDist() =
-        let worldAction = TestData.WorldAction.SorterGen.randWorldAction
-        let newWorld = WorldAction.createWorld worldAction 
-                    |> Result.ExtractOrThrow
-        let genSorterSetDto, meta = 
-            Enviro.getDtoAndMetaFromEnviro<sorterSetDto>
-                                 newWorld.enviro
-                                 TestData.CauseSpec.SorterSet.rndSorterSetName
-            |> Result.ExtractOrThrow
-        let sorterSet = genSorterSetDto |> SorterSetDto.fromDto
-                                        |> Result.ExtractOrThrow
-        Assert.AreEqual(sorterSet.sorterCount, TestData.CauseSpec.SorterSet.sorterCount)
-        Assert.AreEqual(WorldId.value newWorld.id, 
-                        CauseSpecId.value TestData.CauseSpec.SorterSet.rand1.id);
+    //[<TestMethod>]
+    //member this.worldActionGenSorterDist() =
+    //    let worldAction = TestData.WorldAction.SorterGen.randWorldAction
+    //    let newWorld = WorldAction.createWorld worldAction 
+    //                |> Result.ExtractOrThrow
+    //    let genSorterSetDto = 
+    //        Enviro.getDto<sorterSetDto>
+    //                             newWorld.enviro
+    //                             TestData.CauseSpec.SorterSet.rndSorterSetName
+    //        |> Result.ExtractOrThrow
+    //    let sorterSet = genSorterSetDto |> SorterSetDto.fromDto
+    //                                    |> Result.ExtractOrThrow
+    //    Assert.AreEqual(sorterSet.sorterCount, TestData.CauseSpec.SorterSet.sorterCount)
+    //    Assert.AreEqual(WorldId.value newWorld.id, 
+    //                    CauseSpecId.value TestData.CauseSpec.SorterSet.rand1.id);

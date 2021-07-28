@@ -163,3 +163,8 @@ module Rando =
             }
         polarBoxMullerDist ()
 
+    let choose (rando:IRando) (items:'T[]) =
+        if(items.Length > 0) then
+            Some items.[rando.NextPositiveInt % items.Length]
+        else
+            None

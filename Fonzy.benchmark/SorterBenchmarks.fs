@@ -56,11 +56,12 @@ type BenchSorterSetOnInts() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
     let sorterCount = SorterCount.fromInt 50
-    let sorterGen = SorterGen.RandStages 
-                            ((StageCount.degreeTo999StageCount degree),
+    let sorterGen = sorterRndGen.RandStages
+                            ([],
+                             (StageCount.degreeTo999StageCount degree),
                              degree)
     let makeRandomSorter() = 
-            SorterGen.createRandom sorterGen iRando
+            SorterRndGen.createRandom sorterGen iRando
 
     let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
                                   (fun _ -> makeRandomSorter())
@@ -186,11 +187,12 @@ type BenchmarkSorterSetOnBp64() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
     let sorterCount = SorterCount.fromInt 50
-    let sorterGen = SorterGen.RandStages 
-                            ((StageCount.degreeTo999StageCount degree),
+    let sorterGen = sorterRndGen.RandStages 
+                            ([],
+                             (StageCount.degreeTo999StageCount degree),
                              degree)
     let makeRandomSorter() = 
-            SorterGen.createRandom sorterGen iRando
+            SorterRndGen.createRandom sorterGen iRando
 
     let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
                                   (fun _ -> makeRandomSorter())

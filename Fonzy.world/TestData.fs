@@ -58,7 +58,7 @@ module TestData =
                                         prefixSwitchUses
                                         switchCount
 
-            let sorterGen = SorterGen.RandStages (stageCount, TestData.degree)
+           // let sorterGen = SorterGen.RandStages (stageCount, TestData.degree)
             let swPfx = TestData.degree |> TwoCycleGen.evenMode |> Switch.fromTwoCyclePerm |> Seq.toList
             let sorterRndGen = sorterRndGen.RandStages (swPfx, stageCount, TestData.degree)
             let switchFreq = SwitchFrequency.max
@@ -66,20 +66,19 @@ module TestData =
             let useParallel = false
 
 
-            let srgPr ssid sg sc rng ssn =
+            //let srgPr ssid sg sc rng ssn =
+            //    CauseSpecSorters.rndGen ("sorterSetId", ssid)
+            //                            ("sorterGen", sg)
+            //                            ("sorterCount", sc)
+            //                            ("rndGen", rng)
+            //                            (rndSorterSetName, ssn)
 
-                CauseSpecSorters.rndGen ("sorterSetId", ssid)
-                                        ("sorterGen", sg)
-                                        ("sorterCount", sc)
-                                        ("rndGen", rng)
-                                        (rndSorterSetName, ssn)
-
-            let rand1 = srgPr sorterSetId1 sorterGen 
-                             sorterCount (nextRnGen()) rndSorterSetName
-            let rand2 = srgPr sorterSetId2 sorterGen 
-                             sorterCount (nextRnGen()) rndSorterSetName
-            let rand3 = srgPr sorterSetId3 sorterGen
-                             sorterCount (nextRnGen()) rndSorterSetName
+            //let rand1 = srgPr sorterSetId1 sorterGen 
+            //                 sorterCount (nextRnGen()) rndSorterSetName
+            //let rand2 = srgPr sorterSetId2 sorterGen 
+            //                 sorterCount (nextRnGen()) rndSorterSetName
+            //let rand3 = srgPr sorterSetId3 sorterGen
+            //                 sorterCount (nextRnGen()) rndSorterSetName
 
             let switchUsePlan = Sorting.SwitchUsePlan.All
 
@@ -102,15 +101,15 @@ module TestData =
                             sorterEvalResultsName
 
 
-            let genMush sg sc rng sup sbset up resn =
-                CauseSpecSorters.genToSorterPerfBins 
-                                        ("sorterGen", sg)
-                                        ("sorterCount", sc)
-                                        ("rndGen", rng)
-                                        ("switchUsePlan", sup)
-                                        ("sortableSetSpec", sbset)
-                                        ("useParallel", up)
-                                        ("resultsName", resn)
+            //let genMush sg sc rng sup sbset up resn =
+            //    CauseSpecSorters.genToSorterPerfBins 
+            //                            ("sorterGen", sg)
+            //                            ("sorterCount", sc)
+            //                            ("rndGen", rng)
+            //                            ("switchUsePlan", sup)
+            //                            ("sortableSetSpec", sbset)
+            //                            ("useParallel", up)
+            //                            ("resultsName", resn)
 
             let rndGenMush rsg sc rng sup sbset up resn =
                 CauseSpecSorters.rndGenToPerfBins 
@@ -123,15 +122,15 @@ module TestData =
                                         ("resultsName", resn)
 
 
-            let genToSorterPerfBins = 
-                    genMush
-                            sorterGen
-                            sorterCount
-                            (nextRnGen())
-                            switchUsePlan 
-                            TestData.SortableSet.sortableSet
-                            useParallel
-                            sorterEvalResultsName
+            //let genToSorterPerfBins = 
+            //        genMush
+            //                sorterGen
+            //                sorterCount
+            //                (nextRnGen())
+            //                switchUsePlan 
+            //                TestData.SortableSet.sortableSet
+            //                useParallel
+            //                sorterEvalResultsName
 
 
             let rndGenToSorterPerfBins = 
@@ -151,10 +150,10 @@ module TestData =
                                     |> Result.ExtractOrThrow
             let randomUniform = WorldAction.create World.empty causeRndUniform
 
-        module SorterGen = 
-            let randCause = Causes.fromCauseSpec CauseSpec.SorterSet.rand1 
-                            |> Result.ExtractOrThrow
-            let randWorldAction = WorldAction.create World.empty randCause
+        //module SorterGen = 
+        //    let randCause = Causes.fromCauseSpec CauseSpec.SorterSet.rand1 
+        //                    |> Result.ExtractOrThrow
+        //    let randWorldAction = WorldAction.create World.empty randCause
 
     module World = 
     

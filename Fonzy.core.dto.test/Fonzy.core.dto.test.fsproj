@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="RootDtoFixture.fs" />
     <Compile Include="CombinatoricsTypesDtoFixture.fs" />
     <Compile Include="RngGenDtoFixture.fs" />
     <Compile Include="CommonTypesDtoFixture.fs" />

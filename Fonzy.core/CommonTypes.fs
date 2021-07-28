@@ -17,6 +17,9 @@ module Degree =
     let binExp (v: Degree) =
         let fexp = (value v) |> float
         ( ** ) 2.0 fexp |> int
+    
+    let maxSwitchesPerStage (degree:Degree) =
+        (value degree) / 2
 
 
 type MutationRate = private MutationRate of float

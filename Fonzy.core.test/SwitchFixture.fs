@@ -4,48 +4,12 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type SorterPartsFixture () =
-
+type SwitchFixture () =
     [<TestMethod>]
-    member this.Stage_switchIntersection() =
-        let degree = Degree.fromInt 16
-        let randy = RngGen.createLcg (RandomSeed.fromInt 1234) 
-                        |> Rando.fromRngGen
-        let stageCount = StageCount.fromInt 2
-
-        let startingStages() = 
-            Stage.rndSymmetric
-                        degree
-                        randy
-                |> Seq.take (StageCount.value stageCount)
-                |> Stage.switchIntersection
-                |> List.length
-
-        for i=0 to 100 do
-            Console.WriteLine (sprintf "%d" (startingStages()))
-
-        Assert.IsTrue(1 > 0);
-
-
-    [<TestMethod>]
-    member this.Stage_switchPairwiseIntersections() =
-        let degree = Degree.fromInt 16
-        let randy = RngGen.createLcg (RandomSeed.fromInt 1234) |> Rando.fromRngGen
-        let stageCount = StageCount.fromInt 4
-
-        let startingStages() = 
-            Stage.rndSymmetric
-                        degree
-                        randy
-                |> Seq.take (StageCount.value stageCount)
-                |> Stage.switchPairwiseIntersections
-                |> Seq.length
-
-        let res = Seq.init 1000 (fun _ -> startingStages())
-
-        let hist = CollectionUtils.histogram (id) res
-        Assert.IsTrue(hist.Count > 0);
-
+    member this.testSwitchMap() =
+        let yak = Switch.switchMap.[1]
+        let yak2 = Switch.switchMap.[3]
+        Assert.IsFalse(false)
 
     //[<TestMethod>]
     //member this.Stage_windowBuddies() =
@@ -121,23 +85,3 @@ type SorterPartsFixture () =
     //                                                i
     //                                                v))
     //    Assert.AreEqual(1, 1);
-        
-
-    [<TestMethod>]
-    member this.Stage_buddyStages3() =
-        let degree = Degree.fromInt 10
-        let randy = RngGen.createLcg (RandomSeed.fromInt 7234) |> Rando.fromRngGen
-        let stageWindowSize = StageCount.fromInt 4
-        let maxStageTry = (StageCount.fromInt 1200)
-        let stageCount = (StageCount.fromInt 100)
-        let buddyStages() = 
-            Stage.rndSymmetricBuddyStages
-                            stageWindowSize
-                            SwitchFrequency.max
-                            degree
-                            randy
-                            List.Empty 
-                            maxStageTry
-                            stageCount
-        let aa = Array.init 100 (fun _ -> buddyStages())
-        Assert.AreEqual(aa.Length, (StageCount.value stageCount));

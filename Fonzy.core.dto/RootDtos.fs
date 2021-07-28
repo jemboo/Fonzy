@@ -3,6 +3,7 @@ open System
 
 
 type RootDto = {dataType:string; metaData:Map<string,string>; data:string}
+
 module RootDto = 
     let extractData<'T> (rootDto:RootDto) =
         result {

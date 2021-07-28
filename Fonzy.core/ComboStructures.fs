@@ -194,28 +194,29 @@ module TwoCyclePerm =
             values = refl 
         }
 
-
     let rndSymmetric (degree:Degree) 
                      (rnd:IRando) =
         let deg = (Degree.value degree)
         let aRet = Array.init deg (id)
-        let chunkProc (ch:(int*int)[]) =
-            if ch.Length > 1 then
-                let a,b = ch.[0]
-                let c,d = ch.[1]
-                aRet.[a] <- b
-                aRet.[b] <- a
-                aRet.[c] <- d
-                aRet.[d] <- c
-            else
-               let a,b = ch.[0]
-               aRet.[a] <- b
-               aRet.[b] <- a
+        let chunkRi (rfls:reflectiveIndexes) =
+            match rfls with
+            | Single (i, j, d)         ->  aRet.[i] <- j
+                                           aRet.[j] <- i
 
-        let q = Combinatorics.reflectivePairs deg rnd
-                |> Seq.toArray
-        
-        q |> Array.iter(chunkProc)
+            | Unreflectable (i, j, d)  ->  aRet.[i] <- j
+                                           aRet.[j] <- i
+
+            | Pair ((h, i), (j, k), d) ->  aRet.[i] <- h
+                                           aRet.[h] <- i
+                                           aRet.[j] <- k
+                                           aRet.[k] <- j
+
+            | LeftOver (i, j, d)       ->  aRet.[i] <- j
+                                           aRet.[j] <- i
+
+        let q = ReflectiveIndexes.reflectivePairs degree rnd
+                |> Seq.iter(chunkRi)
+
         { degree=degree; values=aRet }
 
 
@@ -601,6 +602,7 @@ module BitsP64 =
 
 
 type record64Array = { values: uint64[] }
+
 module Record64Array =
 
     let make (degree:Degree) = 
@@ -638,8 +640,6 @@ type vecP64 = { values: uint64[] }
 
 type vecP64b = { values: Vector<uint64> }
     
-    
-//type sortableVecb = { degree:Degree; vecLines:Vector<uint64>[] }
 
 
 module VecP64 = 

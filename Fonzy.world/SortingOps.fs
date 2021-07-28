@@ -72,8 +72,8 @@ module SortingOps =
 
             (reducedSSet, switchUses)
 
-        let reduce (srg:sorterRndGen) 
-                   (sSet:sortableSet) = 
+        let reduceByPrefix (srg:sorterRndGen) 
+                           (sSet:sortableSet) = 
             let pfx = srg |> SorterRndGen.getSwitchPrefix
             if pfx.Length = 0 then
                 (sSet, SwitchUses.createNone)

@@ -22,13 +22,13 @@ module SorterSet =
         }
 
     // IRando dependent
-    let createRandom (sorterSetId:SorterSetId)
-                     (sorterGen:SorterGen) 
-                     (sorterCount:SorterCount) 
-                     (rnd:IRando) =
-        fromSorters
-            sorterSetId
-            (sorterGen|> SorterGen.getDegree)
-            (Array.init (SorterCount.value sorterCount)
-                       (fun _ -> (SorterGen.createRandom 
-                                                sorterGen rnd)))
+    //let createRandom (sorterSetId:SorterSetId)
+    //                 (sorterGen:SorterGen) 
+    //                 (sorterCount:SorterCount) 
+    //                 (rnd:IRando) =
+    //    fromSorters
+    //        sorterSetId
+    //        (sorterGen|> SorterGen.getDegree)
+    //        (Array.init (SorterCount.value sorterCount)
+    //                   (fun _ -> (SorterGen.createRandom 
+    //                                            sorterGen rnd)))

@@ -20,37 +20,28 @@ module SorterPbCauseSpecGen2 =
                 ("sortableSetSpec", sortableSetSpec)
                 ("useParallel", (UseParallel.value useParallel))
                 ("resultsName", resultsName)
-
-    let makeRandomSwitches (degree:Degree) = 
-        let randy = Rando.LcgFromSeed (RandomSeed.fromNow)
-        Switch.rndSwitchesOfDegree degree randy
-                |> Seq.take (Degree.value degree)
-                |> Seq.toList
     
     let sorterCountForDegree (degree:Degree) = 
-
         if (Degree.value degree) = 8 then
-             (SorterCount.fromInt 2000000)
+             (SorterCount.fromInt 40000)
         elif (Degree.value degree) = 10 then
-             (SorterCount.fromInt 2000000)
+             (SorterCount.fromInt 40000)
         elif (Degree.value degree) = 12 then
-             (SorterCount.fromInt 2000000)
+             (SorterCount.fromInt 40000)
         elif (Degree.value degree) = 14 then
-             (SorterCount.fromInt 1000000)
+             (SorterCount.fromInt 20000)
         elif (Degree.value degree) = 16 then
-             (SorterCount.fromInt 500000)
+             (SorterCount.fromInt 10000)
         elif (Degree.value degree) = 18 then
-             (SorterCount.fromInt 250000)
+             (SorterCount.fromInt 50000)
         elif (Degree.value degree) = 20 then
-             (SorterCount.fromInt 200000)
+             (SorterCount.fromInt 40000)
         elif (Degree.value degree) = 22 then
-             (SorterCount.fromInt 150000)
-        else (SorterCount.fromInt 100000)
-
+             (SorterCount.fromInt 30000)
+        else (SorterCount.fromInt 20000)
 
     let sorterCountForDegreeTest (degree:Degree) = 
         (SorterCount.fromInt 2)
-
 
     let buddyStageWindows (degree:Degree) =
         let awys =
@@ -66,11 +57,10 @@ module SorterPbCauseSpecGen2 =
             | _ ->   [ 1; 3; 5; 7; 9; 11;]
         awys |> List.map(StageWindowSize.fromInt)
 
-
     let makeBuddyArgs (prefix: Switch list) 
-                      degreesToTest 
+                       degreesToTest 
                       (stageCtr:Degree->StageCount) = 
-
+                      
         let wNd = degreesToTest 
                     |> List.map(fun d -> 
                         (buddyStageWindows d) |> List.map(fun tc -> (tc, d)))
@@ -78,26 +68,72 @@ module SorterPbCauseSpecGen2 =
         wNd |> List.map(fun (wc, d) -> (prefix, (d |> stageCtr), wc, d))
 
 
-    let tup900Switches (switchList: Switch list) (degree:Degree) =
+
+    let makeRandomSwitches (degree:Degree) 
+                           (degM:int) = 
+        let randy = Rando.LcgFromSeed (RandomSeed.fromNow())
+        Switch.rndNonDegenSwitchesOfDegree degree randy
+                |> Seq.take ((Degree.value degree) * degM)
+                |> Seq.toList
+
+
+    let makeRandomStageSwitches (degree:Degree) 
+                                (stageCount:StageCount) = 
+        let randy = Rando.LcgFromSeed (RandomSeed.fromNow())
+        Stage.rndSeq degree (SwitchFrequency.max) randy
+        |> Seq.take (StageCount.value stageCount)
+        |> Seq.map(fun st -> st.switches |> List.toSeq)
+        |> Seq.concat
+        |> Seq.toList
+
+
+    let makeRandomStageSymSwitches (degree:Degree) 
+                                (stageCount:StageCount) = 
+        let randy = Rando.LcgFromSeed (RandomSeed.fromNow())
+        Stage.rndSymmetric degree randy
+        |> Seq.take (StageCount.value stageCount)
+        |> Seq.map(fun st -> st.switches |> List.toSeq)
+        |> Seq.concat
+        |> Seq.toList
+
+
+
+    let tup900Switches (switchList: Switch list) 
+                       (degree:Degree) =
         (switchList, (degree |> SwitchCount.degreeTo900SwitchCount), degree)
+
 
     let tup900Stages (switchList: Switch list) (degree:Degree) =
         (switchList, (degree |> StageCount.degreeTo900StageCount), degree)
+
 
     let makeBuddyArgs900 (prefix: Switch list) degreesToTest = 
         makeBuddyArgs prefix
                       degreesToTest 
                       StageCount.degreeTo900StageCount
 
-    let makeRandSwitches900 degreesToTest =
-        degreesToTest |> List.map(fun d -> tup900Switches (makeRandomSwitches d) d
+
+    let makeRandSwitches900 degreesToTest
+                            (degM:int) = 
+        degreesToTest |> Seq.map(fun d -> tup900Switches (makeRandomSwitches d degM) d
                                             |> sorterRndGen.RandSwitches)
 
-    let makeRandStages900 degreesToTest =
-        degreesToTest |> List.map((tup900Stages []) >> sorterRndGen.RandStages)
 
-    let makeRandSymmetric900 degreesToTest =
-        degreesToTest |> List.map((tup900Stages []) >> sorterRndGen.RandSymmetric)
+    let makeRandStages900 degreesToTest 
+                          (stageCount:StageCount) =
+        degreesToTest |> Seq.map(
+                    fun d -> tup900Stages (makeRandomStageSwitches d stageCount) 
+                                          d
+                              |>  sorterRndGen.RandStages)
+
+
+    let makeRandSymmetric900 degreesToTest 
+                             (stageCount:StageCount) =
+        degreesToTest |> Seq.map(
+                    fun d -> tup900Stages (makeRandomStageSymSwitches d stageCount) 
+                                          d
+                              |>  sorterRndGen.RandSymmetric)
+
 
     let makeRandBuddies900 degreesToTest =
         (makeBuddyArgs900 [] degreesToTest) |> List.map(sorterRndGen.RandBuddies)
@@ -106,24 +142,20 @@ module SorterPbCauseSpecGen2 =
         (makeBuddyArgs900 [] degreesToTest) |> List.map(sorterRndGen.RandSymmetricBuddies)
 
 
-
     let makeRunBatchSeq (seed:RandomSeed) 
                         (outputDir:FilePath)= 
 
         let degreesToTest = 
-            [ 8; 10; 12; 14; 16; 18; 20; 22; 24;] //14; 16; 22; 24;]
-            //   [ 14; 16; 18; 24;]
-             |> List.map (Degree.fromInt)
+            [ 8; 10; 12; 14; 16; 18; 20; 22; 24;]
+             |> Seq.map (Degree.fromInt)
 
         let allSorterRndGens = 
-                //(makeRandSwitches degreesToTest) |> List.append
-                // (makeRandStages degreesToTest) |> List.append
-                // (makeRandCoComp degreesToTest) |> List.append
-                // (makeRandSymmetric degreesToTest) |> List.append
-                 //(makeRandStages999 degreesToTest) |> List.append
-                 // (makeRandStages900 degreesToTest) |> List.append
-                  (makeRandSwitches900 degreesToTest)
-
+                  seq { while true do
+                 //          yield! (makeRandStages900 degreesToTest (StageCount.fromInt 4))
+                 //          yield! (makeRandSymmetric900 degreesToTest (StageCount.fromInt 2))
+                           yield! (makeRandSymmetric900 degreesToTest (StageCount.fromInt 4))
+                           //yield! (makeRandStages900 degreesToTest (StageCount.fromInt 2))
+                     }
 
 
         let randy = RngGen.createLcg seed |> Rando.fromRngGen
@@ -132,7 +164,6 @@ module SorterPbCauseSpecGen2 =
 
         let sorterRndGenToCauseSpec (dex:int) 
                                     (sorterRndGen:sorterRndGen) =
-
             let degree = sorterRndGen |> SorterRndGen.getDegree
             let sorterCount = degree |> sorterCountForDegree
             let rndGen = (nextRnGen(randy))
@@ -149,7 +180,7 @@ module SorterPbCauseSpecGen2 =
                                     |> Result.ExtractOrThrow
 
             let (sortableSetTrim, switchUses) = 
-                        sortableSetEx |> SortingOps.SortableSet.reduce 
+                        sortableSetEx |> SortingOps.SortableSet.reduceByPrefix 
                                                         sorterRndGen
 
 
@@ -160,12 +191,6 @@ module SorterPbCauseSpecGen2 =
 
             let useParallel = UseParallel.create true
             let resultsName = "sorterPerfBins"
-            let pfxDescr = "pfxDescr"
-            let causeSpecDescr = sprintf "%d: Time: %s SorterGen: %s SorterCount: %d" 
-                                    dex
-                                    (System.DateTime.Now.ToLongTimeString())
-                                    (sorterRndGen |> SorterRndGen.reportString) 
-                                    (SorterCount.value sorterCount)
 
             let causeSpec = makeCauseSpec
                                 sorterRndGen 
@@ -176,7 +201,15 @@ module SorterPbCauseSpecGen2 =
                                 useParallel 
                                 resultsName
 
+            let csGu = causeSpec.id |> CauseSpecId.value
+
+            let causeSpecDescr = sprintf "%d: Time: %s SorterGen: %s SorterCount: %d" 
+                                    dex
+                                    (System.DateTime.Now.ToLongTimeString())
+                                    (sorterRndGen |> SorterRndGen.reportString csGu) 
+                                    (SorterCount.value sorterCount)
+
+
             (causeSpecDescr, outputDir, causeSpec)
 
-        allSorterRndGens |> CollectionUtils.listLoop
-                         |> Seq.mapi(fun dex sg -> sorterRndGenToCauseSpec dex sg)
+        allSorterRndGens |> Seq.mapi(fun dex sg -> sorterRndGenToCauseSpec dex sg)

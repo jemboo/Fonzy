@@ -7,24 +7,24 @@ open BenchmarkDotNet.Running
 let main argv =
 
     /// ******* runPerfBinBatchSeq ***********
-    Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq2")
+    //Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq2")
 
-    RunBatch.runPerfBinBatchSeq2 (FilePath.fromString "C:\\SimOut2") 
-                                 RandomSeed.fromNow
-                                0
-                                |> ignore
-    Console.Read() |> ignore
-
+    //RunBatch.runPerfBinBatchSeq2 (FilePath.fromString "C:\\SimOutPfxT") 
+    //                             (RandomSeed.fromNow ())
+    //                             0
+    //                             |> ignore
+    //Console.Read() |> ignore
+    //0
 
 
      /// ******* PerfBinsReport ***********
-    //Console.WriteLine("Starting PerfBinsReport.main")
-    //let res2 =  PerfBinReports.dirPerfBinBySorterGenReport2 
-    //                    (FilePath.fromString "C:\\SimOut3") 
-    //                    (FilePath.fromString "C:\\SimOutReports3")
-    //Console.WriteLine(res2)
-    //Console.Read() |> ignore
-    0 // return an integer exit code
+    Console.WriteLine("Starting PerfBinsReport.main")
+    let res2 =  PerfBinReports.dirPerfBinBySorterGenReport2 
+                        (FilePath.fromString "C:\\SimOutT") 
+                        (FilePath.fromString "C:\\SimOutReportsT")
+    Console.WriteLine(res2)
+    Console.Read() |> ignore
+    0
 
 
 /// ******* Benchmark ***********
@@ -32,4 +32,14 @@ let main argv =
     //let summary = BenchmarkRunner.Run<BenchmarkSorterOnBp64>()
     //printfn "%A" summary
     //Console.Read() |> ignore
-    0 // return an integer exit code
+    //0
+
+
+/// ******* Migrate Data ***********
+    //Console.WriteLine("Starting PerfBinsReport.migratePerfBinReports")
+    //let res2 =  PerfBinReports.migratePerfBinReports 
+    //                    (FilePath.fromString "C:\\SimOut") 
+    //                    (FilePath.fromString "C:\\SimOutT")
+    //Console.WriteLine(res2)
+    //Console.Read() |> ignore
+    //0

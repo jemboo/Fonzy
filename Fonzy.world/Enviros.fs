@@ -37,13 +37,37 @@ module Enviro =
                  }
 
 
-    let getDtoAndMetaFromEnviro<'T> (e:Enviro) (key:string) =
+    let addDto<'T> (e:Enviro) 
+                   (key:string) 
+                   (dto:'T) =
+         let cereal = Json.serialize dto
+         match e with
+         | Empty -> (Enviro.ObjectMap ([(key, cereal)] 
+                        |> Map.ofList)) |> Ok
+         | ObjectMap m -> result {
+                     let! mN = m |> ResultMap.add key cereal
+                     return Enviro.ObjectMap mN
+                 }
+
+
+
+    let getDtoAndMetaFromEnviro<'T> (e:Enviro) 
+                                    (key:string) =
          match e with
          | Empty -> "Empty not supported" |> Error
          | ObjectMap m -> result {
                      let! mN = m |> ResultMap.read key
                      let! ofT, meta = mN |> RootDto.extractFromJson<'T>
                      return ofT, meta
+                 }
+
+
+    let getDto<'T> (e:Enviro) (key:string) =
+         match e with
+         | Empty -> "Empty not supported" |> Error
+         | ObjectMap m -> result {
+                     let! mN = m |> ResultMap.read key
+                     return! Json.deserialize<'T>(mN)
                  }
 
 

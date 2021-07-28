@@ -15,7 +15,8 @@
     <Compile Include="RandoFixture.fs" />
     <Compile Include="CombinatoricsFixture.fs" />
     <Compile Include="ComboStructuresFixture.fs" />
-    <Compile Include="SorterPartsFixture.fs" />
+    <Compile Include="SwitchFixture.fs" />
+    <Compile Include="StageFixture.fs" />
     <Compile Include="SorterGenFixture.fs" />
     <Compile Include="SortingEvalFixture.fs" />
     <Compile Include="SortableSetRolloutFixture.fs" />

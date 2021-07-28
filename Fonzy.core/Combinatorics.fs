@@ -184,84 +184,16 @@ module Combinatorics =
     let reflect (degree:int) (src:int) =
         degree - src - 1
 
-    let isReflSymmetric (degree:int) (pair:int*int) =
-        (reflect degree (fst pair)) = (snd pair)
-
-
-
-
-
-    let buddyStage (degree:Degree) 
-                   (availableFlags:(bool*int[])) =
-        
-        None
-
-
-
-
-    
-    // returns a random symmetric pairs
-    let reflectivePairs (degree:int)
-                        (rnd:IRando) =
-        let rndmx max = 
-            (int rnd.NextPositiveInt) % max
-        let reflec (dex:int) =
-            reflect degree dex
-
-        let flagedArray = Array.init 
-                            degree
-                            (fun i -> (i, true))
-
-        let availableFlags() =
-            flagedArray                         
-            |> Seq.filter (fun (ndx,f) -> f)
-
-        let canContinue() =
-            availableFlags() |> Seq.length > 1
-
-        let nextItem() =
-            let nItem = rndmx (availableFlags() |> Seq.length)     
-            let index =                          
-                availableFlags()
-                |> Seq.item (int nItem)             
-                |> fst   
-            flagedArray.[index] <- (index, false) 
-            index
-
-        let getReflection (a:int) (b:int) =
-            let aR = reflec a
-            let bR = reflec b
-            if (snd flagedArray.[aR]) && (snd flagedArray.[bR]) then
-                flagedArray.[aR] <- (aR, false) 
-                flagedArray.[bR] <- (bR, false) 
-                Some (bR, aR)
-            else    
-                None
-
-        let nextItems() =
-            let nItemA = nextItem()     
-            let nItemB = nextItem()    
-            if nItemA = (reflec nItemB) then
-                [|(nItemA, nItemB)|]
-            else if (nItemA = (reflec nItemA)) || (nItemB = (reflec nItemB)) then
-                [|(nItemA, nItemB)|]
-            else
-                let res = getReflection nItemA nItemB
-                match res with
-                | Some (reflA, reflB) ->
-                          [|(nItemA, nItemB); (reflA, reflB)|]
-                | None -> [|(nItemA, nItemB)|]
-
-        seq { while canContinue() do yield nextItems() }
-
 
     let randomPermutation (rnd:IRando) 
                           (degree:int) =
          (fisherYatesShuffle rnd)  [|0 .. degree-1|] |> Seq.toArray
 
+
     let randomPermutations (rnd:IRando) 
                            (degree:int) =
          Seq.initInfinite (fun n -> randomPermutation rnd degree)
+
 
     let rndTwoCycleArray (rnd:IRando) 
                                    (arraysize:int) 
@@ -275,9 +207,125 @@ module Combinatorics =
             arrayRet.[rndTupes.[i].[1]] <- rndTupes.[i].[0]
         arrayRet
 
+
     let rndFullTwoCycleArray (rnd:IRando) 
                                        (arraysize:int) =
         rndTwoCycleArray rnd arraysize (arraysize/2)
+
+
+
+type reflectiveIndexes =
+     | Single of int*int*Degree
+     | Unreflectable of int*int*Degree
+     | Pair of (int*int)*(int*int)*Degree
+     | LeftOver of int*int*Degree
+
+
+module ReflectiveIndexes =
+
+    let reflect (degree:int) (src:int) =
+        degree - src - 1
+
+
+    let isReflSymmetric (degree:int) (pair:int*int) =
+        (reflect degree (fst pair)) = (snd pair)
+
+
+    let getIndexes (rfls:reflectiveIndexes) =
+        match rfls with
+        | Single (i, j, d)         ->  seq { i; j; }
+        | Unreflectable (i, j, d)  ->  seq { i; j; }
+        | Pair ((h, i), (j, k), d) ->  seq { h; i; j; k; }
+        | LeftOver (i, j, d)       ->  seq { i; j; }
+
+
+    let isGood (rfls:reflectiveIndexes) =
+        match rfls with
+        | Single _         ->  true
+        | Unreflectable _  ->  false
+        | Pair _           ->  true
+        | LeftOver _       ->  false
+
+
+    let isAFullSet (degree:Degree) 
+                   (rflses:reflectiveIndexes seq) = 
+        let dexes = rflses |> Seq.map(getIndexes)
+                           |> Seq.concat
+                           |> Seq.sort
+                           |> Seq.toList
+        [1 .. ((Degree.value degree) - 1)] = dexes
+
+
+    let reflectivePairs (degree:Degree)
+                        (rnd:IRando) =
+            let _rndmx max = 
+                (int rnd.NextPositiveInt) % max
+            let _reflectD (dex:int) =
+                reflect (Degree.value degree) dex
+
+            let _flagedArray = 
+                Array.init (Degree.value degree)
+                           (fun i -> (i, true))
+
+            let _availableFlags() =
+                _flagedArray                         
+                |> Seq.filter (fun (ndx,f) -> f)
+
+            let _canContinue() =
+                _availableFlags() |> Seq.length > 1
+
+            let _nextItem() =
+                let nItem = _rndmx (_availableFlags() |> Seq.length)     
+                let index =                          
+                    _availableFlags()
+                    |> Seq.item (int nItem)             
+                    |> fst   
+                _flagedArray.[index] <- (index, false) 
+                index
+
+            let _getReflection (a:int) (b:int) =
+                let aR = _reflectD a
+                let bR = _reflectD b
+                if (snd _flagedArray.[aR]) && (snd _flagedArray.[bR]) then
+                    _flagedArray.[aR] <- (aR, false) 
+                    _flagedArray.[bR] <- (bR, false) 
+                    Some (bR, aR)
+                else    
+                    None
+
+            let _nextItems() =
+                let nItemA = _nextItem()
+                let nItemB = _nextItem()
+                if nItemA = (_reflectD nItemB) then
+                   (nItemA, nItemB, degree) |> reflectiveIndexes.Single
+                // if one of the nodes is on the center line, then make a (non-reflective) 
+                // pair out of them
+                else if (nItemA = (_reflectD nItemA)) || 
+                        (nItemB = (_reflectD nItemB)) then
+                    (nItemA, nItemB, degree) |> reflectiveIndexes.Unreflectable
+                else
+                    let res = _getReflection nItemA nItemB
+                    match res with
+                    | Some (reflA, reflB) ->
+                              ((nItemA, nItemB), (reflA, reflB), degree) 
+                                    |> reflectiveIndexes.Pair
+                    // if a reflective pair cannot be made from these two, then
+                    // make them into a (non-reflective) pair
+                    | None -> (nItemA, nItemB, degree) |> reflectiveIndexes.LeftOver
+
+            seq { while _canContinue() do yield _nextItems() }
+
+    // the reflectivePairs function above generates only good 
+    // reflective pairs for even degree
+    let goodReflectivePairs (degree:Degree)
+                            (rnd:IRando) =
+         seq { 
+            while true do
+                 let rfpa = reflectivePairs degree rnd          
+                            |> Seq.toArray
+                 if (rfpa |> Array.forall (isGood)) then
+                    yield rfpa
+              }
 
 
 

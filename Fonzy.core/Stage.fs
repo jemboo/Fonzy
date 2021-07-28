@@ -2,88 +2,6 @@
 open System
 open System.Runtime.CompilerServices
 
-[<Struct;>]
-type Switch = {low:int; hi:int}
-module Switch =
-
-    let toString (sw:Switch) =
-        sprintf "(%d, %d)" sw.low sw.hi
-
-    let switchMap = 
-        [for hi=0 to 64 
-            do for low=0 to hi do yield {Switch.low=low; Switch.hi=hi}]
-
-    let getIndex (switch:Switch) =
-        (switch.hi * (switch.hi + 1)) / 2 + switch.low
-
-    let zeroSwitches =
-        seq { while true do yield {Switch.low=0; Switch.hi=0}}
-        
-    // produces switches from only the two cycle components of the 
-    // permutation
-    let fromIntArray (pArray:int[]) =
-            seq { for i = 0 to pArray.Length - 1 do
-                    let j = pArray.[i]
-                    if ((j > i ) && (i = pArray.[j]) ) then
-                            yield {Switch.low=i; Switch.hi=j} }
-
-    let fromPermutation (p:Permutation) =
-        fromIntArray (Permutation.arrayValues p)
-     
-    let fromTwoCyclePerm (p:TwoCyclePerm) =
-        fromIntArray (TwoCyclePerm.arrayValues p)
-    
-    let switchCountForDegree (order:Degree)  =
-        uint32 ((Degree.value order)*(Degree.value order + 1) / 2)
-
-    // IRando dependent
-    let rndNonDegenSwitchesOfDegree (degree:Degree) 
-                               (rnd:IRando) =
-        let maxDex = switchCountForDegree degree
-        seq { while true do 
-                    let p = (int (rnd.NextUInt % maxDex))
-                    let sw = switchMap.[p] 
-                    if (sw.low <> sw.hi) then
-                        yield sw }
-    
-    let rndSwitchesOfDegree (degree:Degree) 
-                            (rnd:IRando) =
-        let maxDex = switchCountForDegree degree
-        seq { while true do 
-                    let p = (int (rnd.NextUInt % maxDex))
-                    yield switchMap.[p] }
-
-
-    let rndSymmetric (degree:Degree)
-                     (rnd:IRando) =
-        let aa (rnd:IRando)  = 
-            (TwoCyclePerm.rndSymmetric 
-                                degree 
-                                rnd )
-                    |> fromTwoCyclePerm
-        seq { while true do yield! (aa rnd) }
-
-
-    let mutateSwitches (order:Degree) 
-                       (mutationRate:MutationRate) 
-                       (rnd:IRando) 
-                       (switches:seq<Switch>) =
-        let mDex = uint32 ((Degree.value order)*(Degree.value order + 1) / 2) 
-        let mutateSwitch (switch:Switch) =
-            match rnd.NextFloat with
-            | k when k < (MutationRate.value mutationRate) -> 
-                        switchMap.[(int (rnd.NextUInt % mDex))] 
-            | _ -> switch
-        switches |> Seq.map(fun sw-> mutateSwitch sw)
-
-
-    let reflect (degree:Degree) (sw:Switch) =
-        let deg = (Degree.value degree)
-        { Switch.low = sw.hi |> Combinatorics.reflect deg;
-          Switch.hi = sw.low |> Combinatorics.reflect deg; }
-
-
-
 type Stage = {switches:Switch list; degree:Degree}
 
 module Stage =
@@ -123,29 +41,31 @@ module Stage =
              }
 
 
-    let getStageIndexesFromSwitches (degree:Degree) 
-                                    (switches:seq<Switch>) =
-        let mutable stageTracker = Array.init (Degree.value degree) 
-                                              (fun _ -> false)
-        let mutable curDex = 0
-        seq { 
-             yield curDex
-             for sw in switches do
-                if (stageTracker.[sw.hi] || stageTracker.[sw.low] ) then
-                    yield curDex
-                    stageTracker <- Array.init (Degree.value degree) 
-                                                (fun _ -> false)
-                stageTracker.[sw.hi] <- true
-                stageTracker.[sw.low] <- true
-                curDex <- curDex + 1
-             yield curDex
-           }
+    //let getStageIndexesFromSwitches (degree:Degree) 
+    //                                (switches:seq<Switch>) =
+    //    let mutable stageTracker = Array.init (Degree.value degree) 
+    //                                          (fun _ -> false)
+    //    let mutable curDex = 0
+    //    seq { 
+    //         yield curDex
+    //         for sw in switches do
+    //            if (stageTracker.[sw.hi] || stageTracker.[sw.low] ) then
+    //                yield curDex
+    //                stageTracker <- Array.init (Degree.value degree) 
+    //                                            (fun _ -> false)
+    //            stageTracker.[sw.hi] <- true
+    //            stageTracker.[sw.low] <- true
+    //            curDex <- curDex + 1
+    //         yield curDex
+    //       }
+
 
     let getStageCount (degree:Degree) 
                       (switches:seq<Switch>) =
             fromSwitches degree switches 
                     |> Seq.length
                     |> StageCount.fromInt
+
 
     let convertToTwoCycle (stage:Stage) =
         stage.switches |> Seq.map(fun s -> (s.low, s.hi))
@@ -177,6 +97,7 @@ module Stage =
         let sA = Switch.fromIntArray tcp |> Seq.toList
         {switches=sA; degree=stage.degree}
         
+
     // IRando dependent
     let rndSeq (degree:Degree) 
                (switchFreq:SwitchFrequency) 
@@ -317,3 +238,103 @@ module Stage =
                     stagesPfx
                     trialStageCount
                     stageCount
+
+
+
+type indexedSelector<'V> = { array:('V * int)[] }
+
+module IndexedSelector =
+
+    let nextIndex<'V> 
+            (selector:indexedSelector<'V>) 
+            (qualifier:'V->bool)
+            (rnd:IRando) =
+
+        let candies = selector.array |> Array.filter(fun tup -> tup |> fst |> qualifier)
+        candies |> Rando.choose rnd |> Option.map snd
+
+
+
+type buddyTrack = { 
+                    degree:Degree;
+                    traces:CircularBuffer<bool*bool>[]; 
+                    buffSz:StageCount; 
+                  }
+
+module BuddyTrack =
+
+    let make (degree:Degree) 
+             (buffSz:StageCount) =
+        let tSide = (Degree.value degree)
+        let arrayLen = (tSide) * (tSide + 1) / 2
+        let cbs = Array.init 
+                    arrayLen 
+                    (fun _ -> CircularBuffer<bool*bool>(
+                                (false,false), 
+                                (StageCount.value buffSz)))
+        {
+            degree = degree;
+            buddyTrack.traces = cbs;
+            buffSz = buffSz;
+        }
+
+
+    let updateCb (index:int) 
+                 (lowVal:bool) 
+                 (hiVal:bool)
+                 (bt:buddyTrack) =
+        let low, hi = bt.traces.[index].Current
+        bt.traces.[index].SetCurrent (lowVal || low, hiVal || hi)
+
+
+    let update (bt:buddyTrack) 
+               (swDex:int) =
+        let switch = Switch.switchMap.[swDex]
+        let lds = Switch.lowOverlapping bt.degree switch.low |> Seq.toArray
+        let hds = Switch.hiOverlapping bt.degree switch.hi |> Seq.toArray
+        lds |> Array.map(fun dex -> updateCb dex true false bt) |> ignore
+        hds |> Array.map(fun dex -> updateCb dex false true bt) |> ignore
+        
+
+    let prepNextStage (bt:buddyTrack) =
+        for dex = 0 to (bt.traces.Length - 1) do
+            let sw = Switch.switchMap.[dex]
+            if(sw.hi = sw.low) then
+                bt.traces.[dex].Push (true, true)
+            else
+                bt.traces.[dex].Push (false, false)
+        bt
+
+    let toSelector (bt:buddyTrack) =
+        { indexedSelector.array = bt.traces 
+                                  |> Array.mapi (fun dex v -> (v, dex)) }
+
+
+    let makeQualifier (depth:StageCount) = 
+        let stageDepth = (StageCount.value depth)
+        fun (cb:CircularBuffer<bool*bool>) ->
+            let lv, hv = cb.GetTick(0)
+            if (lv || hv) then false
+            else 
+               cb.LastNticks(stageDepth) 
+               |> Array.forall(fun (lv, hv) -> not (lv && hv))
+
+
+    let makeNextStage (bt:buddyTrack) 
+                      (depth:StageCount) 
+                      (randy:IRando) =
+
+        let _nextW (bt:buddyTrack) =
+            let selector = toSelector bt 
+            let wDex = IndexedSelector.nextIndex selector (makeQualifier depth) randy
+            match wDex with
+            | Some d ->  update bt d
+                         Some Switch.switchMap.[d]
+            | None -> None
+
+        bt |> prepNextStage |> ignore
+        seq { for dex = 0 to ((bt.degree |> Degree.maxSwitchesPerStage) - 1) do
+                   let wNx = _nextW bt
+                   if (wNx |> Option.isSome) then
+                    yield (wNx |> Option.get)  }
+

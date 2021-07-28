@@ -171,6 +171,44 @@ module SeqUtils =
         seq { yield! first; yield! second }
 
 
+type CircularBuffer<'T> (deflt:'T, size:int) =
+    let arr = Array.create size deflt
+    let mutable headIndex = -1
+
+    member x.Push value =
+        if headIndex + 1 = size then
+            headIndex <- 0
+        else
+            headIndex <- headIndex + 1
+        arr.[headIndex] <- value
+
+    member x.SetCurrent value =
+        arr.[headIndex] <- value
+
+    member x.LastNticks with get(nTicks) =
+        if nTicks > size then
+            failwith "Number of requested ticks exceeds number of ticks"
+        elif headIndex >= nTicks - 1 then
+            let startIndex = (headIndex - nTicks + 1)
+            arr.[startIndex..(headIndex)]
+        else
+            let offset = size - (nTicks - headIndex - 1)
+            let startArray = arr.[offset..]
+            let endArray = arr.[0..headIndex]
+            Array.append startArray endArray
+    
+    member x.GetTick(nTicksPrior) =
+        if headIndex >= nTicksPrior then
+            arr.[headIndex - nTicksPrior]
+        else
+            let offset = size - 1 - (headIndex - nTicksPrior)
+            arr.[offset]
+
+    member x.Current =
+        x.GetTick(0)
+
+
+
 module CollectionUtils =
     // Generates an n-dimenstional cartesian product, with n = LL.Length
     //let rec cart1 LL = 

@@ -132,29 +132,29 @@ module CauseSpecRandGen =
 module CauseSpecSorters =
     let rndSortersBaseId = Guid.Parse "00000000-0000-0000-0000-000000000002"
 
-    let rndGen (sorterSetId:string*SorterSetId) 
-               (sorterGen:string*SorterGen)
-               (sorterCount:string*SorterCount)
-               (rndGen:string*RngGen) 
-               (sorterSetName:string*string) =
+    //let rndGen (sorterSetId:string*SorterSetId) 
+    //           (sorterGen:string*SorterGen)
+    //           (sorterCount:string*SorterCount)
+    //           (rndGen:string*RngGen) 
+    //           (sorterSetName:string*string) =
 
-        let id = seq { rndSortersBaseId:> obj;
-                       sorterGen:> obj;
-                       rndGen:> obj; 
-                       sorterSetName:> obj; } 
-                        |> GuidUtils.guidFromObjs
-        let prams = [
-                     (CauseSpec.tupOp sorterSetId (SorterSetId.value >> string));
-                     (CauseSpec.tupOp sorterGen SorterGenDto.toJson);
-                     (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
-                     (CauseSpec.tupOp rndGen RngGenDto.toJson);
-                     sorterSetName
-                     ] |> Map.ofList
-        {
-            CauseSpec.id = CauseSpecId.fromGuid id; 
-            genus=["Sorters"; "rndGen"]; 
-            prams=prams;
-        }
+    //    let id = seq { rndSortersBaseId:> obj;
+    //                   sorterGen:> obj;
+    //                   rndGen:> obj; 
+    //                   sorterSetName:> obj; } 
+    //                    |> GuidUtils.guidFromObjs
+    //    let prams = [
+    //                 (CauseSpec.tupOp sorterSetId (SorterSetId.value >> string));
+    //                 (CauseSpec.tupOp sorterGen SorterGenDto.toJson);
+    //                 (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
+    //                 (CauseSpec.tupOp rndGen RngGenDto.toJson);
+    //                 sorterSetName
+    //                 ] |> Map.ofList
+    //    {
+    //        CauseSpec.id = CauseSpecId.fromGuid id; 
+    //        genus=["Sorters"; "rndGen"]; 
+    //        prams=prams;
+    //    }
 
     
     let evalSortersBaseId = Guid.Parse "00000000-0000-0000-0000-000000000003"
@@ -187,39 +187,39 @@ module CauseSpecSorters =
         }
 
 
-    let genToPerfBinsBaseId = Guid.Parse "00000000-0000-0000-0000-000000000004"
-    let genToSorterPerfBins 
-              (sorterGen:string*SorterGen)
-              (sorterCount:string*SorterCount)
-              (rndGen:string*RngGen) 
-              (switchUsePlan:string*Sorting.SwitchUsePlan)
-              (sortableSet:string*SortableSetSpec)
-              (useParallel:string*bool)
-              (resultsName:string*string) =
+    //let genToPerfBinsBaseId = Guid.Parse "00000000-0000-0000-0000-000000000004"
+    //let genToSorterPerfBins 
+    //          (sorterGen:string*SorterGen)
+    //          (sorterCount:string*SorterCount)
+    //          (rndGen:string*RngGen) 
+    //          (switchUsePlan:string*Sorting.SwitchUsePlan)
+    //          (sortableSet:string*SortableSetSpec)
+    //          (useParallel:string*bool)
+    //          (resultsName:string*string) =
 
-        let id = seq { genToPerfBinsBaseId:> obj;
-                       sorterGen:> obj;
-                       sorterCount:> obj;
-                       rndGen:> obj;
-                       switchUsePlan:> obj;
-                       sortableSet:> obj;
-                       useParallel:> obj;
-                       resultsName:> obj; } 
-                        |> GuidUtils.guidFromObjs
-        let prams = [
-                     (CauseSpec.tupOp sorterGen SorterGenDto.toJson);
-                     (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
-                     (CauseSpec.tupOp rndGen RngGenDto.toJson);
-                     (CauseSpec.tupOp switchUsePlan Json.serialize);
-                     (CauseSpec.tupOp sortableSet SortableSetSpecDto.toJson);
-                     (CauseSpec.tupOp useParallel Json.serialize);
-                     resultsName
-                     ] |> Map.ofList
-        {
-            CauseSpec.id = CauseSpecId.fromGuid id; 
-            genus=["Sorters"; "genToSorterPerfBins"]; 
-            prams=prams;
-        }
+    //    let id = seq { genToPerfBinsBaseId:> obj;
+    //                   sorterGen:> obj;
+    //                   sorterCount:> obj;
+    //                   rndGen:> obj;
+    //                   switchUsePlan:> obj;
+    //                   sortableSet:> obj;
+    //                   useParallel:> obj;
+    //                   resultsName:> obj; } 
+    //                    |> GuidUtils.guidFromObjs
+    //    let prams = [
+    //                 (CauseSpec.tupOp sorterGen SorterGenDto.toJson);
+    //                 (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
+    //                 (CauseSpec.tupOp rndGen RngGenDto.toJson);
+    //                 (CauseSpec.tupOp switchUsePlan Json.serialize);
+    //                 (CauseSpec.tupOp sortableSet SortableSetSpecDto.toJson);
+    //                 (CauseSpec.tupOp useParallel Json.serialize);
+    //                 resultsName
+    //                 ] |> Map.ofList
+    //    {
+    //        CauseSpec.id = CauseSpecId.fromGuid id; 
+    //        genus=["Sorters"; "genToSorterPerfBins"]; 
+    //        prams=prams;
+    //    }
 
 
     let rndGenToPerfBinsBaseId = Guid.Parse "00000000-0000-0000-0000-000000000005"
@@ -256,6 +256,50 @@ module CauseSpecSorters =
             prams=prams;
         }
 
+    //let genToRndGen (causeSpec:CauseSpec) = 
+
+    //   result {
+    //       let! sorterGen = 
+    //               causeSpec.prams 
+    //                   |> ResultMap.procKeyedString "sorterGen" 
+    //                                                (SorterGenDto.fromJson)
+
+    //       let sorterRndGen = sorterGen |> SorterRndGen.fromSorterGen
+
+    //       let! sorterCount = 
+    //               causeSpec.prams 
+    //                   |> ResultMap.procKeyedInt "sorterCount" 
+    //                                             (fun d -> SorterCount.create "" d)
+    //       let! rngGen = 
+    //               causeSpec.prams 
+    //                   |> ResultMap.procKeyedString "rndGen" 
+    //                                                (RngGenDto.fromJson)
+    //       let! switchUsePlan = 
+    //               causeSpec.prams 
+    //                   |> ResultMap.procKeyedString "switchUsePlan" 
+    //                                                 (Json.deserialize<Sorting.SwitchUsePlan>)
+    //       let! sortableSetSpec = 
+    //               causeSpec.prams 
+    //                   |> ResultMap.procKeyedString "sortableSetSpec" 
+    //                                                 (SortableSetSpecDto.fromJson)
+    //       let! useParallel = 
+    //               causeSpec.prams 
+    //                   |> ResultMap.lookupKeyedBool "useParallel"
+
+    //       let! resultsName = 
+    //               causeSpec.prams 
+    //                   |> ResultMap.procKeyedString "resultsName"
+    //                                                (id >> Result.Ok)
+
+    //       return rndGenToPerfBins
+    //               ("sorterRndGen", sorterRndGen)
+    //               ("sorterCount", sorterCount)
+    //               ("rndGen", rngGen)
+    //               ("switchUsePlan", switchUsePlan)
+    //               ("sortableSetSpec", sortableSetSpec)
+    //               ("useParallel", useParallel)
+    //               ("resultsName", resultsName)
+    //   }
 
 
     let rndStoHillClimbBaseId = Guid.Parse "00000000-0000-0000-0000-000000000006"
