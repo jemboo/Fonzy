@@ -43,12 +43,13 @@ module TestData =
         let sorterLength = degree |> SwitchOrStageCount.toMediocreRandomPerfLength 
                                                     SwitchOrStage.Stage 
         let sorterCount = SorterCount.fromInt 20
-        //let sorterGen = SorterGen.RandSwitches 
-        //                            ((SwitchCount.degreeTo999SwitchCount degree),
-        //                            degree)
+        let sorterRndGen = sorterRndGen.RandSwitches 
+                                    ([],
+                                     (SwitchCount.degreeTo999SwitchCount degree),
+                                     degree)
 
-        //let makeRandomSorter() = 
-        //        SorterGen.createRandom sorterGen iRando
+        let makeRandomSorter() = 
+                SorterRndGen.createRandom sorterRndGen iRando
 
         let makeRandomTwoCycle = 
                 TwoCyclePerm.rndTwoCycle 
@@ -70,14 +71,14 @@ module TestData =
                                 |> Seq.take (SwitchCount.value switchCount)
                                 |> Seq.toList
 
-        //let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
-        //                              (fun _ -> makeRandomSorter())
+        let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
+                                      (fun _ -> makeRandomSorter())
 
-        //let maxConjugatePairs = 100
-        //let altEvenSorters = List.init maxConjugatePairs (fun stageCt -> 
-        //            SorterGen.makeAltEvenOdd degree (StageCount.fromInt (stageCt + 1)) )
-        //                     |> Result.sequence
-        //                     |> Result.ExtractOrThrow
+        let maxConjugatePairs = 100
+        let altEvenSorters = List.init maxConjugatePairs (fun stageCt -> 
+                    SorterGen.makeAltEvenOdd degree (StageCount.fromInt (stageCt + 1)) )
+                             |> Result.sequence
+                             |> Result.ExtractOrThrow
 
         let sorterGreenM = RefSorter.createRefSorter RefSorter.Green16m
                            |> Result.ExtractOrThrow
@@ -88,20 +89,20 @@ module TestData =
         let sortableSet =  ssBinary |> sortableSet.Binary
                                     |> SortableSetSpec.Explicit
 
-    //module SorterSet = 
-    //    let mediocreSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
-    //    let altEvenSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
-    //    let mediocreSorterSet = 
-    //                SorterSet.fromSorters 
-    //                        mediocreSorterSetId 
-    //                        degree 
-    //                        SorterParts.mediocreRandomSorters
+    module SorterSet = 
+        let mediocreSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+        let altEvenSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+        let mediocreSorterSet = 
+                    SorterSet.fromSorters 
+                            mediocreSorterSetId 
+                            degree 
+                            SorterParts.mediocreRandomSorters
 
-    //    let altEvenSorterSet = 
-    //                SorterSet.fromSorters 
-    //                        altEvenSorterSetId
-    //                        degree 
-    //                        SorterParts.altEvenSorters
+        let altEvenSorterSet = 
+                    SorterSet.fromSorters 
+                            altEvenSorterSetId
+                            degree 
+                            SorterParts.altEvenSorters
 
 
 
@@ -228,7 +229,15 @@ module TestData =
         let listOfSwitchUses = 
             List.init switchUsesListLength (fun _ -> 
                         SwitchUses.init SorterParts.switchUseArray)
-                      
-        //let sorterList = 
-        //    List.init (SorterCount.value sorterCount)
-        //              (fun _ -> SorterParts.makeRandomSorter())
+        
+        let sorterList = 
+                [ RefSorter.createRefSorter RefSorter.Green16m |> Result.ExtractOrThrow;
+                  RefSorter.createRefSorter RefSorter.Degree16 |> Result.ExtractOrThrow;
+                  RefSorter.createRefSorter RefSorter.Degree16a |> Result.ExtractOrThrow; ]
+
+
+        let sorterSet = 
+            SorterSet.fromSorters
+                (SorterSetId.fromGuid (Guid.Empty))
+                (Degree.fromInt 16)
+                sorterList

@@ -144,13 +144,13 @@ type BenchmarkSorterOnBp64() =
     let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
     let rollout = BP64SetsRollout.allBinary degree |> Result.ExtractOrThrow
     
-    //[<Benchmark>]
-    //member this.sorterWithNoSAG() =
-    //    let ssR = SortingBp64.sorterWithNoSAG
-    //                          sorter16 
-    //                          rollout 
-    //                          Sorting.SwitchUsePlan.All
-    //    ssR 
+    [<Benchmark>]
+    member this.sorterWithNoSAG() =
+        let ssR = SortingBp64.sorterWithNoSAG
+                              sorter16 
+                              rollout 
+                              Sorting.SwitchUsePlan.All
+        ssR 
 
 
     [<Benchmark>]

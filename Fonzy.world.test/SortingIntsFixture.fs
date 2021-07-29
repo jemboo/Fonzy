@@ -104,85 +104,85 @@ type SortingIntsFixture () =
 
 
 
-    //[<TestMethod>]
-    //member this.SorterSet_eval() =
-    //    let sorterSet = TestData.SorterSet.mediocreSorterSet
-    //    let sortableSetBinary = SortableSetSpec.Generated 
-    //                                (SortableSetGenerated.allIntBits sorterSet.degree)
-    //                             |> SortableSetSpec.getSortableSetExplicit
-    //                             |> Result.ExtractOrThrow 
-    //    let ssR = SortingOps.SorterSet.eval
-    //                    sorterSet 
-    //                    sortableSetBinary 
-    //                    Sorting.SwitchUsePlan.All
-    //                    Sorting.EventGrouping.BySwitch
-    //                    (UseParallel.create true)
-    //                    (SortingEval.SortingRecords.getSorterCoverage true)
-    //                    |> Result.ExtractOrThrow
+    [<TestMethod>]
+    member this.SorterSet_eval() =
+        let sorterSet = TestData.SorterSet.mediocreSorterSet
+        let sortableSetBinary = SortableSetSpec.Generated 
+                                    (SortableSetGenerated.allIntBits sorterSet.degree)
+                                 |> SortableSetSpec.getSortableSetExplicit
+                                 |> Result.ExtractOrThrow 
+        let ssR = SortingOps.SorterSet.eval
+                        sorterSet 
+                        sortableSetBinary 
+                        Sorting.SwitchUsePlan.All
+                        Sorting.EventGrouping.BySwitch
+                        (UseParallel.create true)
+                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        |> Result.ExtractOrThrow
 
-    //    Assert.AreEqual(SorterCount.value sorterSet.sorterCount, ssR.Length)
+        Assert.AreEqual(SorterCount.value sorterSet.sorterCount, ssR.Length)
 
         
 
 
     //// Scraps
         
-    //[<TestMethod>]
-    //member this.getSorterEff_Parallel_NoGrouping() =
-    //    let seed = 1234 |> RandomSeed.fromInt
-    //    let rngGen = (RngGen.createLcg seed)
-    //    let iRando = Rando.fromRngGen rngGen
-    //    let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
-    //    let mediocreSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
-    //    let altEvenSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+    [<TestMethod>]
+    member this.getSorterEff_Parallel_NoGrouping() =
+        let seed = 1234 |> RandomSeed.fromInt
+        let rngGen = (RngGen.createLcg seed)
+        let iRando = Rando.fromRngGen rngGen
+        let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
+        let mediocreSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+        let altEvenSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
 
-    //    let sorterLength = degree |> SwitchOrStageCount.toMediocreRandomPerfLength 
-    //                                                SwitchOrStage.Stage
-    //    let stageCount = degree |> StageCount.degreeTo999StageCount
-    //    let sorterCount = SorterCount.fromInt 500
+        let sorterLength = degree |> SwitchOrStageCount.toMediocreRandomPerfLength 
+                                                    SwitchOrStage.Stage
+        let stageCount = degree |> StageCount.degreeTo999StageCount
+        let sorterCount = SorterCount.fromInt 500
 
-    //    let maxConjugatePairs = 100
-    //    let altEvenSorters = List.init maxConjugatePairs (fun stageCt -> 
-    //         SorterGen.makeAltEvenOdd degree (StageCount.fromInt (stageCt + 5)))
-    //                         |> Result.sequence
-    //                         |> Result.ExtractOrThrow
+        let maxConjugatePairs = 100
+        let altEvenSorters = List.init maxConjugatePairs (fun stageCt -> 
+             SorterGen.makeAltEvenOdd degree (StageCount.fromInt (stageCt + 5)))
+                             |> Result.sequence
+                             |> Result.ExtractOrThrow
 
-    //    let altEvenSorterSet = 
-    //                SorterSet.fromSorters 
-    //                        altEvenSorterSetId
-    //                        degree 
-    //                        altEvenSorters
+        let altEvenSorterSet = 
+                    SorterSet.fromSorters 
+                            altEvenSorterSetId
+                            degree 
+                            altEvenSorters
 
-    //    let makeCoConjSorter (perms:Permutation list) = 
-    //        result {
-    //            let! stp = perms |> TwoCycleGen.makeCoConjugateEvenOdd
-    //            let atp = stp |> Seq.toArray
-    //            return SorterGen.fromTwoCycleArray atp
-    //        }
+        let makeCoConjSorter (perms:Permutation list) = 
+            result {
+                let! stp = perms |> TwoCycleGen.makeCoConjugateEvenOdd
+                let atp = stp |> Seq.toArray
+                return SorterGen.fromTwoCycleArray atp
+            }
             
-    //    let makeRandomSorter() = 
-    //        let sorterGen = SorterGen.RandStages (stageCount, degree)
-    //        SorterGen.createRandom sorterGen
+        let makeRandomSorter() = 
+            let sorterGen = sorterRndGen.RandStages ([], stageCount, degree)
+            SorterRndGen.createRandom sorterGen
 
-    //    let mediocreRandomSorters = 
-    //        List.init (SorterCount.value sorterCount)
-    //                  (fun _ -> makeRandomSorter())
+        let mediocreRandomSorters = 
+            List.init (SorterCount.value sorterCount)
+                      (fun _ -> makeRandomSorter())
 
-    //    let sortableSetEx = SortableSetSpec.Generated 
-    //                            (SortableSetGenerated.allIntBits degree)
-    //                            |> SortableSetSpec.getSortableSetExplicit
-    //                            |> Result.ExtractOrThrow
+        let sortableSetEx = SortableSetSpec.Generated 
+                                (SortableSetGenerated.allIntBits degree)
+                                |> SortableSetSpec.getSortableSetExplicit
+                                |> Result.ExtractOrThrow
 
-    //    let perfBins = SortingOps.SorterSet.getSorterCoverageBins
-    //                      altEvenSorterSet
-    //                      sortableSetEx
-    //                      Sorting.SwitchUsePlan.All
-    //                      true
-    //                      (UseParallel.create true)
+        let perfBins = SortingOps.SorterSet.getSorterCoverageBins
+                          altEvenSorterSet
+                          sortableSetEx
+                          Sorting.SwitchUsePlan.All
+                          true
+                          (UseParallel.create true)
                           
-    //    let yab  = perfBins |> Result.ExtractOrThrow
-    //    let ct = yab |> Array.sumBy(fun spb -> (SorterCount.value spb.sorterCount))
-    //    Assert.IsTrue(ct > 0)
+        let yab  = perfBins |> Result.ExtractOrThrow
+        let ct = yab |> Array.sumBy(fun spb -> (SorterCount.value spb.sorterCount))
+        Assert.IsTrue(ct > 0)
 
 
 

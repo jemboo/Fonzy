@@ -37,6 +37,8 @@ module SortersFromData =
                     switches = switches }
         }
 
+
+
 module SorterWriter =
 
     let sb = new System.Text.StringBuilder()
@@ -82,7 +84,7 @@ type RefSorter =
     | Degree26a  | Degree27        | Degree27a      | Degree28   | Degree28a  
     | Degree29   | Degree29a       | Degree30       | Degree30a 
     | Degree31   | Degree31a       | Degree32       | Degree32a
-    
+
 
 module RefSorter =
 

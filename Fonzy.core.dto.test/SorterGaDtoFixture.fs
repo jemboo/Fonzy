@@ -24,31 +24,31 @@ type SorterGaDtoFixture () =
         Assert.AreEqual(swSorterGenome, swSorterGenomeBack);
 
 
-    //[<TestMethod>]
-    //member this.SorterPhenotypeDto_Single() =
-    //    let phenoSingle = SorterPhenotype.Singleton 
-    //                        (TestData.SorterParts.makeRandomSorter())
-    //    let dto = SorterPhenotypeDto.toDto phenoSingle
-    //    let cereal = Json.serialize dto
-    //    let dtoBack = Json.deserialize<sorterPhenotypeDto> cereal 
-    //                    |> Result.ExtractOrThrow
-    //    Assert.AreEqual(dto, dtoBack);
-    //    let phenoSingleBack = SorterPhenotypeDto.fromDto dtoBack
-    //                            |> Result.ExtractOrThrow
-    //    Assert.AreEqual(phenoSingle, phenoSingleBack);
+    [<TestMethod>]
+    member this.SorterPhenotypeDto_Single() =
+        let phenoSingle = SorterPhenotype.Singleton 
+                            (TestData.SorterParts.makeRandomSorter())
+        let dto = SorterPhenotypeDto.toDto phenoSingle
+        let cereal = Json.serialize dto
+        let dtoBack = Json.deserialize<sorterPhenotypeDto> cereal 
+                        |> Result.ExtractOrThrow
+        Assert.AreEqual(dto, dtoBack);
+        let phenoSingleBack = SorterPhenotypeDto.fromDto dtoBack
+                                |> Result.ExtractOrThrow
+        Assert.AreEqual(phenoSingle, phenoSingleBack);
 
 
-    //[<TestMethod>]
-    //member this.SorterPhenotypeDto_Multiple() =
-    //    let phenoMulti = SorterPhenotype.Multiple TestData.SorterGa.sorterList
-    //    let dto = SorterPhenotypeDto.toDto phenoMulti
-    //    let cereal = Json.serialize dto
-    //    let dtoBack = Json.deserialize<sorterPhenotypeDto> cereal 
-    //                    |> Result.ExtractOrThrow
-    //    Assert.AreEqual(dto, dtoBack);
-    //    let phenoMultiBack = SorterPhenotypeDto.fromDto dtoBack
-    //                            |> Result.ExtractOrThrow
-    //    Assert.AreEqual(phenoMulti, phenoMultiBack);
+    [<TestMethod>]
+    member this.SorterPhenotypeDto_Multiple() =
+        let phenoMulti = SorterPhenotype.Multiple TestData.SorterGa.sorterList
+        let dto = SorterPhenotypeDto.toDto phenoMulti
+        let cereal = Json.serialize dto
+        let dtoBack = Json.deserialize<sorterPhenotypeDto> cereal 
+                        |> Result.ExtractOrThrow
+        Assert.AreEqual(dto, dtoBack);
+        let phenoMultiBack = SorterPhenotypeDto.fromDto dtoBack
+                                |> Result.ExtractOrThrow
+        Assert.AreEqual(phenoMulti, phenoMultiBack);
 
 
     [<TestMethod>]
@@ -77,8 +77,6 @@ type SorterGaDtoFixture () =
         let testRestultMultipleBack = SorterTestResultsDto.fromDto dtoBack
                                         |> Result.ExtractOrThrow
         Assert.AreEqual(testRestultMultiple, testRestultMultipleBack);
-
-
 
 
     [<TestMethod>]

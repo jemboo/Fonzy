@@ -75,7 +75,7 @@ module sorterSHC =
                       (skipPrefix:SwitchCount) =
         fun (step:StepNumber) (seed:int) (sorter:Sorter) ->
             let randy = Rando.fromSeed RngType.Lcg (RandomSeed.fromInt seed)
-            let mutant = sorter |> SorterGen.mutateBySwitch mutRate skipPrefix randy 
+            let mutant = sorter |> SorterMutate.mutateBySwitch mutRate skipPrefix randy 
             (mutant, randy.NextPositiveInt)
 
 
@@ -83,7 +83,7 @@ module sorterSHC =
                      (skipPrefix:SwitchCount) =
         fun (step:StepNumber) (seed:int) (sorter:Sorter) ->
             let randy = Rando.fromSeed RngType.Lcg (RandomSeed.fromInt seed)
-            let mutant = sorter |> SorterGen.mutateByStage  mutRate skipPrefix randy 
+            let mutant = sorter |> SorterMutate.mutateByStage  mutRate skipPrefix randy 
             (mutant, randy.NextPositiveInt)
 
 

@@ -58,27 +58,29 @@ module TestData =
                                         prefixSwitchUses
                                         switchCount
 
-           // let sorterGen = SorterGen.RandStages (stageCount, TestData.degree)
+            let sorterRndGen = sorterRndGen.RandStages ([], stageCount, TestData.degree)
             let swPfx = TestData.degree |> TwoCycleGen.evenMode |> Switch.fromTwoCyclePerm |> Seq.toList
-            let sorterRndGen = sorterRndGen.RandStages (swPfx, stageCount, TestData.degree)
+          //  let sorterRndGen2 = sorterRndGen. ([], stageCount, TestData.degree)
+           // let sorterRndGen2 = sorterRndGen.RandStages (swPfx, stageCount, TestData.degree)
             let switchFreq = SwitchFrequency.max
             let sorterCount = SorterCount.fromInt 100
             let useParallel = false
 
 
-            //let srgPr ssid sg sc rng ssn =
-            //    CauseSpecSorters.rndGen ("sorterSetId", ssid)
-            //                            ("sorterGen", sg)
-            //                            ("sorterCount", sc)
-            //                            ("rndGen", rng)
-            //                            (rndSorterSetName, ssn)
-
-            //let rand1 = srgPr sorterSetId1 sorterGen 
-            //                 sorterCount (nextRnGen()) rndSorterSetName
-            //let rand2 = srgPr sorterSetId2 sorterGen 
-            //                 sorterCount (nextRnGen()) rndSorterSetName
-            //let rand3 = srgPr sorterSetId3 sorterGen
-            //                 sorterCount (nextRnGen()) rndSorterSetName
+            let srgPr ssid sg sc rng ssn =
+                CauseSpecSorters.rndGen 
+                                        ("sorterSetId", ssid)
+                                        ("sorterGen", sg)
+                                        ("sorterCount", sc)
+                                        ("rndGen", rng)
+                                        (rndSorterSetName, ssn)
+                                         
+            let rand1 = srgPr sorterSetId1 sorterRndGen 
+                             sorterCount (nextRnGen()) rndSorterSetName
+            let rand2 = srgPr sorterSetId2 sorterRndGen
+                             sorterCount (nextRnGen()) rndSorterSetName
+            let rand3 = srgPr sorterSetId3 sorterRndGen
+                             sorterCount (nextRnGen()) rndSorterSetName
 
             let switchUsePlan = Sorting.SwitchUsePlan.All
 
@@ -150,10 +152,10 @@ module TestData =
                                     |> Result.ExtractOrThrow
             let randomUniform = WorldAction.create World.empty causeRndUniform
 
-        //module SorterGen = 
-        //    let randCause = Causes.fromCauseSpec CauseSpec.SorterSet.rand1 
-        //                    |> Result.ExtractOrThrow
-        //    let randWorldAction = WorldAction.create World.empty randCause
+        module SorterGen = 
+            let randCause = Causes.fromCauseSpec CauseSpec.SorterSet.rand1 
+                            |> Result.ExtractOrThrow
+            let randWorldAction = WorldAction.create World.empty randCause
 
     module World = 
     

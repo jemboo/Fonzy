@@ -22,15 +22,15 @@ type WorldDtoFixture () =
 
     [<TestMethod>]
     member this.WorldDtoChild () =
-        //let rootGuid = Guid.NewGuid()
-        //let childGuid = Guid.NewGuid()
+        let rootGuid = Guid.NewGuid()
+        let childGuid = Guid.NewGuid()
         //let childCauseType = CauseType.Test (TestCauseType.CreateInt 1)
         //let worldRoot = World.create rootGuid None Cause.noOp Enviro.Empty
         //let worldChild = World.createFromParent childGuid worldRoot (Cause.fromCauseType childCauseType)
         //                     |> Result.ExtractOrThrow
         //let worldDtoChild = WorldDto.toDto worldChild
         //let jsonWorldChild = Json.serialize worldDtoChild
-        //let worldChildDtoBack = Json.deserialize<WorldDto> jsonWorldChild
+        //let worldChildDtoBack = Json.deserialize<worldDto> jsonWorldChild
         //                            |> Result.ExtractOrThrow
         //let worldChildBack = WorldDto.fromDto worldChildDtoBack
         //                        |> Result.ExtractOrThrow

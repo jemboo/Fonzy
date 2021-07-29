@@ -1,59 +1,7 @@
 ﻿namespace global
 open System
 
-//type SorterGen = 
-//    | RandSwitches of SwitchCount * Degree
-//    | RandStages of StageCount * Degree
-//    | RandCoComp of StageCount * Degree
-//    | RandBuddies of StageCount * StageCount * Degree 
-//                    //2nd StageCount is window size
-//    | RandSymmetric of StageCount * Degree
-//    | RandSymmetricBuddies of StageCount * StageCount * Degree
-//                    //2nd StageCount is window size
-
-
 module SorterGen =
-
-//    let getDegree (sorterGen:SorterGen) =
-//        match sorterGen with
-//        | RandSwitches (_, d) -> d
-//        | RandStages   (_, d) -> d
-//        | RandCoComp   (_, d) -> d
-//        | RandBuddies  (_, _, d) -> d
-//        | RandSymmetric   (_, d) -> d
-//        | RandSymmetricBuddies  (_, _, d) -> d
-
-
-//    let reportString (sorterGen:SorterGen) =
-//        match sorterGen with
-//        | RandSwitches (wc, d) ->   
-//                        sprintf "RandSwitches\t%d\t@\t%d" 
-//                            (SwitchCount.value wc) 
-//                            (Degree.value d)
-//        | RandStages (tc, d) -> 
-//                        sprintf "RandStages\t%d\t@\t%d" 
-//                            (StageCount.value tc) 
-//                            (Degree.value d)
-//        | RandCoComp (tc, d) ->   
-//                        sprintf "RandCoComp\t%d\t@\t%d" 
-//                            (StageCount.value tc) 
-//                            (Degree.value d)
-//        | RandBuddies (tc, wc, d) -> 
-//                        sprintf "RandBuddies\t%d\t%d\t%d" 
-//                            (StageCount.value tc) 
-//                            (StageCount.value wc) 
-//                            (Degree.value d) 
-//        | RandSymmetric (tc, d) ->   
-//                        sprintf "RandSymmetric\t%d\t@\t%d"
-//                            (StageCount.value tc) 
-//                            (Degree.value d)
-
-//        | RandSymmetricBuddies (tc, wc, d) -> 
-//                        sprintf "RandSymmetricBuddies\t%d\t%d\t%d" 
-//                            (StageCount.value tc) 
-//                            (StageCount.value wc) 
-//                            (Degree.value d) 
-
 
     let fromTwoCycleArray (tc:TwoCyclePerm[]) =
         let switches = tc |> Seq.map(fun tc-> Switch.fromTwoCyclePerm tc)
@@ -72,50 +20,48 @@ module SorterGen =
             return fromTwoCycleArray (twoCycles |> List.toArray)
         }
 
-
-//    let oddeven_merge_sort (length:int) = 
-//        let mutable lret = List.Empty
-//        let t = Math.Ceiling (Math.Log2 (length |> float))
-//        let cxp = Math.Pow(2.0, t - 1.0) |> int
-//        let mutable p = cxp
-//        while (p > 0) do
-//            let mutable q = cxp
-//            let mutable r = 0
-//            let mutable d = p
-//            while (d > 0) do
-//                seq {0 .. (length - d - 1) }
-//                |> Seq.filter (fun v -> (v &&& p) = r)
-//                |> Seq.iter (fun v -> 
-//                    lret <- { Switch.low = v; Switch.hi = v + d} :: lret )
-//                d <- q - p
-//                q <- q /2
-//                r <- p
-//            p <- p / 2
-//        lret |> List.rev
-
+    let oddeven_merge_sort (length:int) = 
+        let mutable lret = List.Empty
+        let t = Math.Ceiling (Math.Log2 (length |> float))
+        let cxp = Math.Pow(2.0, t - 1.0) |> int
+        let mutable p = cxp
+        while (p > 0) do
+            let mutable q = cxp
+            let mutable r = 0
+            let mutable d = p
+            while (d > 0) do
+                seq {0 .. (length - d - 1) }
+                |> Seq.filter (fun v -> (v &&& p) = r)
+                |> Seq.iter (fun v -> 
+                    lret <- { Switch.low = v; Switch.hi = v + d} :: lret )
+                d <- q - p
+                q <- q /2
+                r <- p
+            p <- p / 2
+        lret |> List.rev
 
 
-//    let oddeven_merge_sort2 (length:int) = 
-//        let mutable lret = List.Empty
-//        let t = Math.Ceiling (Math.Log2 (length |> float))
-//        let cxp = Math.Pow(2.0, t - 1.0) |> int
-//        let mutable p = cxp
-//        while (p > 0) do
-//            let mutable q = cxp
-//            let mutable r = 0
-//            let mutable d = p
-//            while (d > 0) do
-//                let mutable lstage = List.Empty
-//                seq {0 .. (length - d - 1) }
-//                |> Seq.filter (fun v -> (v &&& p) = r)
-//                |> Seq.iter (fun v -> 
-//                    lstage <- { Switch.low = v; Switch.hi = v + d} :: lstage )
-//                d <- q - p
-//                q <- q /2
-//                r <- p
-//                lret <- lstage :: lret
-//            p <- p / 2
-//        lret |> List.rev
+    let oddeven_merge_sort2 (length:int) = 
+        let mutable lret = List.Empty
+        let t = Math.Ceiling (Math.Log2 (length |> float))
+        let cxp = Math.Pow(2.0, t - 1.0) |> int
+        let mutable p = cxp
+        while (p > 0) do
+            let mutable q = cxp
+            let mutable r = 0
+            let mutable d = p
+            while (d > 0) do
+                let mutable lstage = List.Empty
+                seq {0 .. (length - d - 1) }
+                |> Seq.filter (fun v -> (v &&& p) = r)
+                |> Seq.iter (fun v -> 
+                    lstage <- { Switch.low = v; Switch.hi = v + d} :: lstage )
+                d <- q - p
+                q <- q /2
+                r <- p
+                lret <- lstage :: lret
+            p <- p / 2
+        lret |> List.rev
 
 
 
@@ -204,6 +150,7 @@ module SorterGen =
 //                    |> Seq.toArray
 //        Sorter.fromSwitches degree switches
 
+module SorterMutate =
 
     let mutateBySwitch
             (mutationRate:MutationRate)
@@ -529,28 +476,6 @@ module SorterRndGen =
                     |> Seq.toArray
         fromSwitchesAndPrefix degree wPfx switches
 
-
-    let mutateBySwitch (mutationRate:MutationRate) 
-                       (rnd:IRando) (sorter:Sorter) =
-        {
-            Sorter.degree = sorter.degree;
-            Sorter.switchCount = sorter.switchCount;
-            switches = (Switch.mutateSwitches sorter.degree mutationRate rnd sorter.switches) 
-                        |> Seq.toArray
-        }
-
-    let mutateByStage (mutationRate:MutationRate) 
-                      (rnd:IRando) 
-                      (sorter:Sorter) =
-        let stages = Stage.fromSwitches sorter.degree sorter.switches |> Seq.toArray
-        let newStages = stages |> Array.map(fun st -> st |> Stage.randomMutate rnd mutationRate)
-        let newSwitches = [| for stage in newStages do yield! stage.switches |]
-        {
-            Sorter.degree=sorter.degree;
-            switchCount = (SwitchCount.create "" newSwitches.Length) 
-                            |> Result.ExtractOrThrow;
-            switches = newSwitches
-        }
 
     let createRandom (sorterGen:sorterRndGen) 
                      (randy:IRando) =

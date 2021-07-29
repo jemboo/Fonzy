@@ -19,7 +19,7 @@ let main argv =
 
      /// ******* PerfBinsReport ***********
     Console.WriteLine("Starting PerfBinsReport.main")
-    let res2 =  PerfBinReports.dirPerfBinBySorterGenReport2 
+    let res2 =  PerfBinReports.dirPerfBinBySorterGenReport 
                         (FilePath.fromString "C:\\SimOutT") 
                         (FilePath.fromString "C:\\SimOutReportsT")
     Console.WriteLine(res2)
