@@ -1,4 +1,4 @@
-﻿n  mespace global
+﻿namespace global
 open System
 
 

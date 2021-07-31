@@ -27,16 +27,7 @@ module RunBatch =
                     (seed:RandomSeed) 
                     (firstDex:int) =
 
-        runBatchSeq SorterPbCauseSpecGen2.makeRunBatchSeq 
-                    outputDir seed firstDex
-
-
-    let runPerfBinBatchSeq2 
-                    (outputDir:FilePath) 
-                    (seed:RandomSeed) 
-                    (firstDex:int) =
-
-        runBatchSeq SorterPbCauseSpecGen2.makeRunBatchSeq 
+        runBatchSeq SorterPbCauseSpecGen.makeRunBatchSeq 
                     outputDir seed firstDex
 
 

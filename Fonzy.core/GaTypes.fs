@@ -17,6 +17,7 @@ type PoolGenCount = private PoolGenCount of int
 type PoolMemberRank = private PoolMemberRank of int
 type ReplicaCount = private ReplicaCount of int
 type RunCount = private RunCount of int
+type StageWeight = private StageWeight of float
 
 
 module EnviroUpdateParamsId =
@@ -29,6 +30,10 @@ module EnviroId =
     let create id = Ok (EnviroId id)
     let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
 
+module StageWeight =
+    let value (StageWeight v) = v
+    let create id = Ok (StageWeight id)
+    let fromFloat (id:float) = create id |> Result.ExtractOrThrow
 
 module Fitness =
     let value (Fitness v) = v
@@ -45,14 +50,20 @@ module Fitness =
         }
 
     let failure = 
-        0.0 |> fromFloat
+        Double.MaxValue |> fromFloat
+
+
+type sorterFitness =
+     | PefBin of StageWeight
+
+module SorterFitness =
 
     let switchBased (degree:Degree) 
                     (switchCount:SwitchCount) = 
         let bestSwitch = SwitchCount.degreeToRecordSwitchCount degree 
                           |> SwitchCount.value |> float
         let scv = switchCount |> SwitchCount.value |> float
-        (bestSwitch) / (scv) |> fromFloat
+        (scv) / (bestSwitch) |> Fitness.fromFloat
 
 
     let stageBased (degree:Degree) 
@@ -60,21 +71,24 @@ module Fitness =
         let bestStage = StageCount.degreeToRecordStageCount degree 
                             |> StageCount.value |> float
         let scv = stageCount |> StageCount.value |> float
-        (bestStage) / (scv) |> fromFloat
+        (scv) / (bestStage) |> Fitness.fromFloat
 
 
-    let fromSorterPerf (perf:SortingEval.sorterPerf) 
-                       (degree:Degree) =
+    let fromSorterPerf (degree:Degree)  
+                       (stageWeight:StageWeight) 
+                       (perf:SortingEval.sorterPerf) =
         let pv =
             let wV = switchBased degree perf.usedSwitchCount
-                        |> value
+                        |> Fitness.value
             let tV = stageBased degree perf.usedStageCount
-                        |> value
-            ((wV + tV) / 2.0) |> fromFloat
+                        |> Fitness.value
+            let tw = StageWeight.value stageWeight
+            ((wV + tV * tw) / (tw + 1.0)) |> Fitness.fromFloat
 
         match perf.successful with
-        | Some v -> if v then pv else failure
+        | Some v -> if v then pv else Fitness.failure
         | None -> pv
+
 
 
 module InitialConditionCount =

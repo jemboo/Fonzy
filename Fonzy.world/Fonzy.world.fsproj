@@ -16,7 +16,7 @@
     <Compile Include="StoHillClimb.fs" />
     <Compile Include="Enviros.fs" />
     <Compile Include="CauseSpec.fs" />
-    <Compile Include="SorterPbCauseSpecGen2.fs" />
+    <Compile Include="SorterPbCauseSpecGen.fs" />
     <Compile Include="SorterShcCauseSpecGen.fs" />
     <Compile Include="Causes.fs" />
     <Compile Include="Worlds.fs" />

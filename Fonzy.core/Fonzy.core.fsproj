@@ -19,6 +19,7 @@
     <Compile Include="Combinatorics.fs" />
     <Compile Include="ComboStructures.fs" />
     <Compile Include="Tree.fs" />
+    <Compile Include="Annealer.fs" />
     <Compile Include="SortingTypes.fs" />
     <Compile Include="Switch.fs" />
     <Compile Include="Stage.fs" />

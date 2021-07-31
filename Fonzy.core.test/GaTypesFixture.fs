@@ -31,11 +31,11 @@ type SortingGaTypesFixture () =
             }
 
 
-        let sfA = Fitness.fromSorterPerf spfA degree
+        let sfA = SorterFitness.fromSorterPerf degree  (StageWeight.fromFloat 1.0) spfA
                   |> Fitness.value
-        let sfB = Fitness.fromSorterPerf spfB degree
+        let sfB = SorterFitness.fromSorterPerf degree  (StageWeight.fromFloat 1.0) spfB
                   |> Fitness.value
-        let sfC = Fitness.fromSorterPerf spfC degree
+        let sfC = SorterFitness.fromSorterPerf degree  (StageWeight.fromFloat 1.0) spfC
                   |> Fitness.value
 
         Assert.IsTrue(sfA < sfB);

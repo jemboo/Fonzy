@@ -1,47 +1,47 @@
 ﻿namespace global
 open System
 
-
-type StepNumber = private StepNumber of int
-module StepNumber =
-    let value (StepNumber v) = v
-    let create fieldName v = 
-        ConstrainedType.createInt fieldName StepNumber 0 100000000 v
-    let fromInt v = create "" v |> Result.ExtractOrThrow
-    let increment gen = fromInt ((value gen) + 1)
-    let fromKey (m:Map<'a, obj>) (key:'a) =
-        result {
-            let! gv = ResultMap.read key m
-            return! create "" (gv:?>int)
-        }
-
-
 type sHC<'T> = 
     {
        trackId:Guid;
        stepNumber:StepNumber; 
-       seed:int; 
+       seed:RandomSeed; 
        curVal:'T;
-       curFitness:Fitness;
-       updater: StepNumber -> int -> 'T -> 'T * int
-       evaluator: StepNumber -> 'T -> Fitness
+       curFitness:Energy;
+       updater: StepNumber -> IRando -> 'T -> 'T * RandomSeed
+       evaluator: StepNumber -> 'T -> Energy
+       annealer:annealer
     }
 
 module SHC =
 
     let update (hist:List<sHC<'T>>) = 
         let shc = hist |> List.head
+        let randy = Rando.LcgFromSeed shc.seed
         let newVal, newSeed = 
                     shc.updater 
                         shc.stepNumber 
-                        shc.seed 
+                        randy 
                         shc.curVal
-        let curFitness = shc.curFitness
-                         |> Fitness.value
         let newFitness = shc.evaluator shc.stepNumber newVal
-                         |> Fitness.value
-
-        if (curFitness > newFitness) then
+        let curStep = shc.stepNumber
+        let caster = fun () -> randy.NextFloat
+        let anF = shc.annealer.chooser
+        let useNewOne = anF shc.curFitness newFitness caster curStep
+        if (useNewOne) then
+            let newShc =
+                {
+                    sHC.trackId = shc.trackId;
+                    stepNumber = shc.stepNumber |> StepNumber.increment;
+                    curVal = newVal;
+                    curFitness = newFitness;
+                    seed = newSeed;
+                    updater = shc.updater;
+                    evaluator =  shc.evaluator;
+                    annealer = shc.annealer;
+                }
+            newShc::hist
+        else
             let newShc =
                 {
                     sHC.trackId = shc.trackId;
@@ -51,21 +51,9 @@ module SHC =
                     seed = newSeed;
                     updater = shc.updater;
                     evaluator =  shc.evaluator;
+                    annealer = shc.annealer;
                 }
             hist
-        else
-            let newShc =
-                {
-                    sHC.trackId = shc.trackId;
-                    stepNumber = shc.stepNumber |> StepNumber.increment;
-                    curVal = newVal;
-                    curFitness = Fitness.fromFloat newFitness;
-                    seed = newSeed;
-                    updater = shc.updater;
-                    evaluator =  shc.evaluator;
-                }
-            newShc::hist
-
 
 
 
@@ -88,26 +76,28 @@ module sorterSHC =
 
 
     let sorterEval (switchPfx:seq<Switch>)
-                   (degree:Degree) = 
-        let pfxArray = switchPfx |> Seq.toArray
-        let ssAll = SortableSetBp64.allBp64 degree
-                    |> sortableSet.Bp64
+                   (degree:Degree) =
 
-        let ssOp, switchUses = SortingOps.SortableSet.switchReduce
-                                    ssAll
+        let pfxArray = switchPfx |> Seq.toArray
+        let ssAllfordegree = SortableSetBp64.allBp64 degree
+                             |> sortableSet.Bp64
+
+        let ssOp, pfxUses = SortingOps.SortableSet.switchReduce
+                                    ssAllfordegree
                                     pfxArray
 
         fun (step:StepNumber) (sorter:Sorter) ->
             let suPlan = Sorting.SwitchUsePlan.makeIndexes
-                            switchUses
+                            pfxUses
                             (sorter.switches.Length |> SwitchCount.fromInt)
             let swEvRecs = SortingOps.Sorter.eval sorter
                                    ssOp
                                    suPlan
                                    Sorting.EventGrouping.BySwitch
-            let switchUses = swEvRecs |> SortingEval.SwitchEventRecords.getSwitchUses
-            let usedSwitchArray = 
-                    sorter |> SwitchUses.getUsedSwitches switchUses
+            let switchUses = swEvRecs
+                             |> SortingEval.SwitchEventRecords.getSwitchUses
+            let usedSwitches = sorter 
+                               |> SwitchUses.getUsedSwitches switchUses
             let sorterPerf = 
                 {
                     SortingEval.sorterPerf.successful = swEvRecs 
@@ -116,27 +106,32 @@ module sorterSHC =
                     SortingEval.sorterPerf.usedStageCount = 
                             Stage.getStageCount 
                                 sorter.degree 
-                                usedSwitchArray
+                                usedSwitches
                     SortingEval.sorterPerf.usedSwitchCount = 
-                            SwitchCount.fromInt usedSwitchArray.Length
+                            SwitchCount.fromInt usedSwitches.Length
                 }
 
-            Fitness.fromSorterPerf sorterPerf sorter.degree
+            SorterFitness.fromSorterPerf sorter.degree (StageWeight.fromFloat 1.0) sorterPerf 
+
+
 
     let makeSorterClimber (startingVal:Sorter)
-                          (eval: StepNumber -> Sorter -> Fitness)
-                          (updater: StepNumber -> int -> Sorter -> Sorter * int) =
-        let seed = 5
+                          (startingSeed:RandomSeed)
+                          (eval: StepNumber -> Sorter -> Energy)
+                          (updater: StepNumber -> IRando -> Sorter -> Sorter * RandomSeed) 
+                          (annealer:annealer) =
+        let seed = startingSeed
         let gu  = Guid.NewGuid()
         let step = StepNumber.fromInt 0
         let fitness = eval step startingVal
         {
            sHC.trackId = gu;
-           sHC.stepNumber = step; 
+           sHC.stepNumber = step;
            sHC.seed = seed; 
            sHC.curVal = startingVal;
            sHC.curFitness= fitness;
            sHC.updater = updater;
-           sHC.evaluator = eval
+           sHC.evaluator = eval;
+           annealer = annealer;
         }
 

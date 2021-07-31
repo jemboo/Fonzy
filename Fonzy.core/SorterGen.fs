@@ -20,6 +20,7 @@ module SorterGen =
             return fromTwoCycleArray (twoCycles |> List.toArray)
         }
 
+
     let oddeven_merge_sort (length:int) = 
         let mutable lret = List.Empty
         let t = Math.Ceiling (Math.Log2 (length |> float))
@@ -64,91 +65,6 @@ module SorterGen =
         lret |> List.rev
 
 
-
-//    // IRando dependent
-
-//    let randomStages (degree:Degree) 
-//                     (stageCount:StageCount)
-//                     (switchFreq:SwitchFrequency) 
-//                     (rando:IRando) =
-//        let stages = Stage.rndSeq degree switchFreq rando
-//                        |> Seq.take (StageCount.value stageCount)
-//        Sorter.fromStages degree stages
-
-
-//    let randomBuddies (degree:Degree) 
-//                      (stageCount:StageCount)
-//                      (stageWindowSize:StageCount) 
-//                      (rando:IRando) =
-
-//        let switches = (Stage.rndBuddyStages 
-//                                stageWindowSize 
-//                                SwitchFrequency.max  
-//                                degree 
-//                                rando
-//                                List.empty)
-//                        |> Seq.take (StageCount.value stageCount)
-//                        |> Seq.collect(fun st -> st.switches |> List.toSeq)
-//                        |> Seq.toArray
-
-//        Sorter.fromSwitches degree switches
-
-
-//    let randomReflSymmetricBuddies (degree:Degree) 
-//                                   (stageCount:StageCount)
-//                                   (stageWindowSize:StageCount) 
-//                                   (rando:IRando) =
-
-//        let stageTrials = ( (StageCount.value stageCount) * 100 ) 
-//                          |> StageCount.fromInt
-//        let switches = (Stage.rndSymmetricBuddyStages
-//                                stageWindowSize
-//                                SwitchFrequency.max
-//                                degree 
-//                                rando
-//                                List.empty
-//                                stageTrials
-//                                stageCount)
-//                        |> Seq.collect(fun st -> st.switches |> List.toSeq)
-//                        |> Seq.toArray
-
-//        Sorter.fromSwitches degree switches
-
-
-//    let randomConjugatesOfEvenOdd (degree:Degree) 
-//                                  (stageCount:StageCount) 
-//                                  (iRando:IRando) =
-//        result {
-//            let perms = List.init 
-//                            ((StageCount.value stageCount) / 2)
-//                            (fun _ -> TwoCyclePerm.rndFullTwoCycle degree iRando)
-//                        |> List.map (TwoCyclePerm.toPermutation)
-
-//            let! stp = perms |> TwoCycleGen.makeCoConjugateEvenOdd
-//            let atp = stp |> Seq.toArray
-//            return fromTwoCycleArray atp
-//        }
-
-
-//    let randomSymmetric (degree:Degree) 
-//                        (stageCount:StageCount) 
-//                        (iRando:IRando) =
-//        result {
-//            let tcas = Array.init 
-//                            (StageCount.value stageCount)
-//                            (fun _ -> TwoCyclePerm.rndSymmetric degree iRando)
-
-//            return fromTwoCycleArray tcas
-//        }
-
-
-//    let randomSwitches (degree:Degree) 
-//                       (switchCount:SwitchCount) 
-//                       (rnd:IRando) =
-//        let switches = Switch.rndNonDegenSwitchesOfDegree degree rnd
-//                    |> Seq.take (SwitchCount.value switchCount)
-//                    |> Seq.toArray
-//        Sorter.fromSwitches degree switches
 
 module SorterMutate =
 
@@ -195,63 +111,6 @@ module SorterMutate =
             switches = newSwitches
         }
 
-
-//    let createRandom (sorterGen:SorterGen) 
-//                     (randy:IRando) =
-//        match sorterGen with
-//        | SorterGen.RandSwitches  (switchCount, degree) -> 
-//            randomSwitches 
-//                    degree 
-//                    switchCount 
-//                    randy
-//        | SorterGen.RandStages (stageCount, degree) ->
-//            let sc = SwitchFrequency.fromFloat 1.0
-//            randomStages 
-//                    degree 
-//                    stageCount 
-//                    sc
-//                    randy
-//        | SorterGen.RandCoComp (stageCount, degree) ->
-//            randomConjugatesOfEvenOdd 
-//                           degree 
-//                           stageCount
-//                           randy
-//            |> Result.ExtractOrThrow
-//        | SorterGen.RandBuddies (stageCount, windowSize, degree) ->
-//            randomBuddies
-//                           degree 
-//                           stageCount
-//                           windowSize
-//                           randy
-//        | SorterGen.RandSymmetric (stageCount, degree) ->
-//            randomSymmetric 
-//                           degree 
-//                           stageCount
-//                           randy
-//            |> Result.ExtractOrThrow
-//        | SorterGen.RandSymmetricBuddies (stageCount, windowSize, degree) ->
-//            randomReflSymmetricBuddies
-//                           degree 
-//                           stageCount
-//                           windowSize
-//                           randy
-
-
-//    let createRandomArray (sorterGen:SorterGen)
-//                          (sorterCount:SorterCount)
-//                          (rnd:IRando) =
-//            (seq {1 .. (SorterCount.value sorterCount)} 
-//                    |> Seq.map(fun _ -> (createRandom sorterGen rnd))
-//                    |> Seq.toArray)
-
-
-//    let createRandomArrayP (sorterGen:SorterGen)
-//                           (sorterCount:SorterCount)
-//                           (rnd:IRando) =
-//        Array.init (SorterCount.value sorterCount)
-//                   (fun _ -> Rando.fromSeed RngType.Lcg (RandomSeed.fromInt rnd.NextPositiveInt))
-//                |> Array.Parallel.map
-//                            (fun r -> createRandom sorterGen r)
 
 
 type sorterRndGen = 
