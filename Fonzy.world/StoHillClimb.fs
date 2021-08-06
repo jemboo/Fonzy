@@ -1,63 +1,115 @@
 ﻿namespace global
 open System
 
-type sHC<'T> = 
+
+type sHCmutatorSpec =
+    | Constant of sorterMutationType
+
+type sHCevaluatorSpec =
+    | PerfBin of StageWeight
+
+type sHCupdaterSpec =
+    | SaveEnergy
+    | SavePerf
+    | SaveSorter
+    | SaveAll
+
+
+type sorterShcSpec = 
     {
-       trackId:Guid;
-       stepNumber:StepNumber; 
-       seed:RandomSeed; 
-       curVal:'T;
-       curFitness:Energy;
-       updater: StepNumber -> IRando -> 'T -> 'T * RandomSeed
-       evaluator: StepNumber -> 'T -> Energy
-       annealer:annealer
+       rngGen:RngGen; 
+       startingVal:Sorter;
+       mutator:sHCmutatorSpec;
+       updater: sHCupdaterSpec;
+       evaluator: sHCevaluatorSpec;
+       annealer:annealerSpec
     }
+
+
+type sorterShc = 
+    {
+        step:StepNumber;
+        rngGen:RngGen option; 
+        sorter:Sorter option;
+        switchUses:SwitchUses option
+        perf:SortingEval.sorterPerf option
+        energy:Energy option;
+    }
+
+module SorterShc =
+    let getRngGen (shc:sorterShc) = 
+        match shc.rngGen with
+        | Some r -> r |> Ok
+        | None -> Error "rngGen missing"
+
+    let getSorter (shc:sorterShc) = 
+        match shc.sorter with
+        | Some r -> r |> Ok
+        | None -> Error "Sorter missing"
+
+    let getSwitchUses (shc:sorterShc) = 
+        match shc.switchUses with
+        | Some r -> r |> Ok
+        | None -> Error "SwitchUses missing"
+
+    let getPerf (shc:sorterShc) = 
+        match shc.perf with
+        | Some r -> r |> Ok
+        | None -> Error "Perf missing"
+
+    let getEnergy (shc:sorterShc) = 
+        match shc.energy with
+        | Some r -> r |> Ok
+        | None -> Error "Energy missing"
+
+module SorterShcSpec = 
+    let ya = None
+
+type sHC<'A> = 
+    {
+       id:Guid;
+       archive: 'A list;
+       mutator: 'A -> Result<'A, string>
+       updater: 'A list -> 'A -> Result<'A list, string>
+       evaluator: 'A -> Result<'A, string>
+       annealer: 'A -> 'A -> Result<'A, string>
+    }
+
 
 module SHC =
 
-    let update (hist:List<sHC<'T>>) = 
-        let shc = hist |> List.head
-        let randy = Rando.LcgFromSeed shc.seed
-        let newVal, newSeed = 
-                    shc.updater 
-                        shc.stepNumber 
-                        randy 
-                        shc.curVal
-        let newFitness = shc.evaluator shc.stepNumber newVal
-        let curStep = shc.stepNumber
-        let caster = fun () -> randy.NextFloat
-        let anF = shc.annealer.chooser
-        let useNewOne = anF shc.curFitness newFitness caster curStep
-        if (useNewOne) then
-            let newShc =
+    let update (shc:sHC<'A>) =
+        result {
+            let aCurr = shc.archive |> List.head
+            let! aMut = aCurr |> shc.mutator
+            let! aEval = aMut |> shc.evaluator
+            let! aNext = shc.annealer aCurr aEval
+            let! aLst = aNext |> shc.updater shc.archive
+            return
                 {
-                    sHC.trackId = shc.trackId;
-                    stepNumber = shc.stepNumber |> StepNumber.increment;
-                    curVal = newVal;
-                    curFitness = newFitness;
-                    seed = newSeed;
-                    updater = shc.updater;
-                    evaluator =  shc.evaluator;
-                    annealer = shc.annealer;
+                    sHC.id = shc.id;
+                    sHC.archive = aLst;
+                    sHC.mutator = shc.mutator;
+                    sHC.updater = shc.updater;
+                    sHC.evaluator = shc.evaluator;
+                    sHC.annealer = shc.annealer;
                 }
-            newShc::hist
-        else
-            let newShc =
-                {
-                    sHC.trackId = shc.trackId;
-                    stepNumber = shc.stepNumber |> StepNumber.increment;
-                    curVal = shc.curVal;
-                    curFitness = shc.curFitness;
-                    seed = newSeed;
-                    updater = shc.updater;
-                    evaluator =  shc.evaluator;
-                    annealer = shc.annealer;
-                }
-            hist
+        }
 
 
+    //let update (shc:sHC<'T,'A>) = 
+    //    let newVal, randy = shc.mutator shc
+    //    let newEnergy = shc.evaluator shc newVal
+    //    let caster = fun () -> randy.NextFloat
+    //    let useNewVal = shc.annealer.chooser 
+    //                        shc.curEnergy 
+    //                        newEnergy 
+    //                        caster 
+    //                        shc.stepNumber
+    //    let nextVal = if useNewVal then newVal else shc.curVal
+    //    shc.updater shc nextVal
 
-module sorterSHC =
+module SorterSHC =
     
     let switchMutator (mutRate:MutationRate) 
                       (skipPrefix:SwitchCount) =
@@ -115,23 +167,91 @@ module sorterSHC =
 
 
 
-    let makeSorterClimber (startingVal:Sorter)
-                          (startingSeed:RandomSeed)
-                          (eval: StepNumber -> Sorter -> Energy)
-                          (updater: StepNumber -> IRando -> Sorter -> Sorter * RandomSeed) 
-                          (annealer:annealer) =
-        let seed = startingSeed
-        let gu  = Guid.NewGuid()
-        let step = StepNumber.fromInt 0
-        let fitness = eval step startingVal
-        {
-           sHC.trackId = gu;
-           sHC.stepNumber = step;
-           sHC.seed = seed; 
-           sHC.curVal = startingVal;
-           sHC.curFitness= fitness;
-           sHC.updater = updater;
-           sHC.evaluator = eval;
-           annealer = annealer;
-        }
+    //let makeSorterClimber (startingVal:Sorter)
+    //                      (startingSeed:RandomSeed)
+    //                      (eval: StepNumber -> Sorter -> Energy)
+    //                      (updater: StepNumber -> IRando -> Sorter -> Sorter * RandomSeed) 
+    //                      (annealer:annealer) =
+    //    let seed = startingSeed
+    //    let gu  = Guid.NewGuid()
+    //    let step = StepNumber.fromInt 0
+    //    let fitness = eval step startingVal
+    //    {
+    //       sHC.trackId = gu;
+    //       sHC.stepNumber = step;
+    //       sHC.seed = seed; 
+    //       sHC.curVal = startingVal;
+    //       sHC.curEnergy= fitness;
+    //       sHC.updater = updater;
+    //       sHC.evaluator = eval;
+    //       annealer = annealer;
+    //    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+//type sHC<'T> = 
+//    {
+//       trackId:Guid;
+//       stepNumber:StepNumber; 
+//       seed:RandomSeed; 
+//       curVal:'T;
+//       curEnergy:Energy;
+//       updater: StepNumber -> IRando -> 'T -> 'T * RandomSeed
+//       evaluator: StepNumber -> 'T -> Energy
+//       annealer:annealer
+//    }
+
+//module SHC =
+
+//    let update (hist:List<sHC<'T>>) = 
+//        let shc = hist |> List.head
+//        let randy = Rando.LcgFromSeed shc.seed
+//        let newVal, newSeed = 
+//                    shc.updater 
+//                        shc.stepNumber 
+//                        randy 
+//                        shc.curVal
+//        let newFitness = shc.evaluator shc.stepNumber newVal
+//        let curStep = shc.stepNumber
+//        let caster = fun () -> randy.NextFloat
+//        let anF = shc.annealer.chooser
+//        let useNewOne = anF shc.curEnergy newFitness caster curStep
+//        if (useNewOne) then
+//            let newShc =
+//                {
+//                    sHC.trackId = shc.trackId;
+//                    stepNumber = shc.stepNumber |> StepNumber.increment;
+//                    curVal = newVal;
+//                    curEnergy = newFitness;
+//                    seed = newSeed;
+//                    updater = shc.updater;
+//                    evaluator =  shc.evaluator;
+//                    annealer = shc.annealer;
+//                }
+//            newShc::hist
+//        else
+//            let newShc =
+//                {
+//                    sHC.trackId = shc.trackId;
+//                    stepNumber = shc.stepNumber |> StepNumber.increment;
+//                    curVal = shc.curVal;
+//                    curEnergy = shc.curEnergy;
+//                    seed = newSeed;
+//                    updater = shc.updater;
+//                    evaluator =  shc.evaluator;
+//                    annealer = shc.annealer;
+//                }
+//            hist
+
+
 

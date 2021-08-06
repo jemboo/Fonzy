@@ -233,7 +233,7 @@ module TestData =
         let sorterList = 
                 [ RefSorter.createRefSorter RefSorter.Green16m |> Result.ExtractOrThrow;
                   RefSorter.createRefSorter RefSorter.Degree16 |> Result.ExtractOrThrow;
-                  RefSorter.createRefSorter RefSorter.Degree16a |> Result.ExtractOrThrow; ]
+                  RefSorter.createRefSorter RefSorter.End16 |> Result.ExtractOrThrow; ]
 
 
         let sorterSet = 

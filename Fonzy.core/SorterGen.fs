@@ -65,6 +65,11 @@ module SorterGen =
         lret |> List.rev
 
 
+type sorterMutationType = 
+        | BySwitch of SwitchCount*MutationRate
+        | ByStage of SwitchCount*MutationRate
+
+type sorterMutationSpec = sorterMutationType*RngGen
 
 module SorterMutate =
 
@@ -112,8 +117,27 @@ module SorterMutate =
         }
 
 
+    let mutate 
+        (mutate:sorterMutationType) 
+        (rnd:IRando)
+        (sorter:Sorter) =
+        match mutate with
+        | BySwitch (pfx,mr) -> mutateBySwitch
+                                    mr pfx rnd sorter
+        | ByStage (pfx, mr) -> mutateByStage
+                                    mr pfx rnd sorter
 
-type sorterRndGen = 
+    let mutateSorters
+        (mutationSpec:sorterMutationSpec) 
+        (sorters:Sorter seq) =
+        let smt, rng = mutationSpec
+        let randy = rng |> Rando.fromRngGen
+        sorters
+            |> Seq.map(fun s -> mutate smt randy s)
+
+
+
+type sorterRndGen =
     | RandSwitches of Switch list * SwitchCount * Degree
     | RandStages of Switch list  * StageCount * Degree
     | RandBuddies of Switch list  * StageCount * StageWindowSize * Degree 

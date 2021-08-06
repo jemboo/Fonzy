@@ -49,13 +49,13 @@ type annealerSpec =
     | Constant of Temp
     | Exp of Temp * float
 
-type annealer = { annealerSpec:annealerSpec;
-                  chooser:Energy->Energy->(unit->float)->StepNumber->bool  }
+//type annealer = { annealerSpec:annealerSpec;
+//                  chooser:Energy->Energy->(unit->float)->StepNumber->bool  }
 
 module Annealer =
 
     let makeConst (temp:Temp) =
-        fun curFitness newFitness (caster:unit->float) (step:StepNumber) ->
+        fun curFitness newFitness (caster:unit->float) _ ->
             let ofv = curFitness |> Energy.value
             let nfv = newFitness |> Energy.value
             if (ofv >= nfv) then
@@ -84,8 +84,14 @@ module Annealer =
 
     let make (annealerSpec:annealerSpec) =
         match annealerSpec with
-        | Constant t -> { annealer.annealerSpec = annealerSpec;
-                          chooser = (makeConst t); }
-        | Exp (t,hl) -> { annealer.annealerSpec = annealerSpec;
-                          chooser = (makeExp t hl) }
+        | Constant t -> makeConst t
+        | Exp (t,hl) -> makeExp t hl
+
+
+    //let make (annealerSpec:annealerSpec) =
+    //    match annealerSpec with
+    //    | Constant t -> { annealer.annealerSpec = annealerSpec;
+    //                      chooser = (makeConst t); }
+    //    | Exp (t,hl) -> { annealer.annealerSpec = annealerSpec;
+    //                      chooser = (makeExp t hl) }
     

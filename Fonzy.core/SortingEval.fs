@@ -1,5 +1,5 @@
 ﻿namespace global
-
+open System
 
 module SortingEval =
 
@@ -67,6 +67,7 @@ module SortingEval =
                                     |> SortableSetRollout.isSorted
             | BySwitch seGs ->  seGs.sortableRollout
                                     |> SortableSetRollout.isSorted
+
 
         let getUsedSwitchCount (switchEventRecords:switchEventRecords) =
             result {
@@ -154,3 +155,68 @@ module SortingEval =
                                                 checkSuccess
                 return sorterCoverage
             }
+
+
+            
+type Fitness = private Fitness of float
+type StageWeight = private StageWeight of float
+
+module StageWeight =
+    let value (StageWeight v) = v
+    let create id = Ok (StageWeight id)
+    let fromFloat (id:float) = create id |> Result.ExtractOrThrow
+
+module Fitness =
+    let value (Fitness v) = v
+    let create fieldName v = 
+        ConstrainedType.createFloat fieldName Fitness 0.0 10.0 v
+    let fromFloat v = create "" v |> Result.ExtractOrThrow
+    let repStr v = match v with
+                            |Some r -> sprintf "%.4f" (value r)
+                            |None -> ""
+    let fromKey (m:Map<'a, obj>) (key:'a) =
+        result {
+            let! gv = ResultMap.read key m
+            return! create "" (gv:?>float)
+        }
+
+    let failure = 
+        Double.MaxValue |> fromFloat
+
+
+// Positive valued - zero is the best value
+type sorterFitness =
+        | PefBin of StageWeight
+
+module SorterFitness =
+
+    let switchBased (degree:Degree) 
+                    (switchCount:SwitchCount) = 
+        let bestSwitch = SwitchCount.degreeToRecordSwitchCount degree 
+                            |> SwitchCount.value |> float
+        let scv = switchCount |> SwitchCount.value |> float
+        (scv) / (bestSwitch) |> Fitness.fromFloat
+
+
+    let stageBased (degree:Degree) 
+                    (stageCount:StageCount) = 
+        let bestStage = StageCount.degreeToRecordStageCount degree 
+                            |> StageCount.value |> float
+        let scv = stageCount |> StageCount.value |> float
+        (scv) / (bestStage) |> Fitness.fromFloat
+
+
+    let fromSorterPerf (degree:Degree)  
+                       (stageWeight:StageWeight) 
+                       (perf:SortingEval.sorterPerf) =
+        let pv =
+            let wV = switchBased degree perf.usedSwitchCount
+                        |> Fitness.value
+            let tV = stageBased degree perf.usedStageCount
+                        |> Fitness.value
+            let tw = StageWeight.value stageWeight
+            ((wV + tV * tw) / (tw + 1.0)) |> Fitness.fromFloat
+
+        match perf.successful with
+        | Some v -> if v then pv else Fitness.failure
+        | None -> pv
