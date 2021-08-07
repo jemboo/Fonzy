@@ -69,7 +69,7 @@ type sorterMutationType =
         | BySwitch of SwitchCount*MutationRate
         | ByStage of SwitchCount*MutationRate
 
-type sorterMutationSpec = sorterMutationType*RngGen
+//type sorterMutationSpec = sorterMutationType*RngGen
 
 module SorterMutate =
 
@@ -127,13 +127,13 @@ module SorterMutate =
         | ByStage (pfx, mr) -> mutateByStage
                                     mr pfx rnd sorter
 
-    let mutateSorters
-        (mutationSpec:sorterMutationSpec) 
-        (sorters:Sorter seq) =
-        let smt, rng = mutationSpec
-        let randy = rng |> Rando.fromRngGen
-        sorters
-            |> Seq.map(fun s -> mutate smt randy s)
+    //let mutateSorters
+    //    (mutationSpec:sorterMutationSpec) 
+    //    (sorters:Sorter seq) =
+    //    let smt, rng = mutationSpec
+    //    let randy = rng |> Rando.fromRngGen
+    //    sorters
+    //        |> Seq.map(fun s -> mutate smt randy s)
 
 
 
