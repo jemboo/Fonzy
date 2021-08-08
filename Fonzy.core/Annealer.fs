@@ -75,8 +75,8 @@ module Annealer =
                 true
             else
                 let tv = Temp.value temp
-                let sv = StepNumber.value step |> float
-                let curtemp = tv * Math.Exp (- sv / decay)
+                let stepFlt = StepNumber.value step |> float
+                let curtemp = tv * Math.Exp (- stepFlt / decay)
                 let curTry = caster()
                 let curThresh = Math.Exp(-(nfv - ofv) / curtemp)
                 curTry < curThresh

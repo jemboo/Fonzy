@@ -58,6 +58,19 @@ type sorterShc =
     }
 
 
+
+type sorterMutatorSpec =
+    | Constant of sorterMutationType
+
+type sorterEvaluatorSpec =
+    | PerfBin of StageWeight
+
+type sorterUpdaterSpec =
+    | SaveEnergy
+    | SavePerf
+    | SaveSorter
+    | SaveAll
+
 module SorterShc =
 
     let getSwitchUses (shc:sorterShc) = 
@@ -74,41 +87,6 @@ module SorterShc =
         match shc.energy with
         | Some r -> r |> Ok
         | None -> Error "Energy missing"
-
-
-
-
-
-type sorterMutatorSpec =
-    | Constant of sorterMutationType
-
-type sorterEvaluatorSpec =
-    | PerfBin of StageWeight
-
-type sorterUpdaterSpec =
-    | SaveEnergy
-    | SavePerf
-    | SaveSorter
-    | SaveAll
-
-
-
-module SorterSHC =
-    
-    let switchMutator (mutRate:MutationRate) 
-                      (skipPrefix:SwitchCount) =
-        fun (step:StepNumber) (seed:int) (sorter:Sorter) ->
-            let randy = Rando.fromSeed RngType.Lcg (RandomSeed.fromInt seed)
-            let mutant = sorter |> SorterMutate.mutateBySwitch mutRate skipPrefix randy 
-            (mutant, randy.NextPositiveInt)
-
-
-    let stageMutator (mutRate:MutationRate) 
-                     (skipPrefix:SwitchCount) =
-        fun (step:StepNumber) (seed:int) (sorter:Sorter) ->
-            let randy = Rando.fromSeed RngType.Lcg (RandomSeed.fromInt seed)
-            let mutant = sorter |> SorterMutate.mutateByStage  mutRate skipPrefix randy 
-            (mutant, randy.NextPositiveInt)
 
 
     let sorterEval (switchPfx:seq<Switch>)
@@ -134,20 +112,18 @@ module SorterSHC =
                              |> SortingEval.SwitchEventRecords.getSwitchUses
             let usedSwitches = sorter 
                                |> SwitchUses.getUsedSwitches switchUses
-            let sorterPerf = 
-                {
-                    SortingEval.sorterPerf.successful = swEvRecs 
-                        |> SortingEval.SwitchEventRecords.getAllSortsWereComplete
-                        |> Some
-                    SortingEval.sorterPerf.usedStageCount = 
-                            Stage.getStageCount 
-                                sorter.degree 
-                                usedSwitches
-                    SortingEval.sorterPerf.usedSwitchCount = 
-                            SwitchCount.fromInt usedSwitches.Length
-                }
+            {
+                SortingEval.sorterPerf.successful = swEvRecs 
+                    |> SortingEval.SwitchEventRecords.getAllSortsWereComplete
+                    |> Some
+                SortingEval.sorterPerf.usedStageCount = 
+                        Stage.getStageCount 
+                            sorter.degree 
+                            usedSwitches
+                SortingEval.sorterPerf.usedSwitchCount = 
+                        SwitchCount.fromInt usedSwitches.Length
+            }
 
-            SorterFitness.fromSorterPerf sorter.degree (StageWeight.fromFloat 1.0) sorterPerf 
 
 
 
@@ -169,17 +145,39 @@ module SorterShcSpec =
         let gu = [s :> obj] |> GuidUtils.guidFromObjList
         ShcId.fromGuid gu
 
+
     let makeAnnealer (a:annealerSpec) = 
         fun (shcCurrent:sorterShc)
             (shcNew:sorterShc) -> 
-        shcCurrent |> Ok
+
+            result {
+                let! curE = shcCurrent |> SorterShc.getEnergy
+                let! newE = shcNew |> SorterShc.getEnergy
+                let randy = shcNew.rngGen |> Rando.fromRngGen
+                let chooser() =
+                    randy.NextFloat
+                let annF = Annealer.make a
+                let pickNew = annF curE newE chooser shcNew.step
+                if pickNew then return shcNew else return shcCurrent
+            }
 
 
     let makeMutator (m:sorterMutatorSpec) = 
         match m with
         | Constant smt -> 
             fun (shcCurrent:sorterShc) -> 
-            shcCurrent |> Ok
+            result {
+                let randy = shcCurrent.rngGen |> Rando.fromRngGen
+                let sorterMut = SorterMutate.mutate smt randy shcCurrent.sorter
+                return {
+                    step = shcCurrent.step |> StepNumber.increment;
+                    rngGen = randy |> Rando.toRngGen; 
+                    sorter = sorterMut;
+                    switchUses = None;
+                    perf = None;
+                    energy = None
+                }
+            }
 
 
     let makeEvaluator (e:sorterEvaluatorSpec) = 
@@ -190,8 +188,8 @@ module SorterShcSpec =
 
 
     let _sorterUpdate (savePerf:bool)
-                     (saveSorter:bool)
-                     (saveAll:bool) = 
+                      (saveSorter:bool)
+                      (saveAll:bool) = 
         fun (archive:sorterShc list) 
             (shcNew:sorterShc) ->
             archive |> Ok

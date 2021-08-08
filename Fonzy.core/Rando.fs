@@ -108,6 +108,14 @@ module Rando =
         | RngType.Net -> NetFromSeed rngGen.seed
 
 
+    let toRngGen (randy:IRando) =
+        match (randy.RngType) with
+        | RngType.Lcg -> { RngGen.rngType = RngType.Lcg; 
+                           seed = (RandomSeed.fromInt randy.NextPositiveInt) }
+        | RngType.Net -> { RngGen.rngType = RngType.Net; 
+                           seed = (RandomSeed.fromInt randy.NextPositiveInt) }
+
+
     let multiDraw (rnd:IRando) (freq:float) (numDraws:int)  =
         let draw (randy:IRando) =
             if randy.NextFloat < freq then 1 else 0
