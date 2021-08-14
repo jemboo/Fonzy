@@ -1,45 +1,36 @@
 ﻿namespace global
 open System
 
-type SwitchUses = {switchCount:SwitchCount; weights:int[]}
 module SwitchUses =
-   let createNone = 
-       {switchCount=SwitchCount.fromInt 0; weights=[||]}
+   let createNone = {switchUses.weights=[||]}
 
    let createEmpty (switchCount:SwitchCount) =
-       {switchCount=switchCount; 
-        weights=Array.init (SwitchCount.value switchCount) (fun i -> 0)}
+       {weights=Array.zeroCreate (SwitchCount.value switchCount)}
 
    let createOnes (switchCount:SwitchCount) =
         {
-            switchCount=switchCount; 
-            weights=Array.init (SwitchCount.value switchCount) (fun i -> 1)
+            weights=Array.init (SwitchCount.value switchCount) 
+                               (fun _ -> 1)
         }
 
-   let init (weights:int[]) =
-           {
-                switchCount = (SwitchCount.fromInt weights.Length); 
-                weights=weights
-           }
-
+   let init (weights:int[]) =  { weights=weights}
    let getWeights switchUses = switchUses.weights
-   let switchCount switchUses = (SwitchCount.value switchUses.switchCount)
+   let switchCount switchUses = switchUses.weights.Length
 
-   let Add (trackerA:SwitchUses) (trackerB:SwitchUses) =
+   let Add (trackerA:switchUses) 
+           (trackerB:switchUses) =
        if ((switchCount trackerA) <> (switchCount trackerB))  then
            (sprintf "switchCounts: %d, %d are not equal" 
                    (switchCount trackerA) (switchCount trackerB)) |> Error
        else
            let weightsSum = Array.map2 (+) (getWeights trackerA) (getWeights trackerB) 
            {
-               switchCount = SwitchCount.fromInt weightsSum.Length
                weights = weightsSum;
            } |> Ok
 
 
-   let getUsedSwitches (switchUses:SwitchUses) 
+   let getUsedSwitches (switchUses:switchUses) 
                        (sorter:Sorter) =
-       let useCount = SwitchCount.value switchUses.switchCount
        let switches = sorter.switches
        let weights = (getWeights switchUses)
        weights |> Seq.mapi(fun i w -> i,w)
@@ -48,7 +39,7 @@ module SwitchUses =
        |> Seq.toArray
 
 
-   let lastUsedIndex (st:SwitchUses) =
+   let lastUsedIndex (st:switchUses) =
        let w = (getWeights st)
        w
            |> Seq.mapi(fun i x -> (i, x))
@@ -57,31 +48,31 @@ module SwitchUses =
 
 
    let lastUsedIndexes (switchCount:SwitchCount) 
-                       (stseq:seq<SwitchUses>) =            
+                       (stseq:seq<switchUses>) =            
        let stRet = createEmpty switchCount
        let wgts = getWeights stRet
-       let Recordo (stRec:int[]) (stData:SwitchUses) =
+       let Recordo (stRec:int[]) (stData:switchUses) =
            let lui = lastUsedIndex stData
            stRec.[lui]<-stRec.[lui] + 1
        stseq |> Seq.iter(fun st -> Recordo wgts st)
        stRet
 
 
-   let usedSwitchCount (switchUses:SwitchUses) = 
+   let usedSwitchCount (switchUses:switchUses) = 
        getWeights switchUses |> Array.filter(fun i-> i > 0) 
                              |> Array.length
                              |> SwitchCount.fromInt
 
 
-   let getSwitchActionTotal (switchUses:SwitchUses) =
+   let getSwitchActionTotal (switchUses:switchUses) =
        (getWeights switchUses) |> Array.sum
 
 
-   let entropyBits (switchUses:SwitchUses) =
+   let entropyBits (switchUses:switchUses) =
        (getWeights switchUses) |> Combinatorics.entropyBits
 
 
-   let getRefinedStageCount (switchUses:SwitchUses) 
+   let getRefinedStageCount (switchUses:switchUses) 
                             (sorter:Sorter) =
        result {
            let usedSwitches = getUsedSwitches switchUses sorter
@@ -90,7 +81,7 @@ module SwitchUses =
        }
 
 
-   let getRefinedSorter (switchUses:SwitchUses) 
+   let getRefinedSorter (switchUses:switchUses) 
                         (sorter:Sorter) =
        result {
            let usedSwitches = getUsedSwitches switchUses sorter
@@ -102,7 +93,7 @@ module SwitchUses =
 
 
    let getSwitchAndStageUses (sorter:Sorter) 
-                             (switchUses:SwitchUses) =
+                             (switchUses:switchUses) =
        result
            {
                let refinedStageCount = (getRefinedStageCount switchUses sorter)

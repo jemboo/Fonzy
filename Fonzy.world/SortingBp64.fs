@@ -53,8 +53,8 @@ module SortingBp64 =
                 (0, switchCount, emptyRollout ())
             | Sorting.SwitchUsePlan.Range (min, max) -> 
                 (min, max, emptyRollout ())
-            | Sorting.SwitchUsePlan.Indexes (min, max, weights) -> 
-                (min, max, switchPlanRollout weights)
+            | Sorting.SwitchUsePlan.Indexes (min, max, swu) -> 
+                (min, max, switchPlanRollout swu.weights)
         
         let bPsRollCopy = BP64SetsRollout.copy bP64SetsRollout
 
@@ -113,8 +113,8 @@ module SortingBp64 =
                 (0, switchCount, (SwitchUseB64.createEmpty sorter.switchCount))
             | Sorting.SwitchUsePlan.Range (min, max) -> 
                 (min, max, (SwitchUseB64.createEmpty sorter.switchCount))
-            | Sorting.SwitchUsePlan.Indexes (min, max, weights) -> 
-                (min, max, (SwitchUseB64.init sorter.switchCount weights))
+            | Sorting.SwitchUsePlan.Indexes (min, max, swu) -> 
+                (min, max, (SwitchUseB64.init sorter.switchCount swu.weights))
 
         let bp64SetsRolloutCopy = (BP64SetsRollout.copy bp64SetsRollout)
         let mutable sortableIndex = 0

@@ -162,7 +162,7 @@ module CauseSpecSorters =
               (degree:string*Degree)
               (sorterSetName:string*string)
               (switchUsePlan:string*Sorting.SwitchUsePlan)
-              (sortableSet:string*SortableSetSpec)
+              (sortableSet:string*sortableSetSpec)
               (useParallel:string*bool)
               (resultsName:string*string) =
         let id = seq { evalSortersBaseId:> obj;
@@ -193,7 +193,7 @@ module CauseSpecSorters =
               (sorterCount:string*SorterCount)
               (rndGen:string*RngGen) 
               (switchUsePlan:string*Sorting.SwitchUsePlan)
-              (sortableSet:string*SortableSetSpec)
+              (sortableSet:string*sortableSetSpec)
               (useParallel:string*bool)
               (resultsName:string*string) =
 
@@ -228,7 +228,7 @@ module CauseSpecSorters =
               (sorterCount:string*SorterCount)
               (rndGen:string*RngGen) 
               (switchUsePlan:string*Sorting.SwitchUsePlan)
-              (sortableSet:string*SortableSetSpec)
+              (sortableSet:string*sortableSetSpec)
               (useParallel:string*bool)
               (resultsName:string*string) =
 
@@ -308,7 +308,7 @@ module CauseSpecSorters =
               (sorterCount:string*SorterCount)
               (rndGen:string*RngGen) 
               (switchUsePlan:string*Sorting.SwitchUsePlan)
-              (sortableSet:string*SortableSetSpec)
+              (sortableSet:string*sortableSetSpec)
               (useParallel:string*bool)
               (resultsName:string*string) =
 

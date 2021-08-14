@@ -6,11 +6,11 @@ module Sorting =
     type SwitchUsePlan =
         | All 
         | Range of int*int
-        | Indexes of int*int*int[]
+        | Indexes of int*int*switchUses
 
     module SwitchUsePlan = 
 
-        let makeIndexes (prefixUses:SwitchUses) 
+        let makeIndexes (prefixUses:switchUses) 
                         (totalCount:SwitchCount) =
 
             let prefixCount = prefixUses.weights.Length
@@ -22,8 +22,9 @@ module Sorting =
                                     then prefixUses.weights.[dex] else 0)               
 
             (  prefixCount, 
-              (SwitchCount.value totalCount), 
-               scArray)
+               SwitchCount.value totalCount, 
+               {switchUses.weights = scArray}
+            )
             |> SwitchUsePlan.Indexes
 
 

@@ -58,8 +58,8 @@ module SortingInts =
                 (0, switchCount, emptyRollout())
             | Sorting.SwitchUsePlan.Range (min, max) -> 
                 (min, max, emptyRollout())
-            | Sorting.SwitchUsePlan.Indexes (min, max, weights) -> 
-                (min, max, switchPlanRollout weights)
+            | Sorting.SwitchUsePlan.Indexes (min, max, swu) -> 
+                (min, max, switchPlanRollout swu.weights)
         let ssRollCopy = IntSetsRollout.copy intSetsRollout
 
         let mutable sortableIndex=0
@@ -86,7 +86,7 @@ module SortingInts =
                     (sorter:Sorter) 
                     (mindex:int) 
                     (maxdex:int) 
-                    (switchUses:SwitchUses) 
+                    (switchUses:switchUses) 
                     (sortableSetRollout:IntSetsRollout) 
                     (sortableIndex:int) =
         let useWeights = (SwitchUses.getWeights switchUses)
@@ -122,8 +122,8 @@ module SortingInts =
                 (0, switchCount, (SwitchUses.createEmpty sorter.switchCount))
             | Sorting.SwitchUsePlan.Range (min, max) -> 
                 (min, max, (SwitchUses.createEmpty sorter.switchCount))
-            | Sorting.SwitchUsePlan.Indexes (min, max, wgts) -> 
-                let cpyWgts = wgts |> Array.copy
+            | Sorting.SwitchUsePlan.Indexes (min, max, swu) -> 
+                let cpyWgts = swu.weights |> Array.copy
                 (min, max, SwitchUses.init cpyWgts)
 
         let sortableSetRolloutCopy = (IntSetsRollout.copy ssRollout)

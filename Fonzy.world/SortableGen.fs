@@ -93,7 +93,7 @@ module SortableSetGenerated =
 
 
 module SortableSetSpec = 
-    let getSortableSetExplicit (ss:SortableSetSpec) =
+    let getSortableSetExplicit (ss:sortableSetSpec) =
         match ss with
         | Explicit ess -> ess |> Ok
         | Generated gss -> gss |> SortableSetGenerated.generate

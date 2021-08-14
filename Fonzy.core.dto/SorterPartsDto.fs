@@ -74,11 +74,11 @@ module SwitchUsesDto =
             return! fromDto sorterDto
         }
 
-    let toDto (switchUses:SwitchUses) =
+    let toDto (switchUses:switchUses) =
         {switchUsesDto.switchCount= (SwitchUses.switchCount switchUses); 
          weights = (SwitchUses.getWeights switchUses)}
 
-    let toJson (switchUses:SwitchUses) =
+    let toJson (switchUses:switchUses) =
         switchUses |> toDto |> Json.serialize
 
 

@@ -8,11 +8,11 @@
 
   <ItemGroup>
     <Compile Include="WorldTypes.fs" />
-    <Compile Include="SortableGen.fs" />
     <Compile Include="Sorting.fs" />
     <Compile Include="SortingInts.fs" />
     <Compile Include="SortingBp64.fs" />
     <Compile Include="SortingOps.fs" />
+    <Compile Include="SortableGen.fs" />
     <Compile Include="StoHillClimb.fs" />
     <Compile Include="Enviros.fs" />
     <Compile Include="CauseSpec.fs" />

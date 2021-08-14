@@ -519,3 +519,23 @@ module StringUtils =
          |> Seq.toArray
          |> ignore
        sb.ToString()
+
+
+module FuncUtils = 
+    let memoization f =
+        // The dictionary is used to store values for every parameter that has been seen
+        let cache = Dictionary<_,_>()
+        fun c ->
+            let exist, value = cache.TryGetValue (c)
+            match exist with
+            | true -> 
+                // Return the cached result directly, no method call
+                printfn "%O -> In cache" c
+                value
+            | _ -> 
+                // Function call is required first followed by caching the result for next call with the same parameters
+                printfn "%O -> Not in cache, calling function..." c
+                let value = f c
+                cache.Add (c, value)
+                value
+

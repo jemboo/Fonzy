@@ -72,7 +72,7 @@ type BenchSorterSetOnInts() =
                         degree
                         mediocreRandomSorters
 
-    let sortableSetAllBits = SortableSetSpec.Generated 
+    let sortableSetAllBits = sortableSetSpec.Generated 
                                 (SortableSetGenerated.allIntBits degree)
                              |> SortableSetSpec.getSortableSetExplicit
                              |> Result.ExtractOrThrow
@@ -203,7 +203,7 @@ type BenchmarkSorterSetOnBp64() =
                         degree
                         mediocreRandomSorters
 
-    let sortableSetAllBits = SortableSetSpec.Generated 
+    let sortableSetAllBits = sortableSetSpec.Generated 
                                (SortableSetGenerated.allBp64 degree)
                              |> SortableSetSpec.getSortableSetExplicit
                              |> Result.ExtractOrThrow 

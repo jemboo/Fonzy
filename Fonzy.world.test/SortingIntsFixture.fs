@@ -107,7 +107,7 @@ type SortingIntsFixture () =
     [<TestMethod>]
     member this.SorterSet_eval() =
         let sorterSet = TestData.SorterSet.mediocreSorterSet
-        let sortableSetBinary = SortableSetSpec.Generated 
+        let sortableSetBinary = sortableSetSpec.Generated 
                                     (SortableSetGenerated.allIntBits sorterSet.degree)
                                  |> SortableSetSpec.getSortableSetExplicit
                                  |> Result.ExtractOrThrow 
@@ -168,7 +168,7 @@ type SortingIntsFixture () =
             List.init (SorterCount.value sorterCount)
                       (fun _ -> makeRandomSorter())
 
-        let sortableSetEx = SortableSetSpec.Generated 
+        let sortableSetEx = sortableSetSpec.Generated 
                                 (SortableSetGenerated.allIntBits degree)
                                 |> SortableSetSpec.getSortableSetExplicit
                                 |> Result.ExtractOrThrow
@@ -217,7 +217,7 @@ type SortingIntsFixture () =
                             degree 
                             sorterArray
 
-        let sortableSetEx = SortableSetSpec.Generated 
+        let sortableSetEx = sortableSetSpec.Generated 
                                 (SortableSetGenerated.allIntBits degree)
                                 |> SortableSetSpec.getSortableSetExplicit
                                 |> Result.ExtractOrThrow 

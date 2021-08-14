@@ -171,7 +171,7 @@ module SorterPbCauseSpecGen =
 
 
             let sortableSetSpec = SortableSetGenerated.allBp64 degree
-                                    |> SortableSetSpec.Generated
+                                    |> sortableSetSpec.Generated
 
             //let sortableSetSpec = SortableSetGenerated.allIntBits degree
             //                        |> SortableSetSpec.Generated

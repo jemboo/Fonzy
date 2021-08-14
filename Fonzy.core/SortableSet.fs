@@ -59,6 +59,8 @@ module SortableSetBinary =
               SortableSetBinary.sortables = intBits
         }
     
+    let toIntBits (ssBin:SortableSetBinary) = 
+        ssBin.sortables
 
 
 module SortableSetInteger = 
@@ -95,6 +97,8 @@ module SortableSetInteger =
                 |> Array.map(fun ib -> ib.values)
          }
      
+    let toIntBits (ssInt:SortableSetInteger) = 
+        ssInt.sortables |> Seq.map(fun aa -> IntBits.create aa)
 
 
 module SortableSetBp64 = 
@@ -136,7 +140,8 @@ module SortableSetBp64 =
         }
 
 
-    let fromIntBits (degree:Degree) (intBits: IntBits[]) = 
+    let fromIntBits (degree:Degree) 
+                    (intBits: IntBits[]) = 
         let id = seq { intBits:> obj; 
                        degree:> obj;} 
                         |> GuidUtils.guidFromObjs
@@ -147,6 +152,10 @@ module SortableSetBp64 =
                         (BitsP64.fromIntBits intBits)
                         |> Seq.toArray
          }
+
+
+    let toIntBits (ssBp64:SortableSetBp64) = 
+        ssBp64.sortables |> BitsP64.toIntBits
 
 
 
@@ -164,20 +173,29 @@ module SortableSet =
         | Integer  ss -> ss.degree
         | Bp64 ss -> ss.degree
 
+    let toIntBits (ss:sortableSet) = 
+        match ss with
+        | Binary  ss -> ss |> SortableSetBinary.toIntBits |> Array.toSeq
+        | Integer  ss -> ss |> SortableSetInteger.toIntBits
+        | Bp64 ss -> ss |> SortableSetBp64.toIntBits
 
 
-type sortableSetGen = { id:SortableSetId; 
-cat:string; 
-prams:Map<string, string>; }
+
+type sortableSetGen = 
+    { 
+        id:SortableSetId; 
+        cat:string; 
+        prams:Map<string, string>; 
+    }
 
 
-type SortableSetSpec =
+type sortableSetSpec =
     | Explicit of sortableSet
     | Generated of sortableSetGen
 
 
 module SortableSetSpec = 
-    let getId (ss:SortableSetSpec) =
+    let getId (ss:sortableSetSpec) =
         match ss with
         | Explicit ess -> ess |> SortableSet.iD
         | Generated gss -> gss.id

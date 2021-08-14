@@ -182,17 +182,17 @@ type sortableSetSpecDto = {cat:string; value:string;}
 
 module SortableSetSpecDto =
 
-    let toDto (sortableSetSpec:SortableSetSpec) =
+    let toDto (sortableSetSpec:sortableSetSpec) =
         match sortableSetSpec with
-        | SortableSetSpec.Explicit ss -> 
+        | sortableSetSpec.Explicit ss -> 
                     {cat="Explicit"; 
                      value = ss |> SortableSetDto.toJson }
-        | SortableSetSpec.Generated g -> 
+        | sortableSetSpec.Generated g -> 
                     {cat="Generated"; 
                      value = g |> SortableSetGeneratedDto.toJson }
 
 
-    let toJson (sortableSetSpec:SortableSetSpec) =
+    let toJson (sortableSetSpec:sortableSetSpec) =
         sortableSetSpec |> toDto |> Json.serialize
 
 
@@ -201,13 +201,13 @@ module SortableSetSpecDto =
             | "Explicit" -> 
                     result {
                             let! exp = dto.value |> SortableSetDto.fromJson
-                            return SortableSetSpec.Explicit exp
+                            return sortableSetSpec.Explicit exp
                            }
 
             | "Generated" -> 
                     result {
                             let! gen = dto.value |> SortableSetGeneratedDto.fromJson
-                            return SortableSetSpec.Generated gen
+                            return sortableSetSpec.Generated gen
                            }
             | _ -> Error (sprintf "no match for SortableSetDto.cat: %s" dto.cat)
 

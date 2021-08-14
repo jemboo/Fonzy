@@ -45,11 +45,7 @@ module SwitchEventRolloutInt =
             useWeights.[swUdex] <- useWeights.[swUdex] + v
 
         switchEvents.useRoll.values |> Array.iteri(fun dex v -> upDateSwU dex v)
-
-        {   
-            SwitchUses.switchCount = switchEvents.switchCount;
-            SwitchUses.weights = useWeights    
-        }
+        { switchUses.weights = useWeights }
 
 
 module SwitchEventRolloutBp64 =
@@ -82,8 +78,7 @@ module SwitchEventRolloutBp64 =
                        |> Array.map(fun l -> ByteUtils.trueBitCount64 l )
                        |> CollectionUtils.chunkAndSum switchCt
 
-        {   SwitchUses.switchCount = switchEvents.switchCount;
-            SwitchUses.weights = weights }
+        { switchUses.weights = weights }
             
 
 

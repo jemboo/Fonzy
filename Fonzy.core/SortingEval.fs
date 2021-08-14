@@ -11,7 +11,7 @@ module SortingEval =
 
     type groupBySwitch = 
         {
-            switchUses:SwitchUses; 
+            switchUses:switchUses; 
             sortableRollout:sortableSetRollout;
         }
 
@@ -195,15 +195,15 @@ module SorterFitness =
         let bestSwitch = SwitchCount.degreeToRecordSwitchCount degree 
                             |> SwitchCount.value |> float
         let scv = switchCount |> SwitchCount.value |> float
-        (scv) / (bestSwitch) |> Fitness.fromFloat
+        (scv) / (bestSwitch) |> Energy.fromFloat
 
 
     let stageBased (degree:Degree) 
-                    (stageCount:StageCount) = 
+                   (stageCount:StageCount) = 
         let bestStage = StageCount.degreeToRecordStageCount degree 
                             |> StageCount.value |> float
         let scv = stageCount |> StageCount.value |> float
-        (scv) / (bestStage) |> Fitness.fromFloat
+        (scv) / (bestStage) |> Energy.fromFloat
 
 
     let fromSorterPerf (degree:Degree)  
@@ -211,12 +211,12 @@ module SorterFitness =
                        (perf:SortingEval.sorterPerf) =
         let pv =
             let wV = switchBased degree perf.usedSwitchCount
-                        |> Fitness.value
+                        |> Energy.value
             let tV = stageBased degree perf.usedStageCount
-                        |> Fitness.value
+                        |> Energy.value
             let tw = StageWeight.value stageWeight
-            ((wV + tV * tw) / (tw + 1.0)) |> Fitness.fromFloat
+            ((wV + tV * tw) / (tw + 1.0)) |> Energy.fromFloat
 
         match perf.successful with
-        | Some v -> if v then pv else Fitness.failure
+        | Some v -> if v then pv else Energy.failure
         | None -> pv

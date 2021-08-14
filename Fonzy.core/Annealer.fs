@@ -17,8 +17,20 @@ module Energy =
             return! create "" (gv:?>float)
         }
 
-    let failure = 
-        Double.MaxValue |> fromFloat
+    let failure = Double.MaxValue |> fromFloat
+
+    let betterEnergy (a:Energy option) 
+                     (b:Energy option) = 
+        match a, b  with
+        | Some av, Some bv -> if (value av) < (value bv) 
+                                then a else b
+        | None, Some e -> Some e
+        | Some e, None -> Some e
+        | _, None -> failwith "energy missing"
+
+    let isBetterThan (lhs:Energy) 
+                     (rhs:Energy) = 
+        (value lhs) < (value rhs)
 
 type Temp = private Temp of float
 module Temp =

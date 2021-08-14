@@ -10,7 +10,7 @@ type SortingOpsFixture () =
     [<TestMethod>]
     member this.SorterSetCoverageCompBySAG() =
         let sorterSet = TestData.SorterSet.mediocreSorterSet
-        let sortableSetInts = SortableSetSpec.Generated 
+        let sortableSetInts = sortableSetSpec.Generated 
                                  (SortableSetGenerated.allIntBits sorterSet.degree)
                                  |> SortableSetSpec.getSortableSetExplicit
                                  |> Result.ExtractOrThrow 
@@ -23,7 +23,7 @@ type SortingOpsFixture () =
                         (SortingEval.SortingRecords.getSorterCoverage true)
                         |> Result.ExtractOrThrow
 
-        let sortableSetBp64 = SortableSetSpec.Generated 
+        let sortableSetBp64 = sortableSetSpec.Generated 
                                    (SortableSetGenerated.allBp64 sorterSet.degree)
                                    |> SortableSetSpec.getSortableSetExplicit
                                    |> Result.ExtractOrThrow 
@@ -44,7 +44,7 @@ type SortingOpsFixture () =
     member this.SorterSetCoverageCompByNoSAG() =
 
         let sorterSet = TestData.SorterSet.mediocreSorterSet
-        let sortableSetInts = SortableSetSpec.Generated 
+        let sortableSetInts = sortableSetSpec.Generated 
                                     (SortableSetGenerated.allIntBits sorterSet.degree)
                                     |> SortableSetSpec.getSortableSetExplicit
                                     |> Result.ExtractOrThrow 
@@ -57,7 +57,7 @@ type SortingOpsFixture () =
                         (SortingEval.SortingRecords.getSorterCoverage true)
                         |> Result.ExtractOrThrow
 
-        let sortableSetBp64 = SortableSetSpec.Generated 
+        let sortableSetBp64 = sortableSetSpec.Generated 
                                     (SortableSetGenerated.allBp64 sorterSet.degree)
                                     |> SortableSetSpec.getSortableSetExplicit
                                     |> Result.ExtractOrThrow 

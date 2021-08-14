@@ -87,7 +87,7 @@ module TestData =
     module SortableSet =
         let ssBinary = SortableSetBinary.allIntBits degree
         let sortableSet =  ssBinary |> sortableSet.Binary
-                                    |> SortableSetSpec.Explicit
+                                    |> sortableSetSpec.Explicit
 
     module SorterSet = 
         let mediocreSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())

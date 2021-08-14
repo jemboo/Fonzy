@@ -10,8 +10,8 @@ type SorterPhenotype =
     | Multiple of List<Sorter>
 
 type SorterTestResults = 
-    | Singleton of SwitchUses
-    | Multiple of List<SwitchUses>
+    | Singleton of switchUses
+    | Multiple of List<switchUses>
 
 type SorterPhenotypeEval = 
     | Singleton of float

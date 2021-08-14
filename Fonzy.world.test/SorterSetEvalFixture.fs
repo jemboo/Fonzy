@@ -29,7 +29,7 @@ type SortingEvalFixture () =
                             degree
                             mediocreRandomSorters
 
-        let sortableSetAllBits = SortableSetSpec.Generated 
+        let sortableSetAllBits = sortableSetSpec.Generated 
                                    (SortableSetGenerated.allBp64 degree)
                                  |> SortableSetSpec.getSortableSetExplicit
                                  |> Result.ExtractOrThrow 
