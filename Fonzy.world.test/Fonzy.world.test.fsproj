@@ -15,6 +15,7 @@
     <Compile Include="SortingBp64Fixture.fs" />
     <Compile Include="SortingOpsFixture.fs" />
     <Compile Include="SorterSetEvalFixture.fs" />
+    <Compile Include="SortableSetGenFixture.fs" />
     <Compile Include="StoHillClimbFixture.fs" />
     <Compile Include="CausesFixture.fs" />
     <Compile Include="WorldsFixture.fs" />

@@ -4,12 +4,25 @@ open System
 module SorterShcCauseSpecGen = 
     
     let makeRunBatchSeq (seed:RandomSeed)
+                        (batchSize:int)
                         (outputDir:FilePath) = 
 
-        let degreesToTest = 
-            [ 8; 10; 12; 14; 16; 18; 20; 22; 24;] //14; 16; 22; 24;]
-            //   [ 14; 16; 18; 24;]
-             |> List.map (Degree.fromInt)
+        let degree = Degree.fromInt 12
+        let maxSteps = StepNumber.fromInt 10
+        let stageWght = StageWeight.fromFloat 1.0
+        let temp = Temp.fromFloat 1.0
+        let prefix = [||]
+        let pfxLen = SwitchCount.fromInt prefix.Length
+        let mutRate = MutationRate.fromFloat 0.1
+        let mutType = sorterMutationType.ByStage (pfxLen, mutRate)
+
+
+        let stgWghtSpec = stageWght |> shcStageWeightSpec.Constant
+        let evaluatorSpec = sorterEvaluatorSpec.PerfBin
+        let annSpec = temp |> annealerSpec.Constant
+        let updaterSpec = sorterUpdaterSpec.AlwaysFull
+        let termSpec = maxSteps |> sorterTerminatorSpec.FixedLength
+        let mutSpec = mutType |> sorterMutatorSpec.Constant
 
 
         let allSorterGens = 

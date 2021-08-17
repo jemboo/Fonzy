@@ -108,8 +108,8 @@ type SortingIntsFixture () =
     member this.SorterSet_eval() =
         let sorterSet = TestData.SorterSet.mediocreSorterSet
         let sortableSetBinary = sortableSetSpec.Generated 
-                                    (SortableSetGenerated.allIntBits sorterSet.degree)
-                                 |> SortableSetSpec.getSortableSetExplicit
+                                    (SortableSetGen.allIntBits sorterSet.degree)
+                                 |> SortableSetSpec.getSortableSet
                                  |> Result.ExtractOrThrow 
         let ssR = SortingOps.SorterSet.eval
                         sorterSet 
@@ -169,8 +169,8 @@ type SortingIntsFixture () =
                       (fun _ -> makeRandomSorter())
 
         let sortableSetEx = sortableSetSpec.Generated 
-                                (SortableSetGenerated.allIntBits degree)
-                                |> SortableSetSpec.getSortableSetExplicit
+                                (SortableSetGen.allIntBits degree)
+                                |> SortableSetSpec.getSortableSet
                                 |> Result.ExtractOrThrow
 
         let perfBins = SortingOps.SorterSet.getSorterCoverageBins
@@ -218,8 +218,8 @@ type SortingIntsFixture () =
                             sorterArray
 
         let sortableSetEx = sortableSetSpec.Generated 
-                                (SortableSetGenerated.allIntBits degree)
-                                |> SortableSetSpec.getSortableSetExplicit
+                                (SortableSetGen.allIntBits degree)
+                                |> SortableSetSpec.getSortableSet
                                 |> Result.ExtractOrThrow 
 
         let perfBins = SortingOps.SorterSet.getSorterCoverageBins

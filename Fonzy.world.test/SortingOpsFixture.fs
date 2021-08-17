@@ -11,8 +11,8 @@ type SortingOpsFixture () =
     member this.SorterSetCoverageCompBySAG() =
         let sorterSet = TestData.SorterSet.mediocreSorterSet
         let sortableSetInts = sortableSetSpec.Generated 
-                                 (SortableSetGenerated.allIntBits sorterSet.degree)
-                                 |> SortableSetSpec.getSortableSetExplicit
+                                 (SortableSetGen.allIntBits sorterSet.degree)
+                                 |> SortableSetSpec.getSortableSet
                                  |> Result.ExtractOrThrow 
         let ssInts = SortingOps.SorterSet.eval
                         sorterSet 
@@ -24,8 +24,8 @@ type SortingOpsFixture () =
                         |> Result.ExtractOrThrow
 
         let sortableSetBp64 = sortableSetSpec.Generated 
-                                   (SortableSetGenerated.allBp64 sorterSet.degree)
-                                   |> SortableSetSpec.getSortableSetExplicit
+                                   (SortableSetGen.allBp64 sorterSet.degree)
+                                   |> SortableSetSpec.getSortableSet
                                    |> Result.ExtractOrThrow 
 
         let ssBp64 = SortingOps.SorterSet.eval
@@ -45,8 +45,8 @@ type SortingOpsFixture () =
 
         let sorterSet = TestData.SorterSet.mediocreSorterSet
         let sortableSetInts = sortableSetSpec.Generated 
-                                    (SortableSetGenerated.allIntBits sorterSet.degree)
-                                    |> SortableSetSpec.getSortableSetExplicit
+                                    (SortableSetGen.allIntBits sorterSet.degree)
+                                    |> SortableSetSpec.getSortableSet
                                     |> Result.ExtractOrThrow 
         let ssInts = SortingOps.SorterSet.eval
                         sorterSet 
@@ -58,8 +58,8 @@ type SortingOpsFixture () =
                         |> Result.ExtractOrThrow
 
         let sortableSetBp64 = sortableSetSpec.Generated 
-                                    (SortableSetGenerated.allBp64 sorterSet.degree)
-                                    |> SortableSetSpec.getSortableSetExplicit
+                                    (SortableSetGen.allBp64 sorterSet.degree)
+                                    |> SortableSetSpec.getSortableSet
                                     |> Result.ExtractOrThrow 
 
         let ssBp64 = SortingOps.SorterSet.eval

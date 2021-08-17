@@ -111,8 +111,8 @@ type SortingBp64Fixture () =
     member this.SorterSet_eval() =
         let sorterSet = TestData.SorterSet.mediocreSorterSet
         let sortableSetBps = sortableSetSpec.Generated 
-                                 (SortableSetGenerated.allBp64 sorterSet.degree)
-                                 |> SortableSetSpec.getSortableSetExplicit
+                                 (SortableSetGen.allBp64 sorterSet.degree)
+                                 |> SortableSetSpec.getSortableSet
                                  |> Result.ExtractOrThrow
 
         let ssRBp = SortingOps.SorterSet.eval
@@ -131,8 +131,8 @@ type SortingBp64Fixture () =
     member this.SorterSet_evalCompBp() =
         let sorterSet = TestData.SorterSet.mediocreSorterSet
         let sortableSetBps = sortableSetSpec.Generated 
-                                 (SortableSetGenerated.allBp64 sorterSet.degree)
-                                 |> SortableSetSpec.getSortableSetExplicit
+                                 (SortableSetGen.allBp64 sorterSet.degree)
+                                 |> SortableSetSpec.getSortableSet
                                  |> Result.ExtractOrThrow
 
         let ssRBp = SortingOps.SorterSet.eval
@@ -146,8 +146,8 @@ type SortingBp64Fixture () =
 
 
         let sortableSetBinary = sortableSetSpec.Generated 
-                                    (SortableSetGenerated.allIntBits sorterSet.degree)
-                                 |> SortableSetSpec.getSortableSetExplicit
+                                    (SortableSetGen.allIntBits sorterSet.degree)
+                                 |> SortableSetSpec.getSortableSet
                                  |> Result.ExtractOrThrow 
 
         let ssR = SortingOps.SorterSet.eval

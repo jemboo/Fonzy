@@ -1,6 +1,6 @@
 ﻿namespace global
 
-module SortableSetGenerated =
+module SortableSetGen =
 
     let allIntBits (degree:Degree) = 
         let m = [("degree", (Degree.value degree).ToString());]
@@ -93,8 +93,19 @@ module SortableSetGenerated =
 
 
 module SortableSetSpec = 
-    let getSortableSetExplicit (ss:sortableSetSpec) =
+    let getSortableSet (ss:sortableSetSpec) =
         match ss with
         | Explicit ess -> ess |> Ok
-        | Generated gss -> gss |> SortableSetGenerated.generate
+        | Generated gss -> gss |> SortableSetGen.generate
 
+
+module SortableSetSpecReduced = 
+    let make (spec:sortableSetSpecReduced) = 
+        result {
+            let sSetSpec, switchPfx = spec
+            let! sSet = sSetSpec |> SortableSetSpec.getSortableSet
+            let ssRdx, pfxUses = SortingOps.SortableSet.switchReduce
+                                        sSet
+                                        switchPfx
+            return ssRdx, pfxUses
+        }

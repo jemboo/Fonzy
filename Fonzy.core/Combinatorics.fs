@@ -212,6 +212,71 @@ module Combinatorics =
                                        (arraysize:int) =
         rndTwoCycleArray rnd arraysize (arraysize/2)
 
+    let locsPosArrayo (arrayLen:int) (locs: (int*int*int) list) = 
+        let arrayRet = Array.zeroCreate arrayLen
+        locs |> List.iter (fun (l, loc, u) -> arrayRet.[loc] <- 1)
+        arrayRet
+
+    let locsPosArray (arrayLen:int) (locs: int list) = 
+        let arrayRet = Array.zeroCreate arrayLen
+        locs |> List.iter (fun loc -> arrayRet.[loc] <- 1)
+        arrayRet
+
+    let enumNchooseM (n:int) 
+                     (m:int) =
+        
+        let maxVal = n - 1
+
+        let shiftMax (lhs:int list) 
+                     (maxVal:int) =
+            match lhs with
+            | a::_ -> a - 1
+            | _ -> maxVal
+
+        let newMaxf l m r =  
+            let rh, rt = 
+                match r with
+                | rh::rt ->  (rh, rt)
+                | [] -> failwith  "boo boo"
+            rh + 2 + ( l |> List.length )
+
+        let rightPack l m r = 
+            let rh, rt = 
+                match r with
+                | rh::rt ->  (rh, rt)
+                | [] -> failwith  "boo boo"
+            let curMax = newMaxf l m r
+            let rhS = rh + 1
+            if (curMax = maxVal) then 
+              [(rhS + 1) .. maxVal], rhS, rt
+                else 
+              [], curMax, [(curMax - 1) .. -1 .. rhS]@rt
+
+        let rec makeNext (lhs:int list) 
+                         (c:int)  
+                         (rhs:int list) =
+            let maxShift = match lhs with
+                            | a::_ -> a - 1
+                            | _ -> maxVal
+            match lhs, c, rhs with
+            | l, m, [] when m = maxShift -> None
+            | l, m, r when m < maxShift -> Some (l, m + 1, r) 
+            | l, m, rh::rt when (m = maxShift ) && 
+                                (rh = (maxShift - 1)) -> 
+                        makeNext (m::l) rh  rt
+            | l, m, r when (m = maxShift ) -> Some (rightPack l m r)
+            | l, m, r when m = maxShift -> Some (m::l, m + 1, r) 
+            | l, m, r -> None
+
+        let mutable proceed = true
+        let mutable curTup = Some ([], m - 1, [(m - 2) .. -1 .. 0])
+        seq { while proceed do
+                  let a, b, c = curTup |> Option.get
+                  yield a@(b::c) |> List.sort 
+                  curTup <- makeNext a b c
+                  proceed <- (curTup |> Option.isSome)
+            }
+
 
 
 type reflectiveIndexes =

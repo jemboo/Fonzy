@@ -77,7 +77,7 @@ module CauseSorters =
                                             sorterSetName
 
                 let! sorterSet = sorterSetDto |> SorterSetDto.fromDto
-                let! sortableSetEx = sortableSet |> SortableSetSpec.getSortableSetExplicit
+                let! sortableSetEx = sortableSet |> SortableSetSpec.getSortableSet
                 let! perfBins = SortingOps.SorterSet.getSorterCoverageBins
                                       sorterSet
                                       sortableSetEx
@@ -197,7 +197,7 @@ module CauseSorters =
                                             sorterArray
     
                 let! sortableSetEx = sortableSetSpec 
-                                        |> SortableSetSpec.getSortableSetExplicit
+                                        |> SortableSetSpec.getSortableSet
 
                 let (sortableSetTrim, switchUses) = 
                             sortableSetEx |> SortingOps.SortableSet.reduceByPrefix 

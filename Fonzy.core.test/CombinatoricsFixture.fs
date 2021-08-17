@@ -1,5 +1,6 @@
 ﻿namespace Fonzy.core.test
 open Microsoft.VisualStudio.TestTools.UnitTesting
+open System.Diagnostics
 
 [<TestClass>]
 type CombinatoricsFixture () =
@@ -255,3 +256,40 @@ type CombinatoricsFixture () =
             |> ignore
         for i = 0 to 2 do
             Assert.AreEqual(srcUla.[i], destUla.[i])
+
+
+    
+    [<TestMethod>]
+    member this.enumNchooseM() =
+      let n = 8
+      let m = 5
+      let res = Combinatorics.enumNchooseM n m |> Seq.toList
+      Assert.AreEqual(res.Length, 56)
+
+    [<TestMethod>]
+    member this.tryThis() =
+      //let n = 8
+      //let m = 5
+      //let res0 = Combinatorics.tryThis 5 [] 4 []  // [] 5 []
+      //let res1 = Combinatorics.tryThis 5 [] 5 []  // None
+      //let res2 = Combinatorics.tryThis 5 [] 5 [4] // None
+      //let res3 = Combinatorics.tryThis 5 [] 5 [3] // [5] 4 []
+      //let resa = Combinatorics.tryThis 5 [] 5 [2] // [] 4 [3]
+      //let res4 = Combinatorics.tryThis 5 [] 5 [2; 0]  // [] 4 [3; 0]
+
+      //let mutable proceed = true
+      //let mutable curTup = ([], 4, [3;2;1;0])
+      //while proceed do
+      //  let a, b, c = curTup
+      //  let res = Combinatorics.tryThis 7 a b c
+      //  curTup <- match res with
+      //              | Some tup -> tup
+      //              | None -> ([], 0, [])
+
+      //  let aa, bb, cc = curTup
+      //  let jam = aa@(bb::cc) |> List.sort
+      //  Debug.WriteLine (sprintf "%A" jam)
+      //  proceed <- (res |> Option.isSome)
+
+
+      Assert.AreEqual(1, 1)

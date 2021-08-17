@@ -170,14 +170,14 @@ module SorterPbCauseSpecGen =
             let rndGen = (nextRnGen(randy))
 
 
-            let sortableSetSpec = SortableSetGenerated.allBp64 degree
+            let sortableSetSpec = SortableSetGen.allBp64 degree
                                     |> sortableSetSpec.Generated
 
             //let sortableSetSpec = SortableSetGenerated.allIntBits degree
             //                        |> SortableSetSpec.Generated
 
             let sortableSetEx = sortableSetSpec 
-                                    |> SortableSetSpec.getSortableSetExplicit
+                                    |> SortableSetSpec.getSortableSet
                                     |> Result.ExtractOrThrow
 
             let (sortableSetTrim, switchUses) = 

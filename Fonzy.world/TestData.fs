@@ -14,8 +14,8 @@ module TestData =
         let sorterSetGenId2 = SortableSetId.fromGuid (Guid.Parse "22000000-0000-0000-0000-000000000222")
         let sortableCount = SortableCount.fromInt 5
         let sortableCount2 = SortableCount.fromInt 6
-        let rndBits = SortableSetGenerated.rndBits sorterSetGenId1 TestData.degree sortableCount rnGen
-        let rndBits2 = SortableSetGenerated.rndBits sorterSetGenId2 TestData.degree sortableCount2 rnGen
+        let rndBits = SortableSetGen.rndBits sorterSetGenId1 TestData.degree sortableCount rnGen
+        let rndBits2 = SortableSetGen.rndBits sorterSetGenId2 TestData.degree sortableCount2 rnGen
 
     module CauseSpec =
 

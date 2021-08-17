@@ -194,6 +194,9 @@ type sortableSetSpec =
     | Generated of sortableSetGen
 
 
+type sortableSetSpecReduced = sortableSetSpec*Switch[]
+
+
 module SortableSetSpec = 
     let getId (ss:sortableSetSpec) =
         match ss with

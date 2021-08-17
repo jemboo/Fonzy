@@ -7,24 +7,24 @@ open BenchmarkDotNet.Running
 let main argv =
 
     /// ******* runPerfBinBatchSeq ***********
-    //Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq2")
+    Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq2")
 
-    //RunBatch.runPerfBinBatchSeq2 (FilePath.fromString "C:\\SimOutPfxT") 
-    //                             (RandomSeed.fromNow ())
-    //                             0
-    //                             |> ignore
-    //Console.Read() |> ignore
-    //0
+    RunBatch.runPerfBinBatchSeq (FilePath.fromString "C:\\SimOutPfxT") 
+                                (RandomSeed.fromNow ())
+                                0
+                                 |> ignore
+    Console.Read() |> ignore
+    0
 
 
      /// ******* PerfBinsReport ***********
-    Console.WriteLine("Starting PerfBinsReport.main")
-    let res2 =  PerfBinReports.dirPerfBinBySorterGenReport 
-                        (FilePath.fromString "C:\\SimOutT") 
-                        (FilePath.fromString "C:\\SimOutReportsT")
-    Console.WriteLine(res2)
-    Console.Read() |> ignore
-    0
+    //Console.WriteLine("Starting PerfBinsReport.main")
+    //let res2 =  PerfBinReports.dirPerfBinBySorterGenReport 
+    //                    (FilePath.fromString "C:\\SimOutT") 
+    //                    (FilePath.fromString "C:\\SimOutReportsT")
+    //Console.WriteLine(res2)
+    //Console.Read() |> ignore
+    //0
 
 
 /// ******* Benchmark ***********
