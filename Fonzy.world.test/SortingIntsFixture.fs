@@ -117,7 +117,7 @@ type SortingIntsFixture () =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
                         (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
 
         Assert.AreEqual(SorterCount.value sorterSet.sorterCount, ssR.Length)
@@ -173,15 +173,19 @@ type SortingIntsFixture () =
                                 |> SortableSetSpec.getSortableSet
                                 |> Result.ExtractOrThrow
 
-        let perfBins = SortingOps.SorterSet.getSorterCoverageBins
-                          altEvenSorterSet
-                          sortableSetEx
-                          Sorting.SwitchUsePlan.All
-                          true
-                          (UseParallel.create true)
+        let sorterCovs = SortingOps.SorterSet.getSorterCoverages
+                              altEvenSorterSet
+                              sortableSetEx
+                              Sorting.SwitchUsePlan.All
+                              true
+                              (UseParallel.create true)
+                        |> Result.ExtractOrThrow
+
+
+        let perfBins = sorterCovs 
+                        |> SortingEval.SorterPerfBin.fromSorterCoverages
                           
-        let yab  = perfBins |> Result.ExtractOrThrow
-        let ct = yab |> Array.sumBy(fun spb -> (SorterCount.value spb.sorterCount))
+        let ct = perfBins |> Array.sumBy(fun spb -> (SorterCount.value spb.sorterCount))
         Assert.IsTrue(ct > 0)
 
 
@@ -222,12 +226,16 @@ type SortingIntsFixture () =
                                 |> SortableSetSpec.getSortableSet
                                 |> Result.ExtractOrThrow 
 
-        let perfBins = SortingOps.SorterSet.getSorterCoverageBins
+        let sorterCovs = SortingOps.SorterSet.getSorterCoverages
                             sorterSet
                             sortableSetEx
                             Sorting.SwitchUsePlan.All
                             true
                             (UseParallel.create true)
+                        |> Result.ExtractOrThrow
+
+        let perfBins = sorterCovs 
+                        |> SortingEval.SorterPerfBin.fromSorterCoverages
 
         //let pbr  = perfBins |> Result.ExtractOrThrow
         //let rep = (pbr |> SorterPerf.binReport)

@@ -121,7 +121,7 @@ type SortingBp64Fixture () =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
                         (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
 
         Assert.AreEqual(SorterCount.value sorterSet.sorterCount, ssRBp.Length)
@@ -141,7 +141,7 @@ type SortingBp64Fixture () =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
                         (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
 
 
@@ -156,7 +156,7 @@ type SortingBp64Fixture () =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
                         (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
 
         Assert.AreEqual(ssR, ssRBp)

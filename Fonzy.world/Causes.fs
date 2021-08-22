@@ -78,12 +78,16 @@ module CauseSorters =
 
                 let! sorterSet = sorterSetDto |> SorterSetDto.fromDto
                 let! sortableSetEx = sortableSet |> SortableSetSpec.getSortableSet
-                let! perfBins = SortingOps.SorterSet.getSorterCoverageBins
+                let! sorterCovs = SortingOps.SorterSet.getSorterCoverages
                                       sorterSet
                                       sortableSetEx
                                       switchUsePlan
                                       true
                                       (UseParallel.create useParallel)
+
+                let perfBins = sorterCovs 
+                                |> SortingEval.SorterPerfBin.fromSorterCoverages
+
                 let perfBinsDto = perfBins |> SorterPerfBinDto.toDtos
                 return! Enviro.addDto<sorterPerfBinDto[]>
                                     Enviro.Empty resultsName perfBinsDto
@@ -91,66 +95,6 @@ module CauseSorters =
         {Cause.causeSpec=causeSpec; op=causer}
 
 
-    //let genToSorterPerfBins (causeSpec:CauseSpec) =
-    //    let causer = fun (e:Enviro) ->
-    //        result {
-    //            let! sorterGen = 
-    //                    causeSpec.prams 
-    //                        |> ResultMap.procKeyedString "sorterGen" 
-    //                                                     (SorterGenDto.fromJson)
-    //            let! sorterCount = 
-    //                    causeSpec.prams 
-    //                        |> ResultMap.procKeyedInt "sorterCount" 
-    //                                                  (fun d -> SorterCount.create "" d)
-    //            let! rngGen = 
-    //                    causeSpec.prams 
-    //                        |> ResultMap.procKeyedString "rndGen" 
-    //                                                     (RngGenDto.fromJson)
-    //            let! switchUsePlan = 
-    //                    causeSpec.prams 
-    //                        |> ResultMap.procKeyedString "switchUsePlan" 
-    //                                                      (Json.deserialize<Sorting.SwitchUsePlan>)
-    //            let! sortableSet = 
-    //                    causeSpec.prams 
-    //                        |> ResultMap.procKeyedString "sortableSetSpec" 
-    //                                                      (SortableSetSpecDto.fromJson)
-    //            let! useParallel = 
-    //                    causeSpec.prams 
-    //                        |> ResultMap.lookupKeyedBool "useParallel"
-
-    //            let! resultsName = 
-    //                    causeSpec.prams 
-    //                        |> ResultMap.procKeyedString "resultsName"
-    //                                                     (id >> Result.Ok)
-
-    //            let randy = Rando.fromRngGen rngGen
-    //            let sorterArray = SorterGen.createRandomArray 
-    //                                            sorterGen 
-    //                                            sorterCount 
-    //                                            randy
-    //            let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
-    //            let sorterSet = SorterSet.fromSorters 
-    //                                        sorterSetId 
-    //                                        (sorterGen |> SorterGen.getDegree)
-    //                                        sorterArray
-
-    //            let! sortableSetEx = sortableSet |> SortableSetSpec.getSortableSetExplicit
-    //            let! perfBins = SortingOps.SorterSet.getSorterCoverageBins
-    //                                  sorterSet
-    //                                  sortableSetEx
-    //                                  switchUsePlan
-    //                                  true
-    //                                  (UseParallel.create useParallel)
-    //            let perfBinsDto = perfBins |> SorterPerfBinDto.toDtos
-
-    //            return! Enviro.addDto<sorterPerfBinDto[]>
-    //                                Enviro.Empty 
-    //                                resultsName 
-    //                                perfBinsDto
-    //        }
-    //    {Cause.causeSpec=causeSpec; op=causer}
-
-    
     let rndGenToPerfBins (causeSpec:CauseSpec) =
         let causer = fun (e:Enviro) ->
             result {
@@ -203,12 +147,17 @@ module CauseSorters =
                             sortableSetEx |> SortingOps.SortableSet.reduceByPrefix 
                                                             sorterRndGen
 
-                let! perfBins = SortingOps.SorterSet.getSorterCoverageBins
+                let! sorterCovs = SortingOps.SorterSet.getSorterCoverages
                                         sorterSet
                                         sortableSetTrim
                                         switchUsePlan
                                         true
                                         (UseParallel.create useParallel)
+
+                let perfBins = sorterCovs 
+                                |> SortingEval.SorterPerfBin.fromSorterCoverages
+
+
                 let perfBinsDto = perfBins |> SorterPerfBinDto.toDtos
     
                 return! Enviro.addDto<sorterPerfBinDto[]>
@@ -218,10 +167,7 @@ module CauseSorters =
             }
 
         {Cause.causeSpec=causeSpec; op=causer}
-    
-    
-
-
+   
     let fromCauseSpec (genus:string list) (causeSpec:CauseSpec) = 
         match genus with
         | [] -> "No CauseSorters genus" |> Error
@@ -262,6 +208,7 @@ module CauseRandGen =
             }
         {Cause.causeSpec=causeSpec; op=causer} |> Ok
         
+
     let lattice2dArray (causeSpec:CauseSpec) = 
         let causer = fun (e:Enviro) ->
             result {
@@ -288,6 +235,7 @@ module CauseRandGen =
                                     int2dDistDto
             }
         {Cause.causeSpec=causeSpec; op=causer} |> Ok
+
 
     let fromCauseSpec (genus:string list) (causeSpec:CauseSpec) = 
         match genus with

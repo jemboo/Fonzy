@@ -256,51 +256,6 @@ module CauseSpecSorters =
             prams=prams;
         }
 
-    //let genToRndGen (causeSpec:CauseSpec) = 
-
-    //   result {
-    //       let! sorterGen = 
-    //               causeSpec.prams 
-    //                   |> ResultMap.procKeyedString "sorterGen" 
-    //                                                (SorterGenDto.fromJson)
-
-    //       let sorterRndGen = sorterGen |> SorterRndGen.fromSorterGen
-
-    //       let! sorterCount = 
-    //               causeSpec.prams 
-    //                   |> ResultMap.procKeyedInt "sorterCount" 
-    //                                             (fun d -> SorterCount.create "" d)
-    //       let! rngGen = 
-    //               causeSpec.prams 
-    //                   |> ResultMap.procKeyedString "rndGen" 
-    //                                                (RngGenDto.fromJson)
-    //       let! switchUsePlan = 
-    //               causeSpec.prams 
-    //                   |> ResultMap.procKeyedString "switchUsePlan" 
-    //                                                 (Json.deserialize<Sorting.SwitchUsePlan>)
-    //       let! sortableSetSpec = 
-    //               causeSpec.prams 
-    //                   |> ResultMap.procKeyedString "sortableSetSpec" 
-    //                                                 (SortableSetSpecDto.fromJson)
-    //       let! useParallel = 
-    //               causeSpec.prams 
-    //                   |> ResultMap.lookupKeyedBool "useParallel"
-
-    //       let! resultsName = 
-    //               causeSpec.prams 
-    //                   |> ResultMap.procKeyedString "resultsName"
-    //                                                (id >> Result.Ok)
-
-    //       return rndGenToPerfBins
-    //               ("sorterRndGen", sorterRndGen)
-    //               ("sorterCount", sorterCount)
-    //               ("rndGen", rngGen)
-    //               ("switchUsePlan", switchUsePlan)
-    //               ("sortableSetSpec", sortableSetSpec)
-    //               ("useParallel", useParallel)
-    //               ("resultsName", resultsName)
-    //   }
-
 
     let rndStoHillClimbBaseId = Guid.Parse "00000000-0000-0000-0000-000000000006"
     let rndStoHillClimb 

@@ -220,6 +220,7 @@ type CombinatoricsFixture () =
         let actualResult = Combinatorics.cumSum startVal testArray
         Assert.AreEqual(expectedResult.[8], actualResult.[8])
 
+
     [<TestMethod>]
     member this.drawFromWeightedDistribution() =
         let testArray = [|2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0; 10.0; |]
@@ -265,6 +266,7 @@ type CombinatoricsFixture () =
       let m = 5
       let res = Combinatorics.enumNchooseM n m |> Seq.toList
       Assert.AreEqual(res.Length, 56)
+
 
     [<TestMethod>]
     member this.tryThis() =

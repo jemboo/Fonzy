@@ -155,7 +155,7 @@ module SortingOps =
                        }
 
 
-      let getSorterCoverageBins 
+      let getSorterCoverages 
             (sorterSet:SorterSet)
             (sortableSet:sortableSet)
             (switchusePlan:Sorting.SwitchUsePlan)
@@ -170,11 +170,7 @@ module SortingOps =
                             switchusePlan
                             Sorting.EventGrouping.BySwitch
                             _parallel
-                            (SortingEval.SortingRecords.getSorterCoverage
-                                                checkSuccess)
+                            (SortingEval.SorterCoverage.fromSwitchEventRecords true)
 
-                let bins = sorterCovs 
-                                |> SortingEval.SorterPerfBin.fromSorterCoverage
-
-                return bins
+                return sorterCovs
             }

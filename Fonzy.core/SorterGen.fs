@@ -21,7 +21,7 @@ module SorterGen =
         }
 
 
-    let oddeven_merge_sort (length:int) = 
+    let oddeven_merge_switches (length:int) = 
         let mutable lret = List.Empty
         let t = Math.Ceiling (Math.Log2 (length |> float))
         let cxp = Math.Pow(2.0, t - 1.0) |> int
@@ -42,7 +42,7 @@ module SorterGen =
         lret |> List.rev
 
 
-    let oddeven_merge_sort2 (length:int) = 
+    let oddeven_merge_stages (length:int) = 
         let mutable lret = List.Empty
         let t = Math.Ceiling (Math.Log2 (length |> float))
         let cxp = Math.Pow(2.0, t - 1.0) |> int
@@ -69,7 +69,6 @@ type sorterMutationType =
         | BySwitch of SwitchCount*MutationRate
         | ByStage of SwitchCount*MutationRate
 
-//type sorterMutationSpec = sorterMutationType*RngGen
 
 module SorterMutate =
 
@@ -127,15 +126,6 @@ module SorterMutate =
         | ByStage (pfx, mr) -> mutateByStage
                                     mr pfx rnd sorter
 
-    //let mutateSorters
-    //    (mutationSpec:sorterMutationSpec) 
-    //    (sorters:Sorter seq) =
-    //    let smt, rng = mutationSpec
-    //    let randy = rng |> Rando.fromRngGen
-    //    sorters
-    //        |> Seq.map(fun s -> mutate smt randy s)
-
-
 
 type sorterRndGen =
     | RandSwitches of Switch list * SwitchCount * Degree
@@ -146,19 +136,6 @@ type sorterRndGen =
 
 
 module SorterRndGen =
-    
-    //let fromSorterGen (sorterGen:SorterGen) = 
-    //    let wcC (stageCount:StageCount) =
-    //        (StageCount.value stageCount) |> StageWindowSize.fromInt
-
-    //    match sorterGen with
-    //    | SorterGen.RandSwitches (wc, d) -> ([], wc, d) |> sorterRndGen.RandSwitches
-    //    | SorterGen.RandStages   (ts, d) -> ([], ts, d) |> sorterRndGen.RandStages
-    //    | SorterGen.RandBuddies  (tc, wc, d) -> ([], tc, (wcC wc), d) |> sorterRndGen.RandBuddies
-    //    | SorterGen.RandSymmetric   (tc, d) -> ([], tc, d) |> sorterRndGen.RandSymmetric
-    //    | SorterGen.RandSymmetricBuddies  (tc, wc, d) -> ([], tc, (wcC wc), d) |> sorterRndGen.RandSymmetricBuddies
-    //    | SorterGen.RandCoComp (wc, d) -> ([], wc, d) |> sorterRndGen.RandSymmetric
-
 
     let getDegree (sorterGen:sorterRndGen) =
         match sorterGen with

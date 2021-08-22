@@ -2,9 +2,10 @@ namespace Fonzy.world.test
 
 open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
+open System.Diagnostics
 
 [<TestClass>]
-type SortingEvalFixture () =
+type SorterSetEvalFixture () =
 
     [<TestMethod>]
     member this.testBp64NoGrouping() =
@@ -40,7 +41,7 @@ type SortingEvalFixture () =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.NoGrouping
                         (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
          
                     |> Result.ExtractOrThrow
 
@@ -49,3 +50,110 @@ type SortingEvalFixture () =
         Assert.IsTrue(true)
 
 
+    [<TestMethod>]
+    member this.allReductionPerfs() =
+        let degSrc = Degree.fromInt 16
+        let degDest = Degree.fromInt 10
+        let srtGreen = RefSorter.createRefSorter RefSorter.Degree16
+                       |> Result.ExtractOrThrow
+        let subSorters = Switch.allReductions degSrc degDest srtGreen.switches
+                         |> Seq.map(fun sa -> Sorter.fromSwitches degDest sa)
+                         |> Seq.truncate 500000
+                         |> Seq.toArray
+
+        let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+
+        let subSorterSet = 
+                    SorterSet.fromSorters 
+                            sorterSetId
+                            degDest
+                            subSorters
+
+        let sortableSetAllBits = sortableSetSpec.Generated 
+                                   (SortableSetGen.allBp64 degDest)
+                                 |> SortableSetSpec.getSortableSet
+                                 |> Result.ExtractOrThrow 
+
+
+        let ssR = SortingOps.SorterSet.eval
+                        subSorterSet 
+                        sortableSetAllBits
+                        Sorting.SwitchUsePlan.All
+                        Sorting.EventGrouping.NoGrouping
+                        (UseParallel.create true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
+                    |> Result.ExtractOrThrow
+
+
+        let getSorterLength (sc:SortingEval.sorterCoverage) =
+            subSorterSet.sorters.[sc.sorterId].switchCount
+            |> SwitchCount.value
+
+        let report (sc:SortingEval.sorterCoverage) =
+           sprintf "%d\t%s" (getSorterLength sc) 
+                            (SortingEval.SorterPerf.report sc.perf)
+
+
+        let winners =
+            ssR |> List.filter(fun sc -> SortingEval.SorterPerf.isSucessful sc.perf)
+        
+        winners |> List.iter(fun sc -> Debug.WriteLine (report sc))
+
+        Assert.IsTrue(subSorters.Length > 0)
+
+
+
+
+    [<TestMethod>]
+    member this.rndReductionPerfs() =
+        let seed = 1234 |> RandomSeed.fromInt
+        let iRando = Rando.fromRngGen (RngGen.createLcg seed)
+        let degSrc = Degree.fromInt 16
+        let degDest = Degree.fromInt 10
+        let srtGreen = RefSorter.createRefSorter RefSorter.Degree16
+                       |> Result.ExtractOrThrow
+
+        let subSorters = Switch.rndReductions degSrc degDest srtGreen.switches iRando
+                         |> Seq.map(fun sa -> Sorter.fromSwitches degDest sa)
+                         |> Seq.truncate 500000
+                         |> Seq.toArray
+
+        let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+
+        let subSorterSet = 
+                    SorterSet.fromSorters 
+                            sorterSetId
+                            degDest
+                            subSorters
+
+        let sortableSetAllBits = sortableSetSpec.Generated 
+                                   (SortableSetGen.allBp64 degDest)
+                                 |> SortableSetSpec.getSortableSet
+                                 |> Result.ExtractOrThrow 
+
+
+        let ssR = SortingOps.SorterSet.eval
+                        subSorterSet 
+                        sortableSetAllBits
+                        Sorting.SwitchUsePlan.All
+                        Sorting.EventGrouping.NoGrouping
+                        (UseParallel.create true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
+                    |> Result.ExtractOrThrow
+
+
+        let getSorterLength (sc:SortingEval.sorterCoverage) =
+            subSorterSet.sorters.[sc.sorterId].switchCount
+            |> SwitchCount.value
+
+        let report (sc:SortingEval.sorterCoverage) =
+           sprintf "%d\t%s" (getSorterLength sc) 
+                            (SortingEval.SorterPerf.report sc.perf)
+
+
+        let winners =
+            ssR |> List.filter(fun sc -> SortingEval.SorterPerf.isSucessful sc.perf)
+        
+        winners |> List.iter(fun sc -> Debug.WriteLine (report sc))
+
+        Assert.IsTrue(subSorters.Length > 0)

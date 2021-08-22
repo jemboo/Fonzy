@@ -96,7 +96,51 @@ module Switch =
         switches |> Seq.map(fun sw-> mutateSwitch sw)
 
 
-    let reflect (degree:Degree) (sw:Switch) =
+    let reflect (degree:Degree) 
+                (sw:Switch) =
         let deg = (Degree.value degree)
         { Switch.low = sw.hi |> Combinatorics.reflect deg;
           Switch.hi = sw.low |> Combinatorics.reflect deg; }
+
+
+    let reduce  (redMap:int option [])
+                (sw:Switch) =
+        let rpL, rpH = (redMap.[sw.low], redMap.[sw.hi])
+        match rpL, rpH with
+        | Some l, Some h -> Some {Switch.low=l; hi=h;}
+        | _ , _ -> None
+
+
+    let reduceMany (sws:Switch array) 
+                   (redMap:int option []) =
+        sws |> Array.map(reduce redMap)
+            |> Array.filter(Option.isSome)
+            |> Array.map(Option.get)
+
+
+    let allReductions (degreeSource:Degree)
+                      (degreeDest:Degree)
+                      (swa:Switch array) =
+        let sd = (Degree.value degreeSource)
+        let dd = (Degree.value degreeDest)
+        if sd < dd then
+            failwith "source degree cannot be smaller than dest"
+        Combinatorics.enumNchooseM sd dd
+        |> Seq.map(Combinatorics.mapSubset degreeSource)
+        |> Seq.map(reduceMany swa)
+
+
+    let rndReductions (degreeSource:Degree)
+                      (degreeDest:Degree)
+                      (swa:Switch array)
+                      (rnd:IRando) =
+        let sd = (Degree.value degreeSource)
+        let dd = (Degree.value degreeDest)
+        if sd < dd then
+            failwith "source degree cannot be smaller than dest"
+
+        Combinatorics.rndNchooseM sd dd rnd
+        |> Seq.map(Combinatorics.mapSubset degreeSource)
+        |> Seq.map(reduceMany swa)
+
+

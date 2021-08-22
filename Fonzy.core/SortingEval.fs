@@ -26,7 +26,25 @@ module SortingEval =
             usedStageCount:StageCount;
             successful:bool Option
         }
-                
+
+    module SorterPerf =
+
+        let report (perf:sorterPerf) =
+            let fbo (v:bool option) =
+                match v with
+                | Some tv -> sprintf "%b" tv
+                | None -> "none"
+
+            sprintf "%s\t%d\t%d" 
+                        (fbo perf.successful)
+                        (StageCount.value perf.usedStageCount)
+                        (SwitchCount.value perf.usedSwitchCount)
+
+        let isSucessful (perf:sorterPerf) =
+            match perf.successful with
+            | Some tv -> tv
+            | None -> false
+
 
     type sorterPerfBin = 
         { 
@@ -125,7 +143,7 @@ module SortingEval =
 
     module SorterPerfBin = 
     
-        let fromSorterCoverage (coverage:sorterCoverage seq) =
+        let fromSorterCoverages (coverage:sorterCoverage seq) =
 
             let extractSorterPerfBin ((stc, swc), (scs:sorterCoverage[])) =
                 let sct = scs |> Array.filter(fun sc -> sc.perf.successful = (Some true))
@@ -147,14 +165,14 @@ module SortingEval =
                 |> Array.map(extractSorterPerfBin)
 
 
-    module SortingRecords = 
-        let getSorterCoverage (checkSuccess:bool) 
-                              (r:sortingResult) =
-            result {
-                let! sorterCoverage = r |> SorterCoverage.fromSwitchEventRecords 
-                                                checkSuccess
-                return sorterCoverage
-            }
+    //module SortingRecords = 
+    //    let getSorterCoverage (checkSuccess:bool) 
+    //                          (r:sortingResult) =
+    //        result {
+    //            let! sorterCoverage = r |> SorterCoverage.fromSwitchEventRecords 
+    //                                            checkSuccess
+    //            return sorterCoverage
+    //        }
 
 
             

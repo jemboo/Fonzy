@@ -20,7 +20,7 @@ type SortingOpsFixture () =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
                         (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
 
         let sortableSetBp64 = sortableSetSpec.Generated 
@@ -34,7 +34,7 @@ type SortingOpsFixture () =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
                         (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
 
         Assert.AreEqual(ssInts, ssBp64)
@@ -54,7 +54,7 @@ type SortingOpsFixture () =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.NoGrouping
                         (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
 
         let sortableSetBp64 = sortableSetSpec.Generated 
@@ -68,7 +68,7 @@ type SortingOpsFixture () =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.NoGrouping
                         (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
 
         Assert.AreEqual(ssInts.Length, ssBp64.Length)

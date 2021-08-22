@@ -86,7 +86,7 @@ type BenchSorterSetOnInts() =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.NoGrouping
                         (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
         ssR 
 
 
@@ -100,7 +100,7 @@ type BenchSorterSetOnInts() =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
                         (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
         ssR 
 
     
@@ -113,7 +113,7 @@ type BenchSorterSetOnInts() =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.NoGrouping
                         (UseParallel.create false)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
         ssR 
 
 
@@ -125,7 +125,7 @@ type BenchSorterSetOnInts() =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
                         (UseParallel.create false)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
         ssR 
 
 
@@ -217,7 +217,7 @@ type BenchmarkSorterSetOnBp64() =
     //                    Sorting.SwitchUsePlan.All
     //                    Sorting.EventGrouping.NoGrouping
     //                    (UseParallel.create true)
-    //                    (SortingEval.SortingRecords.getSorterCoverage true)
+    //                    (SortingEval.SorterCoverage.fromSwitchEventRecords true)
     //    ssR 
 
 
@@ -231,7 +231,7 @@ type BenchmarkSorterSetOnBp64() =
                         Sorting.SwitchUsePlan.All
                         Sorting.EventGrouping.BySwitch
                         (UseParallel.create true)
-                        (SortingEval.SortingRecords.getSorterCoverage true)
+                        (SortingEval.SorterCoverage.fromSwitchEventRecords true)
         ssR 
 
 
@@ -244,7 +244,7 @@ type BenchmarkSorterSetOnBp64() =
     //                    Sorting.SwitchUsePlan.All
     //                    Sorting.EventGrouping.NoGrouping
     //                    (UseParallel.create false)
-    //                    (SortingEval.SortingRecords.getSorterCoverage true)
+    //                    (SortingEval.SorterCoverage.fromSwitchEventRecords true)
     //    ssR 
 
 
@@ -256,5 +256,5 @@ type BenchmarkSorterSetOnBp64() =
     //                    Sorting.SwitchUsePlan.All
     //                    Sorting.EventGrouping.BySwitch
     //                    (UseParallel.create false)
-    //                    (SortingEval.SortingRecords.getSorterCoverage true)
+    //                    (SortingEval.SorterCoverage.fromSwitchEventRecords true)
     //    ssR 

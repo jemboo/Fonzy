@@ -192,12 +192,12 @@ module Combinatorics =
 
     let randomPermutations (rnd:IRando) 
                            (degree:int) =
-         Seq.initInfinite (fun n -> randomPermutation rnd degree)
+         Seq.initInfinite (fun _ -> randomPermutation rnd degree)
 
 
     let rndTwoCycleArray (rnd:IRando) 
-                                   (arraysize:int) 
-                                   (cycleCount:int) =
+                         (arraysize:int) 
+                         (cycleCount:int) =
         let initialList = [|0 .. arraysize-1|]
         let arrayRet = Array.init arraysize (fun i -> i)
         let rndTupes = (fisherYatesShuffle rnd initialList) 
@@ -227,25 +227,19 @@ module Combinatorics =
         
         let maxVal = n - 1
 
-        let shiftMax (lhs:int list) 
-                     (maxVal:int) =
-            match lhs with
-            | a::_ -> a - 1
-            | _ -> maxVal
-
-        let newMaxf l m r =  
+        let newMaxf l r =  
             let rh, rt = 
                 match r with
                 | rh::rt ->  (rh, rt)
                 | [] -> failwith  "boo boo"
             rh + 2 + ( l |> List.length )
 
-        let rightPack l m r = 
+        let rightPack l r = 
             let rh, rt = 
                 match r with
                 | rh::rt ->  (rh, rt)
                 | [] -> failwith  "boo boo"
-            let curMax = newMaxf l m r
+            let curMax = newMaxf l r
             let rhS = rh + 1
             if (curMax = maxVal) then 
               [(rhS + 1) .. maxVal], rhS, rt
@@ -259,14 +253,14 @@ module Combinatorics =
                             | a::_ -> a - 1
                             | _ -> maxVal
             match lhs, c, rhs with
-            | l, m, [] when m = maxShift -> None
-            | l, m, r when m < maxShift -> Some (l, m + 1, r) 
-            | l, m, rh::rt when (m = maxShift ) && 
-                                (rh = (maxShift - 1)) -> 
-                        makeNext (m::l) rh  rt
-            | l, m, r when (m = maxShift ) -> Some (rightPack l m r)
-            | l, m, r when m = maxShift -> Some (m::l, m + 1, r) 
-            | l, m, r -> None
+            | l, md, [] when md = maxShift -> None
+            | l, md, r when md < maxShift -> Some (l, md + 1, r) 
+            | l, md, rh::rt when (md = maxShift ) && 
+                                 (rh = (maxShift - 1)) -> 
+                        makeNext (md::l) rh  rt
+            | l, md, r when (md = maxShift ) -> Some (rightPack l r)
+            | l, md, r when md = maxShift -> Some (md::l, md + 1, r) 
+            | _, _, _ -> None
 
         let mutable proceed = true
         let mutable curTup = Some ([], m - 1, [(m - 2) .. -1 .. 0])
@@ -276,6 +270,29 @@ module Combinatorics =
                   curTup <- makeNext a b c
                   proceed <- (curTup |> Option.isSome)
             }
+
+    let capN (n:int)
+             (cap:int) 
+             (srcA:int[]) =
+        seq { for i in 0 .. (n-1) do
+              if (srcA.[i] < cap) then
+                yield i }
+            |> Seq.toList
+
+             
+    let rndNchooseM (n:int) 
+                    (m:int) 
+                    (rnd:IRando) =
+        randomPermutations rnd n
+        |> Seq.map(capN n m)
+
+
+    let mapSubset (degree:Degree)
+                  (subset: int list)  =
+        let aRet = Array.create (Degree.value degree)
+                                 None 
+        subset |> List.iteri(fun dex dv -> aRet.[dv] <- Some dex)
+        aRet
 
 
 
