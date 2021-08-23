@@ -19,7 +19,6 @@ module SortingEval =
         | NoGrouping of noGrouping
         | BySwitch of groupBySwitch
 
-
     type sorterPerf = 
         { 
             usedSwitchCount:SwitchCount; 
@@ -106,7 +105,8 @@ module SortingEval =
         { 
             sorterId:SorterId;
             sortableSetId:SortableSetId;
-            perf:sorterPerf; 
+            perf:sorterPerf;
+            usedSwitches:Switch[];
         }
         
                      
@@ -134,9 +134,10 @@ module SortingEval =
                                     usedSwitchCount=usedSwitchCount 
                                    }
                     return {
-                            sorterCoverage.perf = perfBin; 
-                            sorterId = r.sorterId;
-                            sortableSetId = r.sortableSetId
+                                sorterCoverage.perf = perfBin; 
+                                sorterId = r.sorterId;
+                                sortableSetId = r.sortableSetId;
+                                usedSwitches = usedSwitchArray;
                            }
                }
 
@@ -144,11 +145,12 @@ module SortingEval =
     module SorterPerfBin = 
     
         let fromSorterCoverages (coverage:sorterCoverage seq) =
-
             let extractSorterPerfBin ((stc, swc), (scs:sorterCoverage[])) =
-                let sct = scs |> Array.filter(fun sc -> sc.perf.successful = (Some true))
+                let sct = scs |> Array.filter(fun sc -> 
+                                        sc.perf.successful = (Some true))
                               |> Array.length
-                let fct = scs |> Array.filter(fun sc -> sc.perf.successful = (Some false))
+                let fct = scs |> Array.filter(fun sc -> 
+                                        sc.perf.successful = (Some false))
                               |> Array.length
                 {
                     sorterPerfBin.sorterCount = SorterCount.fromInt scs.Length
@@ -157,22 +159,11 @@ module SortingEval =
                     successCount = sct;
                     failCount = fct;
                 }
-
             coverage
                 |> Seq.toArray
                 |> Array.groupBy(fun c-> (c.perf.usedStageCount, 
                                           c.perf.usedSwitchCount))
                 |> Array.map(extractSorterPerfBin)
-
-
-    //module SortingRecords = 
-    //    let getSorterCoverage (checkSuccess:bool) 
-    //                          (r:sortingResult) =
-    //        result {
-    //            let! sorterCoverage = r |> SorterCoverage.fromSwitchEventRecords 
-    //                                            checkSuccess
-    //            return sorterCoverage
-    //        }
 
 
             
@@ -183,6 +174,14 @@ module StageWeight =
     let value (StageWeight v) = v
     let create id = Ok (StageWeight id)
     let fromFloat (id:float) = create id |> Result.ExtractOrThrow
+
+
+type sorterSaving = 
+        | NotAny
+        | All
+        | Successful
+        | Perf of StageWeight*SorterCount
+
 
 module Fitness =
     let value (Fitness v) = v
@@ -204,7 +203,7 @@ module Fitness =
 
 // Positive valued - zero is the best value
 type sorterFitness =
-        | PefBin of StageWeight
+        | PerfBin of StageWeight
 
 module SorterFitness =
 
@@ -238,3 +237,27 @@ module SorterFitness =
         match perf.successful with
         | Some v -> if v then pv else Energy.failure
         | None -> pv
+
+
+module SorterSaving = 
+
+    let chooseSorterCoverages (degree:Degree)
+                              (ssaving:sorterSaving) 
+                              (scs:SortingEval.sorterCoverage[]) =
+        let getBest (degree:Degree) 
+                    (sw:StageWeight) 
+                    (sc:SorterCount) 
+                    (covs:SortingEval.sorterCoverage[]) =
+            let yab = covs |> Array.map(fun c -> 
+                              (c, SorterFitness.fromSorterPerf degree sw c.perf))
+                           |> Array.sortBy(fun tup -> snd tup  |> Energy.value)
+                           |> Array.take(SorterCount.value sc)
+                           |> Array.map(fst)
+            yab
+
+        match ssaving with
+        | NotAny -> [||]
+        | All -> scs
+        | Successful -> scs |> Array.filter(fun s -> 
+                               s.perf |> SortingEval.SorterPerf.isSucessful)
+        | Perf (sw, sc) -> getBest degree sw sc scs

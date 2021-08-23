@@ -163,6 +163,7 @@ module CauseSpecSorters =
               (sorterSetName:string*string)
               (switchUsePlan:string*Sorting.SwitchUsePlan)
               (sortableSet:string*sortableSetSpec)
+              (sorterSaving:string*sorterSaving)
               (useParallel:string*bool)
               (resultsName:string*string) =
         let id = seq { evalSortersBaseId:> obj;
@@ -177,6 +178,7 @@ module CauseSpecSorters =
                      sorterSetName;
                      (CauseSpec.tupOp switchUsePlan Json.serialize);
                      (CauseSpec.tupOp sortableSet SortableSetSpecDto.toJson);
+                     (CauseSpec.tupOp sorterSaving SorterSavingDto.toJson);
                      (CauseSpec.tupOp useParallel Json.serialize);
                      resultsName
                      ] |> Map.ofList
@@ -194,6 +196,7 @@ module CauseSpecSorters =
               (rndGen:string*RngGen) 
               (switchUsePlan:string*Sorting.SwitchUsePlan)
               (sortableSet:string*sortableSetSpec)
+              (sorterSaving:string*sorterSaving)
               (useParallel:string*bool)
               (resultsName:string*string) =
 
@@ -203,7 +206,6 @@ module CauseSpecSorters =
                        rndGen:> obj;
                        switchUsePlan:> obj;
                        sortableSet:> obj;
-                       useParallel:> obj;
                        resultsName:> obj; } 
                         |> GuidUtils.guidFromObjs
         let prams = [
@@ -212,6 +214,7 @@ module CauseSpecSorters =
                      (CauseSpec.tupOp rndGen RngGenDto.toJson);
                      (CauseSpec.tupOp switchUsePlan Json.serialize);
                      (CauseSpec.tupOp sortableSet SortableSetSpecDto.toJson);
+                     (CauseSpec.tupOp sorterSaving SorterSavingDto.toJson);
                      (CauseSpec.tupOp useParallel Json.serialize);
                      resultsName
                      ] |> Map.ofList
@@ -229,6 +232,7 @@ module CauseSpecSorters =
               (rndGen:string*RngGen) 
               (switchUsePlan:string*Sorting.SwitchUsePlan)
               (sortableSet:string*sortableSetSpec)
+              (sorterSaving:string*sorterSaving)
               (useParallel:string*bool)
               (resultsName:string*string) =
 
@@ -247,6 +251,7 @@ module CauseSpecSorters =
                      (CauseSpec.tupOp rndGen RngGenDto.toJson);
                      (CauseSpec.tupOp switchUsePlan Json.serialize);
                      (CauseSpec.tupOp sortableSet SortableSetSpecDto.toJson);
+                     (CauseSpec.tupOp sorterSaving SorterSavingDto.toJson);
                      (CauseSpec.tupOp useParallel Json.serialize);
                      resultsName
                      ] |> Map.ofList

@@ -37,9 +37,9 @@ module Enviro =
                  }
 
 
-    let addDto<'T> (e:Enviro) 
-                   (key:string) 
-                   (dto:'T) =
+    let addDto<'T> (key:string) 
+                   (dto:'T) 
+                   (e:Enviro) =
          let cereal = Json.serialize dto
          match e with
          | Empty -> (Enviro.ObjectMap ([(key, cereal)] 

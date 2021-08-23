@@ -10,6 +10,7 @@ module SorterPbCauseSpecGen =
                 rndGen
                 switchUsePlan
                 sortableSetSpec
+                sorterSaving
                 useParallel
                 resultsName =
 
@@ -19,6 +20,7 @@ module SorterPbCauseSpecGen =
                 ("rndGen", rndGen)
                 ("switchUsePlan", switchUsePlan)
                 ("sortableSetSpec", sortableSetSpec)
+                ("sorterSaving", sorterSaving)
                 ("useParallel", (UseParallel.value useParallel))
                 ("resultsName", resultsName)
     
@@ -198,7 +200,8 @@ module SorterPbCauseSpecGen =
                                 sorterCount 
                                 rndGen 
                                 switchUsePlan 
-                                sortableSetSpec 
+                                sortableSetSpec
+                                sorterSaving.NotAny
                                 useParallel 
                                 resultsName
 

@@ -15,18 +15,13 @@ module EnviroDto =
         idt |> toDto |> Json.serialize
 
     let fromDto (eDto:enviroDto) =
-        if eDto.cat = "Empty" then
-            result {
-                return Enviro.Empty
+        match eDto.cat with
+        | nameof Enviro.ObjectMap -> result {
+            let! b = Json.deserialize<Map<string, string>> eDto.value
+            return Enviro.ObjectMap b
             }
-        else if eDto.cat = "ObjectMap" then
-            result {
-                let! b = Json.deserialize<Map<string, string>> eDto.value
-                return Enviro.ObjectMap b
-            }
-
-        else sprintf "cat: %s for EnviroDto not found"
-                      eDto.cat |> Error
+        | nameof Enviro.Empty -> Enviro.Empty |> Ok
+        | t -> (sprintf "Invalid Enviro Type: %s" t) |> Error
 
     let fromJson (js:string) =
         result {

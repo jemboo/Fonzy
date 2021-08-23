@@ -41,9 +41,9 @@ module CauseSorters =
 
                 let sorterSetDto = sorterSet |> SorterSetDto.toDto
                 return! Enviro.addDto<sorterSetDto>
-                                                e 
                                                 outName 
-                                                sorterSetDto
+                                                sorterSetDto 
+                                                e 
             }
         {Cause.causeSpec=causeSpec; op=causer}
 
@@ -63,6 +63,10 @@ module CauseSorters =
                         causeSpec.prams 
                         |> ResultMap.procKeyedString "sortableSetSpec" 
                                                       (SortableSetSpecDto.fromJson)
+                let! sorterSaving = 
+                        causeSpec.prams 
+                        |> ResultMap.procKeyedString "sorterSaving" 
+                                                      (SorterSavingDto.fromJson)
                 let! useParallel = 
                         causeSpec.prams 
                         |> ResultMap.lookupKeyedBool "useParallel"
@@ -89,8 +93,23 @@ module CauseSorters =
                                 |> SortingEval.SorterPerfBin.fromSorterCoverages
 
                 let perfBinsDto = perfBins |> SorterPerfBinDto.toDtos
-                return! Enviro.addDto<sorterPerfBinDto[]>
-                                    Enviro.Empty resultsName perfBinsDto
+
+                let selectedCovs = sorterCovs
+                                    |> List.toArray
+                                    |> SorterSaving.chooseSorterCoverages
+                                            sorterSet.degree
+                                            sorterSaving
+                                    |> Array.map(SorterCoverageDto.toDto)
+
+                let! e2 = Enviro.addDto<sorterPerfBinDto[]>
+                            resultsName 
+                            perfBinsDto
+                            Enviro.Empty 
+    
+                return! Enviro.addDto<sorterCoverageDto[]>
+                                    resultsName 
+                                    selectedCovs
+                                    e2 
             }
         {Cause.causeSpec=causeSpec; op=causer}
 
@@ -119,6 +138,10 @@ module CauseSorters =
                         causeSpec.prams 
                             |> ResultMap.procKeyedString "sortableSetSpec" 
                                                             (SortableSetSpecDto.fromJson)
+                let! sorterSaving = 
+                        causeSpec.prams 
+                        |> ResultMap.procKeyedString "sorterSaving" 
+                                                      (SorterSavingDto.fromJson)
                 let! useParallel = 
                         causeSpec.prams 
                             |> ResultMap.lookupKeyedBool "useParallel"
@@ -156,14 +179,24 @@ module CauseSorters =
 
                 let perfBins = sorterCovs 
                                 |> SortingEval.SorterPerfBin.fromSorterCoverages
-
-
                 let perfBinsDto = perfBins |> SorterPerfBinDto.toDtos
+
+                let selectedCovs = sorterCovs
+                                    |> List.toArray
+                                    |> SorterSaving.chooseSorterCoverages
+                                            sorterSet.degree
+                                            sorterSaving
+                                    |> Array.map(SorterCoverageDto.toDto)
+
+                let! e2 = Enviro.addDto<sorterPerfBinDto[]>
+                            resultsName 
+                            perfBinsDto
+                            Enviro.Empty 
     
-                return! Enviro.addDto<sorterPerfBinDto[]>
-                                    Enviro.Empty 
+                return! Enviro.addDto<sorterCoverageDto[]>
                                     resultsName 
-                                    perfBinsDto
+                                    selectedCovs
+                                    e2 
             }
 
         {Cause.causeSpec=causeSpec; op=causer}
@@ -202,9 +235,9 @@ module CauseRandGen =
 
                 let intDistDto = intDist |> IntDistDto.toDto
                 return! Enviro.addDto<intDistDto>
-                                            e 
                                             outName 
                                             intDistDto
+                                            e
             }
         {Cause.causeSpec=causeSpec; op=causer} |> Ok
         
@@ -230,9 +263,9 @@ module CauseRandGen =
                                 count
                 let int2dDistDto = l2dDist |> Int2dDistDto.toDto
                 return! Enviro.addDto<int2dDistDto>
-                                    e 
                                     outName 
                                     int2dDistDto
+                                    e 
             }
         {Cause.causeSpec=causeSpec; op=causer} |> Ok
 

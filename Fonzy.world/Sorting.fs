@@ -31,3 +31,5 @@ module Sorting =
     type EventGrouping =
         | NoGrouping
         | BySwitch
+
+

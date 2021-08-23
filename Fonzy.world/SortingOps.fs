@@ -18,14 +18,12 @@ module SortingOps =
                                    ssb
                                    switchusePlan
                                    switchEventAgg
-
             | Integer ssb -> 
                    SortingInts.evalSorterOnInteger 
                                    sorter
                                    ssb
                                    switchusePlan
                                    switchEventAgg
-
             | Bp64 ssb -> 
                       SortingBp64.evalSorter
                                   sorter

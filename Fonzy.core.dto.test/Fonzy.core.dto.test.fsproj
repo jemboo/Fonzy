@@ -14,6 +14,7 @@
     <Compile Include="CommonTypesDtoFixture.fs" />
     <Compile Include="DistributionsDtoFixture.fs" />
     <Compile Include="SorterPartsDtoFixture.fs" />
+    <Compile Include="SorterEvalDtoFixture.fs" />
     <Compile Include="SorterGenDtoFixture.fs" />
     <Compile Include="SorterGaDtoFixture.fs" />
     <Compile Include="OrgsDtoFixture.fs" />

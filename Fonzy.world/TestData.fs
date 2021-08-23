@@ -84,12 +84,13 @@ module TestData =
 
             let switchUsePlan = Sorting.SwitchUsePlan.All
 
-            let evalMush d ssn sup sbset up resn =
+            let evalMush d ssn sup sbset ssav up resn =
                 CauseSpecSorters.evalToSorterPerfBins 
                                         ("degree", d)
                                         ("sorterSetName", ssn)
                                         ("switchUsePlan", sup)
                                         ("sortableSetSpec", sbset)
+                                        ("sorterSaving", ssav)
                                         ("useParallel", up)
                                         ("resultsName", resn)
 
@@ -99,41 +100,21 @@ module TestData =
                             rndSorterSetName 
                             switchUsePlan 
                             TestData.SortableSet.sortableSet
+                            sorterSaving.NotAny
                             useParallel
                             sorterEvalResultsName
 
 
-            //let genMush sg sc rng sup sbset up resn =
-            //    CauseSpecSorters.genToSorterPerfBins 
-            //                            ("sorterGen", sg)
-            //                            ("sorterCount", sc)
-            //                            ("rndGen", rng)
-            //                            ("switchUsePlan", sup)
-            //                            ("sortableSetSpec", sbset)
-            //                            ("useParallel", up)
-            //                            ("resultsName", resn)
-
-            let rndGenMush rsg sc rng sup sbset up resn =
+            let rndGenMush rsg sc rng sup sbset ssav up resn =
                 CauseSpecSorters.rndGenToPerfBins 
                                         ("sorterRndGen", rsg)
                                         ("sorterCount", sc)
                                         ("rndGen", rng)
                                         ("switchUsePlan", sup)
                                         ("sortableSetSpec", sbset)
+                                        ("sorterSaving", ssav)
                                         ("useParallel", up)
                                         ("resultsName", resn)
-
-
-            //let genToSorterPerfBins = 
-            //        genMush
-            //                sorterGen
-            //                sorterCount
-            //                (nextRnGen())
-            //                switchUsePlan 
-            //                TestData.SortableSet.sortableSet
-            //                useParallel
-            //                sorterEvalResultsName
-
 
             let rndGenToSorterPerfBins = 
                     rndGenMush
@@ -142,6 +123,7 @@ module TestData =
                             (nextRnGen())
                             switchUsePlanIndexes 
                             TestData.SortableSet.sortableSet
+                            sorterSaving.NotAny
                             useParallel
                             sorterEvalResultsName
 
