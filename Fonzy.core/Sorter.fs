@@ -2,7 +2,7 @@
 open System
 open FSharpx.Collections
 
-type Sorter = 
+type sorter = 
     { 
         degree:Degree; 
         switches:array<Switch>; 
@@ -11,7 +11,7 @@ type Sorter =
 
 module Sorter =
 
-    let makeId (s:Sorter) = 
+    let makeId (s:sorter) = 
         let gu = [s :> obj] |> GuidUtils.guidFromObjList
         SorterId.fromGuid gu
 
@@ -21,7 +21,7 @@ module Sorter =
         let switchArray = switches |> Seq.toArray
         let switchCount = SwitchCount.fromInt switchArray.Length
         {
-            Sorter.degree=degree;
+            sorter.degree=degree;
             switchCount=switchCount;
             switches = switchArray
         }
@@ -34,28 +34,28 @@ module Sorter =
                                     |> Seq.toArray
         let switchCount = SwitchCount.fromInt switchArray.Length
         {
-            Sorter.degree=degree;
+            sorter.degree=degree;
             switchCount=switchCount;
             switches = switchArray
         }
    
 
-    let appendSwitches (switches:seq<Switch>) (sorter:Sorter) =
+    let appendSwitches (switches:seq<Switch>) (sorter:sorter) =
         let newSwitches = (switches |> Seq.toArray) |> Array.append sorter.switches
         let newSwitchCount = SwitchCount.create "" newSwitches.Length |> Result.toOption
         {
-            Sorter.degree = sorter.degree;
+            sorter.degree = sorter.degree;
             switchCount=newSwitchCount.Value;
             switches = newSwitches
         }
 
-    let trimLength (sorter:Sorter) (newLength:SwitchCount) =
+    let trimLength (sorter:sorter) (newLength:SwitchCount) =
         if (SwitchCount.value sorter.switchCount) < (SwitchCount.value newLength) then
             "New length is longer than sorter" |> Error
         else
         let newSwitches = sorter.switches |> Array.take (SwitchCount.value newLength)
         {
-            Sorter.degree = sorter.degree;
+            sorter.degree = sorter.degree;
             switchCount = newLength;
             switches = newSwitches
         } |> Ok

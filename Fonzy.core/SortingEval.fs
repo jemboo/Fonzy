@@ -97,7 +97,7 @@ module SortingEval =
         {
             sorterId:SorterId;
             sortableSetId:SortableSetId
-            sorter:Sorter; 
+            sorter:sorter; 
             switchEventRecords:switchEventRecords;
         }
 

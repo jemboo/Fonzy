@@ -76,7 +76,7 @@ module SorterMutate =
             (mutationRate:MutationRate)
             (skipPrefix:SwitchCount)
             (rnd:IRando)
-            (sorter:Sorter) =
+            (sorter:sorter) =
         let prefix = sorter.switches
                      |> Array.take (SwitchCount.value skipPrefix)
         let mutatedPart = sorter.switches
@@ -85,8 +85,8 @@ module SorterMutate =
                            |> Switch.mutateSwitches sorter.degree mutationRate rnd
                            |> Seq.toArray
         {
-            Sorter.degree = sorter.degree;
-            Sorter.switchCount = sorter.switchCount;
+            sorter.degree = sorter.degree;
+            switchCount = sorter.switchCount;
             switches = mutatedPart |> Array.append prefix
         }
 
@@ -94,7 +94,7 @@ module SorterMutate =
     let mutateByStage (mutationRate:MutationRate)
                       (skipPrefix:SwitchCount)
                       (rnd:IRando)
-                      (sorter:Sorter) =
+                      (sorter:sorter) =
         let prefixStages = 
                   sorter.switches
                      |> Array.take (SwitchCount.value skipPrefix)
@@ -110,7 +110,7 @@ module SorterMutate =
         let newStages = mutantStages |> Array.append prefixStages
         let newSwitches = [| for stage in newStages do yield! stage.switches |]
         {
-            Sorter.degree=sorter.degree;
+            sorter.degree=sorter.degree;
             switchCount = (SwitchCount.fromInt newSwitches.Length);
             switches = newSwitches
         }
@@ -119,7 +119,7 @@ module SorterMutate =
     let mutate 
         (mutate:sorterMutationType) 
         (rnd:IRando)
-        (sorter:Sorter) =
+        (sorter:sorter) =
         match mutate with
         | BySwitch (pfx,mr) -> mutateBySwitch
                                     mr pfx rnd sorter

@@ -1,17 +1,17 @@
 ﻿namespace global
 open System
 
-type SortableSetBinary = {id:SortableSetId; degree:Degree; 
+type sortableSetBinary = {id:SortableSetId; degree:Degree; 
                             sortables:IntBits[]}
-type SortableSetInteger = {id:SortableSetId; degree:Degree; 
+type sortableSetInteger = {id:SortableSetId; degree:Degree; 
                             sortables:int[][]}
-type SortableSetBp64 = {id:SortableSetId; degree:Degree; 
+type sortableSetBp64 = {id:SortableSetId; degree:Degree; 
                             sortables:bitsP64[]}
 
 type sortableSet =
-     | Binary of SortableSetBinary
-     | Integer of SortableSetInteger
-     | Bp64 of SortableSetBp64
+     | Binary of sortableSetBinary
+     | Integer of sortableSetInteger
+     | Bp64 of sortableSetBp64
 
 
 module SortableSetBinary = 
@@ -23,11 +23,10 @@ module SortableSetBinary =
                        degree:> obj;} 
                         |> GuidUtils.guidFromObjs
         {
-              SortableSetBinary.id = SortableSetId.fromGuid id;
-              SortableSetBinary.degree = degree;
-              SortableSetBinary.sortables = 
-                        (IntBits.arrayOfAllFor degree)
-                        |> Seq.toArray
+              sortableSetBinary.id = SortableSetId.fromGuid id;
+              degree = degree;
+              sortables = (IntBits.arrayOfAllFor degree)
+                          |> Seq.toArray
         }
 
 
@@ -44,9 +43,9 @@ module SortableSetBinary =
                     |> Seq.take (SortableCount.value sortableCount)
                     |> Seq.toArray
         {
-            SortableSetBinary.id = SortableSetId.fromGuid id;
-            SortableSetBinary.degree = degree;
-            SortableSetBinary.sortables = sias
+            sortableSetBinary.id = SortableSetId.fromGuid id;
+            degree = degree;
+            sortables = sias
         }
 
     let fromIntBits (degree:Degree) (intBits: IntBits[]) = 
@@ -54,12 +53,12 @@ module SortableSetBinary =
                        degree:> obj;} 
                         |> GuidUtils.guidFromObjs
         {
-              SortableSetBinary.id = SortableSetId.fromGuid id;
-              SortableSetBinary.degree = degree;
-              SortableSetBinary.sortables = intBits
+              sortableSetBinary.id = SortableSetId.fromGuid id;
+              degree = degree;
+              sortables = intBits
         }
     
-    let toIntBits (ssBin:SortableSetBinary) = 
+    let toIntBits (ssBin:sortableSetBinary) = 
         ssBin.sortables
 
 
@@ -81,9 +80,9 @@ module SortableSetInteger =
                     |> Seq.take (SortableCount.value sortableCount)
                     |> Seq.toArray
         {
-              SortableSetInteger.id = SortableSetId.fromGuid id;
-              SortableSetInteger.degree = degree;
-              SortableSetInteger.sortables = sia
+              sortableSetInteger.id = SortableSetId.fromGuid id;
+              degree = degree;
+              sortables = sia
         }
 
     let fromIntBits (degree:Degree) (intBits: IntBits[]) = 
@@ -91,13 +90,13 @@ module SortableSetInteger =
                        degree:> obj;} 
                         |> GuidUtils.guidFromObjs
         {
-              SortableSetInteger.id = SortableSetId.fromGuid id;
-              SortableSetInteger.degree = degree;
-              SortableSetInteger.sortables = intBits
+              sortableSetInteger.id = SortableSetId.fromGuid id;
+              degree = degree;
+              sortables = intBits
                 |> Array.map(fun ib -> ib.values)
          }
      
-    let toIntBits (ssInt:SortableSetInteger) = 
+    let toIntBits (ssInt:sortableSetInteger) = 
         ssInt.sortables |> Seq.map(fun aa -> IntBits.create aa)
 
 
@@ -111,9 +110,9 @@ module SortableSetBp64 =
                        degree:> obj;} 
                         |> GuidUtils.guidFromObjs
         {
-              SortableSetBp64.id = SortableSetId.fromGuid id;
-              SortableSetBp64.degree = degree;
-              SortableSetBp64.sortables = 
+              sortableSetBp64.id = SortableSetId.fromGuid id;
+              degree = degree;
+              sortables = 
                         (BitsP64.arrayOfAllFor degree)
                         |> Seq.toArray
          }
@@ -134,9 +133,9 @@ module SortableSetBp64 =
                                           (SortableCount.value sortableCount)
                     |> Seq.toArray
         {
-            SortableSetBp64.id = SortableSetId.fromGuid id;
-            SortableSetBp64.degree = degree;
-            SortableSetBp64.sortables = sias
+            sortableSetBp64.id = SortableSetId.fromGuid id;
+            degree = degree;
+            sortables = sias
         }
 
 
@@ -146,15 +145,14 @@ module SortableSetBp64 =
                        degree:> obj;} 
                         |> GuidUtils.guidFromObjs
         {
-              SortableSetBp64.id = SortableSetId.fromGuid id;
-              SortableSetBp64.degree = degree;
-              SortableSetBp64.sortables = 
-                        (BitsP64.fromIntBits intBits)
-                        |> Seq.toArray
+              sortableSetBp64.id = SortableSetId.fromGuid id;
+              degree = degree;
+              sortables = (BitsP64.fromIntBits intBits)
+                           |> Seq.toArray
          }
 
 
-    let toIntBits (ssBp64:SortableSetBp64) = 
+    let toIntBits (ssBp64:sortableSetBp64) = 
         ssBp64.sortables |> BitsP64.toIntBits
 
 

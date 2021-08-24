@@ -7,7 +7,7 @@ module SortingInts =
     // array to store each switch use, thus no SAG (Switch 
     // Action Grouping)
     let private switchRangeWithNoSAG 
-                (sorter:Sorter) 
+                (sorter:sorter) 
                 (mindex:int) 
                 (maxdex:int) 
                 (intSetsRoll:IntSetsRollout) 
@@ -37,7 +37,7 @@ module SortingInts =
     // array to store each switch use, thus no SAG (Switch 
     // Action Grouping)
     let sorterWithNoSAG 
-                    (sorter:Sorter) 
+                    (sorter:sorter) 
                     (intSetsRollout:IntSetsRollout) 
                     (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
@@ -83,7 +83,7 @@ module SortingInts =
     // uses a sorter.switchcount length array to store accumulated
     // switch uses
     let private switchRangeMakeSwitchUses 
-                    (sorter:Sorter) 
+                    (sorter:sorter) 
                     (mindex:int) 
                     (maxdex:int) 
                     (switchUses:switchUses) 
@@ -112,7 +112,7 @@ module SortingInts =
     // uses a sorter.switchcount length array to store accumulated
     // switch uses
     let sorterMakeSwitchUses 
-                    (sorter:Sorter) 
+                    (sorter:sorter) 
                     (ssRollout:IntSetsRollout) 
                     (switchusePlan:Sorting.SwitchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
@@ -144,7 +144,7 @@ module SortingInts =
         }
         
     let evalSorterOnIntSetsRollout
-                    (sorter:Sorter)
+                    (sorter:sorter)
                     (sortableSetRollout:IntSetsRollout)
                     (switchusePlan:Sorting.SwitchUsePlan) 
                     (switchEventAgg:Sorting.EventGrouping) =
@@ -157,8 +157,8 @@ module SortingInts =
                     sorter sortableSetRollout switchusePlan
 
 
-    let evalSorterOnBinary (sorter:Sorter)
-                   (sortableSet:SortableSetBinary)
+    let evalSorterOnBinary (sorter:sorter)
+                   (sortableSet:sortableSetBinary)
                    (switchusePlan:Sorting.SwitchUsePlan) 
                    (switchEventAgg:Sorting.EventGrouping) =
         let sortableSetRollout = 
@@ -170,8 +170,8 @@ module SortingInts =
             sorter sortableSetRollout switchusePlan switchEventAgg
 
 
-    let evalSorterOnInteger (sorter:Sorter)
-                            (sortableSet:SortableSetInteger)
+    let evalSorterOnInteger (sorter:sorter)
+                            (sortableSet:sortableSetInteger)
                             (switchusePlan:Sorting.SwitchUsePlan) 
                             (switchEventAgg:Sorting.EventGrouping) =
         let sortableSetRollout = 
@@ -242,7 +242,7 @@ module SortingInts =
             lstRet |> List.rev
 
 
-        let sortTHistSwitchList (sorter:Sorter) 
+        let sortTHistSwitchList (sorter:sorter) 
                                 (mindex:int) 
                                 (maxdex:int) 
                                 (testCase:IntBits) =
@@ -252,7 +252,7 @@ module SortingInts =
             sortTHistSwitches sws testCase
 
 
-        let sortTHist (sorter:Sorter) (testCase:IntBits) =
+        let sortTHist (sorter:sorter) (testCase:IntBits) =
             let sl = SwitchCount.value sorter.switchCount
             sortTHistSwitchList sorter 0 sl testCase
 

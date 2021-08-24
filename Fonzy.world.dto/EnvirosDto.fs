@@ -7,9 +7,11 @@ module EnviroDto =
     let toDto (env:Enviro) =
         match env with
         | Enviro.ObjectMap objectMap -> {
-                        cat="ObjectMap"; 
+                        cat= nameof Enviro.ObjectMap; 
                         value = Json.serialize objectMap}
-        | Enviro.Empty -> {cat = "Empty"; value = Json.serialize None}
+        | Enviro.Empty -> {
+                        cat = nameof Enviro.Empty; 
+                        value = Json.serialize None}
 
     let toJson (idt:Enviro) =
         idt |> toDto |> Json.serialize

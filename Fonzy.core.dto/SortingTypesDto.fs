@@ -28,3 +28,24 @@ module SwitchOrStageCountDto =
             let! dto = cereal |> Json.deserialize<switchOrStageCountDto>
             return! dto |> fromDto
         }
+
+
+type switchUsesDto = {switchCount:int; weights:int[]}
+module SwitchUsesDto =
+    let fromDto (dto:switchUsesDto) =
+        result {
+            return SwitchUses.init dto.weights
+        }
+
+    let fromJson (cereal:string) =
+        result {
+            let! sorterDto = cereal |> Json.deserialize<switchUsesDto>
+            return! fromDto sorterDto
+        }
+
+    let toDto (switchUses:switchUses) =
+        {switchUsesDto.switchCount= (SwitchUses.switchCount switchUses); 
+         weights = (SwitchUses.getWeights switchUses)}
+
+    let toJson (switchUses:switchUses) =
+        switchUses |> toDto |> Json.serialize

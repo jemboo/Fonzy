@@ -4,12 +4,12 @@ open System
 type SorterSet = { id:SorterSetId; 
                    degree:Degree; 
                    sorterCount:SorterCount; 
-                   sorters:Map<SorterId,Sorter> }
+                   sorters:Map<SorterId, sorter> }
 module SorterSet =
 
     let fromSorters (sorterSetId:SorterSetId)
                     (degree:Degree) 
-                    (sorters:seq<Sorter>) =
+                    (sorters:seq<sorter>) =
         let sorterArray = 
                 sorters 
                 |> Seq.map(fun s-> (s |> Sorter.makeId, s))

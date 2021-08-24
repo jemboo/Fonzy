@@ -9,15 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="CombinatoricsTypesDtoFixture.fs" />
     <Compile Include="RngGenDtoFixture.fs" />
-    <Compile Include="CommonTypesDtoFixture.fs" />
+    <Compile Include="ComboStructuresDtoFixture.fs" />
     <Compile Include="DistributionsDtoFixture.fs" />
     <Compile Include="SorterPartsDtoFixture.fs" />
     <Compile Include="SorterEvalDtoFixture.fs" />
     <Compile Include="SorterGenDtoFixture.fs" />
     <Compile Include="SorterGaDtoFixture.fs" />
     <Compile Include="OrgsDtoFixture.fs" />
+    <Compile Include="yabDtoFixture.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

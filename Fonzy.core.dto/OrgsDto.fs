@@ -6,36 +6,40 @@ type AncestryDto = {cat:string; value:string}
 module AncestryDto =
     let toDto (ancestry:Ancestry) =
          match ancestry with
-         | NoAncestry -> {cat="NoAncestry"; value = ""}
-         | SingleParent id -> {cat="SingleParent"; value = (string (OrgId.value id))}
+         | NoAncestry -> 
+            {
+                cat = nameof Ancestry.NoAncestry; 
+                value = "" }
+         | SingleParent id -> 
+            {
+                cat = nameof Ancestry.SingleParent; 
+                value = (string (OrgId.value id)) 
+            }
          | SingleDistantParent (id, gen) -> 
-                    let genDto = (GenerationNumber.value gen).ToString()
-                    {
-                        cat="SingleDistantParent"; 
-                        value = Json.serialize [(string (OrgId.value id)); genDto]
-                    }
+            let genDto = (GenerationNumber.value gen).ToString()
+            {
+                cat = nameof Ancestry.SingleDistantParent ; 
+                value = Json.serialize [(string (OrgId.value id)); genDto]
+            }
 
     let fromDto (eDto:AncestryDto) =
-        if eDto.cat = "NoAncestry" then
-            result {
+        match eDto.cat with
+        | nameof Ancestry.NoAncestry -> result {
                 return Ancestry.NoAncestry
             }
-        else if eDto.cat = "SingleParent" then
-            result {
+        | nameof Ancestry.SingleParent -> result {
                 let! gu = eDto.value |> GuidUtils.guidFromStringR
                 let! orgId = gu |> OrgId.create
                 return Ancestry.SingleParent orgId
             }
-        else if eDto.cat = "SingleDistantParent" then
-            result {
-                let! vals = eDto.value |> Json.deserialize<string[]>
-                let! gu = vals.[0] |> GuidUtils.guidFromStringR
-                let! orgId = gu |> OrgId.create
-                let! gen = (vals.[1]) |> int |> GenerationNumber.create ""
-                return Ancestry.SingleDistantParent (orgId, gen)
+        | nameof Ancestry.SingleDistantParent -> result {
+            let! vals = eDto.value |> Json.deserialize<string[]>
+            let! gu = vals.[0] |> GuidUtils.guidFromStringR
+            let! orgId = gu |> OrgId.create
+            let! gen = (vals.[1]) |> int |> GenerationNumber.create ""
+            return Ancestry.SingleDistantParent (orgId, gen)
             }
-        else sprintf "cat: %s for AncestryDto not found"
-                      eDto.cat |> Error
+        | t -> (sprintf "Invalid Enviro Type: %s" t) |> Error
 
 
 

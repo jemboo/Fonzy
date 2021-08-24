@@ -7,34 +7,34 @@ type sortableSetIntsDto = {id:Guid; cat:string; degree:int; sortableIntArrays:in
 module SortableSetIntsDto =
     let yab = None
     
-    let toDtoBinary (sortableSetBinary:SortableSetBinary) =
+    let toDtoBinary (ssBinary:sortableSetBinary) =
         {
             sortableSetIntsDto.id = 
-                           (SortableSetId.value sortableSetBinary.id)
+                           (SortableSetId.value ssBinary.id)
             sortableSetIntsDto.cat = "binary"
             sortableSetIntsDto.degree = 
-                           (Degree.value sortableSetBinary.degree)
+                           (Degree.value ssBinary.degree)
             sortableSetIntsDto.sortableIntArrays = 
-                            sortableSetBinary.sortables
+                            ssBinary.sortables
                             |> Array.map(fun avs -> avs.values)
         }
 
-    let toDtoInteger (sortableSetBinary:SortableSetInteger) =
+    let toDtoInteger (ssInteger:sortableSetInteger) =
         {
             sortableSetIntsDto.id = 
-                           (SortableSetId.value sortableSetBinary.id)
+                           (SortableSetId.value ssInteger.id)
             sortableSetIntsDto.cat = "integer"
             sortableSetIntsDto.degree = 
-                           (Degree.value sortableSetBinary.degree)
+                           (Degree.value ssInteger.degree)
             sortableSetIntsDto.sortableIntArrays = 
-                            sortableSetBinary.sortables
+                            ssInteger.sortables
         }
 
-    let toJsonBinary (sortableSetBinary:SortableSetBinary) =
-        sortableSetBinary |> toDtoBinary |> Json.serialize
+    let toJsonBinary (ssBinary:sortableSetBinary) =
+        ssBinary |> toDtoBinary |> Json.serialize
 
-    let toJsonInteger (sortableSetInteger:SortableSetInteger) =
-        sortableSetInteger |> toDtoInteger |> Json.serialize
+    let toJsonInteger (ssInteger:sortableSetInteger) =
+        ssInteger |> toDtoInteger |> Json.serialize
 
     let fromDto (dto:sortableSetIntsDto) =
         if dto.cat = "binary" then
@@ -44,9 +44,9 @@ module SortableSetIntsDto =
                 let sias = dto.sortableIntArrays 
                            |> Array.map(fun avs -> {IntBits.values = avs})
                 return  {
-                            SortableSetBinary.id = id
-                            SortableSetBinary.degree = degree
-                            SortableSetBinary.sortables =sias
+                            sortableSetBinary.id = id
+                            degree = degree
+                            sortables =sias
                         }
                         |> sortableSet.Binary
              }
@@ -55,9 +55,9 @@ module SortableSetIntsDto =
                 let! id = SortableSetId.create dto.id
                 let! degree = Degree.create "" dto.degree
                 return  {
-                            SortableSetInteger.id = id
-                            SortableSetInteger.degree = degree
-                            SortableSetInteger.sortables = dto.sortableIntArrays
+                            sortableSetInteger.id = id
+                            degree = degree
+                            sortables = dto.sortableIntArrays
                         }
                         |> sortableSet.Integer
              }
@@ -73,19 +73,18 @@ type sortableSetBpDto = {id:Guid; degree:int; sortableUintArrays:uint64[][]}
 
 module SortableSetBpDto =
 
-    let toDto (sortableSetBp64:SortableSetBp64) =
+    let toDto (ssBp64:sortableSetBp64) =
         {
             sortableSetBpDto.id = 
-                           (SortableSetId.value sortableSetBp64.id)
-            sortableSetBpDto.degree = 
-                           (Degree.value sortableSetBp64.degree)
-            sortableSetBpDto.sortableUintArrays = 
-                            sortableSetBp64.sortables
+                           (SortableSetId.value ssBp64.id)
+            degree = (Degree.value ssBp64.degree)
+            sortableUintArrays = 
+                            ssBp64.sortables
                             |> Array.map(fun avs -> avs.values)
         }
 
-    let toJson (sortableSetBp64:SortableSetBp64) =
-        sortableSetBp64 |> toDto |> Json.serialize
+    let toJson (ssBp64:sortableSetBp64) =
+        ssBp64 |> toDto |> Json.serialize
 
     let fromDto (dto:sortableSetBpDto) =
         result {
@@ -94,9 +93,9 @@ module SortableSetBpDto =
             let sias = dto.sortableUintArrays 
                        |> Array.map(fun avs -> {bitsP64.values = avs})
             return  {
-                        SortableSetBp64.id = id
-                        SortableSetBp64.degree = degree
-                        SortableSetBp64.sortables = sias
+                        sortableSetBp64.id = id
+                        degree = degree
+                        sortables = sias
                     }
                     |> sortableSet.Bp64
         }

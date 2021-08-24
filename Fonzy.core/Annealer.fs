@@ -1,12 +1,12 @@
-﻿namespace global  // note use of GLOBAL namespace
+﻿namespace global
 
 open System
 
 type Energy = private Energy of float
 module Energy =
     let value (Energy v) = v
-    let create fieldName v = 
-        ConstrainedType.createFloat fieldName Energy 0.0 10.0 v
+    let create fieldName v = Energy v |> Ok
+       // ConstrainedType.createFloat fieldName Energy 0.0 Double. v
     let fromFloat v = create "" v |> Result.ExtractOrThrow
     let repStr v = match v with
                           |Some r -> sprintf "%.4f" (value r)

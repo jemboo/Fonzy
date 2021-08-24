@@ -118,9 +118,9 @@ module Switch =
             |> Array.map(Option.get)
 
 
-    let allReductions (degreeSource:Degree)
-                      (degreeDest:Degree)
-                      (swa:Switch array) =
+    let allMasks (degreeSource:Degree)
+                 (degreeDest:Degree)
+                 (swa:Switch array) =
         let sd = (Degree.value degreeSource)
         let dd = (Degree.value degreeDest)
         if sd < dd then
@@ -130,7 +130,7 @@ module Switch =
         |> Seq.map(reduceMany swa)
 
 
-    let rndReductions (degreeSource:Degree)
+    let rndMasks (degreeSource:Degree)
                       (degreeDest:Degree)
                       (swa:Switch array)
                       (rnd:IRando) =

@@ -9,7 +9,7 @@ let main argv =
     /// ******* runPerfBinBatchSeq ***********
     Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq2")
 
-    RunBatch.runPerfBinBatchSeq (FilePath.fromString "C:\\SimOutPfxT") 
+    RunBatch.runPerfBinBatchSeq (FilePath.fromString "C:\\SimOutTst") 
                                 (RandomSeed.fromNow ())
                                 0
                                  |> ignore

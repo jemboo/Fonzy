@@ -1,8 +1,31 @@
 ﻿namespace global
 open System
 
-module SorterShcCauseSpecGen = 
-    
+module SorterShcCauseSpecGen =
+
+    let makeCauseSpec 
+                    sorterRndGen
+                    sorterCount
+                    rndGen
+                    switchUsePlan
+                    sortableSetSpec
+                    useParallel
+                    resultsName =
+
+        CauseSpecSorters.rndStoHillClimb
+                ("sorterRndGen", sorterRndGen)
+                ("sorterCount", sorterCount)
+                ("rndGen", rndGen)
+                ("switchUsePlan", switchUsePlan)
+                ("sortableSetSpec", sortableSetSpec)
+                ("useParallel", (UseParallel.value useParallel))
+                ("resultsName", resultsName)
+
+
+
+
+
+
     let makeRunBatchSeq (seed:RandomSeed)
                         (batchSize:int)
                         (outputDir:FilePath) = 

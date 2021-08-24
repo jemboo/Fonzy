@@ -100,7 +100,6 @@ module SorterPbCauseSpecGen =
         |> Seq.toList
 
 
-
     let tup900Switches (switchList: Switch list) 
                        (degree:Degree) =
         (switchList, (degree |> SwitchCount.degreeTo900SwitchCount), degree)
@@ -195,13 +194,14 @@ module SorterPbCauseSpecGen =
             let useParallel = UseParallel.create true
             let resultsName = "sorterPerfBins"
 
+            let perf10 = ((StageWeight.fromFloat 1.0), (SorterCount.fromInt 10)) |> sorterSaving.Perf
             let causeSpec = makeCauseSpec
                                 sorterRndGen 
                                 sorterCount 
                                 rndGen 
                                 switchUsePlan 
                                 sortableSetSpec
-                                sorterSaving.NotAny
+                                perf10
                                 useParallel 
                                 resultsName
 

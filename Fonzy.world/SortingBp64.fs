@@ -5,7 +5,7 @@ open SortingEval
 module SortingBp64 =
 
     let private switchRangeWithNoSAG 
-                (sorter:Sorter) 
+                (sorter:sorter) 
                 (mindex:int) 
                 (maxdex:int) 
                 (bp64SetsRollout:bP64SetsRollout) 
@@ -30,7 +30,7 @@ module SortingBp64 =
     // array to store each switch use, thus no SAG (Switch 
     // Action Grouping)
     let sorterWithNoSAG
-                (sorter:Sorter) 
+                (sorter:sorter) 
                 (bP64SetsRollout:bP64SetsRollout) 
                 (switchusePlan:Sorting.SwitchUsePlan) =
 
@@ -79,7 +79,7 @@ module SortingBp64 =
     // uses a sorter.switchcount length array to store accumulated
     // switch uses
     let private switchRangeMakeSwitchUses 
-                    (sorter:Sorter) 
+                    (sorter:sorter) 
                     (mindex:int) (maxdex:int) 
                     (switchUseB64:SwitchUseB64) 
                     (bp64SetsRollout:bP64SetsRollout) 
@@ -102,7 +102,7 @@ module SortingBp64 =
     // creates a sorter.switchcount length array to store accumulated
     // switch uses
     let sorterMakeSwitchUses
-                    (sorter:Sorter) 
+                    (sorter:sorter) 
                     (bp64SetsRollout:bP64SetsRollout)  
                     (switchusePlan:Sorting.SwitchUsePlan) =
 
@@ -138,7 +138,7 @@ module SortingBp64 =
 
 
     let evalSorterOnBP64SetsRollout
-                    (sorter:Sorter)
+                    (sorter:sorter)
                     (bp64SetsRollout:bP64SetsRollout)
                     (switchusePlan:Sorting.SwitchUsePlan) 
                     (switchEventAgg:Sorting.EventGrouping) =
@@ -157,12 +157,12 @@ module SortingBp64 =
                     switchusePlan
 
 
-    let evalSorter (sorter:Sorter)
-                   (sortableSet:SortableSetBp64)
+    let evalSorter (sorter:sorter)
+                   (sSet:sortableSetBp64)
                    (switchusePlan:Sorting.SwitchUsePlan) 
                    (switchEventAgg:Sorting.EventGrouping) =
         let sortableSetRollout = 
-            sortableSet.sortables
+            sSet.sortables
                 |> BP64SetsRollout.fromBitsP64
                         sorter.degree
                 |> Result.ExtractOrThrow
@@ -228,7 +228,7 @@ module SortingBp64 =
             lstRet |> List.rev
 
 
-        let sortTHistSwitchList (sorter:Sorter) 
+        let sortTHistSwitchList (sorter:sorter) 
                                  (mindex:int) 
                                  (maxdex:int) 
                                  (pBits:bitsP64) =
@@ -238,7 +238,7 @@ module SortingBp64 =
             sortTHistSwitches sws pBits
 
 
-        let sortTHist (sorter:Sorter) 
+        let sortTHist (sorter:sorter) 
                       (pBits:bitsP64) =
             let sl = SwitchCount.value sorter.switchCount
             sortTHistSwitchList sorter 0 sl pBits

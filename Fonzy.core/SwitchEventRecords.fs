@@ -30,7 +30,7 @@ module SwitchUses =
 
 
    let getUsedSwitches (switchUses:switchUses) 
-                       (sorter:Sorter) =
+                       (sorter:sorter) =
        let switches = sorter.switches
        let weights = (getWeights switchUses)
        weights |> Seq.mapi(fun i w -> i,w)
@@ -73,7 +73,7 @@ module SwitchUses =
 
 
    let getRefinedStageCount (switchUses:switchUses) 
-                            (sorter:Sorter) =
+                            (sorter:sorter) =
        result {
            let usedSwitches = getUsedSwitches switchUses sorter
            let degree = sorter.degree
@@ -82,7 +82,7 @@ module SwitchUses =
 
 
    let getRefinedSorter (switchUses:switchUses) 
-                        (sorter:Sorter) =
+                        (sorter:sorter) =
        result {
            let usedSwitches = getUsedSwitches switchUses sorter
            let degree = sorter.degree
@@ -92,7 +92,7 @@ module SwitchUses =
        }
 
 
-   let getSwitchAndStageUses (sorter:Sorter) 
+   let getSwitchAndStageUses (sorter:sorter) 
                              (switchUses:switchUses) =
        result
            {

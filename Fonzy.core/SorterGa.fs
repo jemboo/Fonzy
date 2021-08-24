@@ -6,8 +6,8 @@ type SorterGenome =
     | Switches of List<Switch>
 
 type SorterPhenotype = 
-    | Singleton of Sorter
-    | Multiple of List<Sorter>
+    | Singleton of sorter
+    | Multiple of List<sorter>
 
 type SorterTestResults = 
     | Singleton of switchUses

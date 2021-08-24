@@ -58,12 +58,11 @@ module SHC =
             
 
 
-
 type sorterShc = 
     {
         step:StepNumber;
         rngGen:RngGen; 
-        sorter:Sorter;
+        sorter:sorter;
         switchPfx:Switch[];
         switchUses:switchUses option
         perf:SortingEval.sorterPerf option
@@ -76,7 +75,7 @@ type sorterShcArch =
     {
         step:StepNumber;
         rngGen:RngGen option; 
-        sorter:Sorter option;
+        sorter:sorter option;
         switchUses:switchUses option
         perf:SortingEval.sorterPerf
         energy:Energy;
@@ -221,7 +220,7 @@ module SorterShc =
 type sorterShcSpec = 
     {
        rngGen:RngGen; 
-       sorter:Sorter;
+       sorter:sorter;
        switchPfx:Switch[];
        mutator:sorterMutatorSpec;
        shcSortableSetSpec:sortableSetSpecReduced;

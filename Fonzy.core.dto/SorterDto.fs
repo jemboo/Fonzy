@@ -23,12 +23,12 @@ module SorterDto =
             let! sorterDto = cereal |> Json.deserialize<sorterDto>
             return! fromDto sorterDto
         }
-    let toDto (sorter:Sorter) =
+    let toDto (sorter:sorter) =
         {
             sorterDto.degree = (Degree.value sorter.degree); 
             switches = sorter.switches |> Array.map(SwitchDto.toDto)
         }
-    let toJson (sorter:Sorter) =
+    let toJson (sorter:sorter) =
         sorter |> toDto |> Json.serialize
 
 
@@ -61,25 +61,6 @@ module SorterSetDto =
         sorters |> toDto |> Json.serialize
 
 
-type switchUsesDto = {switchCount:int; weights:int[]}
-module SwitchUsesDto =
-    let fromDto (dto:switchUsesDto) =
-        result {
-            return SwitchUses.init dto.weights
-        }
-
-    let fromJson (cereal:string) =
-        result {
-            let! sorterDto = cereal |> Json.deserialize<switchUsesDto>
-            return! fromDto sorterDto
-        }
-
-    let toDto (switchUses:switchUses) =
-        {switchUsesDto.switchCount= (SwitchUses.switchCount switchUses); 
-         weights = (SwitchUses.getWeights switchUses)}
-
-    let toJson (switchUses:switchUses) =
-        switchUses |> toDto |> Json.serialize
 
 
 //type sorterGenDto = {cat:string; prams:Map<string,string>} 
@@ -202,138 +183,3 @@ module SwitchUsesDto =
 //            let! dto = Json.deserialize<sorterGenDto> js
 //            return! fromDto dto
 //        }
-
-
-type sorterRndGenDto = {cat:string; prams:Map<string,string>; switches:int[]} 
-module SorterRndGenDto =
-    let toDto (sg:sorterRndGen) =
-        match sg with
-        | sorterRndGen.RandSwitches (switchList, wc, d) ->
-            let prams = 
-                [
-                    ("switchCount", (SwitchCount.value wc) |> string);
-                    ("degree", (Degree.value d) |> string);
-                ] |> Map.ofList
-            let switchListDto = switchList |> List.toArray 
-                                |> Array.map(fun sw -> SwitchDto.toDto sw)
-            {sorterRndGenDto.cat="RandSwitches"; prams=prams; switches=switchListDto; } 
-        | sorterRndGen.RandStages (switchList, tc, d) ->
-            let prams = 
-                [
-                    ("stageCount", (StageCount.value tc) |> string);
-                    ("degree", (Degree.value d) |> string);
-                ] |> Map.ofList                
-            let switchListDto = switchList |> List.toArray 
-                                    |> Array.map(fun sw -> SwitchDto.toDto sw)
-            { sorterRndGenDto.cat="RandStages"; prams=prams; switches=switchListDto; } 
-        | sorterRndGen.RandBuddies (switchList, tc, ws, d) ->
-            let prams = 
-                [
-                    ("stageCount", (StageCount.value tc) |> string);
-                    ("windowSize", (StageWindowSize.value ws) |> string);
-                    ("degree", (Degree.value d) |> string);
-                ] |> Map.ofList
-            let switchListDto = switchList |> List.toArray 
-                                |> Array.map(fun sw -> SwitchDto.toDto sw)
-            { sorterRndGenDto.cat="RandBuddies"; prams=prams; switches=switchListDto; } 
-        | sorterRndGen.RandSymmetric (switchList, tc, d) ->
-            let prams = 
-                [
-                    ("stageCount", (StageCount.value tc) |> string);
-                    ("degree", (Degree.value d) |> string);
-                ] |> Map.ofList            
-            let switchListDto = switchList |> List.toArray 
-                                |> Array.map(fun sw -> SwitchDto.toDto sw)
-            { sorterRndGenDto.cat="RandSymmetric"; prams=prams; switches=switchListDto; } 
-        | sorterRndGen.RandSymmetricBuddies (switchList, tc, ws, d) ->
-            let prams =
-                [
-                    ("stageCount", (StageCount.value tc) |> string);
-                    ("windowSize", (StageWindowSize.value ws) |> string);
-                    ("degree", (Degree.value d) |> string);
-                ] |> Map.ofList
-            let switchListDto = switchList |> List.toArray 
-                                |> Array.map(fun sw -> SwitchDto.toDto sw)
-            { sorterRndGenDto.cat="RandSymmetricBuddies"; prams=prams; switches=switchListDto; } 
-
-
-
-    let toJson (cs:sorterRndGen) =
-        cs |> toDto |> Json.serialize
-
-    let fromDto (sgDto:sorterRndGenDto) =
-            match sgDto.cat with
-            | "RandSwitches" -> 
-                    result {
-                            let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
-                                                      (fun d -> Degree.create "" d)
-                            let! switchCount = sgDto.prams |> ResultMap.procKeyedInt "switchCount" 
-                                                      (fun d -> SwitchCount.create "" d)
-
-                            let! switchList = sgDto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
-                                                           |> Array.toList
-                                                           |> Result.sequence
-                            return sorterRndGen.RandSwitches (switchList, switchCount, degree)
-                           }
-
-            | "RandStages" -> 
-                    result {
-                            let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
-                                                      (fun d -> StageCount.create "" d)
-                            let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
-                                                      (fun d -> Degree.create "" d)
-
-                            let! switchList = sgDto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
-                                                           |> Array.toList
-                                                           |> Result.sequence
-
-                            return sorterRndGen.RandStages (switchList, stageCount, degree)
-                           }
-
-            | "RandBuddies" -> 
-                    result {
-                            let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
-                                                      (fun d -> Degree.create "" d)
-                            let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
-                                                      (fun d -> StageCount.create "" d) 
-                            let! windowSize = sgDto.prams |> ResultMap.procKeyedInt "windowSize" 
-                                                      (fun d -> StageWindowSize.create "" d)
-                            let! switchList = sgDto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
-                                                           |> Array.toList
-                                                           |> Result.sequence
-                            return sorterRndGen.RandBuddies (switchList, stageCount, windowSize, degree)
-                           }
-            | "RandSymmetric" -> 
-                    result {
-                            let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
-                                                      (fun d -> StageCount.create "" d)
-                            let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
-                                                      (fun d -> Degree.create "" d)
-                            let! switchList = sgDto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
-                                                           |> Array.toList
-                                                           |> Result.sequence
-                            return sorterRndGen.RandSymmetric (switchList, stageCount, degree)
-                           }
-                           
-            | "RandSymmetricBuddies" -> 
-                    result {
-                            let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
-                                                        (fun d -> Degree.create "" d)
-                            let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
-                                                        (fun d -> StageCount.create "" d) 
-                            let! windowSize = sgDto.prams |> ResultMap.procKeyedInt "windowSize" 
-                                                        (fun d -> StageWindowSize.create "" d)
-                            let! switchList = sgDto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
-                                                           |> Array.toList
-                                                           |> Result.sequence
-                            return sorterRndGen.RandSymmetricBuddies (switchList, stageCount, windowSize, degree)
-                            }
-
-            | _ -> Error (sprintf "no match for SorterGenDto.cat: %s" sgDto.cat)
-
-
-    let fromJson (js:string) =
-        result {
-            let! dto = Json.deserialize<sorterRndGenDto> js
-            return! fromDto dto
-        }

@@ -32,7 +32,7 @@ module SortersFromData =
            let! switchSeq = ParseToSwitches sorterString degree
            let switches = switchSeq |> Seq.toArray
            let! switchCount = SwitchCount.create "" switches.Length 
-           return { Sorter.degree = degree; 
+           return { sorter.degree = degree; 
                     switchCount = switchCount;
                     switches = switches }
         }

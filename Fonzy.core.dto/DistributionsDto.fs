@@ -5,18 +5,19 @@ open System
 type intDistTypeDto = {cat:string; value:string}
 module IntDistTypeDto =
     let fromDto (dto:intDistTypeDto) =
-        if dto.cat = "Uniform" then
+        match dto.cat with
+        | nameof IntDistType.Uniform ->
             result {
                 let! b = Json.deserialize<UniformIntegerDistParams> dto.value
                 return IntDistType.Uniform b
             }
-        else if dto.cat = "Normal" then
+        | nameof IntDistType.Normal ->
             result {
                 let! b = Json.deserialize<NormalIntegerDistParams> dto.value
                 return IntDistType.Normal b
             }
-        else sprintf "cat: %s for IntDistTypeDto not found"
-                        dto.cat |> Error
+        | t -> sprintf "cat: %s for IntDistTypeDto not found"
+                     dto.cat |> Error
 
     let fromJson (jstr:string) =
         result {
@@ -26,10 +27,12 @@ module IntDistTypeDto =
 
     let toDto (idt:IntDistType) =
         match idt with
-        | IntDistType.Uniform up -> {intDistTypeDto.cat="Uniform"; 
-                                    value=Json.serialize up}
-        | IntDistType.Normal np -> {intDistTypeDto.cat="Normal"; 
-                                    value=Json.serialize np}
+        | IntDistType.Uniform up -> 
+                        { intDistTypeDto.cat = nameof IntDistType.Uniform; 
+                          value=Json.serialize up}
+        | IntDistType.Normal np -> 
+                        { intDistTypeDto.cat = nameof IntDistType.Normal; 
+                          value=Json.serialize np}
 
     let toJson (idt:IntDistType) =
         idt |> toDto |> Json.serialize
@@ -38,18 +41,18 @@ module IntDistTypeDto =
 type int2dDistTypeDto = {cat:string; value:string}
 module Int2dDistTypeDto =
     let fromDto (dto:int2dDistTypeDto) =
-        if dto.cat = "Uniform" then
-            result {
+        match dto.cat with
+        | nameof Int2dDistType.Uniform -> result {
                 let! b = Json.deserialize<UniformInt2dDistParams> dto.value
                 return Int2dDistType.Uniform b
             }
-        else if dto.cat = "Normal" then
+        | nameof Int2dDistType.Normal -> 
             result {
                 let! b = Json.deserialize<NormalInt2dDistParams> dto.value
                 return Int2dDistType.Normal b
             }
-        else sprintf "cat: %s for Int2dDistTypeDto not found"
-                        dto.cat |> Error
+        | t -> (sprintf "cat: %s for Int2dDistTypeDto not found"
+                    dto.cat ) |> Error
 
     let fromJson (jstr:string) =
         result {
@@ -59,10 +62,12 @@ module Int2dDistTypeDto =
 
     let toDto (idt:Int2dDistType) =
         match idt with
-        | Int2dDistType.Uniform up -> {int2dDistTypeDto.cat="Uniform"; 
-                                            value = Json.serialize up}
-        | Int2dDistType.Normal np -> {int2dDistTypeDto.cat="Normal";
-                                            value = Json.serialize np}
+        | Int2dDistType.Uniform up -> {
+                            int2dDistTypeDto.cat = nameof Int2dDistType.Uniform; 
+                            value = Json.serialize up}
+        | Int2dDistType.Normal np -> {
+                            int2dDistTypeDto.cat = nameof Int2dDistType.Normal;
+                            value = Json.serialize np}
 
     let toJson (idt:Int2dDistType) =
         idt |> toDto |> Json.serialize
@@ -87,7 +92,7 @@ module IntDistDto =
     let toDto (intD:IntDist) =
         {
             intDistDto.intDistTypeDto = intD.intDistType 
-                                                 |> IntDistTypeDto.toDto;
+                                        |> IntDistTypeDto.toDto;
             intDistDto.values = intD.vals
         }
 
@@ -114,7 +119,7 @@ module Int2dDistDto =
     let toDto (l2dD:Int2dDist) =
         {
             int2dDistDto.lattice2dDistTypeDto = l2dD.lattice2dDistType 
-                                                        |> Int2dDistTypeDto.toDto;
+                                                |> Int2dDistTypeDto.toDto;
             int2dDistDto.values = l2dD.vals;
          }
 

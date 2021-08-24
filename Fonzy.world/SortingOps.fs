@@ -6,7 +6,7 @@ module SortingOps =
 
     module Sorter =
         let eval
-                (sorter:Sorter)
+                (sorter:sorter)
                 (sortableSet:sortableSet)
                 (switchusePlan:Sorting.SwitchUsePlan) 
                 (switchEventAgg:Sorting.EventGrouping) =

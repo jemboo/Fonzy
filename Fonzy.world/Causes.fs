@@ -107,7 +107,7 @@ module CauseSorters =
                             Enviro.Empty 
     
                 return! Enviro.addDto<sorterCoverageDto[]>
-                                    resultsName 
+                                    (nameof selectedCovs) 
                                     selectedCovs
                                     e2 
             }
@@ -194,7 +194,7 @@ module CauseSorters =
                             Enviro.Empty 
     
                 return! Enviro.addDto<sorterCoverageDto[]>
-                                    resultsName 
+                                    (nameof selectedCovs)
                                     selectedCovs
                                     e2 
             }

@@ -12,13 +12,14 @@ type SwitchFixture () =
         let yak2 = Switch.switchMap.[3]
         Assert.IsFalse(false)
 
+
     [<TestMethod>]
     member this.allReductions() =
         let degSrc = Degree.fromInt 16
         let degDest = Degree.fromInt 12
         let srtGreen = RefSorter.createRefSorter RefSorter.End16
                        |> Result.ExtractOrThrow
-        let subSorters = Switch.allReductions degSrc degDest srtGreen.switches
+        let subSorters = Switch.allMasks degSrc degDest srtGreen.switches
                          |> Seq.toArray
 
         let hist = subSorters |> CollectionUtils.histogram (fun a -> a.Length)

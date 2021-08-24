@@ -11,13 +11,11 @@
     <Compile Include="ComboStructuresDto.fs" />
     <Compile Include="DistributionsDto.fs" />
     <Compile Include="SortingTypesDto.fs" />
-    <Compile Include="GaTypesDto.fs" />
-    <Compile Include="SorterPartsDto.fs" />
+    <Compile Include="SorterDto.fs" />
     <Compile Include="SortableSetDto.fs" />
     <Compile Include="SortingEvalDto.fs" />
     <Compile Include="SorterGenDto.fs" />
     <Compile Include="SorterGaDto.fs" />
-    <Compile Include="RootDtos.fs" />
     <Compile Include="OrgsDto.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
