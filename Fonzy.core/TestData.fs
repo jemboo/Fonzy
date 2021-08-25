@@ -116,7 +116,7 @@ module TestData =
 
         let intSetsRolloutOfAllSorted = 
                 let ia = IntBits.sorted_0_1_Sequences degree
-                            |> Seq.map(fun ia -> {IntBits.values = ia.values })
+                            |> Seq.map(fun ia -> {intBits.values = ia.values })
                 IntSetsRollout.fromIntBits 
                                degree
                                ia
@@ -125,7 +125,7 @@ module TestData =
 
         let bp64SetsRolloutOfAllSorted = 
                 let ia = IntBits.sorted_0_1_Sequences degree
-                            |> Seq.map(fun ia -> {IntBits.values = ia.values })
+                            |> Seq.map(fun ia -> {intBits.values = ia.values })
                 BP64SetsRollout.fromIntBits
                                 degree
                                 ia

@@ -2,7 +2,7 @@
 open System
 
 
-type CauseSpec = {id:CauseSpecId; genus:string list; prams:Map<string,string>;}
+type causeSpec = {id:CauseSpecId; genus:string list; prams:Map<string,string>;}
 
 
 module CauseSpec = 
@@ -70,13 +70,13 @@ module CauseSpec =
     //    }
 
     let noOpCauseSpecId = Guid.Parse "00000000-0000-0000-0000-000000000000"
-    let noOpCauseSpec = { CauseSpec.id = CauseSpecId.fromGuid noOpCauseSpecId; 
+    let noOpCauseSpec = { causeSpec.id = CauseSpecId.fromGuid noOpCauseSpecId; 
                           genus=["NoOp"]; prams=Map.empty;}
 
 
 module CauseSpecRandGen = 
     let intArrayBaseId = Guid.Parse "00000000-0000-0000-0000-000000000001"
-    let intArray (idt:IntDistType) (count:int) 
+    let intArray (idt:intDistType) (count:int) 
                  (rndGen:RngGen) (outName:string) =
         let id = seq { intArrayBaseId:> obj;
                        idt:> obj; count:> obj; 
@@ -88,7 +88,7 @@ module CauseSpecRandGen =
                      ("intDistType", idt |> IntDistTypeDto.toJson);
                      ("outName", outName)
                      ] |> Map.ofList
-        {CauseSpec.id = CauseSpecId.fromGuid id; genus=["RandGen"; "IntArray"]; prams=prams; }
+        {causeSpec.id = CauseSpecId.fromGuid id; genus=["RandGen"; "IntArray"]; prams=prams; }
 
     let int2dArray (idt:Int2dDistType) (count:int) 
                           (rndGen:RngGen) (outName:string) =
@@ -102,17 +102,17 @@ module CauseSpecRandGen =
                      ("lattice2dDistType", idt |> Int2dDistTypeDto.toJson);
                      ("outName", outName)
                      ] |> Map.ofList
-        {CauseSpec.id = CauseSpecId.fromGuid id; genus=["RandGen"; "Int2dArray"]; prams=prams;}
+        {causeSpec.id = CauseSpecId.fromGuid id; genus=["RandGen"; "Int2dArray"]; prams=prams;}
 
     let uniformInts (minVal:int) (maxVal:int) 
                     (seed:RandomSeed) (count:int) (outName:string) =
-        let idt = IntDistType.Uniform {UniformIntegerDistParams.min=minVal; max = maxVal;}
+        let idt = intDistType.Uniform {uniformIntegerDistParams.min=minVal; max = maxVal;}
         let rng = RngGen.createLcg seed
         intArray idt count rng outName
 
     let normalInts (mean:float) (stdev:float) 
                    (seed:RandomSeed) (count:int) (outName:string) =
-        let idt = IntDistType.Normal {NormalIntegerDistParams.mean = mean; stdDev = stdev;}
+        let idt = intDistType.Normal {normalIntegerDistParams.mean = mean; stdDev = stdev;}
         let rng = RngGen.createLcg seed
         intArray idt count rng outName
 
@@ -151,7 +151,7 @@ module CauseSpecSorters =
                      sorterSetName
                      ] |> Map.ofList
         {
-            CauseSpec.id = CauseSpecId.fromGuid id; 
+            causeSpec.id = CauseSpecId.fromGuid id; 
             genus=["Sorters"; "rndGen"]; 
             prams=prams;
         }
@@ -161,7 +161,7 @@ module CauseSpecSorters =
     let evalToSorterPerfBins 
               (degree:string*Degree)
               (sorterSetName:string*string)
-              (switchUsePlan:string*Sorting.SwitchUsePlan)
+              (switchUsePlan:string*Sorting.switchUsePlan)
               (sortableSet:string*sortableSetSpec)
               (sorterSaving:string*sorterSaving)
               (useParallel:string*bool)
@@ -183,7 +183,7 @@ module CauseSpecSorters =
                      resultsName
                      ] |> Map.ofList
         {
-            CauseSpec.id = CauseSpecId.fromGuid id; 
+            causeSpec.id = CauseSpecId.fromGuid id; 
             genus=["Sorters"; "evalToSorterPerfBins"]; 
             prams=prams;
         }
@@ -194,7 +194,7 @@ module CauseSpecSorters =
               (sorterGen:string*sorterRndGen)
               (sorterCount:string*SorterCount)
               (rndGen:string*RngGen) 
-              (switchUsePlan:string*Sorting.SwitchUsePlan)
+              (switchUsePlan:string*Sorting.switchUsePlan)
               (sortableSet:string*sortableSetSpec)
               (sorterSaving:string*sorterSaving)
               (useParallel:string*bool)
@@ -219,7 +219,7 @@ module CauseSpecSorters =
                      resultsName
                      ] |> Map.ofList
         {
-            CauseSpec.id = CauseSpecId.fromGuid id; 
+            causeSpec.id = CauseSpecId.fromGuid id; 
             genus=["Sorters"; "genToSorterPerfBins"]; 
             prams=prams;
         }
@@ -230,7 +230,7 @@ module CauseSpecSorters =
               (sorterRndGen:string*sorterRndGen)
               (sorterCount:string*SorterCount)
               (rndGen:string*RngGen) 
-              (switchUsePlan:string*Sorting.SwitchUsePlan)
+              (switchUsePlan:string*Sorting.switchUsePlan)
               (sortableSet:string*sortableSetSpec)
               (sorterSaving:string*sorterSaving)
               (useParallel:string*bool)
@@ -256,7 +256,7 @@ module CauseSpecSorters =
                      resultsName
                      ] |> Map.ofList
         {
-            CauseSpec.id = CauseSpecId.fromGuid id; 
+            causeSpec.id = CauseSpecId.fromGuid id; 
             genus=["Sorters"; "rndGenToPerfBins"]; 
             prams=prams;
         }
@@ -267,7 +267,7 @@ module CauseSpecSorters =
               (sorterRndGen:string*sorterRndGen)
               (sorterCount:string*SorterCount)
               (rndGen:string*RngGen) 
-              (switchUsePlan:string*Sorting.SwitchUsePlan)
+              (switchUsePlan:string*Sorting.switchUsePlan)
               (sortableSet:string*sortableSetSpec)
               (useParallel:string*bool)
               (resultsName:string*string) =
@@ -291,7 +291,7 @@ module CauseSpecSorters =
                      resultsName
                      ] |> Map.ofList
         {
-            CauseSpec.id = CauseSpecId.fromGuid id; 
+            causeSpec.id = CauseSpecId.fromGuid id; 
             genus=["Sorters"; "rndStoHillClimb"]; 
             prams=prams;
         }

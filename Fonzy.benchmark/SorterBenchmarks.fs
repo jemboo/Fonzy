@@ -19,7 +19,7 @@ type BenchSorterOnInts() =
         let ssR = SortingInts.sorterWithNoSAG
                               sorter16 
                               rollout 
-                              Sorting.SwitchUsePlan.All
+                              Sorting.switchUsePlan.All
         ssR 
 
 
@@ -28,7 +28,7 @@ type BenchSorterOnInts() =
         let ssR = SortingInts.sorterMakeSwitchUses 
                               sorter16 
                               rollout 
-                              Sorting.SwitchUsePlan.All
+                              Sorting.switchUsePlan.All
         ssR
 
 
@@ -37,8 +37,8 @@ type BenchSorterOnInts() =
         let ssR = SortingInts.evalSorterOnBinary 
                             sorter16 
                             sortableSetBinary 
-                            Sorting.SwitchUsePlan.All
-                            Sorting.EventGrouping.BySwitch
+                            Sorting.switchUsePlan.All
+                            Sorting.eventGrouping.BySwitch
         ssR
 
 
@@ -83,8 +83,8 @@ type BenchSorterSetOnInts() =
         let ssR = SortingOps.SorterSet.eval
                         mediocreSorterSet 
                         sortableSetAllBits
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.NoGrouping
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.NoGrouping
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
         ssR 
@@ -97,8 +97,8 @@ type BenchSorterSetOnInts() =
         let ssR = SortingOps.SorterSet.eval
                         mediocreSorterSet 
                         sortableSetAllBits 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
         ssR 
@@ -110,8 +110,8 @@ type BenchSorterSetOnInts() =
         let ssR = SortingOps.SorterSet.eval
                         mediocreSorterSet 
                         sortableSetAllBits
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.NoGrouping
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.NoGrouping
                         (UseParallel.create false)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
         ssR 
@@ -122,8 +122,8 @@ type BenchSorterSetOnInts() =
         let ssR = SortingOps.SorterSet.eval
                         mediocreSorterSet 
                         sortableSetAllBits 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.BySwitch
                         (UseParallel.create false)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
         ssR 
@@ -149,7 +149,7 @@ type BenchmarkSorterOnBp64() =
         let ssR = SortingBp64.sorterWithNoSAG
                               sorter16 
                               rollout 
-                              Sorting.SwitchUsePlan.All
+                              Sorting.switchUsePlan.All
         ssR 
 
 
@@ -158,7 +158,7 @@ type BenchmarkSorterOnBp64() =
         let ssR = SortingBp64.sorterMakeSwitchUses 
                               sorter16 
                               rollout 
-                              Sorting.SwitchUsePlan.All
+                              Sorting.switchUsePlan.All
         ssR
 
 
@@ -167,8 +167,8 @@ type BenchmarkSorterOnBp64() =
         let ssR = SortingBp64.evalSorter 
                             sorter16 
                             sortableSetbp64 
-                            Sorting.SwitchUsePlan.All
-                            Sorting.EventGrouping.BySwitch
+                            Sorting.switchUsePlan.All
+                            Sorting.eventGrouping.BySwitch
         ssR
 
 
@@ -215,7 +215,7 @@ type BenchmarkSorterSetOnBp64() =
     //                    mediocreSorterSet 
     //                    sortableSetAllBits
     //                    Sorting.SwitchUsePlan.All
-    //                    Sorting.EventGrouping.NoGrouping
+    //                    Sorting.eventGrouping.NoGrouping
     //                    (UseParallel.create true)
     //                    (SortingEval.SorterCoverage.fromSwitchEventRecords true)
     //    ssR 
@@ -228,8 +228,8 @@ type BenchmarkSorterSetOnBp64() =
         let ssR = SortingOps.SorterSet.eval
                         mediocreSorterSet 
                         sortableSetAllBits 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
         ssR 
@@ -242,7 +242,7 @@ type BenchmarkSorterSetOnBp64() =
     //                    mediocreSorterSet 
     //                    sortableSetAllBits
     //                    Sorting.SwitchUsePlan.All
-    //                    Sorting.EventGrouping.NoGrouping
+    //                    Sorting.eventGrouping.NoGrouping
     //                    (UseParallel.create false)
     //                    (SortingEval.SorterCoverage.fromSwitchEventRecords true)
     //    ssR 
@@ -254,7 +254,7 @@ type BenchmarkSorterSetOnBp64() =
     //                    mediocreSorterSet 
     //                    sortableSetAllBits 
     //                    Sorting.SwitchUsePlan.All
-    //                    Sorting.EventGrouping.BySwitch
+    //                    Sorting.eventGrouping.BySwitch
     //                    (UseParallel.create false)
     //                    (SortingEval.SorterCoverage.fromSwitchEventRecords true)
     //    ssR 

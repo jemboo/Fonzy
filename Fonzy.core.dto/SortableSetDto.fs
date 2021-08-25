@@ -42,7 +42,7 @@ module SortableSetIntsDto =
                 let! id = SortableSetId.create dto.id
                 let! degree = Degree.create "" dto.degree
                 let sias = dto.sortableIntArrays 
-                           |> Array.map(fun avs -> {IntBits.values = avs})
+                           |> Array.map(fun avs -> {intBits.values = avs})
                 return  {
                             sortableSetBinary.id = id
                             degree = degree

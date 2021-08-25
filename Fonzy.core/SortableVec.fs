@@ -27,7 +27,7 @@ module SortableVec =
 
 
     let fromIntBits (degree:Degree)
-                    (intBits:seq<IntBits>) =
+                    (intBits:seq<intBits>) =
         intBits |> BitsP64.fromIntBits
                 |> fromBitsP64 degree
 

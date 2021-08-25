@@ -3,7 +3,7 @@ open System
 
 module SorterGen =
 
-    let fromTwoCycleArray (tc:TwoCyclePerm[]) =
+    let fromTwoCycleArray (tc:twoCyclePerm[]) =
         let switches = tc |> Seq.map(fun tc-> Switch.fromTwoCyclePerm tc)
                           |> Seq.concat |> Seq.toArray
         Sorter.fromSwitches tc.[0].degree switches
@@ -225,7 +225,7 @@ module SorterRndGen =
 
     let fromTwoCyclePerms 
                 (wPfx: Switch seq) 
-                (tc:TwoCyclePerm[]) =
+                (tc:twoCyclePerm[]) =
         let switches = tc |> Seq.map(fun tc-> Switch.fromTwoCyclePerm tc)
                           |> Seq.concat
         fromSwitchesAndPrefix tc.[0].degree wPfx switches

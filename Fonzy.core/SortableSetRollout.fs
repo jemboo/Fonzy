@@ -1,7 +1,7 @@
 ﻿namespace global
 open System
 
-type IntSetsRollout = 
+type intSetsRollout = 
         {   degree:Degree; 
             baseArray:int[]; 
             sortableCount:SortableCount  }
@@ -15,7 +15,7 @@ type bP64SetsRollout =
 
 
 type sortableSetRollout =
-    | Int of IntSetsRollout
+    | Int of intSetsRollout
     | Bp64 of bP64SetsRollout
 
 
@@ -30,7 +30,7 @@ module IntSetsRollout =
             let baseCopy = Array.zeroCreate baseArray.Length
             Array.Copy(baseArray, baseCopy, baseArray.Length)
             {
-                IntSetsRollout.degree = degree; 
+                intSetsRollout.degree = degree; 
                 baseArray = baseCopy; 
                 sortableCount = SortableCount.fromInt 
                     (baseCopy.Length / (Degree.value degree))
@@ -38,7 +38,7 @@ module IntSetsRollout =
 
 
     let fromIntBits (degree:Degree) 
-                    (baseArrays:IntBits seq) =
+                    (baseArrays:intBits seq) =
         result {
             let a = baseArrays |> Seq.map(fun a -> a.values)
                                |> Seq.collect(id)
@@ -55,16 +55,16 @@ module IntSetsRollout =
         }
 
 
-    let toIntBits (intsRoll:IntSetsRollout) =
+    let toIntBits (intsRoll:intSetsRollout) =
         let d = (Degree.value intsRoll.degree)
         intsRoll.baseArray |> Seq.chunkBySize d
-                           |> Seq.map(fun a -> {IntBits.values = a})
+                           |> Seq.map(fun a -> {intBits.values = a})
 
 
-    let copy (intsRoll:IntSetsRollout) =
+    let copy (intsRoll:intSetsRollout) =
         let baseCopy = Array.zeroCreate intsRoll.baseArray.Length
         Array.Copy(intsRoll.baseArray, baseCopy, baseCopy.Length)
-        {   IntSetsRollout.degree=intsRoll.degree; 
+        {   intSetsRollout.degree=intsRoll.degree; 
             baseArray=baseCopy;
             sortableCount=intsRoll.sortableCount }
 
@@ -75,12 +75,12 @@ module IntSetsRollout =
         create degree baseArray
 
 
-    let isSorted (intsRoll:IntSetsRollout) =
+    let isSorted (intsRoll:intSetsRollout) =
         intsRoll |> toIntBits 
                  |> Seq.forall(IntBits.isSorted)
 
 
-    let sortedCount (intsRoll:IntSetsRollout) =
+    let sortedCount (intsRoll:intSetsRollout) =
         let d = (Degree.value intsRoll.degree)
         seq {0 .. d .. (intsRoll.baseArray.Length - 1)}
             |> Seq.filter (fun dex -> 
@@ -88,19 +88,19 @@ module IntSetsRollout =
             |> Seq.length
 
 
-    let intBitsDistinct (intsRoll:IntSetsRollout) =
+    let intBitsDistinct (intsRoll:intSetsRollout) =
         intsRoll |> toIntBits
                  |> Seq.distinct
                  |> Seq.toArray
 
 
-    let intBitsHist (intsRollout:IntSetsRollout) =
+    let intBitsHist (intsRollout:intSetsRollout) =
         intsRollout |> toIntBits
                     |> Seq.countBy id
                     |> Seq.toArray
 
     
-    let removeDupes (intsRollout:IntSetsRollout) =
+    let removeDupes (intsRollout:intSetsRollout) =
         let records = Record64Array.make (intsRollout.degree)
         intsRollout |> toIntBits
                     |> Seq.map(IntBits.toUint64)
@@ -148,7 +148,7 @@ module BP64SetsRollout =
 
 
     let fromIntBits (degree:Degree)
-                    (intBits:seq<IntBits>) =
+                    (intBits:seq<intBits>) =
         intBits |> BitsP64.fromIntBits
                 |> fromBitsP64 degree
 

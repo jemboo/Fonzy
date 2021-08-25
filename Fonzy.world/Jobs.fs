@@ -2,23 +2,23 @@
 open System
 
 
-type Job = 
-     | GetWorld of World
+type job = 
+     | GetWorld of world
      | MakeWorld of WorldAction
 
 module Job =
 
-    let getId (job:Job) = 
+    let getId (job:job) = 
         match job with
         | GetWorld w -> w.id
         | MakeWorld wa -> wa.childId
 
-    let getParentId (job:Job) = 
+    let getParentId (job:job) = 
         match job with
         | GetWorld w -> w.parentId
         | MakeWorld wa -> wa.parentWorld.id
 
-    let getCause (job:Job) = 
+    let getCause (job:job) = 
         match job with
         | GetWorld w -> w.cause
         | MakeWorld wa -> wa.cause

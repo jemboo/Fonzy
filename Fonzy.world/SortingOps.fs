@@ -8,8 +8,8 @@ module SortingOps =
         let eval
                 (sorter:sorter)
                 (sortableSet:sortableSet)
-                (switchusePlan:Sorting.SwitchUsePlan) 
-                (switchEventAgg:Sorting.EventGrouping) =
+                (switchusePlan:Sorting.switchUsePlan) 
+                (switchEventAgg:Sorting.eventGrouping) =
 
             match sortableSet with
             | Binary ssb -> 
@@ -44,8 +44,8 @@ module SortingOps =
             let res = Sorter.eval
                             sorter
                             sSet
-                            Sorting.SwitchUsePlan.All
-                            Sorting.EventGrouping.BySwitch
+                            Sorting.switchUsePlan.All
+                            Sorting.eventGrouping.BySwitch
 
             let switchUses = res |> SwitchEventRecords.getSwitchUses
 
@@ -102,10 +102,10 @@ module SortingOps =
     module SorterSet =
 
       let eval<'T> 
-             (sorterSet:SorterSet)
+             (sorterSet:sorterSet)
              (sortableSet:sortableSet)
-             (switchusePlan:Sorting.SwitchUsePlan) 
-             (switchEventAgg:Sorting.EventGrouping) 
+             (switchusePlan:Sorting.switchUsePlan) 
+             (switchEventAgg:Sorting.eventGrouping) 
              (_parallel:UseParallel) 
              (proc:sortingResult -> Result<'T, string>) =
              
@@ -154,9 +154,9 @@ module SortingOps =
 
 
       let getSorterCoverages 
-            (sorterSet:SorterSet)
+            (sorterSet:sorterSet)
             (sortableSet:sortableSet)
-            (switchusePlan:Sorting.SwitchUsePlan)
+            (switchusePlan:Sorting.switchUsePlan)
             (checkSuccess:bool)
             (_parallel:UseParallel) =
 
@@ -166,7 +166,7 @@ module SortingOps =
                             sorterSet 
                             sortableSet 
                             switchusePlan
-                            Sorting.EventGrouping.BySwitch
+                            Sorting.eventGrouping.BySwitch
                             _parallel
                             (SortingEval.SorterCoverage.fromSwitchEventRecords true)
 

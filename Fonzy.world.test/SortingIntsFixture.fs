@@ -15,13 +15,13 @@ type SortingIntsFixture () =
             SortingInts.sorterMakeSwitchUses
                 TestData.SorterParts.goodRefSorter 
                 TestData.SorterActionRecords.intSetsRolloutOfAll
-                Sorting.SwitchUsePlan.All
+                Sorting.switchUsePlan.All
 
         let resNoGrouping = 
             SortingInts.sorterWithNoSAG 
                 TestData.SorterParts.goodRefSorter 
                 TestData.SorterActionRecords.intSetsRolloutOfAll
-                Sorting.SwitchUsePlan.All
+                Sorting.switchUsePlan.All
         
         let switchUsesGrouping = 
                 resGroupBySwitch
@@ -46,7 +46,7 @@ type SortingIntsFixture () =
             SortingInts.sorterWithNoSAG 
                 refSorter 
                 TestData.SorterActionRecords.intSetsRolloutOfAll
-                Sorting.SwitchUsePlan.All
+                Sorting.switchUsePlan.All
    
 
         let sortedSortablesNoSAG = 
@@ -60,7 +60,7 @@ type SortingIntsFixture () =
             SortingInts.sorterMakeSwitchUses 
                 refSorter 
                 TestData.SorterActionRecords.intSetsRolloutOfAll
-                Sorting.SwitchUsePlan.All
+                Sorting.switchUsePlan.All
    
 
         let sortedSortablesMakeSwitchUses = 
@@ -83,8 +83,8 @@ type SortingIntsFixture () =
                     SortingInts.evalSorterOnBinary 
                         sorter16 
                         sortableSetBinary
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.BySwitch
 
         let usedSwitchCount = switchEventRecords 
                               |> SwitchEventRecords.getUsedSwitchCount
@@ -114,8 +114,8 @@ type SortingIntsFixture () =
         let ssR = SortingOps.SorterSet.eval
                         sorterSet 
                         sortableSetBinary 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
@@ -153,7 +153,7 @@ type SortingIntsFixture () =
                             degree 
                             altEvenSorters
 
-        let makeCoConjSorter (perms:Permutation list) = 
+        let makeCoConjSorter (perms:permutation list) = 
             result {
                 let! stp = perms |> TwoCycleGen.makeCoConjugateEvenOdd
                 let atp = stp |> Seq.toArray
@@ -176,7 +176,7 @@ type SortingIntsFixture () =
         let sorterCovs = SortingOps.SorterSet.getSorterCoverages
                               altEvenSorterSet
                               sortableSetEx
-                              Sorting.SwitchUsePlan.All
+                              Sorting.switchUsePlan.All
                               true
                               (UseParallel.create true)
                         |> Result.ExtractOrThrow
@@ -215,8 +215,7 @@ type SortingIntsFixture () =
                                (SorterCount.value sorterCount)
                                (fun _ -> makeSorter ())  
 
-        let sorterSet = 
-                    SorterSet.fromSorters 
+        let sSet = SorterSet.fromSorters 
                             sorterSetId
                             degree 
                             sorterArray
@@ -227,9 +226,9 @@ type SortingIntsFixture () =
                                 |> Result.ExtractOrThrow 
 
         let sorterCovs = SortingOps.SorterSet.getSorterCoverages
-                            sorterSet
+                            sSet
                             sortableSetEx
-                            Sorting.SwitchUsePlan.All
+                            Sorting.switchUsePlan.All
                             true
                             (UseParallel.create true)
                         |> Result.ExtractOrThrow

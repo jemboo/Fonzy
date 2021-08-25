@@ -4,13 +4,13 @@ open System
 type worldDto = {id:Guid; parentId:Guid; causeSpecDto:causeSpecDto; 
                  enviroDto:enviroDto}
 module WorldDto = 
-    let toDto (w:World) =
+    let toDto (w:world) =
         {worldDto.id = WorldId.value w.id;
          worldDto.parentId = WorldId.value w.parentId;
          worldDto.causeSpecDto = w.cause.causeSpec |> CauseSpecDto.toDto;
          worldDto.enviroDto = w.enviro |> EnviroDto.toDto}
 
-    let toJson (w:World) =
+    let toJson (w:world) =
         w |> toDto |> Json.serialize
 
     let fromDto (wDto:worldDto) =
@@ -21,10 +21,10 @@ module WorldDto =
              let! cs = wDto.causeSpecDto |> CauseSpecDto.fromDto;
              let! c = cs |> Causes.fromCauseSpec
              return  {
-                 World.id = worldId;
-                 World.parentId = parentId
-                 World.cause = c
-                 World.enviro = e
+                 world.id = worldId;
+                 parentId = parentId
+                 cause = c
+                 enviro = e
                 } 
             }
 

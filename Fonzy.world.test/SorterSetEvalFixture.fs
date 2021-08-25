@@ -38,8 +38,8 @@ type SorterSetEvalFixture () =
         let ssR = SortingOps.SorterSet.eval
                         mediocreSorterSet 
                         sortableSetAllBits
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.NoGrouping
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.NoGrouping
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
          
@@ -78,8 +78,8 @@ type SorterSetEvalFixture () =
         let ssR = SortingOps.SorterSet.eval
                         subSorterSet 
                         sortableSetAllBits
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.NoGrouping
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.NoGrouping
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                     |> Result.ExtractOrThrow
@@ -129,7 +129,7 @@ type SorterSetEvalFixture () =
         let sorterCovs = SortingOps.SorterSet.getSorterCoverages
                               subSorterSet
                               sortableSetAllBits
-                              Sorting.SwitchUsePlan.All
+                              Sorting.switchUsePlan.All
                               true
                               (UseParallel.create false)
                          |> Result.ExtractOrThrow 
@@ -148,8 +148,8 @@ type SorterSetEvalFixture () =
         let ssR = SortingOps.SorterSet.eval
                         subSorterSet 
                         sortableSetAllBits
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.NoGrouping
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.NoGrouping
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                     |> Result.ExtractOrThrow
@@ -204,8 +204,8 @@ type SorterSetEvalFixture () =
         let ssR = SortingOps.SorterSet.eval
                         subSorterSet 
                         sortableSetAllBits
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.NoGrouping
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.NoGrouping
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                     |> Result.ExtractOrThrow

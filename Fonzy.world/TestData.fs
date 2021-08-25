@@ -25,7 +25,7 @@ module TestData =
             let arrayCount = 103
 
 
-            let intDistType = IntDistType.Uniform (UniformIntegerDistParams.zeroCentered 5)
+            let intDistType = intDistType.Uniform (UniformIntegerDistParams.zeroCentered 5)
             let rndUniform = CauseSpecRandGen.intArray 
                                                 intDistType arrayCount 
                                                 (nextRnGen()) arrayName
@@ -47,7 +47,7 @@ module TestData =
             let sorterSetId3 = SorterSetId.fromGuid (Guid.Parse "11100000-0000-0000-0000-000000000222")
             let sorterEvalId = SorterSetId.fromGuid (Guid.Parse "11110000-0000-0000-0000-000000000222")
 
-            let intDistType = IntDistType.Normal (NormalIntegerDistParams.zeroCentered 1.0)
+            let intDistType = intDistType.Normal (NormalIntegerDistParams.zeroCentered 1.0)
             let stageCount = StageCount.degreeTo999StageCount TestData.degree
             let switchCount = stageCount |>  StageCount.toSwitchCount TestData.degree
             let switchPrefixCount = (Degree.value TestData.degree) / 2 
@@ -82,7 +82,7 @@ module TestData =
             let rand3 = srgPr sorterSetId3 sorterRndGen
                              sorterCount (nextRnGen()) rndSorterSetName
 
-            let switchUsePlan = Sorting.SwitchUsePlan.All
+            let switchUsePlan = Sorting.switchUsePlan.All
 
             let evalMush d ssn sup sbset ssav up resn =
                 CauseSpecSorters.evalToSorterPerfBins 
@@ -152,8 +152,8 @@ module TestData =
         let map2 = [("key21","val21"); ("key22","val22"); ("key23","val23"); ("key24","val24")]
                    |> Map.ofList
 
-        let enviro1 = Enviro.ObjectMap map1
-        let enviro2 = Enviro.ObjectMap map2
+        let enviro1 = enviro.ObjectMap map1
+        let enviro2 = enviro.ObjectMap map2
 
         let world1 = World.create world1ParentId Causes.noOp enviro1
         let world2 = World.create world2ParentId Causes.noOp enviro2
@@ -177,7 +177,7 @@ module TestData =
                    outputKey="key22"}
 
         let mapM = [("keyM1","valM1");] |> Map.ofList
-        let enviroM = Enviro.ObjectMap mapM
+        let enviroM = enviro.ObjectMap mapM
         let mergeMapItems = [mm1;mm2]
         
 

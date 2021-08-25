@@ -11,7 +11,7 @@ type CauseSpecsDtoFixture () =
         let genArrayName = "genA"
         let arrayCount = 103
         let randy = RngGen.createLcg (22 |> RandomSeed.fromInt)
-        let intDistType = IntDistType.Uniform (UniformIntegerDistParams.zeroCentered 5)
+        let intDistType = intDistType.Uniform (UniformIntegerDistParams.zeroCentered 5)
         let csIntGen = CauseSpecRandGen.intArray intDistType arrayCount randy genArrayName
 
         let dto = CauseSpecDto.toDto csIntGen

@@ -1,7 +1,7 @@
 ﻿namespace global
 open System
 
-type SorterSet = { id:SorterSetId; 
+type sorterSet = { id:SorterSetId; 
                    degree:Degree; 
                    sorterCount:SorterCount; 
                    sorters:Map<SorterId, sorter> }
@@ -15,7 +15,7 @@ module SorterSet =
                 |> Seq.map(fun s-> (s |> Sorter.makeId, s))
                 |> Map.ofSeq
         {
-            SorterSet.id =sorterSetId;
+            sorterSet.id =sorterSetId;
             degree=degree; 
             sorterCount= SorterCount.fromInt sorterArray.Count; 
             sorters = sorterArray

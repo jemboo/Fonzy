@@ -16,13 +16,13 @@ type SortingBp64Fixture () =
             SortingBp64.sorterMakeSwitchUses
                 refSorter
                 TestData.SorterActionRecords.bP64SetsRolloutOfAll
-                Sorting.SwitchUsePlan.All
+                Sorting.switchUsePlan.All
 
         let resNoGrouping = 
             SortingBp64.sorterWithNoSAG 
                 refSorter
                 TestData.SorterActionRecords.bP64SetsRolloutOfAll
-                Sorting.SwitchUsePlan.All
+                Sorting.switchUsePlan.All
 
         let switchUsesGrouping = 
                 resGroupBySwitch
@@ -49,7 +49,7 @@ type SortingBp64Fixture () =
             SortingBp64.sorterWithNoSAG 
                 refSorter 
                 TestData.SorterActionRecords.bP64SetsRolloutOfAll
-                Sorting.SwitchUsePlan.All
+                Sorting.switchUsePlan.All
    
         let sortedSortablesNoSAG = 
                 switchEventRecordsNoSAG
@@ -63,7 +63,7 @@ type SortingBp64Fixture () =
             SortingBp64.sorterMakeSwitchUses 
                 refSorter 
                 TestData.SorterActionRecords.bP64SetsRolloutOfAll
-                Sorting.SwitchUsePlan.All
+                Sorting.switchUsePlan.All
    
         let sortedSortablesMakeSwitchUses = 
                 switchEventRecordsMakeSwitchUses
@@ -85,8 +85,8 @@ type SortingBp64Fixture () =
                         SortingBp64.evalSorter 
                             sorter16 
                             ssBp64
-                            Sorting.SwitchUsePlan.All
-                            Sorting.EventGrouping.BySwitch
+                            Sorting.switchUsePlan.All
+                            Sorting.eventGrouping.BySwitch
 
         let usedSwitchCount = switchEventRecords 
                               |> SwitchEventRecords.getUsedSwitchCount
@@ -118,8 +118,8 @@ type SortingBp64Fixture () =
         let ssRBp = SortingOps.SorterSet.eval
                         sorterSet 
                         sortableSetBps 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
@@ -138,8 +138,8 @@ type SortingBp64Fixture () =
         let ssRBp = SortingOps.SorterSet.eval
                         sorterSet 
                         sortableSetBps 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
@@ -153,8 +153,8 @@ type SortingBp64Fixture () =
         let ssR = SortingOps.SorterSet.eval
                         sorterSet 
                         sortableSetBinary 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow

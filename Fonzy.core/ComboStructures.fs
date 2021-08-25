@@ -4,10 +4,10 @@ open System.Numerics
 
 
 // a permutation of the set {0, 1,.. (degree-1)}
-type Permutation = private {degree:Degree; values:int[] }
+type permutation = private {degree:Degree; values:int[] }
 module Permutation =
     let create (degree:Degree) (vals:int[]) =
-            {Permutation.degree=degree; values=vals }
+            {permutation.degree=degree; values=vals }
 
     let createR (degree:Degree) (vals:int[]) =
         if vals.Length <> (Degree.value degree) then
@@ -26,36 +26,36 @@ module Permutation =
     let arrayValues perm = perm.values
     let degree perm = perm.degree
 
-    let areEqual (permA:Permutation) (permB:Permutation) =
+    let areEqual (permA:permutation) (permB:permutation) =
         true
 
-    let isTwoCycle (perm:Permutation) =
+    let isTwoCycle (perm:permutation) =
         Combinatorics.isTwoCycle perm.values
 
     let inRange (degree:Degree) (value:int) =
        ((value > -1) && (value < (Degree.value degree)))
 
-    let inverse (p:Permutation) =
+    let inverse (p:permutation) =
         create p.degree (Combinatorics.inverseMapArray (p |> arrayValues))
 
-    let product (pA:Permutation) (pB:Permutation) =
+    let product (pA:permutation) (pB:permutation) =
         create pA.degree  (Combinatorics.composeMapIntArrays 
                                 (pA |> arrayValues) 
                                 (pB |> arrayValues))
 
-    let conjugate (pA:Permutation) (conj:Permutation) =
+    let conjugate (pA:permutation) (conj:permutation) =
         create pA.degree  (Combinatorics.conjugateIntArrays 
                                 (pA |> arrayValues) 
                                 (conj |> arrayValues))
 
-    let productR (pA:Permutation) (pB:Permutation) =
+    let productR (pA:permutation) (pB:permutation) =
         if (Degree.value pA.degree) <> (Degree.value pB.degree) then
                 Error (sprintf "degree %d <> degree %d:" 
                         (Degree.value pA.degree) (Degree.value pB.degree))
         else
             product pA pB |> Ok
 
-    let powers (maxPower:int) (perm:Permutation)  =
+    let powers (maxPower:int) (perm:permutation)  =
         let mutable loop = true
         let mutable curPerm = perm
         let mutable curPow = 0
@@ -82,7 +82,7 @@ module Permutation =
         Seq.initInfinite(fun _ -> createRandom degree rnd)
 
  // a permutation of the set {0, 1,.. (degree-1)}, that is it's own inverse
-type TwoCyclePerm = private { degree:Degree; values:int[] }
+type twoCyclePerm = private { degree:Degree; values:int[] }
 module TwoCyclePerm =
     let create (degree:Degree) (values:int[]) = 
         if (Degree.value degree) <> values.Length then
@@ -96,24 +96,24 @@ module TwoCyclePerm =
     let arrayValues perm = perm.values
     let degree perm = perm.degree
 
-    let toPermutation (tcp:TwoCyclePerm) =
-        { Permutation.degree = tcp.degree; 
-          Permutation.values = tcp.values }
+    let toPermutation (tcp:twoCyclePerm) =
+        { permutation.degree = tcp.degree; 
+          values = tcp.values }
 
-    let product (pA:TwoCyclePerm) (pB:TwoCyclePerm) =
+    let product (pA:twoCyclePerm) (pB:twoCyclePerm) =
         create pA.degree  (Combinatorics.composeMapIntArrays 
                                 (pA |> arrayValues) 
                                 (pB |> arrayValues))
 
-    let conjugate (pA:TwoCyclePerm) (conj:Permutation) =
+    let conjugate (pA:twoCyclePerm) (conj:permutation) =
         create pA.degree  (Combinatorics.conjugateIntArrays 
                                 (pA |> arrayValues) 
                                 (conj |> Permutation.arrayValues))
 
-    let toTwoCycle (perm:Permutation) =
+    let toTwoCycle (perm:permutation) =
         if (Permutation.isTwoCycle perm) then
-            { TwoCyclePerm.degree = perm.degree; 
-              TwoCyclePerm.values = perm.values } |> Result.Ok
+            { twoCyclePerm.degree = perm.degree; 
+              values = perm.values } |> Result.Ok
         else
             "Not a two cycle" |> Error
 
@@ -180,7 +180,7 @@ module TwoCyclePerm =
         }
 
 
-    let reflect (twoCyclePerm:TwoCyclePerm) =
+    let reflect (twoCyclePerm:twoCyclePerm) =
         let deg = (Degree.value twoCyclePerm.degree)
         let refV pos = Combinatorics.reflect deg
                                              pos
@@ -266,7 +266,7 @@ module TwoCycleGen =
         else oddMode degree
 
 
-    let makeAltEvenOdd (degree:Degree) (conj:Permutation) =
+    let makeAltEvenOdd (degree:Degree) (conj:permutation) =
         seq {while true do 
                 yield TwoCyclePerm.conjugate 
                         (evenMode degree) conj; 
@@ -274,8 +274,8 @@ module TwoCycleGen =
                         (oddModeWithCap degree) conj; }
 
 
-    let makeCoConjugateEvenOdd (conj:Permutation list) =
-        let coes (conj:Permutation) =
+    let makeCoConjugateEvenOdd (conj:permutation list) =
+        let coes (conj:permutation) =
             result {
                     let! eve = TwoCyclePerm.conjugate 
                                 (evenMode conj.degree) conj
@@ -290,30 +290,30 @@ module TwoCycleGen =
                }
 
 
-type IntBits = { values:int[] }
+type intBits = { values:int[] }
 module IntBits =
 
     let create (avs:int[]) = 
-        {IntBits.values = avs}
+        {intBits.values = avs}
 
     let zeroCreate (count:int) = 
-        { IntBits.values = 
+        { intBits.values = 
                 Array.create count 0 }
 
-    let copy (intBits:IntBits) = 
-        {IntBits.values = Array.copy (intBits.values) }
+    let copy (intBits:intBits) = 
+        {intBits.values = Array.copy (intBits.values) }
 
-    let isZero (ibs:IntBits) = 
+    let isZero (ibs:intBits) = 
         ibs.values |> Array.forall((=) 0)
 
-    let isSorted (intBits:IntBits) =
+    let isSorted (intBits:intBits) =
         Combinatorics.isSorted intBits.values
 
     let sorted_O_1_Sequence (degree:Degree) 
                             (onesCount:int) =
         let totalSize = (Degree.value degree)
         let numZeroes = totalSize - onesCount
-        { IntBits.values = Array.init totalSize 
+        { intBits.values = Array.init totalSize 
                     (fun i -> if i< numZeroes then 0 else 1)}
 
     //Returns a bloclLen + 1 length array of IntBits
@@ -333,12 +333,12 @@ module IntBits =
     let fromInteger (len:int) (intVers:int) =
         let bitLoc (loc:int) (intBits:int) =
             if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
-        { IntBits.values = 
+        { intBits.values = 
                     Array.init len 
                                (fun i -> bitLoc i intVers) }
 
 
-    let toInteger (arrayVers:IntBits) =
+    let toInteger (arrayVers:intBits) =
         let mutable intRet = 0
         let bump i =
             intRet <- intRet * 2
@@ -354,12 +354,12 @@ module IntBits =
     let fromUint32 (len:int) (intVers:int) =
         let bitLoc (loc:int) (intBits:int) =
             if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
-        { IntBits.values = 
+        { intBits.values = 
                     Array.init len 
                                 (fun i -> bitLoc i intVers) }
         
         
-    let toUint32 (arrayVers:IntBits) =
+    let toUint32 (arrayVers:intBits) =
         let mutable intRet = 0u
         let bump i =
             intRet <- intRet * 2u
@@ -375,12 +375,12 @@ module IntBits =
     let fromUint64 (len:int) (intVers:int) =
         let bitLoc (loc:int) (intBits:int) =
             if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
-        { IntBits.values = 
+        { intBits.values = 
                     Array.init len 
                                 (fun i -> bitLoc i intVers) }
                 
                 
-    let toUint64 (arrayVers:IntBits) =
+    let toUint64 (arrayVers:intBits) =
         let mutable intRet = 0UL
         let bump i =
             intRet <- intRet * 2UL
@@ -408,7 +408,7 @@ module IntBits =
             Array.init (Degree.value degree)
                        (fun _ -> let q = rando.NextFloat
                                  if (q > 0.5) then 1 else 0   )
-        {IntBits.values = perm }
+        {intBits.values = perm }
 
 
     let createRandoms (degree:Degree) 
@@ -438,7 +438,7 @@ module BitsP32 =
         ibs.values |> Array.forall((=) 0u)
 
     let stripeWrite (uBits:bitsP32) 
-                    (intBits:IntBits) 
+                    (intBits:intBits) 
                     (pos:int) = 
         let one = (1u <<< pos)
         let proc dex =
@@ -457,7 +457,7 @@ module BitsP32 =
             if ((uBits.values.[dex] &&& one) > 0u) then
                 1
             else 0
-        { IntBits.values = uBits.values |> Array.mapi (proc) }
+        { intBits.values = uBits.values |> Array.mapi (proc) }
 
 
     let isSorted (uBits:bitsP32) =
@@ -465,7 +465,7 @@ module BitsP32 =
            |> Seq.forall(IntBits.isSorted)
 
 
-    let fromIntBits (ibSeq:IntBits seq) =
+    let fromIntBits (ibSeq:intBits seq) =
         seq { 
               use e = ibSeq.GetEnumerator()
               let nextChunk() =
@@ -532,7 +532,7 @@ module BitsP64 =
         ibs.values |> Array.forall((=) 0UL)
 
     let stripeWrite (uBits:bitsP64) 
-                    (intBits:IntBits) 
+                    (intBits:intBits) 
                     (pos:int) =
 
         ByteUtils.stripeWrite uBits.values
@@ -542,7 +542,7 @@ module BitsP64 =
 
     let stripeRead (uBits:bitsP64) 
                    (pos:int) = 
-        { IntBits.values = ByteUtils.stripeRead uBits.values pos }
+        { intBits.values = ByteUtils.stripeRead uBits.values pos }
 
 
     let isSorted (uBits:bitsP64) =
@@ -550,7 +550,7 @@ module BitsP64 =
            |> Seq.forall(IntBits.isSorted)
 
 
-    let fromIntBits (ibSeq:IntBits seq) =
+    let fromIntBits (ibSeq:intBits seq) =
         seq { 
               use e = ibSeq.GetEnumerator()
               let nextChunk() =
@@ -618,7 +618,7 @@ module Record64Array =
         records.values.[recordPos] <- record
 
 
-    let recordIntBits (records:record64Array) (intBits:IntBits) = 
+    let recordIntBits (records:record64Array) (intBits:intBits) = 
         let pos = intBits |> IntBits.toInteger
         let bitPos = pos % 64
         let recordPos = pos >>> 6 |> int

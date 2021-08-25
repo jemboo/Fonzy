@@ -10,7 +10,7 @@ type CausesFixture () =
     member this.CauseFromCauseSpecIntArrayRandGen () =
         let cause = Causes.fromCauseSpec TestData.CauseSpec.IntDist.rndUniform
                         |> Result.ExtractOrThrow
-        let env = Enviro.Empty
+        let env = enviro.Empty
         let newEnv = cause.op env |> Result.ExtractOrThrow
         let causedProd =  
             Enviro.getDto<intDistDto> 
@@ -26,7 +26,7 @@ type CausesFixture () =
     member this.CauseFromCauseSpecInt2dArrayRandGen () =
         let cause = Causes.fromCauseSpec TestData.CauseSpec.IntDist.rnd2dUniform 
                                 |> Result.ExtractOrThrow
-        let env = Enviro.Empty
+        let env = enviro.Empty
         let newEnv = cause.op env |> Result.ExtractOrThrow
         let causedProd =  
             Enviro.getDto<int2dDistDto> 
@@ -41,7 +41,7 @@ type CausesFixture () =
     //member this.CauseFromRndGenSorterSet() =
     //    let cause = Causes.fromCauseSpec TestData.CauseSpec.SorterSet.rand1 
     //                            |> Result.ExtractOrThrow
-    //    let env = Enviro.Empty
+    //    let env = enviro.Empty
     //    let newEnv = cause.op env |> Result.ExtractOrThrow
     //    let causedProd =  
     //        Enviro.getDto<sorterSetDto> 
@@ -54,7 +54,7 @@ type CausesFixture () =
 
     //[<TestMethod>]
     //member this.CauseEvalToSorterPerfBins() =
-    //    let envO = Enviro.Empty
+    //    let envO = enviro.Empty
     //    let causeGen = Causes.fromCauseSpec TestData.CauseSpec.SorterSet.rand1 
     //                            |> Result.ExtractOrThrow
     //    let envGen = causeGen.op envO |> Result.ExtractOrThrow
@@ -75,7 +75,7 @@ type CausesFixture () =
 
     //[<TestMethod>]
     //member this.CauseGenToSorterPerfBins() =
-    //    let envO = Enviro.Empty
+    //    let envO = enviro.Empty
     //    let causeGen = Causes.fromCauseSpec TestData.CauseSpec.SorterSet.rand1 
     //                            |> Result.ExtractOrThrow
     //    let envGen = causeGen.op envO |> Result.ExtractOrThrow

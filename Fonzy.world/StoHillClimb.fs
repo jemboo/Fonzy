@@ -174,7 +174,7 @@ module SorterShc =
                 let swEvRecs = SortingOps.Sorter.eval sShc.sorter
                                        sortableSet
                                        suPlan
-                                       Sorting.EventGrouping.BySwitch
+                                       Sorting.eventGrouping.BySwitch
                 let switchUses = swEvRecs
                                  |> SortingEval.SwitchEventRecords.getSwitchUses
                 let usedSwitches = sShc.sorter 

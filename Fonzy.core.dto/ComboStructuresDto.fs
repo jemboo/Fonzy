@@ -7,7 +7,7 @@ module PermutationDto =
             let! degree = Degree.create "" dto.degree
             return! Permutation.createR degree dto.values
         }
-    let toDto (perm:Permutation) =
+    let toDto (perm:permutation) =
         {degree = (Degree.value (Permutation.degree perm)); 
          values = Permutation.arrayValues perm}
         
@@ -26,7 +26,7 @@ module TwoCyclePermDto =
             let! degree = Degree.create "" dto.degree
             return! TwoCyclePerm.create degree dto.values
         }
-    let toDto (tcp:TwoCyclePerm) =
+    let toDto (tcp:twoCyclePerm) =
         {degree = (Degree.value (TwoCyclePerm.degree tcp)); 
          values =  TwoCyclePerm.arrayValues tcp;}
 

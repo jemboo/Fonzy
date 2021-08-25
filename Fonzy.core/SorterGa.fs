@@ -1,8 +1,8 @@
 ﻿namespace global
 
 type SorterGenome = 
-    | Permutaions of List<TwoCyclePerm>
-    | DualPerm of List<TwoCyclePerm * TwoCyclePerm * int>
+    | Permutaions of List<twoCyclePerm>
+    | DualPerm of List<twoCyclePerm * twoCyclePerm * int>
     | Switches of List<Switch>
 
 type SorterPhenotype = 

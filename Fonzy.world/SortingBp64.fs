@@ -32,7 +32,7 @@ module SortingBp64 =
     let sorterWithNoSAG
                 (sorter:sorter) 
                 (bP64SetsRollout:bP64SetsRollout) 
-                (switchusePlan:Sorting.SwitchUsePlan) =
+                (switchusePlan:Sorting.switchUsePlan) =
 
         let switchCount = (SwitchCount.value sorter.switchCount)
 
@@ -49,11 +49,11 @@ module SortingBp64 =
 
         let firstSwitchDex, lastSwitchDex, seRollbp64 = 
             match switchusePlan with
-            | Sorting.SwitchUsePlan.All -> 
+            | Sorting.switchUsePlan.All -> 
                 (0, switchCount, emptyRollout ())
-            | Sorting.SwitchUsePlan.Range (min, max) -> 
+            | Sorting.switchUsePlan.Range (min, max) -> 
                 (min, max, emptyRollout ())
-            | Sorting.SwitchUsePlan.Indexes (min, max, swu) -> 
+            | Sorting.switchUsePlan.Indexes (min, max, swu) -> 
                 (min, max, switchPlanRollout swu.weights)
         
         let bPsRollCopy = BP64SetsRollout.copy bP64SetsRollout
@@ -104,16 +104,16 @@ module SortingBp64 =
     let sorterMakeSwitchUses
                     (sorter:sorter) 
                     (bp64SetsRollout:bP64SetsRollout)  
-                    (switchusePlan:Sorting.SwitchUsePlan) =
+                    (switchusePlan:Sorting.switchUsePlan) =
 
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex, switchUseB64 =
             match switchusePlan with
-            | Sorting.SwitchUsePlan.All -> 
+            | Sorting.switchUsePlan.All -> 
                 (0, switchCount, (SwitchUseB64.createEmpty sorter.switchCount))
-            | Sorting.SwitchUsePlan.Range (min, max) -> 
+            | Sorting.switchUsePlan.Range (min, max) -> 
                 (min, max, (SwitchUseB64.createEmpty sorter.switchCount))
-            | Sorting.SwitchUsePlan.Indexes (min, max, swu) -> 
+            | Sorting.switchUsePlan.Indexes (min, max, swu) -> 
                 (min, max, (SwitchUseB64.init sorter.switchCount swu.weights))
 
         let bp64SetsRolloutCopy = (BP64SetsRollout.copy bp64SetsRollout)
@@ -140,17 +140,17 @@ module SortingBp64 =
     let evalSorterOnBP64SetsRollout
                     (sorter:sorter)
                     (bp64SetsRollout:bP64SetsRollout)
-                    (switchusePlan:Sorting.SwitchUsePlan) 
-                    (switchEventAgg:Sorting.EventGrouping) =
+                    (switchusePlan:Sorting.switchUsePlan) 
+                    (switchEventAgg:Sorting.eventGrouping) =
 
         match switchEventAgg with
-        | Sorting.EventGrouping.NoGrouping -> 
+        | Sorting.eventGrouping.NoGrouping -> 
                 sorterWithNoSAG
                       sorter 
                       bp64SetsRollout 
                       switchusePlan
 
-        | Sorting.EventGrouping.BySwitch -> 
+        | Sorting.eventGrouping.BySwitch -> 
                 sorterMakeSwitchUses 
                     sorter 
                     bp64SetsRollout 
@@ -159,8 +159,8 @@ module SortingBp64 =
 
     let evalSorter (sorter:sorter)
                    (sSet:sortableSetBp64)
-                   (switchusePlan:Sorting.SwitchUsePlan) 
-                   (switchEventAgg:Sorting.EventGrouping) =
+                   (switchusePlan:Sorting.switchUsePlan) 
+                   (switchEventAgg:Sorting.eventGrouping) =
         let sortableSetRollout = 
             sSet.sortables
                 |> BP64SetsRollout.fromBitsP64
@@ -174,11 +174,11 @@ module SortingBp64 =
     module SorterSet =
 
         let eval<'T> 
-                 (sorterSet:SorterSet)
+                 (sorterSet:sorterSet)
                  (bP64SetsRollout:bP64SetsRollout)
                  (sortableSetId:SortableSetId)
-                 (switchusePlan:Sorting.SwitchUsePlan) 
-                 (switchEventAgg:Sorting.EventGrouping) 
+                 (switchusePlan:Sorting.switchUsePlan) 
+                 (switchEventAgg:Sorting.eventGrouping) 
                  (_parallel:UseParallel) 
                  (proc:sortingResult -> Result<'T, string>) =
 

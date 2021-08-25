@@ -46,10 +46,10 @@ module Switch =
                     if ((j > i ) && (i = pArray.[j]) ) then
                             yield {Switch.low=i; Switch.hi=j} }
 
-    let fromPermutation (p:Permutation) =
+    let fromPermutation (p:permutation) =
         fromIntArray (Permutation.arrayValues p)
      
-    let fromTwoCyclePerm (p:TwoCyclePerm) =
+    let fromTwoCyclePerm (p:twoCyclePerm) =
         fromIntArray (TwoCyclePerm.arrayValues p)
     
     let switchCountForDegree (order:Degree)  =

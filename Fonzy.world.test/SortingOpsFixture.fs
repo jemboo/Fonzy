@@ -17,8 +17,8 @@ type SortingOpsFixture () =
         let ssInts = SortingOps.SorterSet.eval
                         sorterSet 
                         sortableSetInts 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
@@ -31,8 +31,8 @@ type SortingOpsFixture () =
         let ssBp64 = SortingOps.SorterSet.eval
                         sorterSet 
                         sortableSetBp64 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
@@ -51,8 +51,8 @@ type SortingOpsFixture () =
         let ssInts = SortingOps.SorterSet.eval
                         sorterSet 
                         sortableSetInts 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.NoGrouping
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.NoGrouping
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
@@ -65,8 +65,8 @@ type SortingOpsFixture () =
         let ssBp64 = SortingOps.SorterSet.eval
                         sorterSet 
                         sortableSetBp64 
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.NoGrouping
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.NoGrouping
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
@@ -88,15 +88,15 @@ type SortingOpsFixture () =
           SortingInts.evalSorterOnIntSetsRollout
                             tss
                             unSortedIntSetRollout
-                            Sorting.SwitchUsePlan.All
-                            Sorting.EventGrouping.BySwitch
+                            Sorting.switchUsePlan.All
+                            Sorting.eventGrouping.BySwitch
 
       let serFourStage = 
         SortingInts.evalSorterOnIntSetsRollout
                         fss
                         unSortedIntSetRollout
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.BySwitch
 
       let rolloutFromTwoStage =
                     serTwoStage 
@@ -110,8 +110,8 @@ type SortingOpsFixture () =
           SortingInts.evalSorterOnIntSetsRollout
                             sss
                             rolloutFromTwoStage
-                            Sorting.SwitchUsePlan.All
-                            Sorting.EventGrouping.BySwitch
+                            Sorting.switchUsePlan.All
+                            Sorting.eventGrouping.BySwitch
 
       let intBitsFourStage =  
             serFourStage 
@@ -141,15 +141,15 @@ type SortingOpsFixture () =
          SortingInts.evalSorterOnIntSetsRollout
                             tss
                             unSortedIntSetRollout
-                            (Sorting.SwitchUsePlan.Range (0,1))
-                            Sorting.EventGrouping.BySwitch
+                            (Sorting.switchUsePlan.Range (0,1))
+                            Sorting.eventGrouping.BySwitch
       
      let serFourStage = 
          SortingInts.evalSorterOnIntSetsRollout
                         tss
                         unSortedIntSetRollout
-                        (Sorting.SwitchUsePlan.Range (0,2))
-                        Sorting.EventGrouping.BySwitch
+                        (Sorting.switchUsePlan.Range (0,2))
+                        Sorting.eventGrouping.BySwitch
       
      let rolloutFromTwoStage =
                     serTwoStage 
@@ -163,8 +163,8 @@ type SortingOpsFixture () =
         SortingInts.evalSorterOnIntSetsRollout
                             tss
                             rolloutFromTwoStage
-                            (Sorting.SwitchUsePlan.Range (1,2))
-                            Sorting.EventGrouping.BySwitch
+                            (Sorting.switchUsePlan.Range (1,2))
+                            Sorting.eventGrouping.BySwitch
       
      let intBitsFourStage =  
              serFourStage 
@@ -193,15 +193,15 @@ type SortingOpsFixture () =
             SortingBp64.evalSorterOnBP64SetsRollout
                           tss
                           unSortedBP64SetRollout
-                          (Sorting.SwitchUsePlan.Range (0,1))
-                          Sorting.EventGrouping.BySwitch
+                          (Sorting.switchUsePlan.Range (0,1))
+                          Sorting.eventGrouping.BySwitch
 
          let serFourStage = 
              SortingBp64.evalSorterOnBP64SetsRollout
                       tss
                       unSortedBP64SetRollout
-                      (Sorting.SwitchUsePlan.Range (0,2))
-                      Sorting.EventGrouping.BySwitch
+                      (Sorting.switchUsePlan.Range (0,2))
+                      Sorting.eventGrouping.BySwitch
 
          let rolloutFromTwoStage =
                   serTwoStage 
@@ -215,8 +215,8 @@ type SortingOpsFixture () =
              SortingBp64.evalSorterOnBP64SetsRollout
                           tss
                           rolloutFromTwoStage
-                          (Sorting.SwitchUsePlan.Range (1,2))
-                          Sorting.EventGrouping.BySwitch
+                          (Sorting.switchUsePlan.Range (1,2))
+                          Sorting.eventGrouping.BySwitch
 
          let intBitsFourStage =  
            serFourStage 
@@ -247,15 +247,15 @@ type SortingOpsFixture () =
           SortingBp64.evalSorterOnBP64SetsRollout
                             tss
                             unSortedBP64SetRollout
-                            Sorting.SwitchUsePlan.All
-                            Sorting.EventGrouping.BySwitch
+                            Sorting.switchUsePlan.All
+                            Sorting.eventGrouping.BySwitch
 
       let serFourStage = 
           SortingBp64.evalSorterOnBP64SetsRollout
                         fss
                         unSortedBP64SetRollout
-                        Sorting.SwitchUsePlan.All
-                        Sorting.EventGrouping.BySwitch
+                        Sorting.switchUsePlan.All
+                        Sorting.eventGrouping.BySwitch
 
       let rolloutFromTwoStage =
                     serTwoStage 
@@ -269,8 +269,8 @@ type SortingOpsFixture () =
           SortingBp64.evalSorterOnBP64SetsRollout
                             sss
                             rolloutFromTwoStage
-                            Sorting.SwitchUsePlan.All
-                            Sorting.EventGrouping.BySwitch
+                            Sorting.switchUsePlan.All
+                            Sorting.eventGrouping.BySwitch
 
       let intBitsFourStage =  
             serFourStage 

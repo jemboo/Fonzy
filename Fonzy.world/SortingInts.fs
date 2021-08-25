@@ -10,7 +10,7 @@ module SortingInts =
                 (sorter:sorter) 
                 (mindex:int) 
                 (maxdex:int) 
-                (intSetsRoll:IntSetsRollout) 
+                (intSetsRoll:intSetsRollout) 
                 (useTrack:int[])
                 (sortableIndex:int) =
         let mutable looP = true
@@ -38,8 +38,8 @@ module SortingInts =
     // Action Grouping)
     let sorterWithNoSAG 
                     (sorter:sorter) 
-                    (intSetsRollout:IntSetsRollout) 
-                    (switchusePlan:Sorting.SwitchUsePlan) =
+                    (intSetsRollout:intSetsRollout) 
+                    (switchusePlan:Sorting.switchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
 
         let emptyRollout () = 
@@ -54,11 +54,11 @@ module SortingInts =
                             
         let firstSwitchDex, lastSwitchDex, seRollout = 
             match switchusePlan with
-            | Sorting.SwitchUsePlan.All -> 
+            | Sorting.switchUsePlan.All -> 
                 (0, switchCount, emptyRollout())
-            | Sorting.SwitchUsePlan.Range (min, max) -> 
+            | Sorting.switchUsePlan.Range (min, max) -> 
                 (min, max, emptyRollout())
-            | Sorting.SwitchUsePlan.Indexes (min, max, swu) -> 
+            | Sorting.switchUsePlan.Indexes (min, max, swu) -> 
                 (min, max, switchPlanRollout swu.weights)
         let ssRollCopy = IntSetsRollout.copy intSetsRollout
 
@@ -87,7 +87,7 @@ module SortingInts =
                     (mindex:int) 
                     (maxdex:int) 
                     (switchUses:switchUses) 
-                    (sortableSetRollout:IntSetsRollout) 
+                    (sortableSetRollout:intSetsRollout) 
                     (sortableIndex:int) =
         let useWeights = (SwitchUses.getWeights switchUses)
         let sortableSetRolloutOffset = sortableIndex * (Degree.value sorter.degree)
@@ -113,16 +113,16 @@ module SortingInts =
     // switch uses
     let sorterMakeSwitchUses 
                     (sorter:sorter) 
-                    (ssRollout:IntSetsRollout) 
-                    (switchusePlan:Sorting.SwitchUsePlan) =
+                    (ssRollout:intSetsRollout) 
+                    (switchusePlan:Sorting.switchUsePlan) =
         let switchCount = (SwitchCount.value sorter.switchCount)
         let firstSwitchDex, lastSwitchDex, switchUses = 
             match switchusePlan with
-            | Sorting.SwitchUsePlan.All -> 
+            | Sorting.switchUsePlan.All -> 
                 (0, switchCount, (SwitchUses.createEmpty sorter.switchCount))
-            | Sorting.SwitchUsePlan.Range (min, max) -> 
+            | Sorting.switchUsePlan.Range (min, max) -> 
                 (min, max, (SwitchUses.createEmpty sorter.switchCount))
-            | Sorting.SwitchUsePlan.Indexes (min, max, swu) -> 
+            | Sorting.switchUsePlan.Indexes (min, max, swu) -> 
                 let cpyWgts = swu.weights |> Array.copy
                 (min, max, SwitchUses.init cpyWgts)
 
@@ -145,22 +145,22 @@ module SortingInts =
         
     let evalSorterOnIntSetsRollout
                     (sorter:sorter)
-                    (sortableSetRollout:IntSetsRollout)
-                    (switchusePlan:Sorting.SwitchUsePlan) 
-                    (switchEventAgg:Sorting.EventGrouping) =
+                    (sortableSetRollout:intSetsRollout)
+                    (switchusePlan:Sorting.switchUsePlan) 
+                    (switchEventAgg:Sorting.eventGrouping) =
         match switchEventAgg with
-        | Sorting.EventGrouping.NoGrouping -> 
+        | Sorting.eventGrouping.NoGrouping -> 
                 sorterWithNoSAG 
                     sorter sortableSetRollout switchusePlan
-        | Sorting.EventGrouping.BySwitch -> 
+        | Sorting.eventGrouping.BySwitch -> 
                 sorterMakeSwitchUses 
                     sorter sortableSetRollout switchusePlan
 
 
     let evalSorterOnBinary (sorter:sorter)
                    (sortableSet:sortableSetBinary)
-                   (switchusePlan:Sorting.SwitchUsePlan) 
-                   (switchEventAgg:Sorting.EventGrouping) =
+                   (switchusePlan:Sorting.switchUsePlan) 
+                   (switchEventAgg:Sorting.eventGrouping) =
         let sortableSetRollout = 
             sortableSet.sortables
                 |> IntSetsRollout.fromIntBits
@@ -172,8 +172,8 @@ module SortingInts =
 
     let evalSorterOnInteger (sorter:sorter)
                             (sortableSet:sortableSetInteger)
-                            (switchusePlan:Sorting.SwitchUsePlan) 
-                            (switchEventAgg:Sorting.EventGrouping) =
+                            (switchusePlan:Sorting.switchUsePlan) 
+                            (switchEventAgg:Sorting.eventGrouping) =
         let sortableSetRollout = 
             sortableSet.sortables
                 |> IntSetsRollout.fromIntArrays
@@ -187,11 +187,11 @@ module SortingInts =
     module SorterSet =
 
         let eval<'T> 
-                (sorterSet:SorterSet)
-                (intSetsRollout:IntSetsRollout)
+                (sorterSet:sorterSet)
+                (intSetsRollout:intSetsRollout)
                 (sortableSetId:SortableSetId)
-                (switchusePlan:Sorting.SwitchUsePlan) 
-                (switchEventAgg:Sorting.EventGrouping) 
+                (switchusePlan:Sorting.switchUsePlan) 
+                (switchEventAgg:Sorting.eventGrouping) 
                 (_parallel:UseParallel) 
                 (proc:sortingResult -> Result<'T, string>) =
 
@@ -223,7 +223,7 @@ module SortingInts =
     module History =
 
         let sortTHistSwitches(switches:Switch list)
-                             (testCase:IntBits) =
+                             (testCase:intBits) =
             let mutable i = 0
             let mutable lstRet = [testCase]
             let mutable newCase = testCase
@@ -245,14 +245,14 @@ module SortingInts =
         let sortTHistSwitchList (sorter:sorter) 
                                 (mindex:int) 
                                 (maxdex:int) 
-                                (testCase:IntBits) =
+                                (testCase:intBits) =
             let sws = sorter.switches |> Array.skip(mindex)
                                       |> Array.take(maxdex - mindex)
                                       |> Array.toList
             sortTHistSwitches sws testCase
 
 
-        let sortTHist (sorter:sorter) (testCase:IntBits) =
+        let sortTHist (sorter:sorter) (testCase:intBits) =
             let sl = SwitchCount.value sorter.switchCount
             sortTHistSwitchList sorter 0 sl testCase
 

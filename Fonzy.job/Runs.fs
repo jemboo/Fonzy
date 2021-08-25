@@ -6,7 +6,7 @@ module Runs =
 
     let runCauseSpec
                     (outputDir:FilePath) 
-                    (causeSpec:CauseSpec) =
+                    (causeSpec:causeSpec) =
         result {
     
             let directoryDataSource = new DirectoryDataSource(outputDir) 

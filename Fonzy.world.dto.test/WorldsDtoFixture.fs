@@ -11,10 +11,10 @@ type WorldDtoFixture () =
         let genArrayName = "genA"
         let arrayCount = 103
         let randy = RngGen.createLcg (22 |> RandomSeed.fromInt)
-        let intDistType = IntDistType.Uniform (UniformIntegerDistParams.zeroCentered 5)
+        let intDistType = intDistType.Uniform (UniformIntegerDistParams.zeroCentered 5)
         let csIntGen = CauseSpecRandGen.intArray intDistType arrayCount randy genArrayName
         let cause = Causes.fromCauseSpec csIntGen |> Result.ExtractOrThrow
-        let w = World.create (WorldId.fromGuid (Guid.NewGuid())) cause Enviro.Empty
+        let w = World.create (WorldId.fromGuid (Guid.NewGuid())) cause enviro.Empty
         let dto = w |> WorldDto.toDto
         let dtoBack = dto |> Json.serialize |> Json.deserialize<worldDto> |> Result.ExtractOrThrow
         Assert.AreEqual(dto, dtoBack);

@@ -2,7 +2,7 @@
 open System
 
 type sortableSetBinary = {id:SortableSetId; degree:Degree; 
-                            sortables:IntBits[]}
+                            sortables:intBits[]}
 type sortableSetInteger = {id:SortableSetId; degree:Degree; 
                             sortables:int[][]}
 type sortableSetBp64 = {id:SortableSetId; degree:Degree; 
@@ -48,7 +48,7 @@ module SortableSetBinary =
             sortables = sias
         }
 
-    let fromIntBits (degree:Degree) (intBits: IntBits[]) = 
+    let fromIntBits (degree:Degree) (intBits: intBits[]) = 
         let id = seq { intBits:> obj; 
                        degree:> obj;} 
                         |> GuidUtils.guidFromObjs
@@ -85,7 +85,7 @@ module SortableSetInteger =
               sortables = sia
         }
 
-    let fromIntBits (degree:Degree) (intBits: IntBits[]) = 
+    let fromIntBits (degree:Degree) (intBits: intBits[]) = 
         let id = seq { intBits:> obj; 
                        degree:> obj;} 
                         |> GuidUtils.guidFromObjs
@@ -140,7 +140,7 @@ module SortableSetBp64 =
 
 
     let fromIntBits (degree:Degree) 
-                    (intBits: IntBits[]) = 
+                    (intBits: intBits[]) = 
         let id = seq { intBits:> obj; 
                        degree:> obj;} 
                         |> GuidUtils.guidFromObjs

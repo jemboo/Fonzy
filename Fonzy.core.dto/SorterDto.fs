@@ -48,7 +48,7 @@ module SorterSetDto =
             let! sorterDto = cereal |> Json.deserialize<sorterSetDto>
             return! fromDto sorterDto
         }
-    let toDto (sorterSet:SorterSet) =
+    let toDto (sorterSet:sorterSet) =
         {
             sorterSetDto.id = (SorterSetId.value sorterSet.id)
             sorterSetDto.sorterDtos = sorterSet.sorters 
@@ -57,7 +57,7 @@ module SorterSetDto =
                             (kvp |> snd |> SorterDto.toDto))
             sorterSetDto.degree = (Degree.value sorterSet.degree)
         }
-    let toJson (sorters:SorterSet) =
+    let toJson (sorters:sorterSet) =
         sorters |> toDto |> Json.serialize
 
 

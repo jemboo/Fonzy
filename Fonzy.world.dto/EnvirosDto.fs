@@ -1,28 +1,27 @@
 ﻿namespace global
 open System
 
-
 type enviroDto = {cat:string; value:string}
 module EnviroDto =
-    let toDto (env:Enviro) =
+    let toDto (env:enviro) =
         match env with
-        | Enviro.ObjectMap objectMap -> {
-                        cat= nameof Enviro.ObjectMap; 
+        | enviro.ObjectMap objectMap -> {
+                        cat= nameof enviro.ObjectMap; 
                         value = Json.serialize objectMap}
-        | Enviro.Empty -> {
-                        cat = nameof Enviro.Empty; 
+        | enviro.Empty -> {
+                        cat = nameof enviro.Empty; 
                         value = Json.serialize None}
 
-    let toJson (idt:Enviro) =
+    let toJson (idt:enviro) =
         idt |> toDto |> Json.serialize
 
     let fromDto (eDto:enviroDto) =
         match eDto.cat with
-        | nameof Enviro.ObjectMap -> result {
+        | nameof enviro.ObjectMap -> result {
             let! b = Json.deserialize<Map<string, string>> eDto.value
-            return Enviro.ObjectMap b
+            return enviro.ObjectMap b
             }
-        | nameof Enviro.Empty -> Enviro.Empty |> Ok
+        | nameof enviro.Empty -> enviro.Empty |> Ok
         | t -> (sprintf "Invalid Enviro Type: %s" t) |> Error
 
     let fromJson (js:string) =

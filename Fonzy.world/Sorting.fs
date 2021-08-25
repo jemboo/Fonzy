@@ -3,7 +3,7 @@ open System
 
 module Sorting =
 
-    type SwitchUsePlan =
+    type switchUsePlan =
         | All 
         | Range of int*int
         | Indexes of int*int*switchUses
@@ -25,10 +25,10 @@ module Sorting =
                SwitchCount.value totalCount, 
                {switchUses.weights = scArray}
             )
-            |> SwitchUsePlan.Indexes
+            |> switchUsePlan.Indexes
 
 
-    type EventGrouping =
+    type eventGrouping =
         | NoGrouping
         | BySwitch
 

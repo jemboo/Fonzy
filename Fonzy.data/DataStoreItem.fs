@@ -53,7 +53,7 @@ module DataStoreItemDto =
         idt |> toDto |> Json.serialize
 
 
-    let storeWorld (w:World) = 
+    let storeWorld (w:world) = 
             let dto = w |> WorldDto.toDto 
             DataStoreItem.WorldDto dto |> toDto
 

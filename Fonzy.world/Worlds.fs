@@ -1,7 +1,7 @@
 ﻿namespace global
 open System
 
-type World = {id:WorldId; parentId:WorldId; cause:Cause; enviro:Enviro}
+type world = {id:WorldId; parentId:WorldId; cause:Cause; enviro:enviro}
 
 module World = 
     let emptyWorldId = WorldId.fromGuid (Guid.Parse "00000000-0000-0000-0000-000000000000")
@@ -9,10 +9,10 @@ module World =
         {id=emptyWorldId; 
         parentId = WorldId.fromGuid Guid.Empty; 
         cause= Causes.noOp; 
-        enviro=Enviro.Empty}
+        enviro=enviro.Empty}
 
 
-    let create (parentId:WorldId) (cause:Cause) (enviroment:Enviro) =
+    let create (parentId:WorldId) (cause:Cause) (enviroment:enviro) =
           let worldId = GuidUtils.addGuids 
                             (WorldId.value parentId) 
                             (CauseSpecId.value cause.causeSpec.id)
@@ -20,18 +20,18 @@ module World =
           {id=worldId; parentId=parentId; cause=cause; enviro=enviroment}
 
 
-    let createFromParent (parentWorld:World) (cause:Cause) =
+    let createFromParent (parentWorld:world) (cause:Cause) =
         result {
             let! newEnv = cause.op parentWorld.enviro
             return create (parentWorld.id) cause newEnv
         }
      
 
-type WorldAction = {childId:WorldId; parentWorld:World; cause:Cause;}
+type WorldAction = {childId:WorldId; parentWorld:world; cause:Cause;}
 
 module WorldAction =
 
-    let create (parentWorld:World) (cause:Cause) =
+    let create (parentWorld:world) (cause:Cause) =
             {
                 parentWorld = parentWorld; 
                 childId = GuidUtils.addGuids 
@@ -58,14 +58,14 @@ module MergeMapItem =
               outputKey = "sortables"};]
 
 type WorldMerge = {id:WorldMergeId; sourceNameMap: Map<string,Guid>; 
-                   mergeMapItems:MergeMapItem list; enviro:Enviro}
+                   mergeMapItems:MergeMapItem list; enviro:enviro}
 module WorldMerge = 
 
-    let mergeWorlds (mergedWorldId:WorldMergeId) (sourceWorlds:Map<string,World>) 
-                    (mergeMapItems:MergeMapItem list) (mergedEnviro:Enviro) =
+    let mergeWorlds (mergedWorldId:WorldMergeId) (sourceWorlds:Map<string, world>) 
+                    (mergeMapItems:MergeMapItem list) (mergedEnviro:enviro) =
 
         let procMergeMapItem (mergeMapItem:MergeMapItem) 
-                             (sourceWorlds:Map<string,World>) 
+                             (sourceWorlds:Map<string,world>) 
                              (destMapR:Result<Map<string,string>, string>) =
             result {
                 let! sourceWorld = ResultMap.read mergeMapItem.sourceMapName 
@@ -90,7 +90,7 @@ module WorldMerge =
             return {WorldMerge.id = mergedWorldId;
                     sourceNameMap=sourceIds; 
                     mergeMapItems= mergeMapItems;
-                    enviro = Enviro.ObjectMap mergedMap}
+                    enviro = enviro.ObjectMap mergedMap}
         }
 
 

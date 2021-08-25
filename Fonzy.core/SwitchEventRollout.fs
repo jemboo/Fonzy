@@ -4,7 +4,7 @@ open System
 type switchEventRolloutInt = {
             switchCount:SwitchCount; 
             sortableCount:SortableCount; 
-            useRoll:IntBits}
+            useRoll:intBits}
 
 
 type switchEventRolloutBp64 = {

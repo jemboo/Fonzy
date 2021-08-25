@@ -2,11 +2,11 @@
 open System
 
 
-type Cause = {causeSpec:CauseSpec; op:Enviro -> Result<Enviro, string>}
+type Cause = {causeSpec:causeSpec; op:enviro -> Result<enviro, string>}
 
 module CauseSorters = 
-    let rndGen (causeSpec:CauseSpec) =
-        let causer = fun (e:Enviro) ->
+    let rndGen (causeSpec:causeSpec) =
+        let causer = fun (e:enviro) ->
             result {
                 let! sorterSetId = 
                         causeSpec.prams 
@@ -48,8 +48,8 @@ module CauseSorters =
         {Cause.causeSpec=causeSpec; op=causer}
 
 
-    let evalToSorterPerfBins (causeSpec:CauseSpec) =
-        let causer = fun (e:Enviro) ->
+    let evalToSorterPerfBins (causeSpec:causeSpec) =
+        let causer = fun (e:enviro) ->
             result {
                 let! sorterSetName = 
                         causeSpec.prams 
@@ -58,7 +58,7 @@ module CauseSorters =
                 let! switchUsePlan = 
                         causeSpec.prams 
                         |> ResultMap.procKeyedString "switchUsePlan" 
-                                                      (Json.deserialize<Sorting.SwitchUsePlan>)
+                                                      (Json.deserialize<Sorting.switchUsePlan>)
                 let! sortableSet = 
                         causeSpec.prams 
                         |> ResultMap.procKeyedString "sortableSetSpec" 
@@ -104,7 +104,7 @@ module CauseSorters =
                 let! e2 = Enviro.addDto<sorterPerfBinDto[]>
                             resultsName 
                             perfBinsDto
-                            Enviro.Empty 
+                            enviro.Empty 
     
                 return! Enviro.addDto<sorterCoverageDto[]>
                                     (nameof selectedCovs) 
@@ -114,8 +114,8 @@ module CauseSorters =
         {Cause.causeSpec=causeSpec; op=causer}
 
 
-    let rndGenToPerfBins (causeSpec:CauseSpec) =
-        let causer = fun (e:Enviro) ->
+    let rndGenToPerfBins (causeSpec:causeSpec) =
+        let causer = fun (e:enviro) ->
             result {
 
                 let! sorterRndGen = 
@@ -129,11 +129,11 @@ module CauseSorters =
                 let! rngGen = 
                         causeSpec.prams 
                             |> ResultMap.procKeyedString "rndGen" 
-                                                            (RngGenDto.fromJson)
+                                                          (RngGenDto.fromJson)
                 let! switchUsePlan = 
                         causeSpec.prams 
                             |> ResultMap.procKeyedString "switchUsePlan" 
-                                                            (Json.deserialize<Sorting.SwitchUsePlan>)
+                                                         (Json.deserialize<Sorting.switchUsePlan>)
                 let! sortableSetSpec = 
                         causeSpec.prams 
                             |> ResultMap.procKeyedString "sortableSetSpec" 
@@ -158,7 +158,7 @@ module CauseSorters =
                                                 randy
 
                 let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
-                let sorterSet = SorterSet.fromSorters 
+                let sSet = SorterSet.fromSorters 
                                             sorterSetId
                                             (sorterRndGen |> SorterRndGen.getDegree)
                                             sorterArray
@@ -171,7 +171,7 @@ module CauseSorters =
                                                             sorterRndGen
 
                 let! sorterCovs = SortingOps.SorterSet.getSorterCoverages
-                                        sorterSet
+                                        sSet
                                         sortableSetTrim
                                         switchUsePlan
                                         true
@@ -184,14 +184,14 @@ module CauseSorters =
                 let selectedCovs = sorterCovs
                                     |> List.toArray
                                     |> SorterSaving.chooseSorterCoverages
-                                            sorterSet.degree
+                                            sSet.degree
                                             sorterSaving
                                     |> Array.map(SorterCoverageDto.toDto)
 
                 let! e2 = Enviro.addDto<sorterPerfBinDto[]>
                             resultsName 
                             perfBinsDto
-                            Enviro.Empty 
+                            enviro.Empty 
     
                 return! Enviro.addDto<sorterCoverageDto[]>
                                     (nameof selectedCovs)
@@ -201,7 +201,7 @@ module CauseSorters =
 
         {Cause.causeSpec=causeSpec; op=causer}
    
-    let fromCauseSpec (genus:string list) (causeSpec:CauseSpec) = 
+    let fromCauseSpec (genus:string list) (causeSpec:causeSpec) = 
         match genus with
         | [] -> "No CauseSorters genus" |> Error
         | ["rndGen"] -> rndGen causeSpec |> Ok
@@ -212,8 +212,8 @@ module CauseSorters =
 
 
 module CauseRandGen = 
-    let intArray (causeSpec:CauseSpec) = 
-        let causer = fun (e:Enviro) ->
+    let intArray (causeSpec:causeSpec) = 
+        let causer = fun (e:enviro) ->
             result {
                 let! count = 
                     causeSpec.prams 
@@ -242,8 +242,8 @@ module CauseRandGen =
         {Cause.causeSpec=causeSpec; op=causer} |> Ok
         
 
-    let lattice2dArray (causeSpec:CauseSpec) = 
-        let causer = fun (e:Enviro) ->
+    let lattice2dArray (causeSpec:causeSpec) = 
+        let causer = fun (e:enviro) ->
             result {
                 let count = 
                     causeSpec.prams.["count"] 
@@ -270,7 +270,7 @@ module CauseRandGen =
         {Cause.causeSpec=causeSpec; op=causer} |> Ok
 
 
-    let fromCauseSpec (genus:string list) (causeSpec:CauseSpec) = 
+    let fromCauseSpec (genus:string list) (causeSpec:causeSpec) = 
         match genus with
         | [] -> "No CauseRandGen genus" |> Error
         | ["IntArray"] -> intArray causeSpec
@@ -280,9 +280,9 @@ module CauseRandGen =
 
 module Causes =
     let noOp =
-        {Cause.causeSpec=CauseSpec.noOpCauseSpec; op=fun (e:Enviro) -> e|>Ok}
+        {Cause.causeSpec=CauseSpec.noOpCauseSpec; op=fun (e:enviro) -> e|>Ok}
 
-    let fromCauseSpec (causeSpec:CauseSpec) = 
+    let fromCauseSpec (causeSpec:causeSpec) = 
      match causeSpec.genus with
      | [] -> "No CauseSpec genus" |> Error
      | ["NoOp"] -> noOp |> Ok

@@ -5,7 +5,7 @@ module RunBatch =
 
     let runBatchSeq 
             (rndCauseSpecGen : RandomSeed -> FilePath -> 
-                seq<string*FilePath*CauseSpec>)
+                seq<string*FilePath*causeSpec>)
             (outputDir:FilePath) 
             (seed:RandomSeed) 
             (firstDex:int)  =
@@ -49,13 +49,13 @@ module RunBatch =
             result {
                 let! ds = reportDataSource.GetDataSource(g)
                 let! worldDto = ds |> DataStoreItem.getWorldDto
-                let! world = worldDto |> WorldDto.fromDto
+                let! worldMerge = worldDto |> WorldDto.fromDto
                 let! sorterPerfBinsDto =  
                         Enviro.getDto<sorterPerfBinDto[]> 
-                                        world.enviro
+                                        worldMerge.enviro
                                         binResultsName
                 let! sorterRndGen = 
-                        world.cause.causeSpec.prams 
+                        worldMerge.cause.causeSpec.prams 
                         |> ResultMap.procKeyedString "sorterRndGen" 
                                                      (SorterRndGenDto.fromJson)
 
