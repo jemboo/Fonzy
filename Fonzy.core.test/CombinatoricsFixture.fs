@@ -6,50 +6,15 @@ open System.Diagnostics
 type CombinatoricsFixture () =
 
     [<TestMethod>]
-    member this.TestFisherYatesShuffleFromSeed() =
+    member this.fisherYatesShuffle() =
       let starting = [|2; 4; 6; 8; 10; 12; 14 |]
       let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
       let seededFY = Combinatorics.fisherYatesShuffle rnd
       let actual =  seededFY [|2; 4; 6; 8; 10; 12; 14 |] |> Seq.toArray
       Assert.AreEqual(starting.Length, actual.Length)
 
-
     [<TestMethod>]
-    member this.ReflectivePairsCanMakeAFullStage() =
-      let degree = Degree.fromInt 16
-      let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424) 
-      let pairs1 = ReflectiveIndexes.reflectivePairs 
-                                      degree
-                                      rnd          
-                       |> Seq.toArray
-
-      let pairs2 = ReflectiveIndexes.reflectivePairs 
-                                  degree
-                                  rnd 
-                       |> Seq.toArray
-
-      Assert.AreEqual(degree, degree)
-
-
-    [<TestMethod>]
-    member this.TestReflectivePairs() =
-      let degree = Degree.fromInt 31
-      let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424) 
-
-      let runTest () =
-          let pairs1 = ReflectiveIndexes.reflectivePairs 
-                                         degree
-                                         rnd          
-                           |> Seq.toArray
-          let res = pairs1 |> Array.forall (ReflectiveIndexes.isGood)
-          (pairs1, res)
-      let qua = Array.init 100 (fun _ -> runTest())
-
-      Assert.AreEqual(degree, degree)
-
-
-    [<TestMethod>]
-    member this.MakeRandomMonoTwoCycle() =
+    member this.rndMonoTwoCycle() =
       let degree = Degree.create "" 5 |> Result.ExtractOrThrow
       let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424) 
       let ts = seq {0 .. 10} 
@@ -59,19 +24,19 @@ type CombinatoricsFixture () =
 
 
     [<TestMethod>]
-    member this.MakeTwoCycle() =
+    member this.drawTwoWithoutRep() =
       let degree = Degree.create "" 7 |> Result.ExtractOrThrow
       let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 4324) 
       let ts = seq {0 .. 1000} 
                     |> Seq.map(fun _ -> Combinatorics.drawTwoWithoutRep degree rnd)
                     |> Seq.groupBy(id)
-                    |> Seq.map(fun t-> (fst t), (snd t)|>Seq.length)
+                    |> Seq.map(fun t-> (fst t), (snd t) |> Seq.length)
                     |> Seq.toArray
       Assert.IsTrue (ts.Length = 21)
 
 
     [<TestMethod>]
-    member this.MakeAllMonoTwoCycles() =
+    member this.makeAllMonoTwoCycles() =
       let degree = Degree.create "" 5 |> Result.ExtractOrThrow
       let dd = Combinatorics.makeAllMonoTwoCycles degree |> Seq.toArray
       Assert.IsTrue (dd.Length = 10)
@@ -88,7 +53,7 @@ type CombinatoricsFixture () =
  
 
     [<TestMethod>]
-    member this.TestComposeMapIntArraysOnIdentity() =
+    member this.composeMapIntArrays() =
         let degree = Degree.create "" 6 |> Result.ExtractOrThrow
         let orig = [|5; 4; 3; 2; 1; 0 |]
         let prodR = Combinatorics.composeMapIntArrays orig ((Permutation.identity degree) |> Permutation.arrayValues)
@@ -98,42 +63,36 @@ type CombinatoricsFixture () =
  
 
     [<TestMethod>]
-    member this.TestIsSorted2() =
+    member this.isSorted() =
         Assert.IsTrue (Combinatorics.isSorted Seq.empty<int>)
         Assert.IsFalse (Combinatorics.isSorted [|0; 1; 1; 0; 1; 0|])
         Assert.IsTrue (Combinatorics.isSorted [|0; 0; 0; 0; 1; 1|])
 
 
     [<TestMethod>]
-    member this.TestIsSortedOffset() =
+    member this.isSortedOffset() =
         Assert.IsFalse (Combinatorics.isSortedOffset [|0; 1; 1; 0; 1; 0; 1; 1 |] 1 5)
         Assert.IsTrue (Combinatorics.isSortedOffset [|0; 0; 0; 0; 1; 1; 0; 0|] 1 5)
 
 
     [<TestMethod>]
-    member this.TestEntropy() =
+    member this.entropyBits() =
         let res1 = Combinatorics.entropyBits [|1; 1 |]
         Assert.AreEqual (res1, 1.0)
         let res2 = Combinatorics.entropyBits [|1; 1; 1; 1; 0|]
         Assert.AreEqual (res2, 2.0)
 
-    //[<TestMethod>]
-    //member this.TestSortIntArray() =
-    //    let length = 29
-    //    let rnd = Rando.LcgFromSeed 424
-    //    let stage = Combinatorics.MakeRandomFullTwoCycleIntArray rnd length
-    //    let sortable = Combinatorics.RandomIntPermutations rnd length 1 |> Seq.item 0
-    //    let counter = Array.init length (fun i -> 0)
+    [<TestMethod>]
+    member this.rndFullTwoCycleArray() =
+        let length = 29
+        let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
+        let unsortedArray = Combinatorics.rndFullTwoCycleArray rnd length
+        let unsortedScore = Combinatorics.unsortednessSquared unsortedArray
+        Assert.IsTrue (unsortedScore >  0)
 
-    //    let sortableResult = Combinatorics.SortCopyOfIntArray sortable stage counter
-        
-    //    let sortableScore = Combinatorics.UnsortednessSquared sortable
-    //    let sortableResultScore = Combinatorics.UnsortednessSquared sortableResult
-
-    //    Assert.IsTrue (sortableScore >  sortableResultScore)
 
     [<TestMethod>]
-    member this.InverseMapArray() =
+    member this.inverseMapArray() =
         let degree = Degree.create "" 8 |> Result.ExtractOrThrow
         let randy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let mutable i = 0
@@ -145,11 +104,11 @@ type CombinatoricsFixture () =
             i <- i+1
 
     [<TestMethod>]
-    member this.TestConjugateIntArrays() =
+    member this.conjugateIntArrays() =
         let degree = Degree.create "" 8 |> Result.ExtractOrThrow
         let randy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let mutable i = 0
-        while i<100 do
+        while i<10 do
             let conjer = Combinatorics.randomPermutation randy (Degree.value degree)
             let tc1 = Combinatorics.randomPermutation randy (Degree.value degree)
             let conj1 = Combinatorics.conjugateIntArrays tc1 conjer
@@ -163,11 +122,11 @@ type CombinatoricsFixture () =
 
 
     [<TestMethod>]
-    member this.TestConjugateIntArrays2() =
+    member this.conjugateIntArrays_preserves_twoCycle() =
         let degree = Degree.create "" 8 |> Result.ExtractOrThrow
         let randy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let mutable i = 0
-        while i<100 do
+        while i<10 do
             let tc = Combinatorics.rndFullTwoCycleArray randy (Degree.value degree)
             let conjer = Combinatorics.randomPermutation randy (Degree.value degree)
             let conj = Combinatorics.conjugateIntArrays tc conjer
@@ -176,17 +135,24 @@ type CombinatoricsFixture () =
 
 
     [<TestMethod>]
-    member this.TestSorted_0_1_Sequence() =
+    member this.sorted_O_1_Sequence() =
         let degree = Degree.fromInt 10
         let block = IntBits.sorted_O_1_Sequence degree 7
-
         let blockItems = block.values |> Array.toList
         Assert.IsTrue(Combinatorics.isSorted blockItems)
         Assert.IsTrue (blockItems.Length = (Degree.value degree))
-
+        
 
     [<TestMethod>]
-    member this.makeRandomTwoCycleIntArray() =
+    member this.sorted_0_1_Sequences() =
+        let degree = Degree.fromInt 10
+        let block = IntBits.sorted_0_1_Sequences degree
+                    |> Seq.toArray
+        Assert.IsTrue (block.Length = (Degree.value degree) + 1)
+        
+
+    [<TestMethod>]
+    member this.rndTwoCycleArray() =
         let randy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let arraySize = 16
         let cycleCount = 2
@@ -196,21 +162,6 @@ type CombinatoricsFixture () =
         let block2 = Combinatorics.rndTwoCycleArray randy arraySize cycleCount
         Assert.IsTrue (Combinatorics.isTwoCycle block2)
 
-
-    [<TestMethod>]
-    member this.TestSorted_0_1_Sequences() =
-        let degree = Degree.fromInt 10
-        let block = IntBits.sorted_0_1_Sequences degree
-                    |> Seq.toArray
-        Assert.IsTrue (block.Length = (Degree.value degree) + 1)
-
-
-    [<TestMethod>]
-    member this.TestBreakIntoSegments() =
-        let testArray = [|1; 2; 3; 4; 5; 6; 7; 8; 9|] 
-        let testBreaks = [|0; 2; 5; 9|] 
-        let yak = Combinatorics.breakArrayIntoSegments testArray testBreaks
-        Assert.AreEqual (yak.Length, 3)
 
     [<TestMethod>]
     member this.cumSum() =
@@ -228,11 +179,10 @@ type CombinatoricsFixture () =
         let mutable log = []
         let LogRes s =
             log <- s::log
-        
         let weightFunction (w:float) =
             1.0 / w
         testArray |>  (Combinatorics.drawFromWeightedDistribution weightFunction rndy)
-            |> Seq.take 100000 |> Seq.toArray
+            |> Seq.take 100 |> Seq.toArray
             |> Array.groupBy(id)
             |> Array.iter(fun b -> LogRes (sprintf "%f %d" (fst b) (snd b).Length))
 
@@ -241,57 +191,39 @@ type CombinatoricsFixture () =
 
     [<TestMethod>]
     member this.makeHull() =
-         let seqX = Seq.initInfinite(fun i-> sprintf "x%d" i)
-         let seqY = Seq.initInfinite(fun i-> sprintf "y%d" i)
-         let h1 = Combinatorics.makeHull seqX seqY 1 2
-                  |> Seq.toArray
-         Assert.IsTrue (true)
+        let seqX = Seq.initInfinite(fun i-> sprintf "x%d" i)
+        let seqY = Seq.initInfinite(fun i-> sprintf "y%d" i)
+        let h1 = Combinatorics.makeHull seqX seqY 1 2
+                |> Seq.toArray
+        Assert.IsTrue (true)
 
 
-    [<TestMethod>]
-    member this.StripeReadAndWrite() =
-        let srcUla = [|128822345678987UL; 0UL; 475555577799876091UL|]
-        let destUla = [|0UL; 0UL; 0UL|]
-        let ivals = [|0..63|] |> Array.map (fun v ->  ByteUtils.stripeRead srcUla v)
-        [0..63] |> List.map (fun v ->  ByteUtils.stripeWrite destUla ivals.[v] v)
-            |> ignore
-        for i = 0 to 2 do
-            Assert.AreEqual(srcUla.[i], destUla.[i])
-
-
-    
     [<TestMethod>]
     member this.enumNchooseM() =
-      let n = 8
-      let m = 5
-      let res = Combinatorics.enumNchooseM n m |> Seq.toList
-      Assert.AreEqual(res.Length, 56)
+        let n = 8
+        let m = 5
+        let res = Combinatorics.enumNchooseM n m |> Seq.toList
+        Assert.AreEqual(res.Length, 56)
+
+
+
+
+
 
 
     [<TestMethod>]
-    member this.tryThis() =
-      //let n = 8
-      //let m = 5
-      //let res0 = Combinatorics.tryThis 5 [] 4 []  // [] 5 []
-      //let res1 = Combinatorics.tryThis 5 [] 5 []  // None
-      //let res2 = Combinatorics.tryThis 5 [] 5 [4] // None
-      //let res3 = Combinatorics.tryThis 5 [] 5 [3] // [5] 4 []
-      //let resa = Combinatorics.tryThis 5 [] 5 [2] // [] 4 [3]
-      //let res4 = Combinatorics.tryThis 5 [] 5 [2; 0]  // [] 4 [3; 0]
+    member this.reflectivePairs() =
+      let degree = Degree.fromInt 30
+      let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424) 
 
-      //let mutable proceed = true
-      //let mutable curTup = ([], 4, [3;2;1;0])
-      //while proceed do
-      //  let a, b, c = curTup
-      //  let res = Combinatorics.tryThis 7 a b c
-      //  curTup <- match res with
-      //              | Some tup -> tup
-      //              | None -> ([], 0, [])
+      let runTest () =
+          let pairs1 = ReflectiveIndexes.reflectivePairs 
+                                         degree
+                                         rnd          
+                           |> Seq.toArray
+          let res = pairs1 |> Array.forall (ReflectiveIndexes.isGood)
+          (pairs1, res)
+      let qua = Array.init 10 (fun _ -> runTest())
+      qua |> Array.iter(fun tup -> Assert.IsTrue(snd tup))
+      Assert.IsTrue(true)
 
-      //  let aa, bb, cc = curTup
-      //  let jam = aa@(bb::cc) |> List.sort
-      //  Debug.WriteLine (sprintf "%A" jam)
-      //  proceed <- (res |> Option.isSome)
-
-
-      Assert.AreEqual(1, 1)

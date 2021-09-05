@@ -24,13 +24,14 @@ type RandoFixture () =
         let degree = 6 |> Degree.create "" |> Result.ExtractOrThrow
         let seed = RandomSeed.create "" 424 |> Result.ExtractOrThrow
         let randoLcg = new RandomLcg(seed)
-        let sortableCount = 4
+        let permCount = 4
 
         let perms = Permutation.createRandoms degree randoLcg
                     |> Seq.map(fun i -> Permutation.arrayValues i )
-                    |> Seq.take sortableCount
+                    |> Seq.truncate permCount
+                    |> Seq.toArray
 
-        Assert.IsTrue(true);
+        Assert.AreEqual(perms.Length, permCount);
 
 
     [<TestMethod>]

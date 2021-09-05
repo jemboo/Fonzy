@@ -10,6 +10,7 @@
     <Compile Include="RngGenDto.fs" />
     <Compile Include="ComboStructuresDto.fs" />
     <Compile Include="DistributionsDto.fs" />
+    <Compile Include="AnnealerDto.fs" />
     <Compile Include="SortingTypesDto.fs" />
     <Compile Include="SorterDto.fs" />
     <Compile Include="SortableSetDto.fs" />

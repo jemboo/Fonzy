@@ -86,7 +86,7 @@ module TestData =
 
     module SortableSet =
         let ssBinary = SortableSetBinary.allIntBits degree
-        let sortableSet =  ssBinary |> sortableSet.Binary
+        let sortableSet =  ssBinary |> sortableSetO.Binary
                                     |> sortableSetSpec.Explicit
 
     module SorterSet = 

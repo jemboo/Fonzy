@@ -43,6 +43,21 @@ type UtilsFixture () =
         Assert.AreEqual(tc, 25)
 
 
+    [<TestMethod>]
+    member this.StripeReadAndWrite() =
+        let srcUla = [|128822345678987UL; 0UL; 475555577799876091UL|]
+        let destUla = [|0UL; 0UL; 0UL|]
+        let ivals = [|0..63|] |> Array.map (fun v ->  ByteUtils.stripeRead srcUla v)
+        [0..63] |> List.map (fun v ->  ByteUtils.stripeWrite destUla ivals.[v] v)
+            |> ignore
+        for i = 0 to 2 do
+            Assert.AreEqual(srcUla.[i], destUla.[i])
+
+
+    
+
+
+
     // GuidUtils
 
     [<TestMethod>]
@@ -133,9 +148,16 @@ type UtilsFixture () =
         Assert.AreEqual(res, [12; 15; 18])
 
 
+    [<TestMethod>]
+    member this.TestBreakIntoSegments() =
+        let testArray = [|1; 2; 3; 4; 5; 6; 7; 8; 9|] 
+        let testBreaks = [|0; 2; 5; 9|] 
+        let yak = CollectionUtils.breakArrayIntoSegments testArray testBreaks
+        Assert.AreEqual (yak.Length, 3)
         
-    // ResultMap
 
+
+    // ResultMap
 
     [<TestMethod>]
     member this.addNewKey() =

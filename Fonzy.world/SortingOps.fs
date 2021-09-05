@@ -7,7 +7,7 @@ module SortingOps =
     module Sorter =
         let eval
                 (sorter:sorter)
-                (sortableSet:sortableSet)
+                (sortableSet:sortableSetO)
                 (switchusePlan:Sorting.switchUsePlan) 
                 (switchEventAgg:Sorting.eventGrouping) =
 
@@ -34,7 +34,7 @@ module SortingOps =
 
     module SortableSet =
 
-        let switchReduce (sSet:sortableSet) 
+        let switchReduce (sSet:sortableSetO) 
                          (switches:seq<Switch>) = 
             let degree = sSet |> SortableSet.degree
             let sorter = Sorter.fromSwitches 
@@ -55,23 +55,23 @@ module SortingOps =
 
             let reducedSSet = 
                 match sSet with
-                | sortableSet.Binary _ -> 
+                | sortableSetO.Binary _ -> 
                     uniBts
                         |> SortableSetBinary.fromIntBits degree
-                        |> sortableSet.Binary
-                | sortableSet.Bp64 _ -> 
+                        |> sortableSetO.Binary
+                | sortableSetO.Bp64 _ -> 
                     uniBts
                         |> SortableSetBp64.fromIntBits degree
-                        |> sortableSet.Bp64
-                | sortableSet.Integer _ -> 
+                        |> sortableSetO.Bp64
+                | sortableSetO.Integer _ -> 
                     uniBts
                         |> SortableSetInteger.fromIntBits degree
-                        |> sortableSet.Integer
+                        |> sortableSetO.Integer
 
             (reducedSSet, switchUses)
 
         let reduceByPrefix (srg:sorterRndGen) 
-                           (sSet:sortableSet) = 
+                           (sSet:sortableSetO) = 
             let pfx = srg |> SorterRndGen.getSwitchPrefix
             if pfx.Length = 0 then
                 (sSet, SwitchUses.createNone)
@@ -81,7 +81,7 @@ module SortingOps =
         let oneStageReduceBp64 (degree:Degree) = 
             
             let wholeSet = SortableSetBp64.allBp64 degree
-                           |> sortableSet.Bp64
+                           |> sortableSetO.Bp64
 
             let switches = degree |> TwoCycleGen.evenMode
                                   |> Switch.fromTwoCyclePerm
@@ -91,7 +91,7 @@ module SortingOps =
         let oneStageReduceInts (degree:Degree) = 
     
             let wholeSet = SortableSetBinary.allIntBits degree
-                           |> sortableSet.Binary
+                           |> sortableSetO.Binary
 
             let switches = degree |> TwoCycleGen.evenMode
                                   |> Switch.fromTwoCyclePerm
@@ -103,7 +103,7 @@ module SortingOps =
 
       let eval<'T> 
              (sorterSet:sorterSet)
-             (sortableSet:sortableSet)
+             (sortableSet:sortableSetO)
              (switchusePlan:Sorting.switchUsePlan) 
              (switchEventAgg:Sorting.eventGrouping) 
              (_parallel:UseParallel) 
@@ -155,7 +155,7 @@ module SortingOps =
 
       let getSorterCoverages 
             (sorterSet:sorterSet)
-            (sortableSet:sortableSet)
+            (sortableSet:sortableSetO)
             (switchusePlan:Sorting.switchUsePlan)
             (checkSuccess:bool)
             (_parallel:UseParallel) =

@@ -2,13 +2,11 @@ namespace Fonzy.core.test
 
 open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
+open System.Diagnostics
 
 [<TestClass>]
-type GaTypesFixture () =
-
-
+type SorterFixture () =
     [<TestMethod>]
     member this.test() =
 
-      Assert.IsTrue(true)
-
+        Assert.IsFalse(false)

@@ -30,7 +30,7 @@ module TestData =
                                                 intDistType arrayCount 
                                                 (nextRnGen()) arrayName
             
-            let int2dDistType = Int2dDistType.Uniform (UniformInt2dDistParams.square 5)
+            let int2dDistType = int2dDistType.Uniform (UniformInt2dDistParams.square 5)
             let rnd2dUniform = CauseSpecRandGen.int2dArray 
                                         int2dDistType arrayCount 
                                         (nextRnGen()) arrayName2d
@@ -70,7 +70,7 @@ module TestData =
             let srgPr ssid sg sc rng ssn =
                 CauseSpecSorters.rndGen 
                                         ("sorterSetId", ssid)
-                                        ("sorterGen", sg)
+                                        ("sorterRndGen", sg)
                                         ("sorterCount", sc)
                                         ("rndGen", rng)
                                         (rndSorterSetName, ssn)

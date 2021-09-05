@@ -131,9 +131,9 @@ module Switch =
 
 
     let rndMasks (degreeSource:Degree)
-                      (degreeDest:Degree)
-                      (swa:Switch array)
-                      (rnd:IRando) =
+                 (degreeDest:Degree)
+                 (swa:Switch array)
+                 (rnd:IRando) =
         let sd = (Degree.value degreeSource)
         let dd = (Degree.value degreeDest)
         if sd < dd then

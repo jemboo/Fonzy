@@ -7,23 +7,6 @@ open Newtonsoft.Json
 type FileUtilsFixture() =
 
     [<TestMethod>]
-    member this.Degree_maxSwitchesPerStage() =
-        let degree = Degree.fromInt 7
-        let msw = 3
-        let cc = Degree.maxSwitchesPerStage degree
-        Assert.AreEqual(msw, cc)
-
-
-    [<TestMethod>]
-    member this.PrintArray() =
-        // ??????????????????????
-        let st = SwitchUses.createEmpty (SwitchCount.fromInt 1000)
-        let wts = SwitchUses.getWeights st
-        let ss = sprintf "%A" wts |> (fun s->s.Replace("\n ", ""))
-        Assert.AreEqual(1, 1)
-
-
-    [<TestMethod>]
     member this.writeCsvFile() =
         let csv =
             {

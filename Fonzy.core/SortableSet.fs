@@ -1,6 +1,20 @@
 ﻿namespace global
 open System
 
+type sortableSetType = 
+    | AllForDegree of Degree
+    | Random of Degree*RngGen*SortableCount
+
+type sortableSetImpl =
+    | Binary
+    | Integer
+    | Bp64
+
+type sortableSet2 = { id:SortableSetId;
+                      sortableSetType:sortableSetType; 
+                      sortableSetImpl:sortableSetImpl; }
+
+
 type sortableSetBinary = {id:SortableSetId; degree:Degree; 
                             sortables:intBits[]}
 type sortableSetInteger = {id:SortableSetId; degree:Degree; 
@@ -8,7 +22,7 @@ type sortableSetInteger = {id:SortableSetId; degree:Degree;
 type sortableSetBp64 = {id:SortableSetId; degree:Degree; 
                             sortables:bitsP64[]}
 
-type sortableSet =
+type sortableSetO =
      | Binary of sortableSetBinary
      | Integer of sortableSetInteger
      | Bp64 of sortableSetBp64
@@ -158,20 +172,20 @@ module SortableSetBp64 =
 
 
 module SortableSet = 
-    let iD (ss:sortableSet) =
+    let iD (ss:sortableSetO) =
         match ss with
         | Binary  ss -> ss.id
         | Integer  ss -> ss.id
         | Bp64 ss -> ss.id
 
 
-    let degree (ss:sortableSet) =
+    let degree (ss:sortableSetO) =
         match ss with
         | Binary  ss -> ss.degree
         | Integer  ss -> ss.degree
         | Bp64 ss -> ss.degree
 
-    let toIntBits (ss:sortableSet) = 
+    let toIntBits (ss:sortableSetO) = 
         match ss with
         | Binary  ss -> ss |> SortableSetBinary.toIntBits |> Array.toSeq
         | Integer  ss -> ss |> SortableSetInteger.toIntBits
@@ -188,7 +202,7 @@ type sortableSetGen =
 
 
 type sortableSetSpec =
-    | Explicit of sortableSet
+    | Explicit of sortableSetO
     | Generated of sortableSetGen
 
 

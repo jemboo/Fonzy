@@ -90,7 +90,7 @@ module CauseSpecRandGen =
                      ] |> Map.ofList
         {causeSpec.id = CauseSpecId.fromGuid id; genus=["RandGen"; "IntArray"]; prams=prams; }
 
-    let int2dArray (idt:Int2dDistType) (count:int) 
+    let int2dArray (idt:int2dDistType) (count:int) 
                           (rndGen:RngGen) (outName:string) =
         let id = seq { intArrayBaseId:> obj;
                        idt:> obj; count:> obj; 
@@ -118,13 +118,13 @@ module CauseSpecRandGen =
 
     let uniformInt2dArray (valSpan:int) (seed:RandomSeed) 
                           (count:int) (outName:string) =
-        let idt = Int2dDistType.Uniform (UniformInt2dDistParams.square valSpan)
+        let idt = int2dDistType.Uniform (UniformInt2dDistParams.square valSpan)
         let rng = RngGen.createLcg seed
         int2dArray idt count rng outName
 
     let normalInt2dArray (stdev:float) (seed:RandomSeed) 
                          (count:int) (outName:string) =
-        let idt = Int2dDistType.Normal (NormalInt2dDistParams.round stdev)
+        let idt = int2dDistType.Normal (NormalInt2dDistParams.round stdev)
         let rng = RngGen.createLcg seed
         int2dArray idt count rng outName
 

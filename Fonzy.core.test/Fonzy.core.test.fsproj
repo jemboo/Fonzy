@@ -9,15 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="TreeFixture.fs" />
-    <Compile Include="AnnealerFixture.fs" />
     <Compile Include="UtilsFixture.fs" />
+    <Compile Include="CommonTypesFixture.fs" />
     <Compile Include="FileUtilsFixture.fs" />
-    <Compile Include="RandoFixture.fs" />
+    <Compile Include="RandomTypesFixture.fs" />
     <Compile Include="CombinatoricsFixture.fs" />
     <Compile Include="ComboStructuresFixture.fs" />
+    <Compile Include="TreeFixture.fs" />
+    <Compile Include="AnnealerFixture.fs" />
     <Compile Include="SwitchFixture.fs" />
     <Compile Include="StageFixture.fs" />
+    <Compile Include="SorterFixture.fs" />
     <Compile Include="SorterGenFixture.fs" />
     <Compile Include="SortingEvalFixture.fs" />
     <Compile Include="SortableSetRolloutFixture.fs" />

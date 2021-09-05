@@ -57,12 +57,10 @@ module StepNumber =
             return! create "" (gv:?>int)
         }
 
+
 type annealerSpec = 
     | Constant of Temp
     | Exp of Temp * float
-
-//type annealer = { annealerSpec:annealerSpec;
-//                  chooser:Energy->Energy->(unit->float)->StepNumber->bool  }
 
 module Annealer =
 
@@ -98,12 +96,3 @@ module Annealer =
         match annealerSpec with
         | Constant t -> makeConst t
         | Exp (t,hl) -> makeExp t hl
-
-
-    //let make (annealerSpec:annealerSpec) =
-    //    match annealerSpec with
-    //    | Constant t -> { annealer.annealerSpec = annealerSpec;
-    //                      chooser = (makeConst t); }
-    //    | Exp (t,hl) -> { annealer.annealerSpec = annealerSpec;
-    //                      chooser = (makeExp t hl) }
-    

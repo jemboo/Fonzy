@@ -1,7 +1,5 @@
 ﻿namespace global
-
 open System.Numerics
-
 
 // a permutation of the set {0, 1,.. (degree-1)}
 type permutation = private {degree:Degree; values:int[] }
@@ -80,6 +78,7 @@ module Permutation =
 
     let createRandoms (degree:Degree) (rnd:IRando) =
         Seq.initInfinite(fun _ -> createRandom degree rnd)
+
 
  // a permutation of the set {0, 1,.. (degree-1)}, that is it's own inverse
 type twoCyclePerm = private { degree:Degree; values:int[] }
@@ -218,6 +217,7 @@ module TwoCyclePerm =
                 |> Seq.iter(chunkRi)
 
         { degree=degree; values=aRet }
+
 
 
 module TwoCycleGen =
@@ -417,6 +417,7 @@ module IntBits =
                 yield createRandom degree rnd }
 
 
+
 type bitsP32 = { values:uint[] }
 module BitsP32 =
 
@@ -602,7 +603,6 @@ module BitsP64 =
 
 
 type record64Array = { values: uint64[] }
-
 module Record64Array =
 
     let make (degree:Degree) = 
@@ -639,8 +639,6 @@ module Record64Array =
 type vecP64 = { values: uint64[] }
 
 type vecP64b = { values: Vector<uint64> }
-    
-
 
 module VecP64 = 
     
@@ -698,4 +696,3 @@ module VecP64 =
             res.[i] <- lhs.[i] ||| rhs.[i]
             i <- i + 1
        
-

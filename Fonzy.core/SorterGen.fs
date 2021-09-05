@@ -65,7 +65,7 @@ module SorterGen =
         lret |> List.rev
 
 
-type sorterMutationType = 
+type sorterMutationType =
         | BySwitch of SwitchCount*MutationRate
         | ByStage of SwitchCount*MutationRate
 

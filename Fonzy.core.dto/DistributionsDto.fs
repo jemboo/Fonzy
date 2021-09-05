@@ -42,14 +42,14 @@ type int2dDistTypeDto = {cat:string; value:string}
 module Int2dDistTypeDto =
     let fromDto (dto:int2dDistTypeDto) =
         match dto.cat with
-        | nameof Int2dDistType.Uniform -> result {
-                let! b = Json.deserialize<UniformInt2dDistParams> dto.value
-                return Int2dDistType.Uniform b
+        | nameof int2dDistType.Uniform -> result {
+                let! b = Json.deserialize<uniformInt2dDistParams> dto.value
+                return int2dDistType.Uniform b
             }
-        | nameof Int2dDistType.Normal -> 
+        | nameof int2dDistType.Normal -> 
             result {
-                let! b = Json.deserialize<NormalInt2dDistParams> dto.value
-                return Int2dDistType.Normal b
+                let! b = Json.deserialize<normalInt2dDistParams> dto.value
+                return int2dDistType.Normal b
             }
         | t -> (sprintf "cat: %s for Int2dDistTypeDto not found"
                     dto.cat ) |> Error
@@ -60,16 +60,16 @@ module Int2dDistTypeDto =
             return! fromDto dto
         }
 
-    let toDto (idt:Int2dDistType) =
+    let toDto (idt:int2dDistType) =
         match idt with
-        | Int2dDistType.Uniform up -> {
-                            int2dDistTypeDto.cat = nameof Int2dDistType.Uniform; 
-                            value = Json.serialize up}
-        | Int2dDistType.Normal np -> {
-                            int2dDistTypeDto.cat = nameof Int2dDistType.Normal;
-                            value = Json.serialize np}
+        | int2dDistType.Uniform up -> {
+                            int2dDistTypeDto.cat = nameof int2dDistType.Uniform; 
+                            value = Json.serialize up }
+        | int2dDistType.Normal np -> {
+                            int2dDistTypeDto.cat = nameof int2dDistType.Normal;
+                            value = Json.serialize np }
 
-    let toJson (idt:Int2dDistType) =
+    let toJson (idt:int2dDistType) =
         idt |> toDto |> Json.serialize
 
 
@@ -106,8 +106,8 @@ module Int2dDistDto =
     let fromDto (dto:int2dDistDto) =
         result {
             let! ldt = Int2dDistTypeDto.fromDto dto.lattice2dDistTypeDto
-            return {Int2dDist.lattice2dDistType = ldt; 
-                    Int2dDist.vals = dto.values}
+            return {int2dDist.lattice2dDistType = ldt; 
+                    vals = dto.values}
         }
 
     let fromJson (js:string) =
@@ -116,12 +116,12 @@ module Int2dDistDto =
             return! fromDto dto
         }
 
-    let toDto (l2dD:Int2dDist) =
+    let toDto (l2dD:int2dDist) =
         {
             int2dDistDto.lattice2dDistTypeDto = l2dD.lattice2dDistType 
                                                 |> Int2dDistTypeDto.toDto;
             int2dDistDto.values = l2dD.vals;
          }
 
-    let toJson (idt:Int2dDist) =
+    let toJson (idt:int2dDist) =
         idt |> toDto |> Json.serialize

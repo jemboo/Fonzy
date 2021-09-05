@@ -58,7 +58,8 @@ module SortableSetGen =
                                                            (RngGenDto.fromJson)
                       let! sortableCount = ssg.prams |> ResultMap.procKeyedInt "sortableCount" 
                                                            (SortableCount.create "")
-                      return (SortableSetBinary.rndBits degree rngGen sortableCount) |> sortableSet.Binary
+                      return (SortableSetBinary.rndBits degree rngGen sortableCount) 
+                              |> sortableSetO.Binary
                    }
 
         //| "rndPerms" -> 
@@ -77,7 +78,7 @@ module SortableSetGen =
                         let! degree = ssg.prams |> ResultMap.procKeyedInt "degree" 
                                                             (fun d -> Degree.create "" d)
 
-                        return  ( SortableSetBinary.allIntBits degree ) |> sortableSet.Binary
+                        return  ( SortableSetBinary.allIntBits degree ) |> sortableSetO.Binary
                     }
 
         | "allBp64" -> 
@@ -85,7 +86,7 @@ module SortableSetGen =
                         let! degree = ssg.prams |> ResultMap.procKeyedInt "degree" 
                                                             (fun d -> Degree.create "" d)
 
-                        return ( SortableSetBp64.allBp64 degree ) |> sortableSet.Bp64
+                        return ( SortableSetBp64.allBp64 degree ) |> sortableSetO.Bp64
                     }
 
 
@@ -109,3 +110,6 @@ module SortableSetSpecReduced =
                                         switchPfx
             return ssRdx, pfxUses
         }
+
+    let makeMemoize =
+        FuncUtils.memoization make

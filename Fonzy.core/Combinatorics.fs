@@ -6,12 +6,6 @@ module Combinatorics =
     let identity (degree:int) =
         [|0 .. degree-1|] 
 
-    // Splits the sourceArray into segments using segBounds
-    let breakArrayIntoSegments (sourceArray : array<'a>) 
-                               (segBounds : array<int>) =
-        seq {1 .. (segBounds.Length - 1) }
-        |> Seq.map(fun i -> sourceArray.[segBounds.[i - 1] .. (segBounds.[i] - 1)])
-        |> Seq.toArray
 
     let composeMapIntArrays (a:array<int>) 
                             (b:array<int>) =
@@ -209,7 +203,7 @@ module Combinatorics =
 
 
     let rndFullTwoCycleArray (rnd:IRando) 
-                                       (arraysize:int) =
+                             (arraysize:int) =
         rndTwoCycleArray rnd arraysize (arraysize/2)
 
     let locsPosArrayo (arrayLen:int) (locs: (int*int*int) list) = 
@@ -296,12 +290,12 @@ module Combinatorics =
 
 
 
+
 type reflectiveIndexes =
      | Single of int*int*Degree
      | Unreflectable of int*int*Degree
      | Pair of (int*int)*(int*int)*Degree
      | LeftOver of int*int*Degree
-
 
 module ReflectiveIndexes =
 

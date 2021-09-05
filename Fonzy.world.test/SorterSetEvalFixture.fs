@@ -58,7 +58,7 @@ type SorterSetEvalFixture () =
                        |> Result.ExtractOrThrow
         let subSorters = Switch.allMasks degSrc degDest srtGreen.switches
                          |> Seq.map(fun sa -> Sorter.fromSwitches degDest sa)
-                         |> Seq.truncate 500000
+                         |> Seq.truncate 5000
                          |> Seq.toArray
 
         let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
@@ -184,7 +184,7 @@ type SorterSetEvalFixture () =
 
         let subSorters = Switch.rndMasks degSrc degDest srtGreen.switches iRando
                          |> Seq.map(fun sa -> Sorter.fromSwitches degDest sa)
-                         |> Seq.truncate 500000
+                         |> Seq.truncate 5000
                          |> Seq.toArray
 
         let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())

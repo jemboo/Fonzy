@@ -8,7 +8,7 @@ open SortingEval
 type SortableSetGenFixture () =
 
     [<TestMethod>]
-    member this.SortableSetSpecReduced() =
+    member this.SortableSetSpecReduced_make() =
         let degree = Degree.fromInt 16
         let prefix = [|{Switch.hi=3; low=0;}|]
         let ssGen = SortableSetGen.allBp64 degree
@@ -30,7 +30,28 @@ type SortableSetGenFixture () =
 
 
     [<TestMethod>]
-    member this.Aab() =
+    member this.SortableSetSpecReduced_makeMemoize() =
+        let degree = Degree.fromInt 16
+        let prefix1 = [|{Switch.hi=3; low=0;}|]
+        let prefix2 = [|{Switch.hi=3; low=1;}|]
+        let ssGen = SortableSetGen.allBp64 degree
+                    |> sortableSetSpec.Generated
+
+        let ssetT1a, wUsesT1a = 
+            (ssGen, prefix1) |> sortableSetSpecReduced
+                             |> SortableSetSpecReduced.makeMemoize
+                             |> Result.ExtractOrThrow
+
+        let ssetT1b, wUsesT1b = 
+            (ssGen, prefix1) |> sortableSetSpecReduced
+                             |> SortableSetSpecReduced.makeMemoize
+                             |> Result.ExtractOrThrow
+
+        let ssetT2, wUsesT2 = 
+            (ssGen, prefix2) |> sortableSetSpecReduced
+                             |> SortableSetSpecReduced.makeMemoize
+                             |> Result.ExtractOrThrow
+
 
         Assert.IsTrue(true)
 

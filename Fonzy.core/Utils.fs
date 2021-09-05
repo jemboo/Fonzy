@@ -269,6 +269,16 @@ module CollectionUtils =
              |> Seq.toArray
              |> Array.reduce addArrays
 
+// Splits the sourceArray into segments using segBounds
+    let breakArrayIntoSegments (sourceArray : array<'a>) 
+                               (segBounds : array<int>) =
+        seq {1 .. (segBounds.Length - 1) }
+        |> Seq.map(fun i -> sourceArray.[segBounds.[i - 1] .. (segBounds.[i] - 1)])
+        |> Seq.toArray
+
+
+
+
 
     let listToTransitionTuples (ltt:'a list) =
         let rec yucko (last:'a) (tail:'a list) (tupes: ('a*'a) list) =
@@ -519,6 +529,11 @@ module StringUtils =
          |> Seq.toArray
          |> ignore
        sb.ToString()
+       
+    let optDto (v:'a option) (f:'a->'b) =
+        match v with
+        | Some av -> Some (f av)
+        | None -> None
 
 
 module FuncUtils = 

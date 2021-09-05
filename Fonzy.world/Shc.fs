@@ -1,12 +1,24 @@
 ﻿namespace global
 open System
 
-
 type ShcId = private ShcId of Guid
 module ShcId =
     let value (ShcId v) = v
     let create id = Ok (ShcId id)
     let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
+
+
+type shcSaveDetails =
+    | Always
+    | IfBest
+    | BetterThanLast
+    | EnergyThresh of Energy
+    | Never
+
+
+type shcTermSpec = 
+    | FixedLength of StepNumber
+    | EnergyBased of Energy*StepNumber*StepNumber
 
 
 type sHC<'T,'A> = 
@@ -124,22 +136,11 @@ module ShcStageWeightSpec =
         | Constant tw -> constantWeight tw
 
 
-type sorterMutatorSpec =
+type sorterMutSpec =
     | Constant of sorterMutationType
 
-type sorterEvaluatorSpec =
+type sorterEvalSpec =
     | PerfBin
-
-type sorterUpdaterSpec =
-    | AlwaysFull
-    | FullIfBest
-    | FullByLast
-    | FullByEnergy of Energy
-    | NeverFull
-
-type sorterTerminatorSpec = 
-    | FixedLength of StepNumber
-    | EnergyBased of Energy*StepNumber*StepNumber
 
 
 module SorterShc =
@@ -163,50 +164,52 @@ module SorterShc =
     let sorterEvalPerfBin
                    (swPk:shcStageWeightSpec) 
                    (ssP:sortableSetSpecReduced) =
+        result {
+        
+            let! sortableSet, pfxUses = SortableSetSpecReduced.make ssP
+            return
+                fun (sShc:sorterShc) ->
+                    result {
+                        let stageW = ShcStageWeightSpec.getStageWeight swPk sShc       
+                        let suPlan = Sorting.SwitchUsePlan.makeIndexes
+                                        pfxUses
+                                        (sShc.sorter.switches.Length |> SwitchCount.fromInt)
+                        let swEvRecs = SortingOps.Sorter.eval sShc.sorter
+                                               sortableSet
+                                               suPlan
+                                               Sorting.eventGrouping.BySwitch
+                        let switchUses = swEvRecs
+                                         |> SortingEval.SwitchEventRecords.getSwitchUses
+                        let usedSwitches = sShc.sorter 
+                                           |> SwitchUses.getUsedSwitches switchUses
+                        let perf = 
+                            {
+                                SortingEval.sorterPerf.successful = swEvRecs 
+                                    |> SortingEval.SwitchEventRecords.getAllSortsWereComplete
+                                    |> Some
+                                SortingEval.sorterPerf.usedStageCount = 
+                                        Stage.getStageCount 
+                                            sShc.sorter.degree 
+                                            usedSwitches
+                                SortingEval.sorterPerf.usedSwitchCount = 
+                                        SwitchCount.fromInt usedSwitches.Length
+                            }
 
-        fun (sShc:sorterShc) ->
-            result {
-                let! sortableSet, pfxUses = SortableSetSpecReduced.make ssP
-                let stageW = ShcStageWeightSpec.getStageWeight swPk sShc       
-                let suPlan = Sorting.SwitchUsePlan.makeIndexes
-                                pfxUses
-                                (sShc.sorter.switches.Length |> SwitchCount.fromInt)
-                let swEvRecs = SortingOps.Sorter.eval sShc.sorter
-                                       sortableSet
-                                       suPlan
-                                       Sorting.eventGrouping.BySwitch
-                let switchUses = swEvRecs
-                                 |> SortingEval.SwitchEventRecords.getSwitchUses
-                let usedSwitches = sShc.sorter 
-                                   |> SwitchUses.getUsedSwitches switchUses
-                let perf = 
-                    {
-                        SortingEval.sorterPerf.successful = swEvRecs 
-                            |> SortingEval.SwitchEventRecords.getAllSortsWereComplete
-                            |> Some
-                        SortingEval.sorterPerf.usedStageCount = 
-                                Stage.getStageCount 
-                                    sShc.sorter.degree 
-                                    usedSwitches
-                        SortingEval.sorterPerf.usedSwitchCount = 
-                                SwitchCount.fromInt usedSwitches.Length
+                        let energy = perf |> SorterFitness.fromSorterPerf sShc.sorter.degree stageW
+                                          |> Some
+                        let bestEnergy = Energy.betterEnergy energy sShc.bestEnergy
+                        return  {
+                            sorterShc.bestEnergy = bestEnergy
+                            sorterShc.energy = energy
+                            sorterShc.perf = Some perf
+                            sorterShc.rngGen = sShc.rngGen
+                            sorterShc.sorter = sShc.sorter
+                            sorterShc.step = sShc.step
+                            sorterShc.switchPfx = sShc.switchPfx
+                            sorterShc.switchUses = Some switchUses
+                        }
                     }
-
-                let energy = perf |> SorterFitness.fromSorterPerf sShc.sorter.degree stageW
-                                  |> Some
-                let bestEnergy = Energy.betterEnergy energy sShc.bestEnergy
-                return  {
-                    sorterShc.bestEnergy = bestEnergy
-                    sorterShc.energy = energy
-                    sorterShc.perf = Some perf
-                    sorterShc.rngGen = sShc.rngGen
-                    sorterShc.sorter = sShc.sorter
-                    sorterShc.step = sShc.step
-                    sorterShc.switchPfx = sShc.switchPfx
-                    sorterShc.switchUses = Some switchUses
-                }
-            }
-
+          }
     
     let isCurrentBest (shc:sorterShc) =
         match shc.energy, shc.bestEnergy  with
@@ -222,13 +225,13 @@ type sorterShcSpec =
        rngGen:RngGen; 
        sorter:sorter;
        switchPfx:Switch[];
-       mutator:sorterMutatorSpec;
+       mutator:sorterMutSpec;
        shcSortableSetSpec:sortableSetSpecReduced;
        shcStageWeightSpec:shcStageWeightSpec;
-       evaluator: sorterEvaluatorSpec;
+       evaluator: sorterEvalSpec;
        annealer:annealerSpec;
-       updater: sorterUpdaterSpec;
-       terminator:sorterTerminatorSpec;
+       updater: shcSaveDetails;
+       terminator:shcTermSpec;
     }
 
 module SorterShcSpec = 
@@ -238,7 +241,7 @@ module SorterShcSpec =
         ShcId.fromGuid gu
 
 
-    let makeAnnealer (a:annealerSpec) = 
+    let makeAnnealer (anSpec:annealerSpec) = 
         fun (shcCurrent:sorterShc)
             (shcNew:sorterShc) -> 
             result {
@@ -247,15 +250,15 @@ module SorterShcSpec =
                 let randy = shcNew.rngGen |> Rando.fromRngGen
                 let chooser() =
                     randy.NextFloat
-                let annF = Annealer.make a
+                let annF = Annealer.make anSpec
                 let pickNew = annF curE newE chooser shcNew.step
                 if pickNew then return shcNew else return shcCurrent
             }
 
 
-    let makeMutator (m:sorterMutatorSpec) = 
+    let makeMutator (m:sorterMutSpec) = 
         match m with
-        | sorterMutatorSpec.Constant smt -> 
+        | sorterMutSpec.Constant smt -> 
             fun (shcCurrent:sorterShc) -> 
             result {
                 let randy = shcCurrent.rngGen |> Rando.fromRngGen
@@ -278,9 +281,10 @@ module SorterShcSpec =
         | PerfBin -> SorterShc.sorterEvalPerfBin
                         spec.shcStageWeightSpec
                         spec.shcSortableSetSpec
+                  
 
 
-    let makeUpdater (u:sorterUpdaterSpec) =
+    let makeUpdater (u:shcSaveDetails) =
         fun (arch:sorterShcArch list) 
             (newT:sorterShc) ->
             let lastArch = arch |> List.head
@@ -293,25 +297,25 @@ module SorterShcSpec =
                             (newT.energy |> Option.get)
                             thresh
             match u with
-                | AlwaysFull -> 
+                | Always -> 
                     (newT |> SorterShcArch.toFull) :: arch 
                     |> Ok
-                | FullIfBest ->  
+                | IfBest ->  
                     (newT |> SorterShcArch.toSorterShcArch curBest) :: arch 
                     |> Ok
-                | FullByLast ->  
+                | BetterThanLast ->  
                     (newT |> SorterShcArch.toSorterShcArch improvement) :: arch 
                     |> Ok
-                | FullByEnergy e -> 
+                | EnergyThresh e -> 
                     let useNew = (threshB e) && improvement
                     (newT |> SorterShcArch.toSorterShcArch useNew) :: arch 
                     |> Ok
-                | NeverFull -> 
+                | Never -> 
                     (newT |> SorterShcArch.toPartial) :: arch 
                     |> Ok
 
 
-    let makeTerminator (spec:sorterTerminatorSpec) =
+    let makeTerminator (spec:shcTermSpec) =
         match spec with
         | FixedLength x -> fun (shc:sorterShc) -> 
              (StepNumber.value shc.step) > (StepNumber.value x)
@@ -335,7 +339,7 @@ module SorterShcSpec =
             bestEnergy = None;
         }
         result {
-            let evaluator = makeEvaluator spec
+            let! evaluator = makeEvaluator spec
             let! sshc0 = evaluator sshcI
             let arch = sshc0 |> SorterShcArch.toFull
             return  {

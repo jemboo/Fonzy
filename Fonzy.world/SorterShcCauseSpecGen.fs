@@ -41,11 +41,11 @@ module SorterShcCauseSpecGen =
 
 
         let stgWghtSpec = stageWght |> shcStageWeightSpec.Constant
-        let evaluatorSpec = sorterEvaluatorSpec.PerfBin
+        let evaluatorSpec = sorterEvalSpec.PerfBin
         let annSpec = temp |> annealerSpec.Constant
-        let updaterSpec = sorterUpdaterSpec.AlwaysFull
-        let termSpec = maxSteps |> sorterTerminatorSpec.FixedLength
-        let mutSpec = mutType |> sorterMutatorSpec.Constant
+        let updaterSpec = shcSaveDetails.Always
+        let termSpec = maxSteps |> shcTermSpec.FixedLength
+        let mutSpec = mutType |> sorterMutSpec.Constant
 
 
         let allSorterGens = 

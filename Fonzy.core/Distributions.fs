@@ -150,41 +150,41 @@ module IntDist =
         {intDist.intDistType=idt; vals = ma idt}
 
 
-type UniformInt2dDistParams = {minX:int; maxX:int; minY:int; maxY:int}
+type uniformInt2dDistParams = {minX:int; maxX:int; minY:int; maxY:int}
 module UniformInt2dDistParams = 
     let square (side:int) =
         {
-            UniformInt2dDistParams.minX = 0;
-            UniformInt2dDistParams.maxX = side;
-            UniformInt2dDistParams.minY = 0;
-            UniformInt2dDistParams.maxY = side;
+            uniformInt2dDistParams.minX = 0;
+            maxX = side;
+            minY = 0;
+            maxY = side;
         }
 
-type NormalInt2dDistParams = {meanX:float; meanY:float; stdDevX:float; stdDevY:float}
+type normalInt2dDistParams = {meanX:float; meanY:float; stdDevX:float; stdDevY:float}
 module NormalInt2dDistParams = 
     let round (dev:float) =
         {
-            NormalInt2dDistParams.meanX = 0.0;
-            NormalInt2dDistParams.meanY = 0.0;
-            NormalInt2dDistParams.stdDevX = dev;
-            NormalInt2dDistParams.stdDevY = dev;
+            normalInt2dDistParams.meanX = 0.0;
+            meanY = 0.0;
+            stdDevX = dev;
+            stdDevY = dev;
         }
 
-type Int2dDistType =
-    | Uniform of UniformInt2dDistParams
-    | Normal of NormalInt2dDistParams
+type int2dDistType =
+    | Uniform of uniformInt2dDistParams
+    | Normal of normalInt2dDistParams
 
 
-type Int2dDist = {lattice2dDistType:Int2dDistType; vals:int2d[]; }
+type int2dDist = {lattice2dDistType:int2dDistType; vals:int2d[]; }
 module Int2dDist =
-    let makeRandom (l2dt:Int2dDistType) (r:IRando) (count:int) =
+    let makeRandom (l2dt:int2dDistType) (r:IRando) (count:int) =
         let ma dt =
             match dt with
-            | Int2dDistType.Uniform uldp -> Array.init count (fun _ -> 
+            | int2dDistType.Uniform uldp -> Array.init count (fun _ -> 
                             Int2d.makeUniformRandom uldp.minX uldp.maxX uldp.minY uldp.maxY r)
-            | Int2dDistType.Normal nldp -> Array.init count (fun _ -> 
+            | Normal nldp -> Array.init count (fun _ -> 
                             Rando.normalDistRandomPair 
                                      nldp.meanX nldp.stdDevX nldp.meanY nldp.stdDevY r
                             |> Int2d.fromFltTuple)
 
-        {Int2dDist.lattice2dDistType=l2dt; vals = ma l2dt}
+        {int2dDist.lattice2dDistType=l2dt; vals = ma l2dt}

@@ -40,7 +40,8 @@ module Sorter =
         }
    
 
-    let appendSwitches (switches:seq<Switch>) (sorter:sorter) =
+    let appendSwitches (switches:seq<Switch>) 
+                       (sorter:sorter) =
         let newSwitches = (switches |> Seq.toArray) |> Array.append sorter.switches
         let newSwitchCount = SwitchCount.create "" newSwitches.Length |> Result.toOption
         {
@@ -49,7 +50,9 @@ module Sorter =
             switches = newSwitches
         }
 
-    let trimLength (sorter:sorter) (newLength:SwitchCount) =
+
+    let trimLength (sorter:sorter) 
+                   (newLength:SwitchCount) =
         if (SwitchCount.value sorter.switchCount) < (SwitchCount.value newLength) then
             "New length is longer than sorter" |> Error
         else

@@ -59,7 +59,7 @@ module CauseSorters =
                         causeSpec.prams 
                         |> ResultMap.procKeyedString "switchUsePlan" 
                                                       (Json.deserialize<Sorting.switchUsePlan>)
-                let! sortableSet = 
+                let! sortableSetSpec = 
                         causeSpec.prams 
                         |> ResultMap.procKeyedString "sortableSetSpec" 
                                                       (SortableSetSpecDto.fromJson)
@@ -81,10 +81,10 @@ module CauseSorters =
                                             sorterSetName
 
                 let! sorterSet = sorterSetDto |> SorterSetDto.fromDto
-                let! sortableSetEx = sortableSet |> SortableSetSpec.getSortableSet
+                let! sortableSet = sortableSetSpec |> SortableSetSpec.getSortableSet
                 let! sorterCovs = SortingOps.SorterSet.getSorterCoverages
                                       sorterSet
-                                      sortableSetEx
+                                      sortableSet
                                       switchUsePlan
                                       true
                                       (UseParallel.create useParallel)

@@ -4,11 +4,10 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type SorterRndGenFixture () =
-
+type SorterGenFixture () =
 
     [<TestMethod>]
-    member this.oddeven_merge_sort() =
+    member this.oddeven_merge_switches() =
         seq {8 .. 64 } 
         |> Seq.iter (fun v -> 
             let ws = SorterGen.oddeven_merge_switches v
@@ -19,7 +18,7 @@ type SorterRndGenFixture () =
 
 
     [<TestMethod>]
-    member this.oddeven_merge_sort2() =
+    member this.oddeven_merge_stages() =
         seq {8 .. 64 } 
         |> Seq.iter (fun v -> 
             let ts = SorterGen.oddeven_merge_stages v

@@ -22,7 +22,7 @@ type MathDataDtoFixture () =
     member this.Int2dDistDto() =
         let rngGen = {RngGen.rngType=RngType.Lcg; seed = RandomSeed.create "" 123|>Result.ExtractOrThrow}
         let rndy = Rando.fromRngGen rngGen
-        let l2dDist = Int2dDistType.Uniform (UniformInt2dDistParams.square 10)
+        let l2dDist = int2dDistType.Uniform (UniformInt2dDistParams.square 10)
         let l2dD = Int2dDist.makeRandom l2dDist rndy 10
         let l2dDDto = Int2dDistDto.toDto l2dD
         let cereal = Json.serialize l2dDDto

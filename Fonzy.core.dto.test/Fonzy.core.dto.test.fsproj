@@ -12,6 +12,7 @@
     <Compile Include="RngGenDtoFixture.fs" />
     <Compile Include="ComboStructuresDtoFixture.fs" />
     <Compile Include="DistributionsDtoFixture.fs" />
+    <Compile Include="AnnealerDtoFixture.fs" />
     <Compile Include="SorterPartsDtoFixture.fs" />
     <Compile Include="SorterEvalDtoFixture.fs" />
     <Compile Include="SorterGenDtoFixture.fs" />
