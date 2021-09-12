@@ -1,6 +1,4 @@
 namespace Fonzy.world.test
-
-open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
@@ -37,81 +35,63 @@ type CausesFixture () =
         Assert.AreEqual(intDist.vals.Length, TestData.CauseSpec.IntDist.arrayCount)
 
 
-    //[<TestMethod>]
-    //member this.CauseFromRndGenSorterSet() =
-    //    let cause = Causes.fromCauseSpec TestData.CauseSpec.SorterSet.rand1 
-    //                            |> Result.ExtractOrThrow
-    //    let env = enviro.Empty
-    //    let newEnv = cause.op env |> Result.ExtractOrThrow
-    //    let causedProd =  
-    //        Enviro.getDto<sorterSetDto> 
-    //                            newEnv 
-    //                            TestData.CauseSpec.SorterSet.rndSorterSetName
-    //        |> Result.ExtractOrThrow
-    //    let rndSorterSet = causedProd |> SorterSetDto.fromDto |> Result.ExtractOrThrow
-    //    Assert.AreEqual(rndSorterSet.sorterCount, TestData.CauseSpec.SorterSet.sorterCount)
-
-
-    //[<TestMethod>]
-    //member this.CauseEvalToSorterPerfBins() =
-    //    let envO = enviro.Empty
-    //    let causeGen = Causes.fromCauseSpec TestData.CauseSpec.SorterSet.rand1 
-    //                            |> Result.ExtractOrThrow
-    //    let envGen = causeGen.op envO |> Result.ExtractOrThrow
-
-    //    let causeEval = Causes.fromCauseSpec 
-    //                            TestData.CauseSpec.SorterSet.evalToSorterPerfBins 
-    //                            |> Result.ExtractOrThrow
-
-    //    let envEvalRes = causeEval.op envGen |> Result.ExtractOrThrow
-
-    //    let sorterEvalResults =  
-    //         Enviro.getDto<sorterPerfBinDto[]> 
-    //                            envEvalRes
-    //                            TestData.CauseSpec.SorterSet.sorterEvalResultsName
-    //        |> Result.ExtractOrThrow
-    //    Assert.IsTrue(sorterEvalResults.Length > 0)
-
-
-    //[<TestMethod>]
-    //member this.CauseGenToSorterPerfBins() =
-    //    let envO = enviro.Empty
-    //    let causeGen = Causes.fromCauseSpec TestData.CauseSpec.SorterSet.rand1 
-    //                            |> Result.ExtractOrThrow
-    //    let envGen = causeGen.op envO |> Result.ExtractOrThrow
-
-    //    let causeEval = Causes.fromCauseSpec 
-    //                            TestData.CauseSpec.SorterSet.genToSorterPerfBins 
-    //                            |> Result.ExtractOrThrow
-
-    //    let envEvalRes = causeEval.op envGen |> Result.ExtractOrThrow
-
-    //    let sorterEvalResults =  
-    //         Enviro.getDto<sorterPerfBinDto[]> 
-    //                            envEvalRes
-    //                            TestData.CauseSpec.SorterSet.sorterEvalResultsName
-    //        |> Result.ExtractOrThrow
-    //    Assert.IsTrue(sorterEvalResults.Length > 0)
-
+    [<TestMethod>]
+    member this.CauseFromRndGenSorterSet() =
+        let cause = Causes.fromCauseSpec TestData.CauseSpec.SorterSet.rand1 
+                                |> Result.ExtractOrThrow
+        let env = enviro.Empty
+        let newEnv = cause.op env |> Result.ExtractOrThrow
+        let causedProd =  
+            Enviro.getDto<sorterSetDto> 
+                                newEnv 
+                                TestData.CauseSpec.SorterSet.rndSorterSetName
+            |> Result.ExtractOrThrow
+        let rndSorterSet = causedProd |> SorterSetDto.fromDto |> Result.ExtractOrThrow
+        Assert.AreEqual(rndSorterSet.sorterCount, TestData.CauseSpec.SorterSet.sorterCount)
 
 
     [<TestMethod>]
-    member this.CauseRndGenToPerfBins() =
+    member this.CauseEvalToSorterPerfBins() =
+        let envO = enviro.Empty
+        let causeGen = Causes.fromCauseSpec TestData.CauseSpec.SorterSet.rand1 
+                                |> Result.ExtractOrThrow
+        let envGen = causeGen.op envO |> Result.ExtractOrThrow
 
         let causeEval = Causes.fromCauseSpec 
-                                TestData.CauseSpec.SorterSet.rndGenToSorterPerfBins 
+                                TestData.CauseSpec.SorterSet.evalToSorterPerfBins 
                                 |> Result.ExtractOrThrow
 
-        let resWrld = World.createFromParent World.empty
-                                  causeEval
-                      |> Result.ExtractOrThrow
-
-        let envEvalRes = resWrld.enviro
+        let envEvalRes = causeEval.op envGen |> Result.ExtractOrThrow
 
         let sorterEvalResults =  
              Enviro.getDto<sorterPerfBinDto[]> 
                                 envEvalRes
                                 TestData.CauseSpec.SorterSet.sorterEvalResultsName
             |> Result.ExtractOrThrow
+        Assert.IsTrue(sorterEvalResults.Length > 0)
+
+
+    [<TestMethod>]
+    member this.CauseRndGenToPerfBins() =
+        let causeEvalR = Causes.fromCauseSpec 
+                                TestData.CauseSpec.SorterSet.rndGenToSorterPerfBins 
+                                
+        let causeEval = causeEvalR |> Result.ExtractOrThrow
+        let resWrldR = World.createFromParent 
+                                  World.empty
+                                  causeEval
+
+        let resWrld =  resWrldR |> Result.ExtractOrThrow
+
+        let envEvalRes = resWrld.enviro
+
+        let sorterEvalResultsR =  
+             Enviro.getDto<sorterPerfBinDto[]> 
+                                envEvalRes
+                                TestData.CauseSpec.SorterSet.sorterEvalResultsName
+        let sorterEvalResults = sorterEvalResultsR |> Result.ExtractOrThrow
         let sbins = sorterEvalResults |> Array.sortByDescending(fun ia -> ia.[2])
         Assert.IsTrue(true)
+
+       
+

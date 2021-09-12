@@ -50,7 +50,7 @@ module CauseSorters =
 
     let evalToSorterPerfBins (causeSpec:causeSpec) =
         let causer = fun (e:enviro) ->
-            result {
+          result {
                 let! sorterSetName = 
                         causeSpec.prams 
                             |> ResultMap.procKeyedString "sorterSetName"
@@ -59,10 +59,10 @@ module CauseSorters =
                         causeSpec.prams 
                         |> ResultMap.procKeyedString "switchUsePlan" 
                                                       (Json.deserialize<Sorting.switchUsePlan>)
-                let! sortableSetSpec = 
+                let! sortableSetType = 
                         causeSpec.prams 
-                        |> ResultMap.procKeyedString "sortableSetSpec" 
-                                                      (SortableSetSpecDto.fromJson)
+                        |> ResultMap.procKeyedString "sortableSetType" 
+                                                      (SortableSetTypeDto.fromJson)
                 let! sorterSaving = 
                         causeSpec.prams 
                         |> ResultMap.procKeyedString "sorterSaving" 
@@ -81,10 +81,13 @@ module CauseSorters =
                                             sorterSetName
 
                 let! sorterSet = sorterSetDto |> SorterSetDto.fromDto
-                let! sortableSet = sortableSetSpec |> SortableSetSpec.getSortableSet
-                let! sorterCovs = SortingOps.SorterSet.getSorterCoverages
+                let ssetMaker = SortableSetMaker.make None
+
+                let! srtblSt = SortableSet.make ssetMaker sortableSetType 
+
+                let! sorterCovs = SortingOps.SorterSet.getSorterCoverages2
                                       sorterSet
-                                      sortableSet
+                                      srtblSt
                                       switchUsePlan
                                       true
                                       (UseParallel.create useParallel)
@@ -110,7 +113,7 @@ module CauseSorters =
                                     (nameof selectedCovs) 
                                     selectedCovs
                                     e2 
-            }
+          } 
         {Cause.causeSpec=causeSpec; op=causer}
 
 
@@ -121,11 +124,11 @@ module CauseSorters =
                 let! sorterRndGen = 
                         causeSpec.prams 
                             |> ResultMap.procKeyedString "sorterRndGen" 
-                                                            (SorterRndGenDto.fromJson)
+                                                         (SorterRndGenDto.fromJson)
                 let! sorterCount = 
                         causeSpec.prams 
                             |> ResultMap.procKeyedInt "sorterCount" 
-                                                            (fun d -> SorterCount.create "" d)
+                                                       (fun d -> SorterCount.create "" d)
                 let! rngGen = 
                         causeSpec.prams 
                             |> ResultMap.procKeyedString "rndGen" 
@@ -134,10 +137,10 @@ module CauseSorters =
                         causeSpec.prams 
                             |> ResultMap.procKeyedString "switchUsePlan" 
                                                          (Json.deserialize<Sorting.switchUsePlan>)
-                let! sortableSetSpec = 
+                let! sortableSetType = 
                         causeSpec.prams 
-                            |> ResultMap.procKeyedString "sortableSetSpec" 
-                                                            (SortableSetSpecDto.fromJson)
+                            |> ResultMap.procKeyedString "sortableSetType" 
+                                                          (SortableSetTypeDto.fromJson)
                 let! sorterSaving = 
                         causeSpec.prams 
                         |> ResultMap.procKeyedString "sorterSaving" 
@@ -149,7 +152,7 @@ module CauseSorters =
                 let! resultsName = 
                         causeSpec.prams 
                             |> ResultMap.procKeyedString "resultsName"
-                                                            (id >> Result.Ok)
+                                                         (id >> Result.Ok)
     
                 let randy = Rando.fromRngGen rngGen
                 let sorterArray = SorterRndGen.createRandomArray 
@@ -162,17 +165,14 @@ module CauseSorters =
                                             sorterSetId
                                             (sorterRndGen |> SorterRndGen.getDegree)
                                             sorterArray
-    
-                let! sortableSetEx = sortableSetSpec 
-                                        |> SortableSetSpec.getSortableSet
 
-                let (sortableSetTrim, switchUses) = 
-                            sortableSetEx |> SortingOps.SortableSet.reduceByPrefix 
-                                                            sorterRndGen
+                let ssetMaker = SortableSetMaker.make None
 
-                let! sorterCovs = SortingOps.SorterSet.getSorterCoverages
+                let! srtblSt = SortableSet.make ssetMaker sortableSetType 
+
+                let! sorterCovs = SortingOps.SorterSet.getSorterCoverages2
                                         sSet
-                                        sortableSetTrim
+                                        srtblSt
                                         switchUsePlan
                                         true
                                         (UseParallel.create useParallel)
@@ -206,7 +206,6 @@ module CauseSorters =
         | [] -> "No CauseSorters genus" |> Error
         | ["rndGen"] -> rndGen causeSpec |> Ok
         | ["evalToSorterPerfBins"] -> evalToSorterPerfBins causeSpec |> Ok
-       // | ["genToSorterPerfBins"] -> genToSorterPerfBins causeSpec |> Ok
         | ["rndGenToPerfBins"] -> rndGenToPerfBins causeSpec |> Ok
         | a::b -> sprintf "CauseTest: %s not handled" a |> Error
 

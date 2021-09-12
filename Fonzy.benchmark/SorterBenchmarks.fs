@@ -12,7 +12,9 @@ type BenchSorterOnInts() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
     let rollout = IntSetsRollout.allBinary degree |> Result.ExtractOrThrow
-    let sortableSetBinary = SortableSetBinary.allIntBits degree
+
+    let bitSets = BitSet.arrayOfAllFor degree
+
     
     [<Benchmark>]
     member this.sorterWithNoSAG() =
@@ -36,7 +38,7 @@ type BenchSorterOnInts() =
     member this.evalSorter() =
         let ssR = SortingInts.evalSorterOnBinary 
                             sorter16 
-                            sortableSetBinary 
+                            bitSets 
                             Sorting.switchUsePlan.All
                             Sorting.eventGrouping.BySwitch
         ssR
@@ -71,16 +73,15 @@ type BenchSorterSetOnInts() =
                         sorterSetId
                         degree
                         mediocreRandomSorters
-
-    let sortableSetAllBits = sortableSetSpec.Generated 
-                                (SortableSetGen.allIntBits degree)
-                             |> SortableSetSpec.getSortableSet
-                             |> Result.ExtractOrThrow
+    let srtblStTypeInts = sortableSetType.AllForDegree 
+                               (sortableSetRep.Integer degree)
+    let sortableSetAllBits = SortableSetMaker.makeNoRepo srtblStTypeInts
+                                |> Result.ExtractOrThrow
 
 
     [<Benchmark>]
     member this.getSorterCoverage50_Parallel_NoGrouping() =
-        let ssR = SortingOps.SorterSet.eval
+        let ssR = SortingOps.SorterSet.eval2
                         mediocreSorterSet 
                         sortableSetAllBits
                         Sorting.switchUsePlan.All
@@ -94,7 +95,7 @@ type BenchSorterSetOnInts() =
 
     [<Benchmark>]
     member this.getSorterCoverage50_Parallel_GroupBySwitch() =
-        let ssR = SortingOps.SorterSet.eval
+        let ssR = SortingOps.SorterSet.eval2
                         mediocreSorterSet 
                         sortableSetAllBits 
                         Sorting.switchUsePlan.All
@@ -107,7 +108,7 @@ type BenchSorterSetOnInts() =
 
     [<Benchmark>]
     member this.getSorterCoverage50_Serial_NoGrouping() =
-        let ssR = SortingOps.SorterSet.eval
+        let ssR = SortingOps.SorterSet.eval2
                         mediocreSorterSet 
                         sortableSetAllBits
                         Sorting.switchUsePlan.All
@@ -119,7 +120,7 @@ type BenchSorterSetOnInts() =
 
     [<Benchmark>]
     member this.getSorterCoverage50_Serial_GroupBySwitch() =
-        let ssR = SortingOps.SorterSet.eval
+        let ssR = SortingOps.SorterSet.eval2
                         mediocreSorterSet 
                         sortableSetAllBits 
                         Sorting.switchUsePlan.All
@@ -138,12 +139,15 @@ type BenchSorterSetOnInts() =
 
 type BenchmarkSorterOnBp64() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
-    let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
-    let sortableSetbp64 = SortableSetBp64.allBp64 degree
+    let srtblStType = sortableSetType.AllForDegree 
+                               (sortableSetRep.Bp64 degree)
+    let sortableSetbp64 = SortableSetMaker.makeNoRepo srtblStType
+                            |> Result.ExtractOrThrow
 
     let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
     let rollout = BP64SetsRollout.allBinary degree |> Result.ExtractOrThrow
-    
+    let bp64s = BitsP64.arrayOfAllFor degree
+
     [<Benchmark>]
     member this.sorterWithNoSAG() =
         let ssR = SortingBp64.sorterWithNoSAG
@@ -166,7 +170,7 @@ type BenchmarkSorterOnBp64() =
     member this.evalSorter() =
         let ssR = SortingBp64.evalSorter 
                             sorter16 
-                            sortableSetbp64 
+                            bp64s
                             Sorting.switchUsePlan.All
                             Sorting.eventGrouping.BySwitch
         ssR
@@ -203,11 +207,10 @@ type BenchmarkSorterSetOnBp64() =
                         degree
                         mediocreRandomSorters
 
-    let sortableSetAllBits = sortableSetSpec.Generated 
-                               (SortableSetGen.allBp64 degree)
-                             |> SortableSetSpec.getSortableSet
-                             |> Result.ExtractOrThrow 
-
+    let srtblStType = sortableSetType.AllForDegree 
+                               (sortableSetRep.Bp64 degree)
+    let sortableSetbp64 = SortableSetMaker.makeNoRepo srtblStType
+                            |> Result.ExtractOrThrow
                             
     //[<Benchmark>]
     //member this.getSorterCoverage50_Parallel_NoGrouping() =
@@ -225,9 +228,9 @@ type BenchmarkSorterSetOnBp64() =
 
     [<Benchmark>]
     member this.getSorterCoverage50_Parallel_GroupBySwitch() =
-        let ssR = SortingOps.SorterSet.eval
+        let ssR = SortingOps.SorterSet.eval2
                         mediocreSorterSet 
-                        sortableSetAllBits 
+                        sortableSetbp64 
                         Sorting.switchUsePlan.All
                         Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)

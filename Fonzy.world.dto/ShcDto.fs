@@ -232,7 +232,7 @@ type sorterShcSpecDto =
      sorter:sorterDto;
      switchPfx: int[];
      mutSpec:sorterMutSpecDto;
-     sortableRs:sortableSetSpecReducedDto
+     srtblStType:sortableSetTypeDto
      stWgtSpec:shcStageWeightSpecDto
      evalSpec:sorterEvalSpecDto
      annealer:annealerSpecDto;
@@ -248,7 +248,7 @@ module SorterShcSpecDto =
                                      |> Array.toList
                                      |> Result.sequence
             let! mutSpec = dto.mutSpec |> SorterMutSpecDto.fromDto
-            let! ssRs = dto.sortableRs |> SortableSetSpecReducedDto.fromDto
+            let! ssRs = dto.srtblStType |> SortableSetTypeDto.fromDto
             let! swS = dto.stWgtSpec |> ShcStageWeightSpecDto.fromDto
             let! evl = dto.evalSpec |> SorterEvalSpecDto.fromDto
             let! ann = dto.annealer  |> AnnealerSpecDto.fromDto
@@ -259,7 +259,7 @@ module SorterShcSpecDto =
                       sorter = srt;
                       switchPfx = swx |> List.toArray;
                       mutator = mutSpec;
-                      shcSortableSetSpec = ssRs;
+                      srtblSetType = ssRs;
                       shcStageWeightSpec = swS;
                       evaluator = evl;
                       annealer = ann;
@@ -281,7 +281,7 @@ module SorterShcSpecDto =
                 sorter = sss.sorter |> SorterDto.toDto;
                 switchPfx = sss.switchPfx |> Array.map(SwitchDto.toDto);
                 mutSpec = sss.mutator |> SorterMutSpecDto.toDto
-                sortableRs = sss.shcSortableSetSpec |> SortableSetSpecReducedDto.toDto
+                srtblStType = sss.srtblSetType |> SortableSetTypeDto.toDto
                 stWgtSpec = sss.shcStageWeightSpec |> ShcStageWeightSpecDto.toDto
                 evalSpec = sss.evaluator |> SorterEvalSpecDto.toDto
                 annealer = sss.annealer |> AnnealerSpecDto.toDto

@@ -158,30 +158,21 @@ type ComboStructuresFixture () =
     member this.IntBits_FromInteger() =
      let len = 6
      let expectedArray = [|1; 1; 1; 0; 1; 0|]
-     let converted = IntBits.fromInteger 6 23
+     let converted = BitSet.fromInteger 6 23
      Assert.IsTrue ((expectedArray = converted.values))
      
 
     [<TestMethod>]
     member this.IntBits_FromAndToInteger() =
      let testInt = 123456
-     let converted = IntBits.fromInteger 32 testInt
-     let intBack = IntBits.toInteger converted
+     let converted = BitSet.fromInteger 32 testInt
+     let intBack = BitSet.toInteger converted
      Assert.AreEqual (testInt, intBack)
-
-     
-    [<TestMethod>]
-    member this.trueBitCount32() =
-        let gA = IntBits.create [|1;0;0;0;0;1;1;0;0;0;0;1;1;0;1;0;0;0;0;1|]
-        let gB = IntBits.toUint32 gA
-        let tc = ByteUtils.trueBitCount32 gB
-        Assert.AreEqual(tc, 7)
-
 
     [<TestMethod>]
     member this.trueBitCount64() =
-        let gA = IntBits.create [|1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1|]
-        let gB = IntBits.toUint64 gA
+        let gA = BitSet.create [|1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1|]
+        let gB = BitSet.toUint64 gA
         let tc = ByteUtils.trueBitCount64 gB
         Assert.AreEqual(tc, 25)
 
@@ -215,15 +206,15 @@ type ComboStructuresFixture () =
      let intBitsArray = 
         unEncodedVals 
             |> Array.map(fun av ->
-               IntBits.fromInteger (Degree.value degree)
+               BitSet.fromInteger (Degree.value degree)
                                    av)
 
      let theUints = BitsP32.zeroCreate (Degree.value degree)
 
-     let bp32s = BitsP32.fromIntBits intBitsArray
+     let bp32s = BitsP32.fromBitSets intBitsArray
                  |> Seq.toArray
 
-     let bitsBack = BitsP32.toIntBits bp32s
+     let bitsBack = BitsP32.toBitSets bp32s
                     |> Seq.toArray
 
      for i = 0 to (unEncodedVals.Length - 1) do
@@ -231,7 +222,7 @@ type ComboStructuresFixture () =
                              intBitsArray.[i]
                              i
      let decodedVals = 
-            bitsBack |> Array.map(IntBits.toInteger)
+            bitsBack |> Array.map(BitSet.toInteger)
      let l = decodedVals.Length
      Assert.AreEqual (bitsBack.Length, l)
      for i = 0 to (unEncodedVals.Length - 1) do
@@ -243,7 +234,7 @@ type ComboStructuresFixture () =
      let degree = Degree.fromInt 16
      let encodedVal = 8675
      let pos = 11
-     let intBits = IntBits.fromInteger (Degree.value degree)
+     let intBits = BitSet.fromInteger (Degree.value degree)
                                        encodedVal
      let blank = BitsP32.zeroCreate (Degree.value degree)
      BitsP32.stripeWrite blank
@@ -251,7 +242,7 @@ type ComboStructuresFixture () =
                          pos
      let bitsBack = BitsP32.stripeRead blank 
                                        pos
-     let decoded = IntBits.toInteger bitsBack
+     let decoded = BitSet.toInteger bitsBack
      Assert.AreEqual (encodedVal, decoded)
 
 
@@ -261,13 +252,12 @@ type ComboStructuresFixture () =
       let encodedVal = 8675
       let rec64Array = Record64Array.make degree
 
-      let intBits = IntBits.fromInteger (Degree.value degree)
+      let intBits = BitSet.fromInteger (Degree.value degree)
                                          encodedVal
       Record64Array.recordIntBits rec64Array intBits
-      let intBitsBack = Record64Array.toIntArrays degree rec64Array
+      let intBitsBack = Record64Array.toBitSets degree rec64Array
                         |> Seq.head
       Assert.AreEqual (intBits, intBitsBack)
-
 
 
     [<TestMethod>]

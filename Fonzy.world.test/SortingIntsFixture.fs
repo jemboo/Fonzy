@@ -38,59 +38,59 @@ type SortingIntsFixture () =
         Assert.AreEqual(usedSwitchCount.Length, (SwitchCount.value refSorter.switchCount))
 
 
-    [<TestMethod>]
-    member this.getHistogramOfSortedSortables() =
-        let refSorter = TestData.SorterParts.goodRefSorter
+    //[<TestMethod>]
+    //member this.getHistogramOfSortedSortables() =
+    //    let refSorter = TestData.SorterParts.goodRefSorter
 
-        let switchEventRecordsNoSAG = 
-            SortingInts.sorterWithNoSAG 
-                refSorter 
-                TestData.SorterActionRecords.intSetsRolloutOfAll
-                Sorting.switchUsePlan.All
+    //    let switchEventRecordsNoSAG = 
+    //        SortingInts.sorterWithNoSAG 
+    //            refSorter 
+    //            TestData.SorterActionRecords.intSetsRolloutOfAll
+    //            Sorting.switchUsePlan.All
    
 
-        let sortedSortablesNoSAG = 
-                switchEventRecordsNoSAG
-                    |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
-                    |> Array.toList
+    //    let sortedSortablesNoSAG = 
+    //            switchEventRecordsNoSAG
+    //                |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
+    //                |> Array.toList
 
-        Assert.AreEqual(sortedSortablesNoSAG.Length, (Degree.value refSorter.degree) + 1)
+    //    Assert.AreEqual(sortedSortablesNoSAG.Length, (Degree.value refSorter.degree) + 1)
 
-        let switchEventRecordsMakeSwitchUses = 
-            SortingInts.sorterMakeSwitchUses 
-                refSorter 
-                TestData.SorterActionRecords.intSetsRolloutOfAll
-                Sorting.switchUsePlan.All
+    //    let switchEventRecordsMakeSwitchUses = 
+    //        SortingInts.sorterMakeSwitchUses 
+    //            refSorter 
+    //            TestData.SorterActionRecords.intSetsRolloutOfAll
+    //            Sorting.switchUsePlan.All
    
 
-        let sortedSortablesMakeSwitchUses = 
-                switchEventRecordsMakeSwitchUses
-                    |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
-                    |> Array.toList
+    //    let sortedSortablesMakeSwitchUses = 
+    //            switchEventRecordsMakeSwitchUses
+    //                |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
+    //                |> Array.toList
 
-        Assert.AreEqual(sortedSortablesMakeSwitchUses.Length, (Degree.value refSorter.degree) + 1)
+    //    Assert.AreEqual(sortedSortablesMakeSwitchUses.Length, (Degree.value refSorter.degree) + 1)
 
 
 
-    [<TestMethod>]
-    member this.evalSorter() =
-        let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
-        let sorter16 = RefSorter.goodRefSorterForDegree degree 
-                        |> Result.ExtractOrThrow
-        let sortableSetBinary = SortableSetBinary.allIntBits degree
+    //[<TestMethod>]
+    //member this.evalSorter() =
+    //    let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
+    //    let sorter16 = RefSorter.goodRefSorterForDegree degree 
+    //                    |> Result.ExtractOrThrow
+    //    let sortableSetBinary = SortableSetBinary.allIntBits degree
         
-        let switchEventRecords = 
-                    SortingInts.evalSorterOnBinary 
-                        sorter16 
-                        sortableSetBinary
-                        Sorting.switchUsePlan.All
-                        Sorting.eventGrouping.BySwitch
+    //    let switchEventRecords = 
+    //                SortingInts.evalSorterOnBinary 
+    //                    sorter16 
+    //                    sortableSetBinary.sortables
+    //                    Sorting.switchUsePlan.All
+    //                    Sorting.eventGrouping.BySwitch
 
-        let usedSwitchCount = switchEventRecords 
-                              |> SwitchEventRecords.getUsedSwitchCount
-                              |> Result.ExtractOrThrow
+    //    let usedSwitchCount = switchEventRecords 
+    //                          |> SwitchEventRecords.getUsedSwitchCount
+    //                          |> Result.ExtractOrThrow
 
-        Assert.IsTrue((SwitchCount.value usedSwitchCount) > 0)
+    //    Assert.IsTrue((SwitchCount.value usedSwitchCount) > 0)
 
 
     [<TestMethod>]
@@ -100,20 +100,21 @@ type SortingIntsFixture () =
         let hist = SortingInts.History.sortTHist goodSorter testCase
         Assert.AreEqual(hist.Length, 1 + SwitchCount.value goodSorter.switchCount)
         let result = hist.Item (hist.Length - 1)
-        Assert.IsTrue(result |> IntBits.isSorted)
+        Assert.IsTrue(result |> BitSet.isSorted)
 
 
 
     [<TestMethod>]
     member this.SorterSet_eval() =
         let sorterSet = TestData.SorterSet.mediocreSorterSet
-        let sortableSetBinary = sortableSetSpec.Generated 
-                                    (SortableSetGen.allIntBits sorterSet.degree)
-                                 |> SortableSetSpec.getSortableSet
-                                 |> Result.ExtractOrThrow 
-        let ssR = SortingOps.SorterSet.eval
+        let srtblStType = sortableSetType.AllForDegree 
+                                   (sortableSetRep.Bp64 sorterSet.degree)
+        let srtableSet = SortableSetMaker.makeNoRepo srtblStType
+                         |> Result.ExtractOrThrow
+
+        let ssR = SortingOps.SorterSet.eval2
                         sorterSet 
-                        sortableSetBinary 
+                        srtableSet 
                         Sorting.switchUsePlan.All
                         Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)
@@ -168,14 +169,14 @@ type SortingIntsFixture () =
             List.init (SorterCount.value sorterCount)
                       (fun _ -> makeRandomSorter())
 
-        let sortableSetEx = sortableSetSpec.Generated 
-                                (SortableSetGen.allIntBits degree)
-                                |> SortableSetSpec.getSortableSet
-                                |> Result.ExtractOrThrow
+        let sstInt = sortableSetType.AllForDegree
+                        (sortableSetRep.Integer degree)
+        let srtblStInt = SortableSetMaker.makeNoRepo sstInt
+                        |> Result.ExtractOrThrow
 
-        let sorterCovs = SortingOps.SorterSet.getSorterCoverages
+        let sorterCovs = SortingOps.SorterSet.getSorterCoverages2
                               altEvenSorterSet
-                              sortableSetEx
+                              srtblStInt
                               Sorting.switchUsePlan.All
                               true
                               (UseParallel.create true)
@@ -220,21 +221,21 @@ type SortingIntsFixture () =
                             degree 
                             sorterArray
 
-        let sortableSetEx = sortableSetSpec.Generated 
-                                (SortableSetGen.allIntBits degree)
-                                |> SortableSetSpec.getSortableSet
-                                |> Result.ExtractOrThrow 
+        //let sortableSetEx = sortableSetSpec.Generated 
+        //                        (SortableSetGen.allIntBits degree)
+        //                        |> SortableSetSpec.getSortableSet
+        //                        |> Result.ExtractOrThrow 
 
-        let sorterCovs = SortingOps.SorterSet.getSorterCoverages
-                            sSet
-                            sortableSetEx
-                            Sorting.switchUsePlan.All
-                            true
-                            (UseParallel.create true)
-                        |> Result.ExtractOrThrow
+        //let sorterCovs = SortingOps.SorterSet.getSorterCoverages
+        //                    sSet
+        //                    sortableSetEx
+        //                    Sorting.switchUsePlan.All
+        //                    true
+        //                    (UseParallel.create true)
+        //                |> Result.ExtractOrThrow
 
-        let perfBins = sorterCovs 
-                        |> SortingEval.SorterPerfBin.fromSorterCoverages
+        //let perfBins = sorterCovs 
+        //                |> SortingEval.SorterPerfBin.fromSorterCoverages
 
         //let pbr  = perfBins |> Result.ExtractOrThrow
         //let rep = (pbr |> SorterPerf.binReport)

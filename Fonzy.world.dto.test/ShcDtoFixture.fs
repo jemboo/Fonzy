@@ -6,21 +6,8 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 [<TestClass>]
 type ShcDtoFixture () =
 
-
     [<TestMethod>]
-    member this.SortableSetSpecDto() =
-        let degree = Degree.fromInt 12
-        let sortableSetSpec = SortableSetGen.allBp64 degree
-                                |> sortableSetSpec.Generated
-        let sorterSetCereal = TestData.SorterSet.mediocreSorterSet 
-                                |> SorterSetDto.toJson
-        let sorterSetBack = sorterSetCereal |> SorterSetDto.fromJson
-                                            |> Result.ExtractOrThrow
-        Assert.AreEqual(TestData.SorterSet.mediocreSorterSet, sorterSetBack);
-
-
-    [<TestMethod>]
-    member this.SortableSetSpecReducedDto() =
+    member this.SorterSetDto() =
         let sorterSetCereal = TestData.SorterSet.mediocreSorterSet |> SorterSetDto.toJson
         let sorterSetBack = sorterSetCereal |> SorterSetDto.fromJson
                                             |> Result.ExtractOrThrow
@@ -111,7 +98,7 @@ type ShcDtoFixture () =
         let rng = RngGen.createLcg (RandomSeed.fromInt 123)
         let sorter = RefSorter.goodRefSorterForDegree degree
                         |> Result.ExtractOrThrow
-        let wPfx = [|1;2;3;|] |> Switch.fromIntArray
+        let wPfx = [|1;2;3;0;|] |> Switch.fromIntArray
                    |> Seq.toArray
         let pfxSc = SwitchCount.fromInt wPfx.Length
         let mutRate = MutationRate.fromFloat 1.0

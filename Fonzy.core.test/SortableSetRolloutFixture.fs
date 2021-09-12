@@ -25,9 +25,9 @@ type SortableSetRolloutFixture() =
 
 
     [<TestMethod>]
-    member this.IntSetsRollout_distinctResults() =
+    member this.removeDupes() =
       let unsortedIntsRollout = TestData.SorterActionRecords.intSetsRolloutOfAllSorted
-      let drs = unsortedIntsRollout |> IntSetsRollout.intBitsDistinct
+      let drs = unsortedIntsRollout |> IntSetsRollout.removeDupes
       Assert.IsTrue(drs.Length = (Degree.value TestData.degree) + 1)
 
 
@@ -36,23 +36,23 @@ type SortableSetRolloutFixture() =
     member this.SortableSetRollout_histogramOfSortableSets() =
       let unSortedRollout = TestData.SorterActionRecords.intSetsRolloutOfAll
       let sortableCount = SortableCount.value unSortedRollout.sortableCount
-      let histo = unSortedRollout |> IntSetsRollout.intBitsHist
+      let histo = unSortedRollout |> IntSetsRollout.intSetHist
       let totalCount = histo |> Array.sumBy(snd)
       Assert.AreEqual(sortableCount, totalCount)
 
 
-    [<TestMethod>]
-    member this.removeDupesFromNoDupes() =
-      let unSortedBp64Rollout = TestData.SorterActionRecords.bP64SetsRolloutOfAll
-                                  |> sortableSetRollout.Bp64
+    //[<TestMethod>]
+    //member this.removeDupesFromNoDupes() =
+    //  let unSortedBp64Rollout = TestData.SorterActionRecords.bP64SetsRolloutOfAll
+    //                              |> sortableSetRollout.Bp64
 
-      let intBitsFromBp =  unSortedBp64Rollout 
-                            |> SortableSetRollout.toIntBits
-                            |> Seq.toArray
+    //  let intBitsFromBp =  unSortedBp64Rollout 
+    //                        |> SortableSetRollout.toIntBits
+    //                        |> Seq.toArray
       
-      let intBitsBpUnique =  unSortedBp64Rollout 
-                                |> SortableSetRollout.removeDupes
-                                |> Seq.toArray
+    //  let intBitsBpUnique =  unSortedBp64Rollout 
+    //                            |> SortableSetRollout.removeDupes
+    //                            |> Seq.toArray
 
-      Assert.AreEqual(intBitsFromBp.Length, intBitsBpUnique.Length)
+    //  Assert.AreEqual(intBitsFromBp.Length, intBitsBpUnique.Length)
 

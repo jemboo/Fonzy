@@ -9,7 +9,7 @@ module SorterPbCauseSpecGen =
                 sorterCount
                 rndGen
                 switchUsePlan
-                sortableSetSpec
+                sortableSetType
                 sorterSaving
                 useParallel
                 resultsName =
@@ -19,7 +19,7 @@ module SorterPbCauseSpecGen =
                 ("sorterCount", sorterCount)
                 ("rndGen", rndGen)
                 ("switchUsePlan", switchUsePlan)
-                ("sortableSetSpec", sortableSetSpec)
+                ("sortableSetType", sortableSetType)
                 ("sorterSaving", sorterSaving)
                 ("useParallel", (UseParallel.value useParallel))
                 ("resultsName", resultsName)
@@ -167,24 +167,19 @@ module SorterPbCauseSpecGen =
         let sorterRndGenToCauseSpec (dex:int) 
                                     (sorterRndGen:sorterRndGen) =
             let degree = sorterRndGen |> SorterRndGen.getDegree
+            let pfx = sorterRndGen |> SorterRndGen.getSwitchPrefix
+            let ssRep = sortableSetRep.Bp64 degree 
+            let srtableStType = sortableSetType.SwitchReduced 
+                                 ((sortableSetType.AllForDegree ssRep), pfx)
             let sorterCount = degree |> sorterCountForDegree
             let rndGen = (nextRnGen(randy))
 
-
-            let sortableSetSpec = SortableSetGen.allBp64 degree
-                                    |> sortableSetSpec.Generated
-
-            //let sortableSetSpec = SortableSetGenerated.allIntBits degree
-            //                        |> SortableSetSpec.Generated
-
-            let sortableSetEx = sortableSetSpec 
-                                    |> SortableSetSpec.getSortableSet
-                                    |> Result.ExtractOrThrow
+            let ssImplBps = SortableSetMaker.allZeroOnes
+                                    (sortableSetRep.Binary degree)
 
             let (sortableSetTrim, switchUses) = 
-                        sortableSetEx |> SortingOps.SortableSet.reduceByPrefix 
-                                                        sorterRndGen
-
+                ssImplBps |> SortingOps.SortableSet.reduceByPrefix2 sorterRndGen
+                |> Result.ExtractOrThrow
 
             let totalSwitchCt = sorterRndGen |> SorterRndGen.getSwitchCount
             let switchUsePlan = Sorting.SwitchUsePlan.makeIndexes 
@@ -199,8 +194,8 @@ module SorterPbCauseSpecGen =
                                 sorterRndGen 
                                 sorterCount 
                                 rndGen 
-                                switchUsePlan 
-                                sortableSetSpec
+                                switchUsePlan
+                                srtableStType
                                 perf10
                                 useParallel 
                                 resultsName

@@ -7,7 +7,7 @@ open BenchmarkDotNet.Running
 let main argv =
 
     /// ******* runPerfBinBatchSeq ***********
-    Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq2")
+    Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq")
 
     RunBatch.runPerfBinBatchSeq (FilePath.fromString "C:\\SimOutTst") 
                                 (RandomSeed.fromNow ())

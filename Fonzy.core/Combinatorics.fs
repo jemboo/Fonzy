@@ -73,7 +73,6 @@ module Combinatorics =
              i<-i+1
         looP
 
-
     let isTwoCycle (a:int[]) =
         (composeMapIntArrays a a) = identity a.Length
 
@@ -133,6 +132,11 @@ module Combinatorics =
         seq {for i = 0 to x - 1 do yield (xa.[i], ya.[y-1])}
             |> Seq.append (seq {for i = 0 to y - 2 do yield (xa.[x-1], ya.[i])})
 
+    let randOneOrZero (pctOnes:float) (rnd:IRando) 
+                      (len:int) =
+        Seq.init len (fun _ -> 
+                if (rnd.NextFloat > pctOnes) then 0 else 1)
+
     let drawTwoWithoutRep (degree:Degree) 
                           (rnd:IRando) =
         let aBit = rnd.NextPositiveInt % Degree.value(degree)
@@ -142,8 +146,7 @@ module Combinatorics =
         if aBit < bBit then aBit, bBit
         else bBit, aBit
 
-    let rndMonoTwoCycle (degree:Degree) 
-                               (rnd:IRando) =
+    let rndMonoTwoCycle (degree:Degree) (rnd:IRando) =
         let tup = drawTwoWithoutRep degree rnd
         makeMonoTwoCycle degree (fst tup) (snd tup)
 
@@ -178,7 +181,6 @@ module Combinatorics =
     let reflect (degree:int) (src:int) =
         degree - src - 1
 
-
     let randomPermutation (rnd:IRando) 
                           (degree:int) =
          (fisherYatesShuffle rnd)  [|0 .. degree-1|] |> Seq.toArray
@@ -205,6 +207,7 @@ module Combinatorics =
     let rndFullTwoCycleArray (rnd:IRando) 
                              (arraysize:int) =
         rndTwoCycleArray rnd arraysize (arraysize/2)
+
 
     let locsPosArrayo (arrayLen:int) (locs: (int*int*int) list) = 
         let arrayRet = Array.zeroCreate arrayLen

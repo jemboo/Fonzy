@@ -28,17 +28,9 @@ type UtilsFixture () =
 
 
     [<TestMethod>]
-    member this.trueBitCount32() =
-        let gA = IntBits.create [|1;0;0;0;0;1;1;0;0;0;0;1;1;0;1;0;0;0;0;1|]
-        let gB = IntBits.toUint32 gA
-        let tc = ByteUtils.trueBitCount32 gB
-        Assert.AreEqual(tc, 7)
-
-
-    [<TestMethod>]
     member this.trueBitCount64() =
-        let gA = IntBits.create [|1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1|]
-        let gB = IntBits.toUint64 gA
+        let gA = BitSet.create [|1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1|]
+        let gB = BitSet.toUint64 gA
         let tc = ByteUtils.trueBitCount64 gB
         Assert.AreEqual(tc, 25)
 
@@ -81,6 +73,19 @@ type UtilsFixture () =
     member this.guidFromObjs() =
         let objsA = seq { 1:>obj; 2:> obj;}
         let objsB = seq { 1:>obj; 2:> obj;}
+        let gA = objsA |> GuidUtils.guidFromObjs
+        let gB = objsB |> GuidUtils.guidFromObjs
+        Assert.AreEqual(gA, gB)
+
+
+
+    [<TestMethod>]
+    member this.guidFromObjs2() =
+        let d1 = sortableSetRep.Bp64 (Degree.fromInt 5)
+        let d2 = sortableSetRep.Bp64 (Degree.fromInt 5)
+
+        let objsA = seq { d1:>obj; }
+        let objsB = seq { d2:>obj; }
         let gA = objsA |> GuidUtils.guidFromObjs
         let gB = objsB |> GuidUtils.guidFromObjs
         Assert.AreEqual(gA, gB)

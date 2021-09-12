@@ -290,30 +290,30 @@ module TwoCycleGen =
                }
 
 
-type intBits = { values:int[] }
-module IntBits =
+type intSet = { values:int[] }
+module IntSet =
 
     let create (avs:int[]) = 
-        {intBits.values = avs}
+        {intSet.values = avs}
 
     let zeroCreate (count:int) = 
-        { intBits.values = 
+        { intSet.values = 
                 Array.create count 0 }
 
-    let copy (intBits:intBits) = 
-        {intBits.values = Array.copy (intBits.values) }
+    let copy (intSet:intSet) = 
+        {intSet.values = Array.copy (intSet.values) }
 
-    let isZero (ibs:intBits) = 
+    let isZero (ibs:intSet) = 
         ibs.values |> Array.forall((=) 0)
 
-    let isSorted (intBits:intBits) =
-        Combinatorics.isSorted intBits.values
+    let isSorted (intSet:intSet) =
+        Combinatorics.isSorted intSet.values
 
     let sorted_O_1_Sequence (degree:Degree) 
                             (onesCount:int) =
         let totalSize = (Degree.value degree)
         let numZeroes = totalSize - onesCount
-        { intBits.values = Array.init totalSize 
+        { intSet.values = Array.init totalSize 
                     (fun i -> if i< numZeroes then 0 else 1)}
 
     //Returns a bloclLen + 1 length array of IntBits
@@ -323,22 +323,15 @@ module IntBits =
                 yield (sorted_O_1_Sequence degree i) }
 
 
-    let randomPctOnes (rnd:IRando) 
-                      (len:int) 
-                      (pctOnes:float) =
-        Seq.init len (fun _ -> 
-                if (rnd.NextFloat > pctOnes) then 0 else 1)
-
-
     let fromInteger (len:int) (intVers:int) =
         let bitLoc (loc:int) (intBits:int) =
             if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
-        { intBits.values = 
+        { intSet.values = 
                     Array.init len 
-                               (fun i -> bitLoc i intVers) }
+                                (fun i -> bitLoc i intVers) }
 
 
-    let toInteger (arrayVers:intBits) =
+    let toInteger (arrayVers:intSet) =
         let mutable intRet = 0
         let bump i =
             intRet <- intRet * 2
@@ -348,39 +341,16 @@ module IntBits =
         for i in (arrayVers.values.Length - 1) .. -1 .. 0 do
             bump i
         intRet
-
-        
-        
-    let fromUint32 (len:int) (intVers:int) =
-        let bitLoc (loc:int) (intBits:int) =
-            if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
-        { intBits.values = 
-                    Array.init len 
-                                (fun i -> bitLoc i intVers) }
-        
-        
-    let toUint32 (arrayVers:intBits) =
-        let mutable intRet = 0u
-        let bump i =
-            intRet <- intRet * 2u
-            if (arrayVers.values.[i] = 1) then
-                intRet <- intRet + 1u
-        
-        for i in (arrayVers.values.Length - 1) .. -1 .. 0 do
-            bump i
-        intRet
-
-                
                 
     let fromUint64 (len:int) (intVers:int) =
         let bitLoc (loc:int) (intBits:int) =
             if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
-        { intBits.values = 
+        { intSet.values = 
                     Array.init len 
                                 (fun i -> bitLoc i intVers) }
                 
                 
-    let toUint64 (arrayVers:intBits) =
+    let toUint64 (arrayVers:intSet) =
         let mutable intRet = 0UL
         let bump i =
             intRet <- intRet * 2UL
@@ -406,16 +376,110 @@ module IntBits =
     let createRandom (degree:Degree) (rando:IRando) = 
         let perm = 
             Array.init (Degree.value degree)
+                        (fun _ -> let q = rando.NextFloat
+                                  if (q > 0.5) then 1 else 0 )
+        {intSet.values = perm }
+
+
+    let createRandoms (degree:Degree) 
+                        (rnd:IRando) =
+        seq { while true do 
+                yield createRandom degree rnd }
+
+
+type bitSet = { values:int[] }
+module BitSet =
+
+    let create (avs:int[]) = 
+        {bitSet.values = avs}
+
+    let zeroCreate (count:int) = 
+        { bitSet.values = 
+                Array.create count 0 }
+
+    let copy (bitSet:bitSet) = 
+        {bitSet.values = Array.copy (bitSet.values) }
+
+    let isZero (ibs:bitSet) = 
+        ibs.values |> Array.forall((=) 0)
+
+    let isSorted (bitSet:bitSet) =
+        Combinatorics.isSorted bitSet.values
+
+    let sorted_O_1_Sequence (degree:Degree) 
+                            (onesCount:int) =
+        let totalSize = (Degree.value degree)
+        let numZeroes = totalSize - onesCount
+        { bitSet.values = Array.init totalSize 
+                    (fun i -> if i< numZeroes then 0 else 1)}
+
+    //Returns a bloclLen + 1 length array of IntBits
+    // of all possible sorted 0-1 sequences of length degree
+    let sorted_0_1_Sequences (degree:Degree)  =
+        seq { for i = 0 to (Degree.value degree) do 
+                yield (sorted_O_1_Sequence degree i) }
+
+
+    let fromInteger (len:int) (intVers:int) =
+        let bitLoc (loc:int) (intBits:int) =
+            if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
+        { bitSet.values = 
+                    Array.init len 
+                               (fun i -> bitLoc i intVers) }
+
+    let toInteger (arrayVers:bitSet) =
+        let mutable intRet = 0
+        let bump i =
+            intRet <- intRet * 2
+            if (arrayVers.values.[i] = 1) then
+                intRet <- intRet + 1
+
+        for i in (arrayVers.values.Length - 1) .. -1 .. 0 do
+            bump i
+        intRet
+                
+    let fromUint64 (len:int) (intVers:int) =
+        let bitLoc (loc:int) (intBits:int) =
+            if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
+        { bitSet.values = 
+                    Array.init len 
+                                (fun i -> bitLoc i intVers) }
+                
+                
+    let toUint64 (arrayVers:bitSet) =
+        let mutable intRet = 0UL
+        let bump i =
+            intRet <- intRet * 2UL
+            if (arrayVers.values.[i] = 1) then
+                intRet <- intRet + 1UL
+                
+        for i in (arrayVers.values.Length - 1) .. -1 .. 0 do
+            bump i
+        intRet
+
+    let seqOfAllFor (degree:Degree) =
+        let dv = Degree.value degree 
+        {0 .. (1 <<< dv) - 1}
+        |> Seq.map (fun i -> fromInteger dv i)
+
+
+    let arrayOfAllFor (degree:Degree) =
+        let order = (Degree.value degree)
+        Array.init (1 <<< order) (fun i -> fromInteger order i)
+
+
+    let createRandom (degree:Degree) (rando:IRando) = 
+        let perm = 
+            Array.init (Degree.value degree)
                        (fun _ -> let q = rando.NextFloat
                                  if (q > 0.5) then 1 else 0   )
-        {intBits.values = perm }
+        {bitSet.values = perm }
 
 
     let createRandoms (degree:Degree) 
                       (rnd:IRando) =
         seq { while true do 
                 yield createRandom degree rnd }
-
 
 
 type bitsP32 = { values:uint[] }
@@ -439,11 +503,11 @@ module BitsP32 =
         ibs.values |> Array.forall((=) 0u)
 
     let stripeWrite (uBits:bitsP32) 
-                    (intBits:intBits) 
+                    (bitSet:bitSet) 
                     (pos:int) = 
         let one = (1u <<< pos)
         let proc dex =
-            if (intBits.values.[dex] = 1) then
+            if (bitSet.values.[dex] = 1) then
                 uBits.values.[dex] <- 
                             uBits.values.[dex] ||| one
         
@@ -458,15 +522,15 @@ module BitsP32 =
             if ((uBits.values.[dex] &&& one) > 0u) then
                 1
             else 0
-        { intBits.values = uBits.values |> Array.mapi (proc) }
+        { bitSet.values = uBits.values |> Array.mapi (proc) }
 
 
     let isSorted (uBits:bitsP32) =
         seq { 0 .. 31} |> Seq.map (fun pos -> stripeRead uBits pos)
-           |> Seq.forall(IntBits.isSorted)
+           |> Seq.forall(BitSet.isSorted)
 
 
-    let fromIntBits (ibSeq:intBits seq) =
+    let fromBitSets (ibSeq:bitSet seq) =
         seq { 
               use e = ibSeq.GetEnumerator()
               let nextChunk() =
@@ -482,7 +546,7 @@ module BitsP32 =
                 yield nextChunk()  }
 
 
-    let toIntBits (bp32s:bitsP32 seq) =
+    let toBitSets (bp32s:bitsP32 seq) =
         seq { 
               use e = bp32s.GetEnumerator()
               let nextChunk bt32 =
@@ -490,7 +554,7 @@ module BitsP32 =
                 seq { 
                    while i < 32 do
                    let ibts =  stripeRead bt32 i
-                   if (not (IntBits.isZero ibts)) then
+                   if (not (BitSet.isZero ibts)) then
                     yield ibts
                    i <- i + 1 }
 
@@ -499,20 +563,20 @@ module BitsP32 =
 
 
     let seqOfAllFor (degree:Degree) =
-        fromIntBits (IntBits.seqOfAllFor degree)
+        fromBitSets (BitSet.seqOfAllFor degree)
 
 
     let arrayOfAllFor (degree:Degree) =
-        fromIntBits (IntBits.arrayOfAllFor degree)
+        fromBitSets (BitSet.arrayOfAllFor degree)
         |> Seq.toArray
 
 
     let createRandoms (degree:Degree) 
                       (rnd:IRando) 
                       (count:int) =
-        (IntBits.createRandoms degree rnd) 
+        (BitSet.createRandoms degree rnd) 
             |> Seq.take count
-            |> fromIntBits
+            |> fromBitSets
 
 
 
@@ -533,25 +597,23 @@ module BitsP64 =
         ibs.values |> Array.forall((=) 0UL)
 
     let stripeWrite (uBits:bitsP64) 
-                    (intBits:intBits) 
+                    (bitSet:bitSet) 
                     (pos:int) =
-
         ByteUtils.stripeWrite uBits.values
-                              intBits.values
+                              bitSet.values
                               pos
-
 
     let stripeRead (uBits:bitsP64) 
                    (pos:int) = 
-        { intBits.values = ByteUtils.stripeRead uBits.values pos }
+        { bitSet.values = ByteUtils.stripeRead uBits.values pos }
 
 
     let isSorted (uBits:bitsP64) =
         seq { 0 .. 63 } |> Seq.map (fun pos -> stripeRead uBits pos)
-           |> Seq.forall(IntBits.isSorted)
+           |> Seq.forall(BitSet.isSorted)
 
 
-    let fromIntBits (ibSeq:intBits seq) =
+    let fromBitSet (ibSeq:bitSet seq) =
         seq { 
               use e = ibSeq.GetEnumerator()
               let nextChunk() =
@@ -568,7 +630,7 @@ module BitsP64 =
 
 
     // returns only the nonzero Inbits
-    let toIntBits (bp64s:bitsP64 seq) =
+    let toBitSet (bp64s:bitsP64 seq) =
         seq { 
               use e = bp64s.GetEnumerator()
               let nextChunk bt64 =
@@ -576,7 +638,7 @@ module BitsP64 =
                 seq { 
                    while i < 64 do
                    let ibts =  stripeRead bt64 i
-                   if (not (IntBits.isZero ibts)) then
+                   if (not (BitSet.isZero ibts)) then
                     yield ibts
                    i <- i + 1 }
 
@@ -585,20 +647,20 @@ module BitsP64 =
 
 
     let seqOfAllFor (degree:Degree) =
-        fromIntBits (IntBits.seqOfAllFor degree)
+        fromBitSet (BitSet.seqOfAllFor degree)
 
 
     let arrayOfAllFor (degree:Degree) =
-        fromIntBits (IntBits.arrayOfAllFor degree)
+        fromBitSet (BitSet.arrayOfAllFor degree)
         |> Seq.toArray
 
 
     let createRandoms (degree:Degree) 
                       (rnd:IRando) 
                       (count:int) =
-        (IntBits.createRandoms degree rnd) 
+        (BitSet.createRandoms degree rnd) 
             |> Seq.take count
-            |> fromIntBits
+            |> fromBitSet
 
 
 
@@ -618,8 +680,8 @@ module Record64Array =
         records.values.[recordPos] <- record
 
 
-    let recordIntBits (records:record64Array) (intBits:intBits) = 
-        let pos = intBits |> IntBits.toInteger
+    let recordIntBits (records:record64Array) (bitSet:bitSet) = 
+        let pos = bitSet |> BitSet.toInteger
         let bitPos = pos % 64
         let recordPos = pos >>> 6 |> int
         let stamp = 1UL <<< bitPos
@@ -627,13 +689,13 @@ module Record64Array =
         records.values.[recordPos] <- record
 
 
-    let toIntArrays (degree:Degree) (records:record64Array)= 
+    let toBitSets (degree:Degree) (records:record64Array)= 
         seq {
                 for i in 0 .. ( records.values.Length - 1 ) do
                     yield! ( records.values.[i] 
                                 |> ByteUtils.trueBitIndexes64 
                                 |> Seq.map(fun dx -> dx + i*64 ) )
-        }  |> Seq.map(IntBits.fromInteger (Degree.value degree))
+        }  |> Seq.map(BitSet.fromInteger (Degree.value degree))
 
 
 type vecP64 = { values: uint64[] }

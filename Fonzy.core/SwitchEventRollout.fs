@@ -4,7 +4,7 @@ open System
 type switchEventRolloutInt = {
             switchCount:SwitchCount; 
             sortableCount:SortableCount; 
-            useRoll:intBits}
+            useRoll:bitSet}
 
 
 type switchEventRolloutBp64 = {
@@ -19,14 +19,13 @@ type switchEventRollout =
      | Bp64 of switchEventRolloutBp64
 
 
-
 module SwitchEventRolloutInt =
     let create (switchCount:SwitchCount) 
                (sortableCount:SortableCount) = 
         {   
             switchEventRolloutInt.switchCount = switchCount;
             sortableCount = sortableCount;
-            useRoll = IntBits.zeroCreate 
+            useRoll = BitSet.zeroCreate 
                         ((SwitchCount.value switchCount) * 
                         (SortableCount.value sortableCount))    
         }
@@ -80,7 +79,6 @@ module SwitchEventRolloutBp64 =
 
         { switchUses.weights = weights }
             
-
 
 module SwitchEventRollout =
     let toSwitchUses (switchEventRollout:switchEventRollout) =

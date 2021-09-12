@@ -41,64 +41,67 @@ type SortingBp64Fixture () =
         Assert.AreEqual(usedSwitchCountGrouping, usedSwitchCountNoGrouping)
 
 
-    [<TestMethod>]
-    member this.getHistogramOfSortedSortables() =
-        let refSorter = TestData.SorterParts.goodRefSorter
+    //[<TestMethod>]
+    //member this.getHistogramOfSortedSortables() =
+    //    let refSorter = TestData.SorterParts.goodRefSorter
 
-        let switchEventRecordsNoSAG = 
-            SortingBp64.sorterWithNoSAG 
-                refSorter 
-                TestData.SorterActionRecords.bP64SetsRolloutOfAll
-                Sorting.switchUsePlan.All
+    //    let switchEventRecordsNoSAG = 
+    //        SortingBp64.sorterWithNoSAG 
+    //            refSorter 
+    //            TestData.SorterActionRecords.bP64SetsRolloutOfAll
+    //            Sorting.switchUsePlan.All
    
-        let sortedSortablesNoSAG = 
-                switchEventRecordsNoSAG
-                    |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
-                    |> Array.toList
+    //    let sortedSortablesNoSAG = 
+    //            switchEventRecordsNoSAG
+    //                |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
+    //                |> Array.toList
 
-        Assert.AreEqual(sortedSortablesNoSAG.Length, (Degree.value refSorter.degree))
+    //    Assert.AreEqual(sortedSortablesNoSAG.Length, (Degree.value refSorter.degree))
 
 
-        let switchEventRecordsMakeSwitchUses = 
-            SortingBp64.sorterMakeSwitchUses 
-                refSorter 
-                TestData.SorterActionRecords.bP64SetsRolloutOfAll
-                Sorting.switchUsePlan.All
+    //    let switchEventRecordsMakeSwitchUses = 
+    //        SortingBp64.sorterMakeSwitchUses 
+    //            refSorter 
+    //            TestData.SorterActionRecords.bP64SetsRolloutOfAll
+    //            Sorting.switchUsePlan.All
    
-        let sortedSortablesMakeSwitchUses = 
-                switchEventRecordsMakeSwitchUses
-                    |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
-                    |> Array.toList
+    //    let sortedSortablesMakeSwitchUses = 
+    //            switchEventRecordsMakeSwitchUses
+    //                |> SortingEval.SwitchEventRecords.getHistogramOfSortedSortables
+    //                |> Array.toList
 
-        Assert.AreEqual(sortedSortablesMakeSwitchUses.Length, (Degree.value refSorter.degree))
+    //    Assert.AreEqual(sortedSortablesMakeSwitchUses.Length, (Degree.value refSorter.degree))
 
 
 
-    [<TestMethod>]
-    member this.evalSorter() =
-        let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
-        let sorter16 = RefSorter.goodRefSorterForDegree degree 
-                        |> Result.ExtractOrThrow
-        let ssBp64 = SortableSetBp64.allBp64 degree
+    //[<TestMethod>]
+    //member this.evalSorter() =
+    //    let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
+    //    let sorter16 = RefSorter.goodRefSorterForDegree degree 
+    //                    |> Result.ExtractOrThrow
+    //    let sst = sortableSetType.AllForDegree
+    //                    (sortableSetRep.Bp64 sorter16.degree)
+    //    let srtblSt = SortableSetMaker.makeNoRepo sst
+    //                  |> Result.ExtractOrThrow
 
-        let switchEventRecords = 
-                        SortingBp64.evalSorter 
-                            sorter16 
-                            ssBp64
-                            Sorting.switchUsePlan.All
-                            Sorting.eventGrouping.BySwitch
+    //    let switchEventRecords = 
+    //                    SortingBp64.evalSorter 
+    //                        sorter16 
+    //                        ssBp64.sortables
+    //                        Sorting.switchUsePlan.All
+    //                        Sorting.eventGrouping.BySwitch
 
-        let usedSwitchCount = switchEventRecords 
-                              |> SwitchEventRecords.getUsedSwitchCount
-                              |> Result.ExtractOrThrow
+    //    let usedSwitchCount = switchEventRecords 
+    //                          |> SwitchEventRecords.getUsedSwitchCount
+    //                          |> Result.ExtractOrThrow
 
-        Assert.IsTrue((SwitchCount.value usedSwitchCount) > 0)
+    //    Assert.IsTrue((SwitchCount.value usedSwitchCount) > 0)
 
 
     [<TestMethod>]
     member this.Hist() =
         let testCase = seq { TestData.SorterParts.randomIntBits }
-                       |> BitsP64.fromIntBits
+                       |> BitsP64.fromBitSet
                        |> Seq.head
         let goodSorter = TestData.SorterParts.goodRefSorter
         let hist = SortingBp64.History.sortTHist goodSorter testCase
@@ -110,14 +113,14 @@ type SortingBp64Fixture () =
     [<TestMethod>]
     member this.SorterSet_eval() =
         let sorterSet = TestData.SorterSet.mediocreSorterSet
-        let sortableSetBps = sortableSetSpec.Generated 
-                                 (SortableSetGen.allBp64 sorterSet.degree)
-                                 |> SortableSetSpec.getSortableSet
-                                 |> Result.ExtractOrThrow
+        let sst = sortableSetType.AllForDegree
+                        (sortableSetRep.Binary sorterSet.degree)
+        let srtblSt = SortableSetMaker.makeNoRepo sst
+                      |> Result.ExtractOrThrow
 
-        let ssRBp = SortingOps.SorterSet.eval
+        let ssRBp = SortingOps.SorterSet.eval2
                         sorterSet 
-                        sortableSetBps 
+                        srtblSt 
                         Sorting.switchUsePlan.All
                         Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)
@@ -130,34 +133,36 @@ type SortingBp64Fixture () =
     [<TestMethod>]
     member this.SorterSet_evalCompBp() =
         let sorterSet = TestData.SorterSet.mediocreSorterSet
-        let sortableSetBps = sortableSetSpec.Generated 
-                                 (SortableSetGen.allBp64 sorterSet.degree)
-                                 |> SortableSetSpec.getSortableSet
-                                 |> Result.ExtractOrThrow
 
-        let ssRBp = SortingOps.SorterSet.eval
+        let sstBp = sortableSetType.AllForDegree
+                        (sortableSetRep.Bp64 sorterSet.degree)
+        let srtblStBp = SortableSetMaker.makeNoRepo sstBp
+                        |> Result.ExtractOrThrow
+
+        let ssRBp = SortingOps.SorterSet.eval2
                         sorterSet 
-                        sortableSetBps 
+                        srtblStBp 
                         Sorting.switchUsePlan.All
                         Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
+                        |> List.map(fun sc -> sc.perf)
 
+        let sstInt = sortableSetType.AllForDegree
+                        (sortableSetRep.Integer sorterSet.degree)
+        let srtblStInt = SortableSetMaker.makeNoRepo sstInt
+                        |> Result.ExtractOrThrow
 
-        let sortableSetBinary = sortableSetSpec.Generated 
-                                    (SortableSetGen.allIntBits sorterSet.degree)
-                                 |> SortableSetSpec.getSortableSet
-                                 |> Result.ExtractOrThrow 
-
-        let ssR = SortingOps.SorterSet.eval
+        let ssR = SortingOps.SorterSet.eval2
                         sorterSet 
-                        sortableSetBinary 
+                        srtblStInt 
                         Sorting.switchUsePlan.All
                         Sorting.eventGrouping.BySwitch
                         (UseParallel.create true)
                         (SortingEval.SorterCoverage.fromSwitchEventRecords true)
                         |> Result.ExtractOrThrow
+                        |> List.map(fun sc -> sc.perf)
 
         Assert.AreEqual(ssR, ssRBp)
 

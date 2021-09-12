@@ -58,7 +58,7 @@ module TestData =
                                 iRando 
 
         let randomIntBits = 
-            IntBits.createRandom degree iRando
+            BitSet.createRandom degree iRando
 
         let randomBitsP64 = 
             BitsP64.createRandoms degree iRando 1
@@ -85,9 +85,16 @@ module TestData =
 
 
     module SortableSet =
-        let ssBinary = SortableSetBinary.allIntBits degree
-        let sortableSet =  ssBinary |> sortableSetO.Binary
-                                    |> sortableSetSpec.Explicit
+        //let ssBinary = SortableSetBinary.allIntBits degree
+        //let sortableSet =  ssBinary |> sortableSetO.Binary
+        //                            |> sortableSetSpec.Explicit
+
+        let srtblSetType = sortableSetType.AllForDegree 
+                                (sortableSetRep.Bp64 degree)
+        let swLst = [|0;1;2;|] |> Switch.fromIntArray |> Seq.toList
+        let srtblSetTypeR = sortableSetType.SwitchReduced 
+                                (srtblSetType, swLst)
+
 
     module SorterSet = 
         let mediocreSorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
@@ -115,18 +122,18 @@ module TestData =
                                  |> Result.ExtractOrThrow
 
         let intSetsRolloutOfAllSorted = 
-                let ia = IntBits.sorted_0_1_Sequences degree
-                            |> Seq.map(fun ia -> {intBits.values = ia.values })
-                IntSetsRollout.fromIntBits 
+                let ia = BitSet.sorted_0_1_Sequences degree
+                            |> Seq.map(fun ia -> {bitSet.values = ia.values })
+                IntSetsRollout.fromBitSet
                                degree
                                ia
                 |> Result.ExtractOrThrow
 
 
         let bp64SetsRolloutOfAllSorted = 
-                let ia = IntBits.sorted_0_1_Sequences degree
-                            |> Seq.map(fun ia -> {intBits.values = ia.values })
-                BP64SetsRollout.fromIntBits
+                let ia = BitSet.sorted_0_1_Sequences degree
+                            |> Seq.map(fun ia -> {bitSet.values = ia.values })
+                BP64SetsRollout.fromBitSet
                                 degree
                                 ia
                 |> Result.ExtractOrThrow

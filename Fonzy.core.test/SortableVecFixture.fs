@@ -1,7 +1,5 @@
 ﻿namespace Fonzy.core.test
 open Microsoft.VisualStudio.TestTools.UnitTesting
-open System
-open System.Collections.Generic
 
 [<TestClass>]
 type SortableVecFixture () =
@@ -15,12 +13,12 @@ type SortableVecFixture () =
     [<TestMethod>]
     member this.fromIntBits() =
         let sc = SortableCount.fromInt 100
-        let intBits = IntBits.createRandoms
+        let intBits = BitSet.createRandoms
                         TestData.degree
                         TestData.iRando
                       |> Seq.take (SortableCount.value sc)
                       |> Seq.toList
-        let svec = SortableVec.fromIntBits 
+        let svec = SortableVec.fromBitSet 
                             TestData.degree
                             intBits
                 
@@ -31,16 +29,16 @@ type SortableVecFixture () =
     [<TestMethod>]
     member this.toIntBits() =
         let sc = SortableCount.fromInt 100
-        let intBits = IntBits.createRandoms
+        let intBits = BitSet.createRandoms
                         TestData.degree
                         TestData.iRando
                       |> Seq.take (SortableCount.value sc)
                       |> Seq.toList
-        let svec = SortableVec.fromIntBits 
+        let svec = SortableVec.fromBitSet 
                             TestData.degree
                             intBits
 
-        let intBitsBack = svec |> SortableVec.toIntBits
+        let intBitsBack = svec |> SortableVec.toBitSet
                            |> Seq.toList
 
         Assert.AreEqual(intBits, intBitsBack)

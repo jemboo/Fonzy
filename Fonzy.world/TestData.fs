@@ -14,8 +14,6 @@ module TestData =
         let sorterSetGenId2 = SortableSetId.fromGuid (Guid.Parse "22000000-0000-0000-0000-000000000222")
         let sortableCount = SortableCount.fromInt 5
         let sortableCount2 = SortableCount.fromInt 6
-        let rndBits = SortableSetGen.rndBits sorterSetGenId1 TestData.degree sortableCount rnGen
-        let rndBits2 = SortableSetGen.rndBits sorterSetGenId2 TestData.degree sortableCount2 rnGen
 
     module CauseSpec =
 
@@ -84,12 +82,12 @@ module TestData =
 
             let switchUsePlan = Sorting.switchUsePlan.All
 
-            let evalMush d ssn sup sbset ssav up resn =
+            let evalMush d ssn sup srtblSetType ssav up resn =
                 CauseSpecSorters.evalToSorterPerfBins 
                                         ("degree", d)
                                         ("sorterSetName", ssn)
                                         ("switchUsePlan", sup)
-                                        ("sortableSetSpec", sbset)
+                                        ("sortableSetType", srtblSetType)
                                         ("sorterSaving", ssav)
                                         ("useParallel", up)
                                         ("resultsName", resn)
@@ -99,19 +97,19 @@ module TestData =
                             TestData.degree 
                             rndSorterSetName 
                             switchUsePlan 
-                            TestData.SortableSet.sortableSet
+                            TestData.SortableSet.srtblSetType
                             sorterSaving.NotAny
                             useParallel
                             sorterEvalResultsName
 
 
-            let rndGenMush rsg sc rng sup sbset ssav up resn =
+            let rndGenMush rsg sc rng sup srtblSetType ssav up resn =
                 CauseSpecSorters.rndGenToPerfBins 
                                         ("sorterRndGen", rsg)
                                         ("sorterCount", sc)
                                         ("rndGen", rng)
                                         ("switchUsePlan", sup)
-                                        ("sortableSetSpec", sbset)
+                                        ("sortableSetType", srtblSetType)
                                         ("sorterSaving", ssav)
                                         ("useParallel", up)
                                         ("resultsName", resn)
@@ -122,7 +120,7 @@ module TestData =
                             sorterCount
                             (nextRnGen())
                             switchUsePlanIndexes 
-                            TestData.SortableSet.sortableSet
+                            TestData.SortableSet.srtblSetTypeR
                             sorterSaving.NotAny
                             useParallel
                             sorterEvalResultsName

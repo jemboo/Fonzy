@@ -163,10 +163,11 @@ module SorterShc =
 
     let sorterEvalPerfBin
                    (swPk:shcStageWeightSpec) 
-                   (ssP:sortableSetSpecReduced) =
+                   (srtblSetType:sortableSetType) =
         result {
         
-            let! sortableSet, pfxUses = SortableSetSpecReduced.make ssP
+            let! sortableSet, pfxUses = SortableSetMaker.makeT 
+                                                  srtblSetType
             return
                 fun (sShc:sorterShc) ->
                     result {
@@ -174,7 +175,7 @@ module SorterShc =
                         let suPlan = Sorting.SwitchUsePlan.makeIndexes
                                         pfxUses
                                         (sShc.sorter.switches.Length |> SwitchCount.fromInt)
-                        let swEvRecs = SortingOps.Sorter.eval sShc.sorter
+                        let swEvRecs = SortingOps.Sorter.eval2 sShc.sorter
                                                sortableSet
                                                suPlan
                                                Sorting.eventGrouping.BySwitch
@@ -226,7 +227,7 @@ type sorterShcSpec =
        sorter:sorter;
        switchPfx:Switch[];
        mutator:sorterMutSpec;
-       shcSortableSetSpec:sortableSetSpecReduced;
+       srtblSetType:sortableSetType;
        shcStageWeightSpec:shcStageWeightSpec;
        evaluator: sorterEvalSpec;
        annealer:annealerSpec;
@@ -280,7 +281,7 @@ module SorterShcSpec =
         match spec.evaluator with
         | PerfBin -> SorterShc.sorterEvalPerfBin
                         spec.shcStageWeightSpec
-                        spec.shcSortableSetSpec
+                        spec.srtblSetType
                   
 
 

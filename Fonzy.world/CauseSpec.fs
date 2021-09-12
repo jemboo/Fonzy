@@ -162,7 +162,7 @@ module CauseSpecSorters =
               (degree:string*Degree)
               (sorterSetName:string*string)
               (switchUsePlan:string*Sorting.switchUsePlan)
-              (sortableSet:string*sortableSetSpec)
+              (sortableSet:string*sortableSetType)
               (sorterSaving:string*sorterSaving)
               (useParallel:string*bool)
               (resultsName:string*string) =
@@ -177,7 +177,7 @@ module CauseSpecSorters =
                      (CauseSpec.tupOp degree (Degree.value >> string));
                      sorterSetName;
                      (CauseSpec.tupOp switchUsePlan Json.serialize);
-                     (CauseSpec.tupOp sortableSet SortableSetSpecDto.toJson);
+                     (CauseSpec.tupOp sortableSet SortableSetTypeDto.toJson);
                      (CauseSpec.tupOp sorterSaving SorterSavingDto.toJson);
                      (CauseSpec.tupOp useParallel Json.serialize);
                      resultsName
@@ -195,7 +195,7 @@ module CauseSpecSorters =
               (sorterCount:string*SorterCount)
               (rndGen:string*RngGen) 
               (switchUsePlan:string*Sorting.switchUsePlan)
-              (sortableSet:string*sortableSetSpec)
+              (sortableSet:string*sortableSetType)
               (sorterSaving:string*sorterSaving)
               (useParallel:string*bool)
               (resultsName:string*string) =
@@ -213,7 +213,7 @@ module CauseSpecSorters =
                      (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
                      (CauseSpec.tupOp rndGen RngGenDto.toJson);
                      (CauseSpec.tupOp switchUsePlan Json.serialize);
-                     (CauseSpec.tupOp sortableSet SortableSetSpecDto.toJson);
+                     (CauseSpec.tupOp sortableSet SortableSetTypeDto.toJson);
                      (CauseSpec.tupOp sorterSaving SorterSavingDto.toJson);
                      (CauseSpec.tupOp useParallel Json.serialize);
                      resultsName
@@ -231,7 +231,7 @@ module CauseSpecSorters =
               (sorterCount:string*SorterCount)
               (rndGen:string*RngGen) 
               (switchUsePlan:string*Sorting.switchUsePlan)
-              (sortableSet:string*sortableSetSpec)
+              (sortableSet:string*sortableSetType)
               (sorterSaving:string*sorterSaving)
               (useParallel:string*bool)
               (resultsName:string*string) =
@@ -250,7 +250,7 @@ module CauseSpecSorters =
                      (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
                      (CauseSpec.tupOp rndGen RngGenDto.toJson);
                      (CauseSpec.tupOp switchUsePlan Json.serialize);
-                     (CauseSpec.tupOp sortableSet SortableSetSpecDto.toJson);
+                     (CauseSpec.tupOp sortableSet SortableSetTypeDto.toJson);
                      (CauseSpec.tupOp sorterSaving SorterSavingDto.toJson);
                      (CauseSpec.tupOp useParallel Json.serialize);
                      resultsName
@@ -268,7 +268,7 @@ module CauseSpecSorters =
               (sorterCount:string*SorterCount)
               (rndGen:string*RngGen) 
               (switchUsePlan:string*Sorting.switchUsePlan)
-              (sortableSet:string*sortableSetSpec)
+              (sortableSet:string*sortableSetType)
               (useParallel:string*bool)
               (resultsName:string*string) =
 
@@ -286,7 +286,7 @@ module CauseSpecSorters =
                      (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
                      (CauseSpec.tupOp rndGen RngGenDto.toJson);
                      (CauseSpec.tupOp switchUsePlan Json.serialize);
-                     (CauseSpec.tupOp sortableSet SortableSetSpecDto.toJson);
+                     (CauseSpec.tupOp sortableSet SortableSetTypeDto.toJson);
                      (CauseSpec.tupOp useParallel Json.serialize);
                      resultsName
                      ] |> Map.ofList

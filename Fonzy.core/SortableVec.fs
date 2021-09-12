@@ -26,9 +26,9 @@ module SortableVec =
         }
 
 
-    let fromIntBits (degree:Degree)
-                    (intBits:seq<intBits>) =
-        intBits |> BitsP64.fromIntBits
+    let fromBitSet (degree:Degree)
+                   (intBits:seq<bitSet>) =
+        intBits |> BitsP64.fromBitSet
                 |> fromBitsP64 degree
 
 
@@ -46,8 +46,8 @@ module SortableVec =
                 yield bp64Of i svec}
 
 
-    let toIntBits (svec:sortableVec) =
-        svec |> toBitsP64 |> BitsP64.toIntBits
+    let toBitSet (svec:sortableVec) =
+        svec |> toBitsP64 |> BitsP64.toBitSet
 
 
     let compEx  (svec:sortableVec) (switch:Switch) =

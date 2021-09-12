@@ -145,25 +145,25 @@ module SortingInts =
         
     let evalSorterOnIntSetsRollout
                     (sorter:sorter)
-                    (sortableSetRollout:intSetsRollout)
+                    (intSetsRollout:intSetsRollout)
                     (switchusePlan:Sorting.switchUsePlan) 
                     (switchEventAgg:Sorting.eventGrouping) =
         match switchEventAgg with
         | Sorting.eventGrouping.NoGrouping -> 
                 sorterWithNoSAG 
-                    sorter sortableSetRollout switchusePlan
+                    sorter intSetsRollout switchusePlan
         | Sorting.eventGrouping.BySwitch -> 
                 sorterMakeSwitchUses 
-                    sorter sortableSetRollout switchusePlan
+                    sorter intSetsRollout switchusePlan
 
 
     let evalSorterOnBinary (sorter:sorter)
-                   (sortableSet:sortableSetBinary)
+                   (bitSet:bitSet[])
                    (switchusePlan:Sorting.switchUsePlan) 
                    (switchEventAgg:Sorting.eventGrouping) =
         let sortableSetRollout = 
-            sortableSet.sortables
-                |> IntSetsRollout.fromIntBits
+            bitSet
+                |> IntSetsRollout.fromBitSet
                         sorter.degree
                 |> Result.ExtractOrThrow
         evalSorterOnIntSetsRollout
@@ -171,11 +171,12 @@ module SortingInts =
 
 
     let evalSorterOnInteger (sorter:sorter)
-                            (sortableSet:sortableSetInteger)
+                            (intSets:intSet[])
                             (switchusePlan:Sorting.switchUsePlan) 
                             (switchEventAgg:Sorting.eventGrouping) =
         let sortableSetRollout = 
-            sortableSet.sortables
+            intSets
+                |> Array.map(fun a -> a.values)
                 |> IntSetsRollout.fromIntArrays
                                     sorter.degree
                 |> Result.ExtractOrThrow
@@ -223,13 +224,13 @@ module SortingInts =
     module History =
 
         let sortTHistSwitches(switches:Switch list)
-                             (testCase:intBits) =
+                             (testCase:bitSet) =
             let mutable i = 0
             let mutable lstRet = [testCase]
             let mutable newCase = testCase
 
             while (i < switches.Length) do
-                newCase <- newCase |> IntBits.copy
+                newCase <- newCase |> BitSet.copy
                 let intArray = newCase.values
                 let switch = switches.[i]
                 let lv = intArray.[switch.low]
@@ -245,14 +246,14 @@ module SortingInts =
         let sortTHistSwitchList (sorter:sorter) 
                                 (mindex:int) 
                                 (maxdex:int) 
-                                (testCase:intBits) =
+                                (testCase:bitSet) =
             let sws = sorter.switches |> Array.skip(mindex)
                                       |> Array.take(maxdex - mindex)
                                       |> Array.toList
             sortTHistSwitches sws testCase
 
 
-        let sortTHist (sorter:sorter) (testCase:intBits) =
+        let sortTHist (sorter:sorter) (testCase:bitSet) =
             let sl = SwitchCount.value sorter.switchCount
             sortTHistSwitchList sorter 0 sl testCase
 

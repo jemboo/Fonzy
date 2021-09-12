@@ -4,7 +4,7 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type SorterPartsDtoFixture () =
+type SorterDtoFixture () =
 
     [<TestMethod>]
     member this.SwitchDto() =

@@ -46,8 +46,8 @@ type SortingEvalFixture () =
                   |> Energy.value
 
 
-        Assert.IsTrue(sfA < sfB);
-        Assert.IsTrue(sfB < sfC);
+        Assert.IsTrue(sfA > sfB);
+        Assert.IsTrue(sfB > sfC);
 
 
 
