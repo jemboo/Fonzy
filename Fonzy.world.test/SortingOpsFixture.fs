@@ -14,7 +14,7 @@ type SortingOpsFixture () =
         let srtableSetInt = SortableSetMaker.makeNoRepo srtblStTypeInt
                          |> Result.ExtractOrThrow
 
-        let ssInts = SortingOps.SorterSet.eval2
+        let ssInts = SortingOps.SorterSet.eval
                         sorterSet 
                         srtableSetInt 
                         Sorting.switchUsePlan.All
@@ -31,7 +31,7 @@ type SortingOpsFixture () =
                          |> Result.ExtractOrThrow
 
 
-        let ssBp64 = SortingOps.SorterSet.eval2
+        let ssBp64 = SortingOps.SorterSet.eval
                         sorterSet 
                         srtableSetBp
                         Sorting.switchUsePlan.All

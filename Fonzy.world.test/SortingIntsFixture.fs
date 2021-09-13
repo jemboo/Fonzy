@@ -112,7 +112,7 @@ type SortingIntsFixture () =
         let srtableSet = SortableSetMaker.makeNoRepo srtblStType
                          |> Result.ExtractOrThrow
 
-        let ssR = SortingOps.SorterSet.eval2
+        let ssR = SortingOps.SorterSet.eval
                         sorterSet 
                         srtableSet 
                         Sorting.switchUsePlan.All
@@ -172,15 +172,15 @@ type SortingIntsFixture () =
         let sstInt = sortableSetType.AllForDegree
                         (sortableSetRep.Integer degree)
         let srtblStInt = SortableSetMaker.makeNoRepo sstInt
-                        |> Result.ExtractOrThrow
+                         |> Result.ExtractOrThrow
 
-        let sorterCovs = SortingOps.SorterSet.getSorterCoverages2
+        let sorterCovs = SortingOps.SorterSet.getSorterCoverages
                               altEvenSorterSet
                               srtblStInt
                               Sorting.switchUsePlan.All
                               true
                               (UseParallel.create true)
-                        |> Result.ExtractOrThrow
+                         |> Result.ExtractOrThrow
 
 
         let perfBins = sorterCovs 

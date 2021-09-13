@@ -15,7 +15,7 @@ module World =
     let create (parentId:WorldId) 
                (cause:Cause) 
                (enviroment:enviro) =
-          let worldId = [parentId:>obj; cause:>obj; enviroment:>obj;]
+          let worldId = [parentId:>obj; cause.causeSpec:>obj;]
                           |> GuidUtils.guidFromObjs
                           |> WorldId.fromGuid;
           {id=worldId; parentId=parentId; cause=cause; enviro=enviroment}

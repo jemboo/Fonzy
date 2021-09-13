@@ -7,7 +7,6 @@ type intSetsRollout =
             sortableCount:SortableCount  }
 
 
-
 type bP64SetsRollout = 
         {   degree:Degree; 
             baseArray:uint64[]; 
@@ -17,7 +16,6 @@ type bP64SetsRollout =
 type sortableSetRollout =
     | Int of intSetsRollout
     | Bp64 of bP64SetsRollout
-
 
 
 module IntSetsRollout =
@@ -61,11 +59,6 @@ module IntSetsRollout =
                             |> Seq.toArray
             return! create degree a 
         }
-
-    //let toBitSet (intsRoll:intSetsRollout) =
-    //    let d = (Degree.value intsRoll.degree)
-    //    intsRoll.baseArray |> Seq.chunkBySize d
-    //                       |> Seq.map(fun a -> {bitSet.values = a})
 
 
     let toIntSet (intsRoll:intSetsRollout) =

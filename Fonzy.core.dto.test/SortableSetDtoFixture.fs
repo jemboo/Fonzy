@@ -57,3 +57,14 @@ type SortableSetDtoFixture () =
         let sstBack = dto |> SortableSetTypeDto.fromDto
                           |> Result.ExtractOrThrow
         Assert.AreEqual(sstR, sstBack);
+
+
+    [<TestMethod>]
+    member this.sortableSetImplDto() =
+        let degree = Degree.fromInt 5
+        let intSets = [|{intSet.values =[|0;4;3;2;1|]}; {intSet.values =[|1;4;3;2;0|]}|]
+        let ssImpl = sortableSetImpl.Integer (intSets, degree)
+        let ssDto = ssImpl |> SortableSetImplDto.toDto
+        let ssImplBack = ssDto |> SortableSetImplDto.fromDto
+                               |> Result.ExtractOrThrow
+        Assert.AreEqual(ssImpl, ssImplBack);

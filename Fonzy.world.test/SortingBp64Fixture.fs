@@ -85,9 +85,9 @@ type SortingBp64Fixture () =
     //                  |> Result.ExtractOrThrow
 
     //    let switchEventRecords = 
-    //                    SortingBp64.evalSorter 
+    //                    SortingBp64.evalSorter
     //                        sorter16 
-    //                        ssBp64.sortables
+    //                        srtblSt
     //                        Sorting.switchUsePlan.All
     //                        Sorting.eventGrouping.BySwitch
 
@@ -118,7 +118,7 @@ type SortingBp64Fixture () =
         let srtblSt = SortableSetMaker.makeNoRepo sst
                       |> Result.ExtractOrThrow
 
-        let ssRBp = SortingOps.SorterSet.eval2
+        let ssRBp = SortingOps.SorterSet.eval
                         sorterSet 
                         srtblSt 
                         Sorting.switchUsePlan.All
@@ -139,7 +139,7 @@ type SortingBp64Fixture () =
         let srtblStBp = SortableSetMaker.makeNoRepo sstBp
                         |> Result.ExtractOrThrow
 
-        let ssRBp = SortingOps.SorterSet.eval2
+        let ssRBp = SortingOps.SorterSet.eval
                         sorterSet 
                         srtblStBp 
                         Sorting.switchUsePlan.All
@@ -154,7 +154,7 @@ type SortingBp64Fixture () =
         let srtblStInt = SortableSetMaker.makeNoRepo sstInt
                         |> Result.ExtractOrThrow
 
-        let ssR = SortingOps.SorterSet.eval2
+        let ssR = SortingOps.SorterSet.eval
                         sorterSet 
                         srtblStInt 
                         Sorting.switchUsePlan.All

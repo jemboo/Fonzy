@@ -178,7 +178,7 @@ module SorterPbCauseSpecGen =
                                     (sortableSetRep.Binary degree)
 
             let (sortableSetTrim, switchUses) = 
-                ssImplBps |> SortingOps.SortableSet.reduceByPrefix2 sorterRndGen
+                ssImplBps |> SortingOps.SortableSet.reduceByPrefix sorterRndGen
                 |> Result.ExtractOrThrow
 
             let totalSwitchCt = sorterRndGen |> SorterRndGen.getSwitchCount

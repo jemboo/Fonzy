@@ -4,7 +4,8 @@ open System
 
 type Cause = {causeSpec:causeSpec; op:enviro -> Result<enviro, string>}
 
-module CauseSorters = 
+module CauseSorters =
+
     let rndGen (causeSpec:causeSpec) =
         let causer = fun (e:enviro) ->
             result {
@@ -85,7 +86,7 @@ module CauseSorters =
 
                 let! srtblSt = SortableSet.make ssetMaker sortableSetType 
 
-                let! sorterCovs = SortingOps.SorterSet.getSorterCoverages2
+                let! sorterCovs = SortingOps.SorterSet.getSorterCoverages
                                       sorterSet
                                       srtblSt
                                       switchUsePlan
@@ -170,7 +171,7 @@ module CauseSorters =
 
                 let! srtblSt = SortableSet.make ssetMaker sortableSetType 
 
-                let! sorterCovs = SortingOps.SorterSet.getSorterCoverages2
+                let! sorterCovs = SortingOps.SorterSet.getSorterCoverages
                                         sSet
                                         srtblSt
                                         switchUsePlan
@@ -201,6 +202,7 @@ module CauseSorters =
 
         {Cause.causeSpec=causeSpec; op=causer}
    
+
     let fromCauseSpec (genus:string list) (causeSpec:causeSpec) = 
         match genus with
         | [] -> "No CauseSorters genus" |> Error

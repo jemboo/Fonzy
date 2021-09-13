@@ -70,14 +70,6 @@ module SortingEval =
             | BySwitch seGs -> seGs.switchUses
 
 
-        //let getHistogramOfSortedSortables (switchEventRecords:switchEventRecords) =
-        //    match switchEventRecords with
-        //    | NoGrouping seNg -> seNg.sortableRollout 
-        //                            |> SortableSetRollout.intBitsHist
-        //    | BySwitch seGs ->  seGs.sortableRollout 
-        //                            |> SortableSetRollout.intBitsHist
-
-
         let getAllSortsWereComplete (switchEventRecords:switchEventRecords) =
             match switchEventRecords with
             | NoGrouping seNg -> seNg.sortableRollout 

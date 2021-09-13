@@ -175,7 +175,7 @@ module SorterShc =
                         let suPlan = Sorting.SwitchUsePlan.makeIndexes
                                         pfxUses
                                         (sShc.sorter.switches.Length |> SwitchCount.fromInt)
-                        let swEvRecs = SortingOps.Sorter.eval2 sShc.sorter
+                        let swEvRecs = SortingOps.Sorter.eval sShc.sorter
                                                sortableSet
                                                suPlan
                                                Sorting.eventGrouping.BySwitch

@@ -196,7 +196,7 @@ module SortingInts =
                 (_parallel:UseParallel) 
                 (proc:sortingResult -> Result<'T, string>) =
 
-            let rewrap tup ssr = 
+            let rewrap ssr tup = 
                 let sorterId, sorter = tup
                 let swEvRecs = evalSorterOnIntSetsRollout 
                                     sorter ssr switchusePlan switchEventAgg
@@ -212,11 +212,11 @@ module SortingInts =
                 return!
                     match UseParallel.value(_parallel) with
                     | true  -> sorterSet.sorters |> Map.toArray 
-                                                 |> Array.Parallel.map(fun s-> rewrap s intSetsRollout)
+                                                 |> Array.Parallel.map(rewrap intSetsRollout)
                                                  |> Array.toList
                                                  |> Result.sequence
                     | false -> sorterSet.sorters |> Map.toList 
-                                                 |> List.map(fun s-> rewrap s intSetsRollout)
+                                                 |> List.map(rewrap intSetsRollout)
                                                  |> Result.sequence
             }
 
