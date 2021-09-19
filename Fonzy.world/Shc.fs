@@ -166,8 +166,8 @@ module SorterShc =
                    (srtblSetType:sortableSetType) =
         result {
         
-            let! sortableSet, pfxUses = SortableSetMaker.makeT 
-                                                  srtblSetType
+            let! sortableSet, pfxUses = SortableSetMaker.makeTNoRepo 
+                                                    srtblSetType
             return
                 fun (sShc:sorterShc) ->
                     result {
@@ -176,7 +176,7 @@ module SorterShc =
                                         pfxUses
                                         (sShc.sorter.switches.Length |> SwitchCount.fromInt)
                         let swEvRecs = SortingOps.Sorter.eval sShc.sorter
-                                               sortableSet
+                                               sortableSet.sortableSetImpl
                                                suPlan
                                                Sorting.eventGrouping.BySwitch
                         let switchUses = swEvRecs

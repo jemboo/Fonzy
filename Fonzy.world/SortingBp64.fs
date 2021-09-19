@@ -176,13 +176,12 @@ module SortingBp64 =
         let eval<'T> 
                  (sorterSet:sorterSet)
                  (bP64SetsRollout:bP64SetsRollout)
-                 (sortableSetId:SortableSetId)
                  (switchusePlan:Sorting.switchUsePlan) 
                  (switchEventAgg:Sorting.eventGrouping) 
                  (_parallel:UseParallel) 
-                 (proc:sortingResult -> Result<'T, string>) =
+                 (reporter:sortingResult -> Result<'T, string>) =
 
-            let rewrap tup ssr = 
+            let rewrap tup ssr proc = 
                 let sorterId, sorter = tup
                 let swEvRecs = evalSorterOnBP64SetsRollout 
                                     sorter ssr switchusePlan switchEventAgg
@@ -190,7 +189,6 @@ module SortingBp64 =
                     sortingResult.sorter = sorter;
                     sortingResult.switchEventRecords = swEvRecs;
                     sortingResult.sorterId = sorterId;
-                    sortingResult.sortableSetId = sortableSetId
                 }
                 proc resSoSS
 
@@ -198,11 +196,11 @@ module SortingBp64 =
                 return!
                     match UseParallel.value(_parallel) with
                     | true  -> sorterSet.sorters |> Map.toArray 
-                                                 |> Array.Parallel.map(fun s-> rewrap s bP64SetsRollout)
+                                                 |> Array.Parallel.map(fun s-> rewrap s bP64SetsRollout reporter)
                                                  |> Array.toList
                                                  |> Result.sequence
                     | false -> sorterSet.sorters |> Map.toList 
-                                                 |> List.map(fun s-> rewrap s bP64SetsRollout)
+                                                 |> List.map(fun s-> rewrap s bP64SetsRollout reporter)
                                                  |> Result.sequence
             }
 

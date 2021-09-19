@@ -8,7 +8,7 @@ module SorterShcCauseSpecGen =
                     sorterCount
                     rndGen
                     switchUsePlan
-                    sortableSetSpec
+                    sortableSetType
                     useParallel
                     resultsName =
 
@@ -17,7 +17,7 @@ module SorterShcCauseSpecGen =
                 ("sorterCount", sorterCount)
                 ("rndGen", rndGen)
                 ("switchUsePlan", switchUsePlan)
-                ("sortableSetSpec", sortableSetSpec)
+                ("sortableSetType", sortableSetType)
                 ("useParallel", (UseParallel.value useParallel))
                 ("resultsName", resultsName)
 

@@ -186,7 +186,7 @@ module TestData =
             let sorterCoverage1 =
                 { 
                     sorterCoverage.sorterId = sorterId1;
-                    sortableSetId = sortableSetId1;
+         //           sortableSetId = sortableSetId1;
                     perf = sorterPerf1;
                     usedSwitches = [||];
                 }
@@ -194,7 +194,7 @@ module TestData =
             let sorterCoverage2 =
                 { 
                     sorterCoverage.sorterId = sorterId2;
-                    sortableSetId = sortableSetId1;
+           //         sortableSetId = sortableSetId1;
                     perf = sorterPerf2;
                     usedSwitches = [||];
                 }
@@ -202,7 +202,7 @@ module TestData =
             let sorterCoverage3 =
                 { 
                     SortingEval.sorterCoverage.sorterId = sorterId3;
-                    SortingEval.sorterCoverage.sortableSetId = sortableSetId1;
+                 //   SortingEval.sorterCoverage.sortableSetId = sortableSetId1;
                     SortingEval.sorterCoverage.perf = sorterPerf3;
                     usedSwitches = [||];
                 }
@@ -210,7 +210,7 @@ module TestData =
             let sorterCoverage4 =
                 { 
                     SortingEval.sorterCoverage.sorterId = sorterId4;
-                    SortingEval.sorterCoverage.sortableSetId = sortableSetId1;
+                //    SortingEval.sorterCoverage.sortableSetId = sortableSetId1;
                     SortingEval.sorterCoverage.perf = sorterPerf4;
                     usedSwitches = [||];
                 }
@@ -218,7 +218,7 @@ module TestData =
             let sorterCoverage5 =
                 { 
                     SortingEval.sorterCoverage.sorterId = sorterId5;
-                    SortingEval.sorterCoverage.sortableSetId = sortableSetId1;
+              //      SortingEval.sorterCoverage.sortableSetId = sortableSetId1;
                     SortingEval.sorterCoverage.perf = sorterPerf4;
                     usedSwitches = [||];
                 }

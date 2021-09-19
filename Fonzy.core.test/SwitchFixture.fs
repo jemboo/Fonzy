@@ -6,6 +6,7 @@ open System.Diagnostics
 
 [<TestClass>]
 type SwitchFixture () =
+
     [<TestMethod>]
     member this.testSwitchMap() =
         let yak = Switch.switchMap.[1]

@@ -5,7 +5,27 @@ open SortingEval
 module SortingOps =
 
     module Sorter =
-
+    
+        let evalRollout
+            (sorter:sorter)
+            (sortableSetRollout:sortableSetRollout)
+            (switchusePlan:Sorting.switchUsePlan) 
+            (switchEventAgg:Sorting.eventGrouping) =
+            match sortableSetRollout with
+            | sortableSetRollout.Int iSr ->
+                SortingInts.evalSorterOnIntSetsRollout 
+                                    sorter
+                                    iSr
+                                    switchusePlan
+                                    switchEventAgg
+            | sortableSetRollout.Bp64 bpSr ->
+                SortingBp64.evalSorterOnBP64SetsRollout
+                                    sorter
+                                    bpSr
+                                    switchusePlan
+                                    switchEventAgg
+    
+    
         let eval
                 (sorter:sorter)
                 (sortableSetImpl:sortableSetImpl)
@@ -33,31 +53,11 @@ module SortingOps =
                                   switchEventAgg
 
 
-        let evalR
-                (sorter:sorter)
-                (sortableSetRollout:sortableSetRollout)
-                (switchusePlan:Sorting.switchUsePlan) 
-                (switchEventAgg:Sorting.eventGrouping) =
-                match sortableSetRollout with
-                | sortableSetRollout.Int iSr ->
-                    SortingInts.evalSorterOnIntSetsRollout 
-                                        sorter
-                                        iSr
-                                        switchusePlan
-                                        switchEventAgg
-                | sortableSetRollout.Bp64 bpSr ->
-                    SortingBp64.evalSorterOnBP64SetsRollout
-                                        sorter
-                                        bpSr
-                                        switchusePlan
-                                        switchEventAgg
-
-
 
     module SortableSet =
 
         let switchReduce (ssImpl:sortableSetImpl) 
-                          (pfxs:Switch[]) = 
+                         (pfxs:Switch[]) = 
 
             let degree = ssImpl |> SortableSetImpl.getDegree
             let sorter = Sorter.fromSwitches 
@@ -90,35 +90,16 @@ module SortingOps =
             }
 
 
-        let reduceByPrefix (srg:sorterRndGen) 
-                            (ssImpl:sortableSetImpl)  =
+        let reduceBySorterRndGen (srg:sorterRndGen) 
+                                 (ssImpl:sortableSetImpl)  =
             let pfx = srg |> SorterRndGen.getSwitchPrefix
                           |> List.toArray
             if pfx.Length = 0 then
                 (ssImpl, SwitchUses.createNone) |> Ok
             else switchReduce ssImpl pfx
 
+
                 
-//switchReducet oneStageReduceBp64 (degree:Degree) = 
-            
-        //    let wholeSet = SortableSetBp64.allBp64 degree
-        //                   |> sortableSetO.Bp64
-
-        //    let switches = degree |> TwoCycleGen.evenMode
-        //                          |> Switch.fromTwoCyclePerm
-        //    switchReduce wholeSet switches
-
-
-        //let oneStageReduceInts (degree:Degree) = 
-    
-        //    let wholeSet = SortableSetBinary.allIntBits degree
-        //                   |> sortableSetO.Binary
-
-        //    let switches = degree |> TwoCycleGen.evenMode
-        //                          |> Switch.fromTwoCyclePerm
-        //    switchReduce wholeSet switches
-
-
     module SorterSet =
 
       let eval<'T> 
@@ -137,7 +118,6 @@ module SortingOps =
                     return! SortingInts.SorterSet.eval 
                                 sorterSet
                                 intSetsRollout
-                                srtblSt.id
                                 switchusePlan
                                 switchEventAgg
                                 _parallel
@@ -150,7 +130,6 @@ module SortingOps =
                     return! SortingBp64.SorterSet.eval 
                                 sorterSet
                                 bp64Rollout
-                                srtblSt.id
                                 switchusePlan
                                 switchEventAgg
                                 _parallel
@@ -163,12 +142,12 @@ module SortingOps =
                     return! SortingInts.SorterSet.eval 
                                 sorterSet
                                 intSetsRollout
-                                srtblSt.id
                                 switchusePlan
                                 switchEventAgg
                                 _parallel
                                 proc
                     }
+
 
 
       let getSorterCoverages
@@ -186,7 +165,7 @@ module SortingOps =
                             switchusePlan
                             Sorting.eventGrouping.BySwitch
                             _parallel
-                            (SortingEval.SorterCoverage.fromSwitchEventRecords true)
+                            (SortingEval.SorterCoverage.fromSwitchEventRecords checkSuccess)
 
                 return sorterCovs
             }

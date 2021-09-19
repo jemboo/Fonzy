@@ -56,8 +56,6 @@ module SorterMutationTypeDto =
         ss |> toDto |> Json.serialize
 
 
-
-
 type sorterRndGenDto = {cat:string; prams:Map<string,string>; switches:int[]} 
 module SorterRndGenDto =
     let toDto (sg:sorterRndGen) =

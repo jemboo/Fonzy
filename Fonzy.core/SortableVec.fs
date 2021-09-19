@@ -47,7 +47,7 @@ module SortableVec =
 
 
     let toBitSet (svec:sortableVec) =
-        svec |> toBitsP64 |> BitsP64.toBitSet
+        svec |> toBitsP64 |> BitsP64.toBitSets
 
 
     let compEx  (svec:sortableVec) (switch:Switch) =

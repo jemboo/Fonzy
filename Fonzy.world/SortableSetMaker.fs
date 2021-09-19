@@ -58,23 +58,34 @@ module SortableSetMaker =
 
 
 
-    let rec makeT (ssType:sortableSetType) = 
+    let rec makeT (repo: (SortableSetId->sortableSetImpl) option) 
+                  (ssType:sortableSetType) = 
+
+        let _lookup ssid =
+            match repo with
+            | Some f -> f ssid |> Ok
+            | None -> "repo missing" |> Error
+
         match ssType with
         | sortableSetType.AllForDegree ssr -> 
-                (allZeroOnes ssr, {switchUses.weights =[||] }) |> Ok
+                (allZeroOnes ssr, {switchUses.weights = [||] }) |> Ok
         | sortableSetType.Explicit ssid ->
-                "sortableSetType.Explicit is Not supported" |> Error
+            result {
+                let! sset = _lookup ssid
+                return (sset, {switchUses.weights = [||] }) 
+            }
         | sortableSetType.Random (rng, sc, ssr) ->
             let degree = ssr |> SortableSetRep.getDegree
-            (rndIntBits ssr degree rng sc, {switchUses.weights =[||] })  |> Ok
+            (rndIntBits ssr degree rng sc, {switchUses.weights = [||] })  |> Ok
         | sortableSetType.SwitchReduced (sst, swPfx) ->
             result {
-                let! toChop = makeT sst
-                let! res = SortingOps.SortableSet.switchReduce
-                                            (fst toChop)
+                let! implB, wUsesB = makeT repo sst
+                let! implR, wUsesR  = SortingOps.SortableSet.switchReduce
+                                             implB
                                             (swPfx |> List.toArray)
-                return res
+                return (implR, wUsesB |> SwitchUses.append wUsesR)
             }
+
 
     let rec make (repo: (SortableSetId->sortableSetImpl) option) 
                  (ssType:sortableSetType) = 
@@ -102,5 +113,11 @@ module SortableSetMaker =
     let makeNoRepo (sortableSetType:sortableSetType) =
         SortableSet.make (make None) sortableSetType
 
+    let makeTNoRepo (sortableSetType:sortableSetType) =
+        SortableSet.makeT (makeT None) sortableSetType
+
     let makeMemoize (repo: (SortableSetId->sortableSetImpl) option)  =
         FuncUtils.memoization (make repo)
+        
+    let makeMemoizeNoRepo =
+        makeMemoize None

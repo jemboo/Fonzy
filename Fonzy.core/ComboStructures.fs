@@ -400,6 +400,12 @@ module BitSet =
     let copy (bitSet:bitSet) = 
         {bitSet.values = Array.copy (bitSet.values) }
 
+    let fromIntSet (ntSet:intSet) =
+        create ntSet.values
+
+    let toIntSet (btSet:bitSet) = 
+        IntSet.create btSet.values
+
     let isZero (ibs:bitSet) = 
         ibs.values |> Array.forall((=) 0)
 
@@ -629,8 +635,8 @@ module BitsP64 =
                 yield nextChunk()  }
 
 
-    // returns only the nonzero Inbits
-    let toBitSet (bp64s:bitsP64 seq) =
+    // returns only the nonzero sets
+    let toBitSets (bp64s:bitsP64 seq) =
         seq { 
               use e = bp64s.GetEnumerator()
               let nextChunk bt64 =
@@ -644,6 +650,11 @@ module BitsP64 =
 
               while e.MoveNext() do
                 yield! nextChunk e.Current  }
+
+
+    // returns only the nonzero sets
+    let toIntSets (bp64s:bitsP64 seq) =
+        bp64s |> toBitSets |> Seq.map(BitSet.toIntSet)
 
 
     let seqOfAllFor (degree:Degree) =

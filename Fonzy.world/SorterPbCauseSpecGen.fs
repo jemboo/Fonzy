@@ -24,6 +24,8 @@ module SorterPbCauseSpecGen =
                 ("useParallel", (UseParallel.value useParallel))
                 ("resultsName", resultsName)
     
+
+
     let sorterCountForDegree (degree:Degree) = 
         if (Degree.value degree) = 8 then
              (SorterCount.fromInt 40000)
@@ -178,7 +180,7 @@ module SorterPbCauseSpecGen =
                                     (sortableSetRep.Binary degree)
 
             let (sortableSetTrim, switchUses) = 
-                ssImplBps |> SortingOps.SortableSet.reduceByPrefix sorterRndGen
+                ssImplBps |> SortingOps.SortableSet.reduceBySorterRndGen sorterRndGen
                 |> Result.ExtractOrThrow
 
             let totalSwitchCt = sorterRndGen |> SorterRndGen.getSwitchCount

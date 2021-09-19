@@ -154,7 +154,7 @@ module BP64SetsRollout =
 
     let toBitSet (bP64Roll:bP64SetsRollout) =
         bP64Roll |> toBitsP64
-                 |> BitsP64.toBitSet
+                 |> BitsP64.toBitSets
 
 
     let isSorted (bp64Roll:bP64SetsRollout) =
@@ -193,6 +193,7 @@ module BP64SetsRollout =
 
 
 module SortableSetRollout =
+
     let getDegree (sortableSetRollout:sortableSetRollout) =
         match sortableSetRollout with
         | sortableSetRollout.Int isr -> isr.degree
@@ -210,6 +211,26 @@ module SortableSetRollout =
         match sortableRollout with
         | Int  isr ->    isr |> IntSetsRollout.isSorted
         | Bp64  bp64r -> bp64r |> BP64SetsRollout.isSorted
+
+
+    let fromSortableSetImpl (impl:sortableSetImpl) = 
+        match impl with
+        | sortableSetImpl.Binary (bitSet, d) ->
+            result {
+             let! roll = bitSet |> IntSetsRollout.fromBitSet d
+             return roll |> sortableSetRollout.Int
+            }
+        | sortableSetImpl.Integer  (intSet, d) ->
+            result {
+             let! roll = intSet |> IntSetsRollout.fromIntSets d
+             return roll |> sortableSetRollout.Int
+            }
+            
+        | sortableSetImpl.Bp64 (bp64, d) ->
+            result {
+             let! roll = bp64 |> BP64SetsRollout.fromBitsP64 d
+             return roll |> sortableSetRollout.Bp64
+            }
 
 
     //let toIntBits (sortableRollout:sortableSetRollout) =

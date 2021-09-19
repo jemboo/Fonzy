@@ -5,7 +5,7 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 open SortingEval
 
 [<TestClass>]
-type StoHillClimbFixture () =
+type ShcFixture () =
 
 
     [<TestMethod>]

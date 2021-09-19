@@ -88,7 +88,6 @@ module SortingEval =
     type sortingResult =
         {
             sorterId:SorterId;
-            sortableSetId:SortableSetId
             sorter:sorter; 
             switchEventRecords:switchEventRecords;
         }
@@ -96,7 +95,6 @@ module SortingEval =
     type sorterCoverage = 
         { 
             sorterId:SorterId;
-            sortableSetId:SortableSetId;
             perf:sorterPerf;
             usedSwitches:Switch[];
         }
@@ -128,7 +126,6 @@ module SortingEval =
                     return {
                                 sorterCoverage.perf = perfBin; 
                                 sorterId = r.sorterId;
-                                sortableSetId = r.sortableSetId;
                                 usedSwitches = usedSwitchArray;
                            }
                }

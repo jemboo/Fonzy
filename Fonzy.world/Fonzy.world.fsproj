@@ -12,7 +12,7 @@
     <Compile Include="SortingInts.fs" />
     <Compile Include="SortingBp64.fs" />
     <Compile Include="SortingOps.fs" />
-    <Compile Include="SortableGen.fs" />
+    <Compile Include="SortableSetMaker.fs" />
     <Compile Include="Shc.fs" />
     <Compile Include="Enviros.fs" />
     <Compile Include="CauseSpec.fs" />

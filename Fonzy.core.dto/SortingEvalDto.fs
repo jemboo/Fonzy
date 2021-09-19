@@ -80,7 +80,6 @@ module SorterPerfBinDto =
 
 
 type sorterCoverageDto = {sorterId:Guid; 
-                          sortableSetId:Guid;
                           perfDto:sorterPerfDto;
                           usedSwitches:int[]}
 
@@ -88,7 +87,6 @@ module SorterCoverageDto =
     let fromDto (dto:sorterCoverageDto) =
         result {
             let! sorterId = SorterId.create dto.sorterId
-            let! sortableSetId = SortableSetId.create dto.sortableSetId
             let! perf = dto.perfDto |> SorterPerfDto.fromDto
             let! usedSwitches = dto.usedSwitches 
                                 |> Array.map(fun sw -> SwitchDto.fromDto sw)
@@ -96,7 +94,6 @@ module SorterCoverageDto =
                                 |> Result.sequence
 
             return { SortingEval.sorterCoverage.sorterId = sorterId;
-                     SortingEval.sorterCoverage.sortableSetId = sortableSetId;
                      SortingEval.sorterCoverage.perf = perf;
                      SortingEval.sorterCoverage.usedSwitches = 
                             usedSwitches |> List.toArray;}
@@ -110,7 +107,7 @@ module SorterCoverageDto =
 
     let toDto (cov:SortingEval.sorterCoverage) =
         {sorterId = (SorterId.value cov.sorterId); 
-         sortableSetId = (SortableSetId.value cov.sortableSetId);
+        // sortableSetId = (SortableSetId.value cov.sortableSetId);
          perfDto = cov.perf |> SorterPerfDto.toDto;
          usedSwitches = cov.usedSwitches |> Array.map(SwitchDto.toDto)}
 

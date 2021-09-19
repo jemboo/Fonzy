@@ -25,6 +25,16 @@ type SortableSetRolloutFixture() =
 
 
     [<TestMethod>]
+    member this.SwitchUses_append() =
+      let pfx = {switchUses.weights = [|1;2;3|]}
+      let sfx = {switchUses.weights = [|4;5;6|]}
+      let expected = {switchUses.weights = [|1;2;3;4;5;6|]}
+      let fuz = pfx |> SwitchUses.append sfx
+      Assert.AreEqual(expected, fuz)
+
+
+
+    [<TestMethod>]
     member this.removeDupes() =
       let unsortedIntsRollout = TestData.SorterActionRecords.intSetsRolloutOfAllSorted
       let drs = unsortedIntsRollout |> IntSetsRollout.removeDupes

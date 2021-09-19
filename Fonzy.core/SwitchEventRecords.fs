@@ -17,7 +17,7 @@ module SwitchUses =
    let getWeights switchUses = switchUses.weights
    let switchCount switchUses = switchUses.weights.Length
 
-   let Add (trackerA:switchUses) 
+   let add (trackerA:switchUses) 
            (trackerB:switchUses) =
        if ((switchCount trackerA) <> (switchCount trackerB))  then
            (sprintf "switchCounts: %d, %d are not equal" 
@@ -27,6 +27,11 @@ module SwitchUses =
            {
                weights = weightsSum;
            } |> Ok
+
+           
+   let append (sfx:switchUses) 
+              (pfx:switchUses) =
+        {switchUses.weights = sfx.weights |> Array.append pfx.weights}
 
 
    let getUsedSwitches (switchUses:switchUses) 

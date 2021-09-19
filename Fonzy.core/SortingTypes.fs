@@ -19,6 +19,7 @@ type SwitchOrStageCount = | Switch of SwitchCount
 
 type switchUses = {weights:int[]}
 
+
 module SortableCount =
     let value (SortableCount v) = v
     let create fieldName v = 

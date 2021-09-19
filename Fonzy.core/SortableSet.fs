@@ -25,6 +25,16 @@ module SortableSetImpl =
         | sortableSetImpl.Integer (nts, d) -> d
         | sortableSetImpl.Bp64 (bpS, d) -> d
 
+    let getIntSets (rep:sortableSetImpl) =
+        match rep with
+        | sortableSetImpl.Binary (bs, d) ->
+            bs |> Array.map(BitSet.toIntSet)
+        | sortableSetImpl.Integer (nts, d) -> nts
+        | sortableSetImpl.Bp64 (bpS, d) -> 
+            bpS |> BitsP64.toIntSets |> Seq.toArray
+
+
+
 type sortableSetType = 
     | AllForDegree of sortableSetRep
     | Explicit of SortableSetId
@@ -32,6 +42,7 @@ type sortableSetType =
     | SwitchReduced of sortableSetType*Switch list
     
 type sortableSetMaker  = sortableSetType -> Result<sortableSetImpl,string>
+type sortableSetMakerT  = sortableSetType -> Result<sortableSetImpl* switchUses, string>
 
 type sortableSet = { id:SortableSetId;
                      sortableSetType:sortableSetType; 
@@ -50,6 +61,20 @@ module SortableSet =
                 sortableSet.id = ssId;
                 sortableSetType = sortableSetType;
                 sortableSetImpl = rep}
+        }
+
+    let makeT (sortableSetMakerT:sortableSetMakerT) 
+             (sortableSetType:sortableSetType) =
+        result {
+            let! impl, uses = sortableSetMakerT sortableSetType
+            let! ssId = seq { sortableSetType:> obj; } 
+                         |> GuidUtils.guidFromObjs
+                         |>  SortableSetId.create
+            return ({
+                sortableSet.id = ssId;
+                sortableSetType = sortableSetType;
+                sortableSetImpl = impl},
+                uses)
         }
 
 
