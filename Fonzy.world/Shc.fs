@@ -327,7 +327,7 @@ module SorterShcSpec =
             ||
             (StepNumber.value shc.step) > (StepNumber.value x)
 
-    let make (spec:sorterShcSpec) =
+    let toShc (spec:sorterShcSpec) =
 
         let sshcI = {
             sorterShc.step = StepNumber.fromInt 0;
@@ -356,3 +356,24 @@ module SorterShcSpec =
         }
 
 
+
+type sorterShcSpecRndGen = 
+    {
+       baseSpec:sorterShcSpec; 
+       generator:IRando->sorterShcSpec;
+       rndGen:RngGen;
+       count:int
+    }
+
+type sssrgType = 
+    | RndGen
+
+module SorterShcSpecRndGen = 
+    let yab = 
+        None
+
+
+    let generate (sssrg:sorterShcSpecRndGen) = 
+        let randy = sssrg.rndGen |> Rando.fromRngGen
+        seq {0 .. (sssrg.count - 1) }
+        |> Seq.map( fun _ -> sssrg.generator randy)

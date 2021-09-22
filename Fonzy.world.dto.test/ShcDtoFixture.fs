@@ -103,19 +103,30 @@ type ShcDtoFixture () =
         let pfxSc = SwitchCount.fromInt wPfx.Length
         let mutRate = MutationRate.fromFloat 1.0
         let mutSpec = (pfxSc, mutRate) |> sorterMutationType.ByStage
-                        |> sorterMutSpec.Constant 
-                            
-        //let sscSpec =
-        //  {
-        //    sorterShcSpec.rngGen = rng;
-        //    sorter = sorter;
-        //    switchPfx = wPfx;
-        //    mutator = mutSpec;
-        //    shcSortableSetSpec = ssRs;
-        //    shcStageWeightSpec = swS;
-        //    evaluator = evl;
-        //    annealer = ann;
-        //    updater = updt;
-        //    terminator = term;
-        //  }
-        Assert.AreEqual(1, 1);
+                        |> sorterMutSpec.Constant
+        let srtbleSetType = sortableSetType.AllForDegree 
+                                (sortableSetRep.Integer degree)
+        let swS = shcStageWeightSpec.Constant (StageWeight.fromFloat 1.0)
+        let evl = sorterEvalSpec.PerfBin
+        let ann = annealerSpec.Constant (Temp.fromFloat 1.0)
+        let updt = shcSaveDetails.Always
+        let term = shcTermSpec.FixedLength (StepNumber.fromInt 10)
+        let sscSpec =
+          {
+            sorterShcSpec.rngGen = rng;
+            sorterShcSpec.sorter = sorter;
+            sorterShcSpec.switchPfx = wPfx;
+            sorterShcSpec.mutator = mutSpec;
+            sorterShcSpec.srtblSetType = srtbleSetType;
+            sorterShcSpec.shcStageWeightSpec = swS;
+            evaluator = evl;
+            annealer = ann;
+            updater = updt;
+            terminator = term;
+          }
+
+        let dto = sscSpec |> SorterShcSpecDto.toDto
+        let sscSpecBack = dto |> SorterShcSpecDto.fromDto
+                              |> Result.ExtractOrThrow
+
+        Assert.AreEqual(sscSpec, sscSpecBack);

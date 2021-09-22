@@ -8,7 +8,7 @@ type SorterGaDtoFixture () =
 
     [<TestMethod>]
     member this.SorterGenomeDto_Permutation() =
-        let tsSorterGenome = SorterGenome.Permutaions TestData.SorterGa.twoCycleList
+        let tsSorterGenome = sorterGenome.Permutaions TestData.SorterGa.twoCycleList
         let swSgDto = SorterGenomeDto.toDto tsSorterGenome
         let tsSorterGenomeBack = SorterGenomeDto.fromDto swSgDto
                                   |> Result.ExtractOrThrow
@@ -17,7 +17,7 @@ type SorterGaDtoFixture () =
 
     [<TestMethod>]
     member this.SorterGenomeDto_Switch() =
-        let swSorterGenome = SorterGenome.Switches TestData.SorterParts.switchList
+        let swSorterGenome = sorterGenome.Switches TestData.SorterParts.switchList
         let swSgDto = SorterGenomeDto.toDto swSorterGenome
         let swSorterGenomeBack = SorterGenomeDto.fromDto swSgDto
                                   |> Result.ExtractOrThrow
@@ -26,7 +26,7 @@ type SorterGaDtoFixture () =
 
     [<TestMethod>]
     member this.SorterPhenotypeDto_Single() =
-        let phenoSingle = SorterPhenotype.Singleton 
+        let phenoSingle = sorterPhenotype.Singleton
                             (TestData.SorterParts.makeRandomSorter())
         let dto = SorterPhenotypeDto.toDto phenoSingle
         let cereal = Json.serialize dto
@@ -40,7 +40,7 @@ type SorterGaDtoFixture () =
 
     [<TestMethod>]
     member this.SorterPhenotypeDto_Multiple() =
-        let phenoMulti = SorterPhenotype.Multiple TestData.SorterGa.sorterList
+        let phenoMulti = sorterPhenotype.Multiple TestData.SorterGa.sorterList
         let dto = SorterPhenotypeDto.toDto phenoMulti
         let cereal = Json.serialize dto
         let dtoBack = Json.deserialize<sorterPhenotypeDto> cereal 
@@ -54,7 +54,7 @@ type SorterGaDtoFixture () =
     [<TestMethod>]
     member this.SorterTestResultsDto_Single() =
         let switchUses = SwitchUses.init TestData.SorterParts.switchUseArray
-        let testRestultSingle = SorterTestResults.Singleton switchUses
+        let testRestultSingle = sorterTestResults.Singleton switchUses
         let dto = SorterTestResultsDto.toDto testRestultSingle
         let cereal = Json.serialize dto
         let dtoBack = Json.deserialize<sorterTestResultsDto> cereal 
@@ -67,7 +67,7 @@ type SorterGaDtoFixture () =
 
     [<TestMethod>]
     member this.SorterTestResultsDto_Multiple() =
-        let testRestultMultiple = SorterTestResults.Multiple 
+        let testRestultMultiple = sorterTestResults.Multiple 
                                     TestData.SorterGa.listOfSwitchUses
         let dto = SorterTestResultsDto.toDto testRestultMultiple
         let cereal = Json.serialize dto
@@ -81,7 +81,7 @@ type SorterGaDtoFixture () =
 
     [<TestMethod>]
     member this.SorterPhenotypeEvalDto_Single() =
-        let phenotypeEvalSingle = SorterPhenotypeEval.Singleton 42.0
+        let phenotypeEvalSingle = sorterPhenotypeEval.Singleton 42.0
         let dto = SorterPhenotypeEvalDto.toDto phenotypeEvalSingle
         let cereal = Json.serialize dto
         let dtoBack = Json.deserialize<sorterPhenotypeEvalDto> cereal 
@@ -94,7 +94,7 @@ type SorterGaDtoFixture () =
 
     [<TestMethod>]
     member this.SorterPhenotypeEvalDto_Multiple() =
-        let phenotypeEvalMultiple = SorterPhenotypeEval.Multiple [1.0; 2.0; 3.0;]
+        let phenotypeEvalMultiple = sorterPhenotypeEval.Multiple [1.0; 2.0; 3.0;]
         let dto = SorterPhenotypeEvalDto.toDto phenotypeEvalMultiple
         let cereal = Json.serialize dto
         let dtoBack = Json.deserialize<sorterPhenotypeEvalDto> cereal 
@@ -103,6 +103,3 @@ type SorterGaDtoFixture () =
         let testRestultMultipleBack = SorterPhenotypeEvalDto.fromDto dtoBack
                                         |> Result.ExtractOrThrow
         Assert.AreEqual(phenotypeEvalMultiple, testRestultMultipleBack);
-
-
-

@@ -9,22 +9,22 @@ type Ancestry =
 
 type Genome = 
         | NoGenome
-        | Sorter of SorterGenome
+        | Sorter of sorterGenome
 
 
 type Phenotype = 
         | NoPhenotype
-        | Sorter of SorterPhenotype
+        | Sorter of sorterPhenotype
 
 
 type OrgPerformance =
     | NoPerformance
-    | Sorter of SorterTestResults
+    | Sorter of sorterTestResults
 
 
 type PhenotypeEval = 
         | NoPhenotypeEval
-        | Sorter of SorterPhenotypeEval
+        | Sorter of sorterPhenotypeEval
 
 
 type Org =

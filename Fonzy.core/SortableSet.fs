@@ -76,11 +76,3 @@ module SortableSet =
                 sortableSetImpl = impl},
                 uses)
         }
-
-
-type sortableSetGen = 
-    { 
-        id:SortableSetId; 
-        cat:string; 
-        prams:Map<string, string>; 
-    }

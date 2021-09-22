@@ -11,7 +11,7 @@ module SorterGenomeDto =
                             |> Array.toList
                             |> Result.sequence
 
-                return SorterGenome.Permutaions bs
+                return sorterGenome.Permutaions bs
             }
         else if dto.cat = "Switches" then
             result {
@@ -20,14 +20,14 @@ module SorterGenomeDto =
                             |> Array.toList
                             |> Result.sequence
 
-                return SorterGenome.Switches bs
+                return sorterGenome.Switches bs
             }
         else sprintf "cat: %s for SorterGenomeDto not found"
                         dto.cat |> Error
 
-    let toDto (sorterGenome:SorterGenome) =
+    let toDto (sorterGenome:sorterGenome) =
         match sorterGenome with
-        | SorterGenome.Permutaions ps ->
+        | sorterGenome.Permutaions ps ->
             let dsf = ps |> List.toArray 
                          |> Array.map(fun p-> p |> TwoCyclePermDto.toDto
                                                 |> Json.serialize)
@@ -35,7 +35,7 @@ module SorterGenomeDto =
                 sorterGenomeDto.cat = "Permutaions"; 
                 value = dsf |> Json.serialize       
             }
-        | SorterGenome.Switches sw ->
+        | sorterGenome.Switches sw ->
             {
                 sorterGenomeDto.cat = "Switches"; 
                 value = sw |> List.toArray 
@@ -49,7 +49,7 @@ module SorterPhenotypeDto =
         if dto.cat = "Singleton" then
             result {
                 let! sorter =  SorterDto.fromJson dto.value
-                return SorterPhenotype.Singleton sorter
+                return sorterPhenotype.Singleton sorter
             }
         else if dto.cat = "Multiple" then
             result {
@@ -57,7 +57,7 @@ module SorterPhenotypeDto =
                 let! bs = b |> Array.map(SorterDto.fromJson)
                             |> Array.toList
                             |> Result.sequence
-                return SorterPhenotype.Multiple bs
+                return sorterPhenotype.Multiple bs
             }
         else sprintf "cat: %s for SorterPhenotypeDto not found"
                         dto.cat |> Error
@@ -67,14 +67,14 @@ module SorterPhenotypeDto =
                 return! fromDto dto
             }
 
-    let toDto (sorterPhenotype:SorterPhenotype) =
+    let toDto (sorterPhenotype:sorterPhenotype) =
         match sorterPhenotype with
-        | SorterPhenotype.Singleton s ->
+        | sorterPhenotype.Singleton s ->
             {
                 sorterPhenotypeDto.cat = "Singleton"; 
                 value = s |> SorterDto.toDto |> Json.serialize
             }
-        | SorterPhenotype.Multiple sList ->
+        | sorterPhenotype.Multiple sList ->
             {
                 sorterPhenotypeDto.cat = "Multiple"; 
                 value = sList |> List.toArray 
@@ -89,7 +89,7 @@ module SorterTestResultsDto =
         if dto.cat = "Singleton" then
             result {
                 let! switchUses =  SwitchUsesDto.fromJson dto.value
-                return SorterTestResults.Singleton switchUses
+                return sorterTestResults.Singleton switchUses
             }
         else if dto.cat = "Multiple" then
             result {
@@ -97,7 +97,7 @@ module SorterTestResultsDto =
                 let! bs = b |> Array.map(SwitchUsesDto.fromJson)
                             |> Array.toList
                             |> Result.sequence
-                return SorterTestResults.Multiple bs
+                return sorterTestResults.Multiple bs
             }
         else sprintf "cat: %s for SorterTestResultsDto not found"
                         dto.cat |> Error
@@ -107,14 +107,14 @@ module SorterTestResultsDto =
                 return! fromDto dto
             }
 
-    let toDto (sorterPhenotype:SorterTestResults) =
+    let toDto (sorterPhenotype:sorterTestResults) =
         match sorterPhenotype with
-        | SorterTestResults.Singleton s ->
+        | sorterTestResults.Singleton s ->
             {
                 sorterTestResultsDto.cat = "Singleton";
                 value = s |> SwitchUsesDto.toDto |> Json.serialize
             }
-        | SorterTestResults.Multiple sList ->
+        | sorterTestResults.Multiple sList ->
             {
                 sorterTestResultsDto.cat = "Multiple";
                 value = sList |> List.toArray 
@@ -129,12 +129,12 @@ module SorterPhenotypeEvalDto =
         if dto.cat = "Singleton" then
             result {
                 let eval = float dto.value
-                return SorterPhenotypeEval.Singleton eval
+                return sorterPhenotypeEval.Singleton eval
             }
         else if dto.cat = "Multiple" then
             result {
                 let! b = Json.deserialize<float[]> dto.value
-                return SorterPhenotypeEval.Multiple (b |> Array.toList)
+                return sorterPhenotypeEval.Multiple (b |> Array.toList)
             }
         else sprintf "cat: %s for SorterTestResultsDto not found"
                         dto.cat |> Error
@@ -144,14 +144,14 @@ module SorterPhenotypeEvalDto =
                 return! fromDto dto
             }
 
-    let toDto (sorterPhenotype:SorterPhenotypeEval) =
+    let toDto (sorterPhenotype:sorterPhenotypeEval) =
         match sorterPhenotype with
-        | SorterPhenotypeEval.Singleton s ->
+        | sorterPhenotypeEval.Singleton s ->
             {
                 sorterPhenotypeEvalDto.cat = "Singleton";
                 value = s.ToString()
             }
-        | SorterPhenotypeEval.Multiple sList ->
+        | sorterPhenotypeEval.Multiple sList ->
             {
                 sorterPhenotypeEvalDto.cat = "Multiple";
                 value = sList |> List.toArray 
