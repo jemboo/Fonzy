@@ -58,6 +58,21 @@ module StepNumber =
         }
 
 
+type RevNumber = private RevNumber of int
+module RevNumber =
+    let value (RevNumber v) = v
+    let create fieldName v = 
+        ConstrainedType.createInt fieldName RevNumber 0 100000000 v
+    let fromInt v = create "" v |> Result.ExtractOrThrow
+    let increment gen = fromInt ((value gen) + 1)
+    let fromKey (m:Map<'a, obj>) (key:'a) =
+        result {
+            let! gv = ResultMap.read key m
+            return! create "" (gv:?>int)
+        }
+
+
+
 type annealerSpec = 
     | Constant of Temp
     | Exp of Temp * float
@@ -73,7 +88,7 @@ module Annealer =
             else
                 let tv = Temp.value temp
                 let curTry = caster()
-                let curThresh = Math.Exp(-(nfv - ofv) / tv)
+                let curThresh = Math.Exp(-(nfv - ofv) / tv) / 2.0
                 curTry < curThresh
 
         
@@ -88,7 +103,7 @@ module Annealer =
                 let stepFlt = StepNumber.value step |> float
                 let curtemp = tv * Math.Exp (- stepFlt / decay)
                 let curTry = caster()
-                let curThresh = Math.Exp(-(nfv - ofv) / curtemp)
+                let curThresh = Math.Exp(-(nfv - ofv) / curtemp) / 2.0
                 curTry < curThresh
 
 

@@ -150,6 +150,20 @@ module Combinatorics =
         let tup = drawTwoWithoutRep degree rnd
         makeMonoTwoCycle degree (fst tup) (snd tup)
 
+
+    let draw1D (min:float) (max:float) (rnd:IRando) =
+        seq { while true do 
+                yield min + rnd.NextFloat * (max - min) }
+
+
+    let draw2D (min1:float) (max1:float)
+               (min2:float) (max2:float) 
+               (rnd:IRando) =
+        seq { while true do 
+                yield ( min1 + rnd.NextFloat * (max1 - min1),
+                        min2 + rnd.NextFloat * (max2 - min2)) }
+
+
     let drawFromWeightedDistribution (weightFunction:float->float) 
                                      (rnd:IRando) 
                                      (items:float[]) =

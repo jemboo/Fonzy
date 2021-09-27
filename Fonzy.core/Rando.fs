@@ -72,17 +72,19 @@ module Rando =
         new RandomLcg(seed) :> IRando
 
 
-    let private _NextGuid (curr:IRando) : System.Guid =
-                GuidUtils.makeGuid (curr.NextULong) (curr.NextULong) 
-                                   (curr.NextULong) (curr.NextULong)
+    let private _NextGuid (curr:IRando) =
+            GuidUtils.makeGuid (curr.NextULong) (curr.NextULong) 
+                                (curr.NextULong) (curr.NextULong)
 
 
-    let private _NextGuid2 (curr1:IRando) (curr2:IRando) : System.Guid =
-                GuidUtils.makeGuid (curr1.NextULong) (curr1.NextULong) 
-                                   (curr2.NextULong) (curr2.NextULong)
+    let private _NextGuid2 (curr1:IRando) 
+                           (curr2:IRando) =
+            GuidUtils.makeGuid (curr1.NextULong) (curr1.NextULong) 
+                               (curr2.NextULong) (curr2.NextULong)
 
 
-    let NextGuid (curr1:IRando) (curr2:IRando option) : System.Guid =
+    let NextGuid (curr1:IRando) 
+                 (curr2:IRando option) =
         match curr2 with
         | Some rando -> _NextGuid2 curr1 rando
         | None -> _NextGuid curr1

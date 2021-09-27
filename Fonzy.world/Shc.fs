@@ -45,8 +45,8 @@ module SHC =
 
     let update (shc:sHC<'T,'A>) =
         result {
-            let! newGen = shc.current |> newGen shc.mutator shc.evaluator
-            let! aNext = shc.annealer shc.current newGen
+            let! updated = shc.current |> newGen shc.mutator shc.evaluator
+            let! aNext = shc.annealer shc.current updated
             let! aLst = aNext |> shc.updater shc.archive
             return
                 {
@@ -73,6 +73,7 @@ module SHC =
 type sorterShc = 
     {
         step:StepNumber;
+        revision:RevNumber;
         rngGen:RngGen; 
         sorter:sorter;
         switchPfx:Switch[];
@@ -86,6 +87,7 @@ type sorterShc =
 type sorterShcArch = 
     {
         step:StepNumber;
+        revision:RevNumber;
         rngGen:RngGen option; 
         sorter:sorter option;
         switchUses:switchUses option
@@ -98,6 +100,7 @@ module SorterShcArch =
     let toFull (shc:sorterShc) =
         {
             sorterShcArch.step = shc.step;
+            sorterShcArch.revision = shc.revision;
             sorterShcArch.rngGen = Some shc.rngGen;
             sorterShcArch.sorter = Some shc.sorter;
             sorterShcArch.switchUses = shc.switchUses;
@@ -108,6 +111,7 @@ module SorterShcArch =
     let toPartial (shc:sorterShc) =
         {
             sorterShcArch.step = shc.step;
+            sorterShcArch.revision = shc.revision;
             sorterShcArch.rngGen = None;
             sorterShcArch.sorter = None;
             sorterShcArch.switchUses = None;
@@ -206,6 +210,7 @@ module SorterShc =
                             sorterShc.rngGen = sShc.rngGen
                             sorterShc.sorter = sShc.sorter
                             sorterShc.step = sShc.step
+                            sorterShc.revision = sShc.revision
                             sorterShc.switchPfx = sShc.switchPfx
                             sorterShc.switchUses = Some switchUses
                         }
@@ -226,13 +231,13 @@ type sorterShcSpec =
        rngGen:RngGen; 
        sorter:sorter;
        switchPfx:Switch[];
-       mutator:sorterMutSpec;
+       mutatorSpec:sorterMutSpec;
        srtblSetType:sortableSetType;
        shcStageWeightSpec:shcStageWeightSpec;
-       evaluator: sorterEvalSpec;
-       annealer:annealerSpec;
-       updater: shcSaveDetails;
-       terminator:shcTermSpec;
+       evalSpec: sorterEvalSpec;
+       annealerSpec:annealerSpec;
+       updaterSpec: shcSaveDetails;
+       termSpec:shcTermSpec;
     }
 
 module SorterShcSpec = 
@@ -253,7 +258,14 @@ module SorterShcSpec =
                     randy.NextFloat
                 let annF = Annealer.make anSpec
                 let pickNew = annF curE newE chooser shcNew.step
-                if pickNew then return shcNew else return shcCurrent
+                if pickNew then 
+                    return shcNew else
+                    let newRng = shcCurrent.rngGen 
+                                    |> Rando.fromRngGen
+                                    |> Rando.toRngGen
+                    return { shcCurrent with 
+                                step = shcNew.step;
+                                rngGen = newRng }
             }
 
 
@@ -266,54 +278,62 @@ module SorterShcSpec =
                 let sorterMut = SorterMutate.mutate smt randy shcCurrent.sorter
                 return {
                     step = shcCurrent.step |> StepNumber.increment;
+                    revision = shcCurrent.revision |> RevNumber.increment;
                     rngGen = randy |> Rando.toRngGen; 
                     sorter = sorterMut;
                     switchPfx = shcCurrent.switchPfx;
                     switchUses = None;
                     perf = None;
                     energy = None;
-                    bestEnergy = None;
+                    bestEnergy = shcCurrent.bestEnergy;
                 }
             }
 
 
     let makeEvaluator (spec:sorterShcSpec) = 
-        match spec.evaluator with
+        match spec.evalSpec with
         | PerfBin -> SorterShc.sorterEvalPerfBin
                         spec.shcStageWeightSpec
                         spec.srtblSetType
                   
 
 
-    let makeUpdater (u:shcSaveDetails) =
+    let makeUpdater (saveDetails:shcSaveDetails) =
         fun (arch:sorterShcArch list) 
             (newT:sorterShc) ->
             let lastArch = arch |> List.head
-            let curBest = newT |> SorterShc.isCurrentBest
+
             let improvement =  Energy.isBetterThan 
                                         (newT.energy |> Option.get)
                                         lastArch.energy
-            let threshB (thresh:Energy)  =  
-                    Energy.isBetterThan 
-                            (newT.energy |> Option.get)
-                            thresh
-            match u with
-                | Always -> 
-                    (newT |> SorterShcArch.toFull) :: arch 
-                    |> Ok
-                | IfBest ->  
-                    (newT |> SorterShcArch.toSorterShcArch curBest) :: arch 
-                    |> Ok
-                | BetterThanLast ->  
-                    (newT |> SorterShcArch.toSorterShcArch improvement) :: arch 
-                    |> Ok
-                | EnergyThresh e -> 
-                    let useNew = (threshB e) && improvement
-                    (newT |> SorterShcArch.toSorterShcArch useNew) :: arch 
-                    |> Ok
-                | Never -> 
-                    (newT |> SorterShcArch.toPartial) :: arch 
-                    |> Ok
+
+            if ((newT.revision = lastArch.revision) || 
+                (not improvement)) then
+                arch |> Ok else
+
+                let curBest = newT |> SorterShc.isCurrentBest
+
+                let threshB (thresh:Energy)  =  
+                        Energy.isBetterThan 
+                                (newT.energy |> Option.get)
+                                thresh
+                match saveDetails with
+                    | Always -> 
+                        (newT |> SorterShcArch.toFull) :: arch 
+                        |> Ok
+                    | IfBest ->  
+                        (newT |> SorterShcArch.toSorterShcArch curBest) :: arch 
+                        |> Ok
+                    | BetterThanLast ->  
+                        (newT |> SorterShcArch.toSorterShcArch improvement) :: arch 
+                        |> Ok
+                    | EnergyThresh e -> 
+                        let useNew = (threshB e) && improvement
+                        (newT |> SorterShcArch.toSorterShcArch useNew) :: arch 
+                        |> Ok
+                    | Never -> 
+                        (newT |> SorterShcArch.toPartial) :: arch 
+                        |> Ok
 
 
     let makeTerminator (spec:shcTermSpec) =
@@ -331,6 +351,7 @@ module SorterShcSpec =
 
         let sshcI = {
             sorterShc.step = StepNumber.fromInt 0;
+            sorterShc.revision = RevNumber.fromInt 0;
             sorterShc.energy = None;
             sorterShc.perf = None;
             sorterShc.rngGen = spec.rngGen;
@@ -347,33 +368,105 @@ module SorterShcSpec =
                id = makeId spec;
                current = sshc0;
                archive = [arch];
-               mutator = makeMutator spec.mutator;
+               mutator = makeMutator spec.mutatorSpec;
                evaluator = evaluator;
-               annealer = makeAnnealer spec.annealer
-               updater = makeUpdater spec.updater;
-               terminator = makeTerminator spec.terminator;
+               annealer = makeAnnealer spec.annealerSpec
+               updater = makeUpdater spec.updaterSpec;
+               terminator = makeTerminator spec.termSpec;
             }
         }
 
 
+type sssrgType = 
+    | RndGen
+    | Sorters of sorterSetGen
+    | Annealer of annealerSpec
+
 
 type sorterShcSpecRndGen = 
     {
-       baseSpec:sorterShcSpec; 
-       generator:IRando->sorterShcSpec;
+       baseSpec:sorterShcSpec;
+       sssrgType:sssrgType;
        rndGen:RngGen;
        count:int
     }
 
-type sssrgType = 
-    | RndGen
 
-module SorterShcSpecRndGen = 
-    let yab = 
-        None
+module SorterShcSpecRndGen =
+
+    let swapRndGen rndG (shc:sorterShcSpec) count = 
+        let randy = rndG |> Rando.fromRngGen
+        seq {0 .. (count - 1) }
+        |> Seq.map( fun _ -> 
+                { shc with 
+                      rngGen = (randy |> Rando.toRngGen)})
 
 
-    let generate (sssrg:sorterShcSpecRndGen) = 
-        let randy = sssrg.rndGen |> Rando.fromRngGen
-        seq {0 .. (sssrg.count - 1) }
-        |> Seq.map( fun _ -> sssrg.generator randy)
+    let swapSorters (srSrepo: (SorterSetId->sorterSet) option) 
+                    rndG 
+                    (baseSpec:sorterShcSpec) 
+                    count
+                    (ssg:sorterSetGen) = 
+        result {
+            let randy = rndG |> Rando.fromRngGen
+            let! srtrSet = SorterSetGen.createSorterSet srSrepo ssg
+            let srtrA = srtrSet.sorters |> Map.toArray |> Array.map(snd)
+            return seq { 0 .. (count - 1) }
+            |> Seq.map( fun dex -> 
+                    { baseSpec with 
+                          rngGen = (randy |> Rando.toRngGen);
+                          sorter = srtrA.[dex % srtrA.Length]})
+        }
+
+    let swapAnnealers  rndG 
+                       (shc:sorterShcSpec)
+                       count
+                       (endPt:annealerSpec) = 
+        let annAc randy =
+            result {
+               return! 
+                   match shc.annealerSpec, endPt with
+                   | annealerSpec.Constant c1, annealerSpec.Constant c2  -> 
+                        Combinatorics.draw1D (Temp.value c1) (Temp.value c2) randy
+                        |> Seq.map(fun t -> (Temp.fromFloat t) |> annealerSpec.Constant)
+                        |> Seq.take count
+                        |> Ok
+                   | annealerSpec.Exp (t1, d1), annealerSpec.Exp (t2, d2) -> 
+                        Combinatorics.draw2D (Temp.value t1) d1 
+                                             (Temp.value t2) d2 randy
+                        |> Seq.map(fun tup -> ((Temp.fromFloat (fst tup)), (snd tup)) |> annealerSpec.Exp)
+                        |> Seq.take count
+                        |> Ok
+                   | _ -> "annealerSpecs must me the same type" |> Error
+            }
+
+        result {
+            let randy = rndG |> Rando.fromRngGen
+            let! anns = annAc randy
+            return anns 
+                    |> Seq.map(fun an ->  
+                        { shc with 
+                              rngGen = (randy |> Rando.toRngGen);
+                              annealerSpec = an })
+        }
+
+
+    let generate (sbSrepo: (SortableSetId->sorterSet) option) 
+                 (srSrepo: (SorterSetId->sorterSet) option) 
+                 (sssrg:sorterShcSpecRndGen) = 
+        match sssrg.sssrgType with
+        | RndGen -> swapRndGen sssrg.rndGen
+                               sssrg.baseSpec
+                               sssrg.count |> Ok
+
+        | Sorters ssG -> swapSorters srSrepo
+                                     sssrg.rndGen 
+                                     sssrg.baseSpec 
+                                     sssrg.count 
+                                     ssG
+
+        | Annealer endSpec -> swapAnnealers 
+                                sssrg.rndGen 
+                                sssrg.baseSpec 
+                                sssrg.count 
+                                endSpec

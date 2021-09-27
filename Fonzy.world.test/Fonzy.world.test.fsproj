@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SorterGenFixture.fs" />
     <Compile Include="SortableGenFixture.fs" />
+    <Compile Include="SorterGenFixture.fs" />
     <Compile Include="SortingIntsFixture.fs" />
     <Compile Include="SortingBp64Fixture.fs" />
     <Compile Include="SortingOpsFixture.fs" />

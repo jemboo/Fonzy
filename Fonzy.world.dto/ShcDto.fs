@@ -258,13 +258,13 @@ module SorterShcSpecDto =
                       sorterShcSpec.rngGen = rng;
                       sorter = srt;
                       switchPfx = swx |> List.toArray;
-                      mutator = mutSpec;
+                      sorterShcSpec.mutatorSpec = mutSpec;
                       srtblSetType = ssRs;
                       shcStageWeightSpec = swS;
-                      evaluator = evl;
-                      annealer = ann;
-                      updater = updt;
-                      terminator = term;
+                      sorterShcSpec.evalSpec = evl;
+                      sorterShcSpec.annealerSpec = ann;
+                      sorterShcSpec.updaterSpec = updt;
+                      sorterShcSpec.termSpec = term;
                     }
         }
                      
@@ -280,13 +280,13 @@ module SorterShcSpecDto =
                 sorterShcSpecDto.rngGen = sss.rngGen |> RngGenDto.toDto;
                 sorter = sss.sorter |> SorterDto.toDto;
                 switchPfx = sss.switchPfx |> Array.map(SwitchDto.toDto);
-                mutSpec = sss.mutator |> SorterMutSpecDto.toDto
+                mutSpec = sss.mutatorSpec |> SorterMutSpecDto.toDto
                 srtblStType = sss.srtblSetType |> SortableSetTypeDto.toDto
                 stWgtSpec = sss.shcStageWeightSpec |> ShcStageWeightSpecDto.toDto
-                evalSpec = sss.evaluator |> SorterEvalSpecDto.toDto
-                annealer = sss.annealer |> AnnealerSpecDto.toDto
-                updater = sss.updater |> ShcSaveDetailsDto.toDto
-                term = sss.terminator  |> ShcTermSpecDto.toDto
+                evalSpec = sss.evalSpec |> SorterEvalSpecDto.toDto
+                annealer = sss.annealerSpec |> AnnealerSpecDto.toDto
+                updater = sss.updaterSpec |> ShcSaveDetailsDto.toDto
+                term = sss.termSpec  |> ShcTermSpecDto.toDto
             }
 
     let toJson (idt:sorterShcSpec) =

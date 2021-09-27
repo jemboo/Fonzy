@@ -6,6 +6,9 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 [<TestClass>]
 type ShcDtoFixture () =
 
+    let degree = Degree.fromInt 12
+
+
     [<TestMethod>]
     member this.SorterSetDto() =
         let sorterSetCereal = TestData.SorterSet.mediocreSorterSet |> SorterSetDto.toJson
@@ -58,7 +61,6 @@ type ShcDtoFixture () =
 
     [<TestMethod>]
     member this.sorterShcArchDto () =
-        let degree = Degree.fromInt 12
         let stp = StepNumber.fromInt 5
         let rng = RngGen.createLcg (RandomSeed.fromInt 123)
         let sorter = RefSorter.goodRefSorterForDegree degree
@@ -93,7 +95,6 @@ type ShcDtoFixture () =
 
     [<TestMethod>]
     member this.sorterShcSpecDto () =
-        let degree = Degree.fromInt 12
         let stp = StepNumber.fromInt 5
         let rng = RngGen.createLcg (RandomSeed.fromInt 123)
         let sorter = RefSorter.goodRefSorterForDegree degree
@@ -116,13 +117,13 @@ type ShcDtoFixture () =
             sorterShcSpec.rngGen = rng;
             sorterShcSpec.sorter = sorter;
             sorterShcSpec.switchPfx = wPfx;
-            sorterShcSpec.mutator = mutSpec;
+            sorterShcSpec.mutatorSpec = mutSpec;
             sorterShcSpec.srtblSetType = srtbleSetType;
             sorterShcSpec.shcStageWeightSpec = swS;
-            evaluator = evl;
-            annealer = ann;
-            updater = updt;
-            terminator = term;
+            evalSpec = evl;
+            annealerSpec = ann;
+            updaterSpec = updt;
+            termSpec = term;
           }
 
         let dto = sscSpec |> SorterShcSpecDto.toDto
