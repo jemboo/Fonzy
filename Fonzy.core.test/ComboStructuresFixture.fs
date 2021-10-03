@@ -125,12 +125,9 @@ type ComboStructuresFixture () =
        let degree = Degree.fromInt 16
        let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
        let refSyms = Array.init 100 (fun _ ->
-           TwoCyclePerm.rndSymmetric
-                                        degree
-                                        rnd)
+           TwoCyclePerm.rndSymmetric degree  rnd)
        let smyr = refSyms |> Array.toSeq
-                    |> Seq.map 
-                    (Switch.fromTwoCyclePerm >> Seq.toArray)
+                    |> Seq.map (Switch.fromTwoCyclePerm >> Seq.toArray)
                     |> Seq.concat
                     |> Seq.map(fun sw -> sw = (Switch.reflect degree sw))
                     |> Seq.countBy(id)
@@ -139,6 +136,33 @@ type ComboStructuresFixture () =
        Assert.AreEqual(smyr.Length, 2)
        let rr = refSyms |> Array.map(fun tcp -> 
                 (tcp, tcp = (tcp |> TwoCyclePerm.reflect)))
+
+       Assert.IsTrue(true)
+
+
+
+    [<TestMethod>]
+    member this.TwoCyclePerm_mutateReflSymmetric() =
+       let degree = Degree.fromInt 16
+       let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
+       let refSyms = Array.init 1000 (fun _ ->
+           TwoCyclePerm.rndSymmetric degree  rnd)
+       let rr = refSyms |> Array.map(fun tcp -> 
+                (tcp, tcp = (tcp |> TwoCyclePerm.reflect)))
+                |> Array.countBy(snd)
+
+       let refMuts = refSyms |> Array.map(fun p ->
+                        let tcp = seq { 
+                                while true do 
+                                yield 
+                                    Combinatorics.drawTwoWithoutRep 
+                                                    degree 
+                                                    rnd }
+                        TwoCyclePerm.mutateByReflPair tcp p)
+
+       let rm = refMuts |> Array.map(fun tcp -> 
+                 (tcp, tcp = (tcp |> TwoCyclePerm.reflect)))
+                 |> Array.countBy(snd)
 
        Assert.IsTrue(true)
 

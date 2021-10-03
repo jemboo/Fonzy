@@ -69,34 +69,25 @@ module Stage =
 
     let convertToTwoCycle (stage:Stage) =
         stage.switches |> Seq.map(fun s -> (s.low, s.hi))
-                        |> TwoCyclePerm.makeFromTupleSeq stage.degree
+                       |> TwoCyclePerm.makeFromTupleSeq stage.degree
 
-
-    let mutateStage (stage:Stage) 
-                    (pair:int*int) =
-        let tcp = stage |> convertToTwoCycle |> TwoCyclePerm.arrayValues
-        let a, b = pair
-        let c = tcp.[a]
-        let d = tcp.[b]
-        if (a=c) && (b=d) then
-            tcp.[a] <- b
-            tcp.[b] <- a
-        elif (a=c) then
-            tcp.[a] <- b
-            tcp.[b] <- a
-            tcp.[d] <- d
-        elif (b=d) then
-            tcp.[a] <- b
-            tcp.[b] <- a
-            tcp.[c] <- c
-        else
-            tcp.[a] <- b
-            tcp.[c] <- d
-            tcp.[b] <- a
-            tcp.[d] <- c
-        let sA = Switch.fromIntArray tcp |> Seq.toList
+                       
+    let mutateStageByPair (stage:Stage) 
+                          (pair:int*int) =
+        let tcpM = stage |> convertToTwoCycle 
+                         |> TwoCyclePerm.mutateByPair pair
+        let sA = Switch.fromIntArray tcpM.values |> Seq.toList
         {switches=sA; degree=stage.degree}
-        
+
+
+    let mutateStageReflByPair (stage:Stage) 
+                              (pairs:seq<int*int>) =
+
+        let tcpM = stage |> convertToTwoCycle 
+                         |> TwoCyclePerm.mutateByReflPair pairs
+        let sA = Switch.fromIntArray tcpM.values |> Seq.toList
+        {switches=sA; degree=stage.degree}
+
 
     // IRando dependent
     let rndSeq (degree:Degree) 
@@ -141,7 +132,22 @@ module Stage =
                         let tcp = Combinatorics.drawTwoWithoutRep 
                                                     stage.degree 
                                                     rnd
-                        mutateStage stage tcp
+                        mutateStageByPair stage tcp
+            | _ -> stage
+
+
+    let randomReflMutate (rnd:IRando) 
+                         (mutationRate:MutationRate) 
+                         (stage:Stage) = 
+        match rnd.NextFloat with
+            | k when k < (MutationRate.value mutationRate) -> 
+                        let tcp = seq { 
+                                while true do 
+                                yield 
+                                    Combinatorics.drawTwoWithoutRep 
+                                                    stage.degree 
+                                                    rnd }
+                        mutateStageReflByPair stage tcp 
             | _ -> stage
 
 

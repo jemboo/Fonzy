@@ -122,9 +122,11 @@ module TwoCyclePerm =
              values=(Combinatorics.makeMonoTwoCycle degree low hi)} |> Ok
         else Error "low or hi is out of range" 
 
+
     let makeAllMonoCycles (degree:Degree) =
         (Combinatorics.makeAllMonoTwoCycles degree) 
         |> Seq.map (fun s -> {degree=degree; values= s})
+
 
     let makeFromTupleSeq (degree:Degree) (tupes:seq<int*int>) =
         let curPa = [|0 .. (Degree.value degree)-1|]
@@ -143,14 +145,74 @@ module TwoCyclePerm =
         tupes |> Seq.iter(OpPa)
         { degree=degree; values=curPa }
 
+
+    let mutateByPair (pair:int*int) 
+                     (tcp:twoCyclePerm) =
+        let tcpA = tcp |> arrayValues |> Array.copy
+        let a, b = pair
+        let c = tcpA.[a]
+        let d = tcpA.[b]
+        if (a=c) && (b=d) then
+            tcpA.[a] <- b
+            tcpA.[b] <- a
+        elif (a=c) then
+            tcpA.[a] <- b
+            tcpA.[b] <- a
+            tcpA.[d] <- d
+        elif (b=d) then
+            tcpA.[a] <- b
+            tcpA.[b] <- a
+            tcpA.[c] <- c
+        else
+            tcpA.[a] <- b
+            tcpA.[c] <- d
+            tcpA.[b] <- a
+            tcpA.[d] <- c
+        { tcp with values=tcpA}
+
+        
+    let mutateByReflPair (pairs: seq<(int*int)>) 
+                         (tcp:twoCyclePerm) =
+        let mutato (pair:int*int) = 
+            let tca = tcp |> arrayValues |> Array.copy
+            let dv = tcp.degree |> Degree.value
+            let pA, pB = pair
+            let tpA, tpB = tca.[pA], tca.[pB]
+            let rA, rB = (Combinatorics.reflect dv pA), (Combinatorics.reflect dv pB)
+            let rtA, rtB = (Combinatorics.reflect dv tpA), (Combinatorics.reflect dv tpB)
+
+            tca.[pA] <- tpB
+            tca.[tpB] <- pA
+
+            tca.[pB] <- tpA
+            tca.[tpA] <- pB
+
+            tca.[rB] <- rtA
+            tca.[rtA] <- rB
+
+            tca.[rA] <- rtB
+            tca.[rtB] <- rA
+
+            { tcp with values=tca}
+
+        //let muts =
+        pairs |> Seq.map(fun pr -> mutato pr)
+              |> Seq.filter(fun mut -> Combinatorics.isTwoCycle mut.values)
+              |> Seq.head
+        //if muts.Length > 0 then
+        //    muts.[0]
+        //else
+        //    { tcp with values = tcp |> arrayValues |> Array.copy}
+
+
     // IRando dependent
     
     let makeRandomMonoCycle (degree:Degree) (rnd:IRando) =
         { 
             degree = degree; 
             values = Combinatorics.rndMonoTwoCycle 
-                        degree 
-                        rnd 
+                                    degree 
+                                    rnd 
         }
         
     let rndTwoCycle (degree:Degree)
@@ -181,17 +243,17 @@ module TwoCyclePerm =
 
     let reflect (twoCyclePerm:twoCyclePerm) =
         let deg = (Degree.value twoCyclePerm.degree)
-        let refV pos = Combinatorics.reflect deg
-                                             pos
+        let refV pos = 
+            Combinatorics.reflect deg pos
+
         let refl = Array.init 
                     deg
-                    (fun dex -> 
-         twoCyclePerm.values.[refV dex] 
-         |> refV)
+                    (fun dex -> twoCyclePerm.values.[refV dex] |> refV)
         {
             degree = twoCyclePerm.degree; 
             values = refl 
         }
+
 
     let rndSymmetric (degree:Degree) 
                      (rnd:IRando) =

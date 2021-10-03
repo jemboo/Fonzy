@@ -81,29 +81,29 @@ module Annealer =
 
     let makeConst (temp:Temp) =
         fun curFitness newFitness (caster:unit->float) _ ->
-            let ofv = curFitness |> Energy.value
+            let cfv = curFitness |> Energy.value
             let nfv = newFitness |> Energy.value
-            if (ofv >= nfv) then
+            if (cfv >= nfv) then
                 true
             else
                 let tv = Temp.value temp
                 let curTry = caster()
-                let curThresh = Math.Exp(-(nfv - ofv) / tv) / 2.0
+                let curThresh = Math.Exp(-(nfv - cfv) / tv) / 2.0
                 curTry < curThresh
 
         
     let makeExp (temp:Temp) (decay:float) =
         fun curFitness newFitness (caster:unit->float) step ->
-            let ofv = curFitness |> Energy.value
+            let cfv = curFitness |> Energy.value
             let nfv = newFitness |> Energy.value
-            if (ofv >= nfv) then
+            if (cfv >= nfv) then
                 true
             else
                 let tv = Temp.value temp
                 let stepFlt = StepNumber.value step |> float
                 let curtemp = tv * Math.Exp (- stepFlt / decay)
                 let curTry = caster()
-                let curThresh = Math.Exp(-(nfv - ofv) / curtemp) / 2.0
+                let curThresh = Math.Exp(-(nfv - cfv) / curtemp) / 2.0
                 curTry < curThresh
 
 

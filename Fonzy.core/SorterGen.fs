@@ -68,6 +68,7 @@ module SorterGen =
 type sorterMutationType =
         | BySwitch of SwitchCount*MutationRate
         | ByStage of SwitchCount*MutationRate
+        | ByStageRfl of SwitchCount*MutationRate
 
 
 module SorterMutate =
@@ -115,6 +116,31 @@ module SorterMutate =
             switches = newSwitches
         }
 
+    let mutateByStageRfl (mutationRate:MutationRate)
+                         (skipPrefix:SwitchCount)
+                         (rnd:IRando)
+                         (sorter:sorter) =
+        let prefixStages = 
+                  sorter.switches
+                     |> Array.take (SwitchCount.value skipPrefix)
+                     |> Stage.fromSwitches sorter.degree
+                     |> Seq.toArray
+        let mutableStages = 
+                  sorter.switches
+                     |> Array.toSeq
+                     |> Seq.skip (SwitchCount.value skipPrefix)
+                     |> Stage.fromSwitches sorter.degree
+                     |> Seq.toArray
+        let mutantStages = mutableStages
+                            |> Array.map(Stage.randomReflMutate rnd mutationRate)
+        let newStages = mutantStages |> Array.append prefixStages
+        let newSwitches = [| for stage in newStages do yield! stage.switches |]
+        {
+            sorter.degree=sorter.degree;
+            switchCount = (SwitchCount.fromInt newSwitches.Length);
+            switches = newSwitches
+        }
+
 
     let mutate 
         (mutate:sorterMutationType) 
@@ -125,14 +151,15 @@ module SorterMutate =
                                     mr pfx rnd sorter
         | ByStage (pfx, mr) -> mutateByStage
                                     mr pfx rnd sorter
-
+        | ByStageRfl (pfx, mr) -> mutateByStageRfl
+                                    mr pfx rnd sorter
 
 type sorterRndGen =
     | RandSwitches of Switch list * SwitchCount * Degree
     | RandStages of Switch list  * StageCount * Degree
     | RandBuddies of Switch list  * StageCount * StageWindowSize * Degree 
     | RandSymmetric of Switch list  * StageCount * Degree
-    | RandSymmetricBuddies of Switch list  * StageCount * StageWindowSize * Degree
+    | RandRflBuddies of Switch list  * StageCount * StageWindowSize * Degree
 
 
 module SorterRndGen =
@@ -143,7 +170,7 @@ module SorterRndGen =
         | RandStages   (_, _, d) -> d
         | RandBuddies  (_, _, _, d) -> d
         | RandSymmetric   (_, _, d) -> d
-        | RandSymmetricBuddies  (_, _, _, d) -> d
+        | RandRflBuddies  (_, _, _, d) -> d
 
 
     let getSwitchPrefix (srg:sorterRndGen) =
@@ -152,7 +179,7 @@ module SorterRndGen =
         | RandStages   (swl, _, _) -> swl
         | RandBuddies  (swl, _, _, _) -> swl
         | RandSymmetric   (swl, _, _) -> swl
-        | RandSymmetricBuddies  (swl, _, _, _) -> swl
+        | RandRflBuddies  (swl, _, _, _) -> swl
 
 
     let getSwitchCount (srg:sorterRndGen) =
@@ -161,7 +188,7 @@ module SorterRndGen =
         | RandStages   (_, t, d) -> t |> StageCount.toSwitchCount d
         | RandBuddies  (_, t, _, d) -> t |> StageCount.toSwitchCount d
         | RandSymmetric   (_, t, d) -> t |> StageCount.toSwitchCount d
-        | RandSymmetricBuddies  (_, t, _, d) -> t |> StageCount.toSwitchCount d
+        | RandRflBuddies  (_, t, _, d) -> t |> StageCount.toSwitchCount d
 
 
     let reportString (id:Guid)
@@ -197,7 +224,7 @@ module SorterRndGen =
                             (StageCount.value tc) 
                             (Degree.value d)
 
-        | RandSymmetricBuddies (pfxc, tc, wc, d) ->
+        | RandRflBuddies (pfxc, tc, wc, d) ->
                 sprintf "%s\tRandSymmetricBuddies\t%s\t%d\t%d\t%d"
                             (id.ToString())
                             (pfxc.Length |> string)
@@ -277,7 +304,7 @@ module SorterRndGen =
         fromSwitchesAndPrefix degree wPfx switches
 
 
-    let randomReflSymmetricBuddies (degree:Degree) 
+    let randomReflBuddies (degree:Degree) 
                                    (wPfx: Switch seq) 
                                    (stageCount:StageCount)
                                    (stageWindowSize:StageWindowSize) 
@@ -372,8 +399,8 @@ module SorterRndGen =
                            randy
             |> Result.ExtractOrThrow
 
-        | sorterRndGen.RandSymmetricBuddies (swl, stageCount, windowSize, degree) ->
-            randomReflSymmetricBuddies
+        | sorterRndGen.RandRflBuddies (swl, stageCount, windowSize, degree) ->
+            randomReflBuddies
                            degree
                            swl
                            stageCount

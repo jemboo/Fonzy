@@ -143,7 +143,7 @@ module SorterPbCauseSpecGen =
         (makeBuddyArgs900 [] degreesToTest) |> List.map(sorterRndGen.RandBuddies)
 
     let makeRandSymmetricBuddies900 degreesToTest =
-        (makeBuddyArgs900 [] degreesToTest) |> List.map(sorterRndGen.RandSymmetricBuddies)
+        (makeBuddyArgs900 [] degreesToTest) |> List.map(sorterRndGen.RandRflBuddies)
 
 
     let makeRunBatchSeq (seed:RandomSeed) 

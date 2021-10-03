@@ -179,7 +179,8 @@ module ShcTermSpecDto =
 
 
 type sorterShcArchDto = 
-    {step:int; 
+    {step:int;
+     rev:int; 
      rngGen:rngGenDto option;
      sorter:sorterDto option;
      switchUses:switchUsesDto option;
@@ -190,19 +191,22 @@ module SorterShcArchDto =
     let fromDto (dto:sorterShcArchDto) =
         result {
             let! st = dto.step |> StepNumber.create "";
+            let! rev = dto.step |> RevNumber.create "";
             let! rng = dto.rngGen |> Result.bindOption RngGenDto.fromDto
             let! srt = dto.sorter |> Result.bindOption SorterDto.fromDto
             let! swu = dto.switchUses |> Result.bindOption SwitchUsesDto.fromDto
             let! prf = dto.perf  |> SorterPerfDto.fromDto
             let! e = dto.energy  |> Energy.create ""
-            return {
-                      sorterShcArch.step = st;
-                      rngGen = rng;
-                      sorter = srt;
-                      switchUses = swu;
-                      perf = prf;
-                      energy = e;
-                    }
+            return 
+             {
+                sorterShcArch.step = st;
+                revision = rev;
+                rngGen = rng;
+                sorter = srt;
+                switchUses = swu;
+                perf = prf;
+                energy = e;
+             }
         }
                      
     let fromJson (jstr:string) =
@@ -213,12 +217,13 @@ module SorterShcArchDto =
 
     let toDto (ssA:sorterShcArch) =
             {
-             sorterShcArchDto.step = (StepNumber.value ssA.step); 
-             rngGen = ssA.rngGen |> Option.bind (RngGenDto.toDto >> Some);
-             sorter = ssA.sorter |> Option.bind (SorterDto.toDto >> Some);
-             switchUses = ssA.switchUses |> Option.bind (SwitchUsesDto.toDto >> Some);
-             perf = ssA.perf |> SorterPerfDto.toDto
-             energy = (Energy.value ssA.energy); 
+                 sorterShcArchDto.step = (StepNumber.value ssA.step);
+                 rev = (RevNumber.value ssA.revision);
+                 rngGen = ssA.rngGen |> Option.bind (RngGenDto.toDto >> Some);
+                 sorter = ssA.sorter |> Option.bind (SorterDto.toDto >> Some);
+                 switchUses = ssA.switchUses |> Option.bind (SwitchUsesDto.toDto >> Some);
+                 perf = ssA.perf |> SorterPerfDto.toDto
+                 energy = (Energy.value ssA.energy); 
            }
 
     let toJson (idt:sorterShcArch) =
@@ -254,18 +259,19 @@ module SorterShcSpecDto =
             let! ann = dto.annealer  |> AnnealerSpecDto.fromDto
             let! updt = dto.updater  |> ShcSaveDetailsDto.fromDto
             let! term = dto.term  |> ShcTermSpecDto.fromDto
-            return {
-                      sorterShcSpec.rngGen = rng;
-                      sorter = srt;
-                      switchPfx = swx |> List.toArray;
-                      sorterShcSpec.mutatorSpec = mutSpec;
-                      srtblSetType = ssRs;
-                      shcStageWeightSpec = swS;
-                      sorterShcSpec.evalSpec = evl;
-                      sorterShcSpec.annealerSpec = ann;
-                      sorterShcSpec.updaterSpec = updt;
-                      sorterShcSpec.termSpec = term;
-                    }
+            return 
+             {
+                sorterShcSpec.rngGen = rng;
+                sorter = srt;
+                switchPfx = swx |> List.toArray;
+                sorterShcSpec.mutatorSpec = mutSpec;
+                srtblSetType = ssRs;
+                shcStageWeightSpec = swS;
+                sorterShcSpec.evalSpec = evl;
+                sorterShcSpec.annealerSpec = ann;
+                sorterShcSpec.updaterSpec = updt;
+                sorterShcSpec.termSpec = term;
+             }
         }
                      
     let fromJson (jstr:string) =
@@ -275,7 +281,6 @@ module SorterShcSpecDto =
         }
 
     let toDto (sss:sorterShcSpec) =
-
             {
                 sorterShcSpecDto.rngGen = sss.rngGen |> RngGenDto.toDto;
                 sorter = sss.sorter |> SorterDto.toDto;

@@ -62,6 +62,7 @@ type ShcDtoFixture () =
     [<TestMethod>]
     member this.sorterShcArchDto () =
         let stp = StepNumber.fromInt 5
+        let rev = RevNumber.fromInt 3
         let rng = RngGen.createLcg (RandomSeed.fromInt 123)
         let sorter = RefSorter.goodRefSorterForDegree degree
                         |> Result.ExtractOrThrow
@@ -78,6 +79,7 @@ type ShcDtoFixture () =
         let energy = Energy.fromFloat 1.0
         let archie = {
             sorterShcArch.step = stp;
+            sorterShcArch.revision = rev;
             rngGen = Some rng;
             sorter = Some sorter;
             switchUses = Some switchUses;
