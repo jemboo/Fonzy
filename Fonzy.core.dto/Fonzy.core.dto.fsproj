@@ -17,6 +17,7 @@
     <Compile Include="SortingEvalDto.fs" />
     <Compile Include="SorterGenDto.fs" />
     <Compile Include="SorterSetDto.fs" />
+    <Compile Include="ShcDto.fs" />
     <Compile Include="SorterGaDto.fs" />
     <Compile Include="OrgsDto.fs" />
     <Compile Include="Program.fs" />

@@ -28,64 +28,6 @@ type shcTermSpec =
     | EnergyBased of Energy*StepNumber*StepNumber
 
 
-type sHC<'T,'A> = 
-    {
-       id:ShcId;
-       current: 'T;
-       archive: 'A list;
-       mutator: 'T -> Result<'T, string>
-       evaluator: 'T -> Result<'T, string>
-       annealer: 'T -> 'T -> Result<'T, string>
-       updater: 'A list -> 'T -> Result<'A list, string>
-       terminator: 'T -> bool
-    }
-
-module SHC =
-
-    let newGen  (mutator:'A -> Result<'A, string>)
-                (evaluator:'A -> Result<'A, string>) 
-                (curGen:'A) =
-        result {
-            let! aMut = curGen |> mutator
-            return! aMut |> evaluator
-        }
-
-    let update (shc:sHC<'T,'A>) =
-        result {
-            let! updated = shc.current |> newGen shc.mutator shc.evaluator
-            let! aNext = shc.annealer shc.current updated
-            let! aLst = aNext |> shc.updater shc.archive
-            return
-                {
-                    sHC.id = shc.id;
-                    sHC.current = aNext;
-                    sHC.archive = aLst;
-                    sHC.mutator = shc.mutator;
-                    sHC.updater = shc.updater;
-                    sHC.evaluator = shc.evaluator;
-                    sHC.annealer = shc.annealer;
-                    sHC.terminator = shc.terminator;
-                }
-        }
-
-    let run (shc:sHC<'T,'A>) =
-        let goOn (s) = 
-            not (s.terminator s.current)
-        result {
-            let mutable shcCur = shc
-            while (goOn shcCur) do
-                let! shcNew = shcCur |> update
-                shcCur <- shcNew
-            return shcCur
-        }
-
-    let runBatch (shcs:sHC<'T,'A>[]) =
-        let ree = shcs |> Array.Parallel.map(run)
-        ree
-
-
-
-
 type shcStageWeightSpec =
     | Constant of StageWeight
 
@@ -196,58 +138,6 @@ module SorterShc =
         | Some r -> r |> Ok
         | None -> Error "Energy missing"
 
-
-    let sorterEvalPerfBin
-                   (swPk:shcStageWeightSpec) 
-                   (srtblSetType:sortableSetType) =
-        result {
-        
-            let! sortableSet, pfxUses = SortableSetMaker.makeTNoRepo 
-                                                    srtblSetType
-            return
-                fun (sShc:sorterShc) ->
-                    result {
-                        let stageW = ShcStageWeightSpec.getStageWeight swPk sShc       
-                        let suPlan = Sorting.SwitchUsePlan.makeIndexes
-                                        pfxUses
-                                        (sShc.sorter.switches.Length |> SwitchCount.fromInt)
-                        let swEvRecs = SortingOps.Sorter.eval sShc.sorter
-                                               sortableSet.sortableSetImpl
-                                               suPlan
-                                               Sorting.eventGrouping.BySwitch
-                        let switchUses = swEvRecs
-                                         |> SortingEval.SwitchEventRecords.getSwitchUses
-                        let usedSwitches = sShc.sorter 
-                                           |> SwitchUses.getUsedSwitches switchUses
-                        let perf = 
-                            {
-                                SortingEval.sorterPerf.successful = swEvRecs 
-                                    |> SortingEval.SwitchEventRecords.getAllSortsWereComplete
-                                    |> Some
-                                SortingEval.sorterPerf.usedStageCount = 
-                                        Stage.getStageCount 
-                                            sShc.sorter.degree 
-                                            usedSwitches
-                                SortingEval.sorterPerf.usedSwitchCount = 
-                                        SwitchCount.fromInt usedSwitches.Length
-                            }
-
-                        let energy = perf |> SorterFitness.fromSorterPerf sShc.sorter.degree stageW
-                                          |> Some
-                        let bestEnergy = Energy.betterEnergy energy sShc.bestEnergy
-                        return  {
-                            sorterShc.bestEnergy = bestEnergy
-                            sorterShc.energy = energy
-                            sorterShc.perf = Some perf
-                            sorterShc.rngGen = sShc.rngGen
-                            sorterShc.sorter = sShc.sorter
-                            sorterShc.step = sShc.step
-                            sorterShc.revision = sShc.revision
-                            sorterShc.switchPfx = sShc.switchPfx
-                            sorterShc.switchUses = Some switchUses
-                        }
-                    }
-          }
     
     let isCurrentBest (shc:sorterShc) =
         match shc.energy, shc.bestEnergy  with
@@ -267,23 +157,26 @@ module SorterShcSpec =
     let makeAnnealer (anSpec:annealerSpec) = 
         fun (shcCurrent:sorterShc)
             (shcNew:sorterShc) -> 
-            result {
-                let! curE = shcCurrent |> SorterShc.getEnergy
-                let! newE = shcNew |> SorterShc.getEnergy
-                let randy = shcNew.rngGen |> Rando.fromRngGen
-                let chooser() =
-                    randy.NextFloat
-                let annF = Annealer.make anSpec
-                let pickNew = annF curE newE chooser shcNew.step
-                if pickNew then 
-                    return shcNew else
-                    let newRng = shcCurrent.rngGen 
-                                    |> Rando.fromRngGen
-                                    |> Rando.toRngGen
-                    return { shcCurrent with 
-                                step = shcNew.step;
-                                rngGen = newRng }
-            }
+            if ((StepNumber.value shcCurrent.step) = 0) then
+                shcNew |> Ok
+            else
+                result {
+                    let! curE = shcCurrent |> SorterShc.getEnergy
+                    let! newE = shcNew |> SorterShc.getEnergy
+                    let randy = shcNew.rngGen |> Rando.fromRngGen
+                    let chooser() =
+                        randy.NextFloat
+                    let annF = Annealer.make anSpec
+                    let pickNew = annF curE newE chooser shcNew.step
+                    if pickNew then 
+                        return shcNew else
+                        let newRng = shcCurrent.rngGen 
+                                        |> Rando.fromRngGen
+                                        |> Rando.toRngGen
+                        return { shcCurrent with 
+                                    step = shcNew.step;
+                                    rngGen = newRng }
+                }
 
 
     let makeMutator (m:sorterMutSpec) = 
@@ -307,55 +200,45 @@ module SorterShcSpec =
             }
 
 
-    let makeEvaluator (spec:sorterShcSpec) = 
-        match spec.evalSpec with
-        | PerfBin -> SorterShc.sorterEvalPerfBin
-                        spec.shcStageWeightSpec
-                        spec.srtblSetType
-                  
-
     let makeUpdater (saveDetails:shcSaveDetails) =
         fun (arch:sorterShcArch list) 
             (newT:sorterShc) ->
-            let lastArch = arch |> List.head
+            if arch.Length = 0 then
+                [newT |> SorterShcArch.toFull] |> Ok
+            else
+                let lastArch = arch |> List.head
 
-            let improvement =  Energy.isBetterThan 
-                                        (newT.energy |> Option.get)
-                                        lastArch.energy
+                let improvement = Energy.isBetterThan 
+                                            (newT.energy |> Option.get)
+                                            lastArch.energy
 
-            if ((newT.revision = lastArch.revision) || 
-                (not improvement)) then
-                arch |> Ok else
+                if newT.revision = lastArch.revision || not improvement then
+                    arch |> Ok 
+                else
+                    let curBest = newT |> SorterShc.isCurrentBest
 
-                let curBest = newT |> SorterShc.isCurrentBest
-
-                let threshB (thresh:Energy)  =  
+                    let threshB (thresh:Energy) =  
                         Energy.isBetterThan 
-                                (newT.energy |> Option.get)
-                                thresh
-                match saveDetails with
-                    | Always -> 
-                        (newT |> SorterShcArch.toFull) :: arch 
-                        |> Ok
-                    | IfBest ->  
-                        (newT |> SorterShcArch.toSorterShcArch curBest) :: arch 
-                        |> Ok
-                    | BetterThanLast ->  
-                        (newT |> SorterShcArch.toSorterShcArch improvement) :: arch 
-                        |> Ok
-                    | EnergyThresh e -> 
-                        let useNew = (threshB e) && improvement
-                        (newT |> SorterShcArch.toSorterShcArch useNew) :: arch 
-                        |> Ok
-                    | Never -> 
-                        (newT |> SorterShcArch.toPartial) :: arch 
-                        |> Ok
+                                    (newT.energy |> Option.get)
+                                    thresh
+                    match saveDetails with
+                        | Always -> 
+                            (newT |> SorterShcArch.toFull) :: arch 
+                            |> Ok
+                        | IfBest ->  
+                            (newT |> SorterShcArch.toSorterShcArch curBest) :: arch 
+                            |> Ok
+                        | BetterThanLast ->  
+                            (newT |> SorterShcArch.toSorterShcArch improvement) :: arch 
+                            |> Ok
+                        | EnergyThresh e -> 
+                            let useNew = (threshB e) && improvement
+                            (newT |> SorterShcArch.toSorterShcArch useNew) :: arch 
+                            |> Ok
+                        | Never -> 
+                            (newT |> SorterShcArch.toPartial) :: arch 
+                            |> Ok
 
-
-    let makeBadUpdater (saveDetails:shcSaveDetails) =
-        fun (arch:sorterShcArch list) 
-            (newT:sorterShc) ->
-            "bad updater" |> Error
 
 
     let makeTerminator (spec:shcTermSpec) =
@@ -370,43 +253,12 @@ module SorterShcSpec =
             (StepNumber.value shc.step) > (StepNumber.value x)
 
 
-    let toShc (spec:sorterShcSpec) =
-
-        let sshcI = {
-            sorterShc.step = StepNumber.fromInt 0;
-            sorterShc.revision = RevNumber.fromInt 0;
-            sorterShc.energy = None;
-            sorterShc.perf = None;
-            sorterShc.rngGen = spec.rngGen;
-            sorterShc.switchPfx = spec.switchPfx;
-            sorterShc.sorter = spec.sorter;
-            sorterShc.switchUses = None;
-            bestEnergy = None;
-        }
-        result {
-            let! evaluator = makeEvaluator spec
-            let! sshc0 = evaluator sshcI
-            let arch = sshc0 |> SorterShcArch.toFull
-            return  {
-               id = makeId spec;
-               current = sshc0;
-               archive = [arch];
-               mutator = makeMutator spec.mutatorSpec;
-               evaluator = evaluator;
-               annealer = makeAnnealer spec.annealerSpec;
-               updater = makeUpdater spec.updaterSpec;
-               terminator = makeTerminator spec.termSpec;
-            }
-        }
-
-
 type sssrgType = 
     | Annealer of annealerSpec
     | Mutation of sorterMutSpec
     | RndGen
     | Sorters of sorterSetGen
     | StageWeight of shcStageWeightSpec
-
 
 
 type sorterShcSpecRndGen = 
@@ -530,7 +382,118 @@ module SorterShcSpecRndGen =
                                     stw
 
 
-type sorterShcSet = 
+
+type sHC<'T,'A> = 
     {
-       members:Map<sorterShcSpec, sorterShc>;
+       id:ShcId;
+       current: 'T;
+       archive: 'A list;
+       mutator: 'T -> Result<'T, string>
+       evaluator: 'T -> Result<'T, string>
+       annealer: 'T -> 'T -> Result<'T, string>
+       updater: 'A list -> 'T -> Result<'A list, string>
+       terminator: 'T -> bool
     }
+
+    
+type sHCset<'S,'T,'A> =  
+    {
+        specs:Map<ShcId,'S>;
+        members:Map<ShcId, Result<sHC<'T,'A>, string>>;
+    }
+    
+type sorterShcResult =
+    {
+        spec:sorterShcSpec;
+        arch: array<sorterShcArch>
+    }
+
+type sorterShcResults =
+    {
+        members: array<sorterShcResult>
+    }
+
+module SHC =
+
+    let newGen  (mutator:'A -> Result<'A, string>)
+                (evaluator:'A -> Result<'A, string>) 
+                (curGen:'A) =
+        result {
+            let! aMut = curGen |> mutator
+            return! aMut |> evaluator
+        }
+
+    let update (shc:sHC<'T,'A>) =
+        if shc.archive.Length = 0 then
+            result {
+                let! updated = shc.current |> shc.evaluator
+                let! aNext = shc.annealer shc.current updated
+                let! aLst = aNext |> shc.updater shc.archive
+                return
+                    {
+                        sHC.id = shc.id;
+                        sHC.current = aNext;
+                        sHC.archive = aLst;
+                        sHC.mutator = shc.mutator;
+                        sHC.updater = shc.updater;
+                        sHC.evaluator = shc.evaluator;
+                        sHC.annealer = shc.annealer;
+                        sHC.terminator = shc.terminator;
+                    }
+            }
+        else
+            result {
+                let! updated = shc.current |> newGen shc.mutator shc.evaluator
+                let! aNext = shc.annealer shc.current updated
+                let! aLst = aNext |> shc.updater shc.archive
+                return
+                    {
+                        sHC.id = shc.id;
+                        sHC.current = aNext;
+                        sHC.archive = aLst;
+                        sHC.mutator = shc.mutator;
+                        sHC.updater = shc.updater;
+                        sHC.evaluator = shc.evaluator;
+                        sHC.annealer = shc.annealer;
+                        sHC.terminator = shc.terminator;
+                    }
+            }
+
+    let run (shc:sHC<'T,'A>) =
+        let goOn (s) = 
+            not (s.terminator s.current)
+        result {
+            let mutable shcCur = shc
+            while (goOn shcCur) do
+                let! shcNew = shcCur |> update
+                shcCur <- shcNew
+            return shcCur
+        }
+
+    let runBatch (shcs:sHC<'T,'A>[]) =
+        let ree = shcs |> Array.Parallel.map(run)
+        ree
+
+
+module sHCset = 
+    let make<'S,'T,'A> (specs: seq<'S>)
+                       (idGen: 'S->ShcId)
+                       (maker: 'S->Result<sHC<'T,'A>, string>) =
+        let specMap = specs |> Seq.map(fun s -> (idGen s, s))
+                            |> Map.ofSeq
+        let memberMap = specs |> Seq.map(fun s -> (idGen s, maker s))
+                              |> Map.ofSeq
+
+        {sHCset.specs= specMap; sHCset.members = memberMap}
+
+
+    let runBatch (shcs:sHCset<'S,'T,'A>) = 
+        let _runn (id:ShcId) (shcr:Result<sHC<'T,'A>, string>) =
+            match shcr with
+            | Ok shc -> (id, SHC.run shc)
+            | Error m -> (id, sprintf "error creating spec: %s" m |> Error)
+            
+        let mms = shcs.members |> Map.toArray
+                               |> Array.Parallel.map(fun tup -> _runn (fst tup) (snd tup))
+                               |> Map.ofSeq
+        {shcs with members = mms}

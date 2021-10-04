@@ -32,6 +32,7 @@
     <Compile Include="SortableSetRollout.fs" />
     <Compile Include="SwitchEventRollout.fs" />
     <Compile Include="SortingEval.fs" />
+    <Compile Include="Shc.fs" />
     <Compile Include="GaTypes.fs" />
     <Compile Include="SorterGa.fs" />
     <Compile Include="SorterGaOps.fs" />

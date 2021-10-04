@@ -34,7 +34,7 @@ type ShcFixture () =
     let evlSpec = sorterEvalSpec.PerfBin
     let annSpec = annealerSpec.Exp ((Temp.fromFloat 0.00005), 20000.0)
     let updtSpec = shcSaveDetails.BetterThanLast
-    let termSpec = shcTermSpec.FixedLength (StepNumber.fromInt 250)
+    let termSpec = shcTermSpec.FixedLength (StepNumber.fromInt 50)
     let srtrShcSpec =
         {
            sorterShcSpec.rngGen = rnG; 
@@ -62,7 +62,7 @@ type ShcFixture () =
             | Some e -> sprintf "%f" (Energy.value e)
             | None -> ""
 
-        let shc = SorterShcSpec.toShc srtrShcSpec
+        let shc = SHC.fromSorterShcSpec srtrShcSpec
                     |> Result.ExtractOrThrow
 
         //let mutable shcN = SHC.update shc
@@ -107,7 +107,7 @@ type ShcFixture () =
                     }
         let shcSet = SorterShcSpecRndGen.generate None None sssrg
                      |> Result.ExtractOrThrow
-                     |> Seq.map(SorterShcSpec.toShc)
+                     |> Seq.map(SHC.fromSorterShcSpec)
                      |> Seq.toList
                      |> Result.sequence
                      |> Result.ExtractOrThrow

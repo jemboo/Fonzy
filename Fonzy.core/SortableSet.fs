@@ -40,6 +40,14 @@ type sortableSetType =
     | Explicit of SortableSetId
     | Random of RngGen*SortableCount*sortableSetRep
     | SwitchReduced of sortableSetType*Switch list
+
+module SortableSetType = 
+    let getPrefix sst =
+        match sst with
+        | sortableSetType.AllForDegree ssr -> []
+        | sortableSetType.Explicit  ssid -> []
+        | sortableSetType.Random (r, sc, ssr) -> []
+        | sortableSetType.SwitchReduced (sst, swL) -> swL
     
 type sortableSetMaker  = sortableSetType -> Result<sortableSetImpl,string>
 type sortableSetMakerT  = sortableSetType -> Result<sortableSetImpl* switchUses, string>
