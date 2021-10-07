@@ -150,7 +150,19 @@ module SorterShc =
 module SorterShcSpec = 
 
     let makeId (s:sorterShcSpec) = 
-        let gu = [s :> obj] |> GuidUtils.guidFromObjList
+        let gu = seq {
+                       s.annealerSpec :> obj;
+                       s.evalSpec :> obj;
+                       s.mutatorSpec :> obj; 
+                       s.rngGen :> obj;
+                       s.shcStageWeightSpec :> obj; 
+                       s.sorter :> obj;
+                       s.srtblSetType :> obj;
+                       s.switchPfx :> obj;
+                       s.termSpec :> obj;
+                       s.updaterSpec :> obj;} 
+
+                        |> GuidUtils.guidFromObjs
         ShcId.fromGuid gu
 
 

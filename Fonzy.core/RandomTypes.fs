@@ -38,11 +38,11 @@ module RngGen =
 module RngType =
     let toDto (rngt: RngType) =
         match rngt with
-        | Lcg -> "Lcg"
-        | Net -> "Net"
+        | Lcg -> nameof RngType.Lcg
+        | Net -> nameof RngType.Net
     let create str =
         match str with
-        | "Lcg" -> RngType.Lcg |> Ok
-        | "Net" -> RngType.Net |> Ok
+        | nameof RngType.Lcg -> RngType.Lcg |> Ok
+        | nameof RngType.Net -> RngType.Net |> Ok
         | _ -> Error (sprintf "no match for RngType: %s" str)
 

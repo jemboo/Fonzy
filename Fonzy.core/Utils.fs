@@ -108,15 +108,15 @@ module GuidUtils =
                        |> Seq.fold(fun a b -> folder a b) acc
         System.Guid(laz)
 
-    let guidFromObjList (objs:obj list) =
-        let acc = Array.create 16 (byte 0)
-        let folder (a:byte[]) (b:byte[]) =
-            a |> Array.map2(fun a b -> a+b) b
+    //let guidFromObjList (objs:obj list) =
+    //    let acc = Array.create 16 (byte 0)
+    //    let folder (a:byte[]) (b:byte[]) =
+    //        a |> Array.map2(fun a b -> a+b) b
 
-        let md5 = MD5.Create();
-        let laz = objs |> List.map(fun o -> md5.ComputeHash(ByteUtils.structHash o))
-                       |> List.fold(fun a b -> folder a b) acc
-        System.Guid(laz)
+    //    let md5 = MD5.Create();
+    //    let laz = objs |> List.map(fun o -> md5.ComputeHash(ByteUtils.structHash o))
+    //                   |> List.fold(fun a b -> folder a b) acc
+    //    System.Guid(laz)
 
     let guidFromStringR (gstr:string) =
         let mutable gv = Guid.NewGuid()

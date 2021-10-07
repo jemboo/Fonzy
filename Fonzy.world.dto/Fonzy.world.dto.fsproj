@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="ShcDto.fs" />
+    <Compile Include="ShcWDto.fs" />
     <Compile Include="EnvirosDto.fs" />
     <Compile Include="CauseSpecsDto.fs" />
     <Compile Include="WorldsDto.fs" />

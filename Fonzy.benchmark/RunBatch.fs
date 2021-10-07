@@ -32,6 +32,16 @@ module RunBatch =
 
 
 
+    let runShcSets
+                    (outputDir:FilePath) 
+                    (seed:RandomSeed) 
+                    (firstDex:int) =
+
+        runBatchSeq SorterPbCauseSpecGen.makeRunBatchSeq 
+                    outputDir seed firstDex
+
+
+
   module PerfBinReports =
 
 

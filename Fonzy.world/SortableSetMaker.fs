@@ -34,7 +34,7 @@ module SortableSetMaker =
         let degree = (ssr |> SortableSetRep.getDegree)
         
         let ssid = ([("allZeroOnes" :> obj); (degree :> obj)]) 
-                   |> GuidUtils.guidFromObjList
+                   |> GuidUtils.guidFromObjs
                    |> SortableSetId.fromGuid
         let intSet() = 
             IntSet.arrayOfAllFor degree

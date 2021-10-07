@@ -7,7 +7,7 @@ open SortingEval
 [<TestClass>]
 type ShcFixture () =
 
-    let degree = Degree.fromInt 18
+    let degree = Degree.fromInt 16
     let rnG = RngGen.createLcg (RandomSeed.fromInt 366)
     let iRando = Rando.fromRngGen rnG
     //let sorterGen = sorterRndGen.RandStages
@@ -65,15 +65,6 @@ type ShcFixture () =
         let shc = SHC.fromSorterShcSpec srtrShcSpec
                     |> Result.ExtractOrThrow
 
-        //let mutable shcN = SHC.update shc
-        //                    |> Result.ExtractOrThrow
-
-        //let mutable curRev = 0
-
-        //for i = 1 to 5000 do
-        //    shcN <- SHC.update shcN
-        //                |> Result.ExtractOrThrow
-
         let shcN = SHC.run shc |> Result.ExtractOrThrow
 
         shcN.archive |> List.iter(fun a -> 
@@ -81,13 +72,6 @@ type ShcFixture () =
                                 (StepNumber.value a.step) 
                                 (a.perf |> SorterPerf.report) 
                                 (Energy.value a.energy)))
-
-            //if (RevNumber.value shcN.current.revision ) <> curRev then
-            //    curRev <- (RevNumber.value shcN.current.revision )
-            //    Console.WriteLine(sprintf "%d\t%s\t%s" 
-            //                        (StepNumber.value shcN.current.step)
-            //                        (reptP shcN.current)
-            //                        (engP shcN.current.energy))
 
         Assert.IsTrue(true)
 
@@ -107,11 +91,9 @@ type ShcFixture () =
                     }
         let shcSet = SorterShcSpecRndGen.generate None None sssrg
                      |> Result.ExtractOrThrow
-                     |> Seq.map(SHC.fromSorterShcSpec)
-                     |> Seq.toList
-                     |> Result.sequence
-                     |> Result.ExtractOrThrow
-                     |> List.toArray
+                     |> sHCset.makeSorterShcSet
 
-        let batchRes = SHC.runBatch shcSet
+        let batchRes = sHCset.runBatch (UseParallel.create true) shcSet
+        let shcRes = sHCset.getResults batchRes
+        let txtOut = shcRes |> SorterShcResultsDto.toDto
         Assert.IsTrue(true)

@@ -255,7 +255,8 @@ type sHCset<'S,'T,'A> =
 type sorterShcResult =
     {
         spec:sorterShcSpec;
-        arch: array<sorterShcArch>
+        cat:string
+        report: string
     }
 
 type sorterShcResults =
@@ -348,48 +349,70 @@ module SHC =
             return shcCur
         }
 
-    let runBatch (shcs:sHC<'T,'A>[]) =
-        let ree = shcs |> Array.Parallel.map(run)
-        ree
-
 
 module sHCset = 
-    let make<'S,'T,'A> (specs: seq<'S>)
-                       (idGen: 'S->ShcId)
-                       (maker: 'S->Result<sHC<'T,'A>, string>) =
-        let specMap = specs |> Seq.map(fun s -> (idGen s, s))
+    let make<'S,'T,'A> (idGen: 'S->ShcId)
+                       (maker: 'S->Result<sHC<'T,'A>, string>) 
+                       (specs: seq<'S>) =
+        let specA = specs |> Seq.toArray
+        let specMap = specA |> Array.map(fun s -> (idGen s, s))
                             |> Map.ofSeq
-        let memberMap = specs |> Seq.map(fun s -> (idGen s, maker s))
+        let memberMap = specA |> Array.map(fun s -> (idGen s, maker s))
                               |> Map.ofSeq
 
         {sHCset.specs= specMap; sHCset.members = memberMap}
 
+    let makeSorterShcSet (specs: seq<sorterShcSpec>) =
+        make (SorterShcSpec.makeId) (SHC.fromSorterShcSpec) specs
 
-    let runBatch (shcs:sHCset<'S,'T,'A>) = 
+    let runBatch (useP:UseParallel) 
+                 (shcs:sHCset<'S,'T,'A>) = 
         let _runn (id:ShcId) (shcr:Result<sHC<'T,'A>, string>) =
             match shcr with
             | Ok shc -> (id, SHC.run shc)
             | Error m -> (id, sprintf "error creating spec: %s" m |> Error)
             
-        let mms = shcs.members |> Map.toArray
-                               |> Array.Parallel.map(fun tup -> _runn (fst tup) (snd tup))
-                               |> Map.ofSeq
+
+        let mms = 
+            match UseParallel.value(useP) with
+            | true  -> shcs.members 
+                        |> Map.toArray
+                        |> Array.Parallel.map(fun tup -> _runn (fst tup) (snd tup))
+                        |> Map.ofSeq
+            | false -> shcs.members 
+                        |> Map.toArray
+                        |> Array.map(fun tup -> _runn (fst tup) (snd tup))
+                        |> Map.ofSeq
+
         {shcs with members = mms}
 
 
-    //let getResults (shcs:sHCset<sorterShcSpec, sorterShc, sorterShcArch>) = 
-    //    let _rpt id:ShcId = 
-    //        let spec = shcs.specs.[id]
-    //        let aR = shcs.members.[id]
-    //        match aR with
-    //        | Ok m -> m.archive |> List.map(S)
+    let getResults (shcs:sHCset<sorterShcSpec, sorterShc, sorterShcArch>) = 
+        let memberIds = shcs.members |> Map.toArray |> Array.map(fst)
+        let _rpt id = 
+            let spec = shcs.specs.[id]
+            let aR = shcs.members.[id]
+            let rpt = 
+                match aR with
+                | Ok m -> ("arch", m.archive |> List.map(SorterShcArchDto.toJson)
+                                    |> Json.serialize)
+                | Error m -> ("error", m)
+            {
+                sorterShcResult.spec = spec;
+                sorterShcResult.cat = (fst rpt)
+                sorterShcResult.report = (snd rpt)
+            }
 
-    
+        {sorterShcResults.members =  memberIds |> Array.map(_rpt) }
+
+
+
 //type sorterShcResult =
-//    {
-//        spec:sorterShcSpec;
-//        arch: array<sorterShcArch>
-//    }
+//{
+//    spec:sorterShcSpec;
+//    cat:string
+//    report: string
+//}
 
 //type sorterShcResults =
 //    {

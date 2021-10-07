@@ -12,14 +12,14 @@ module SorterShcCauseSpecGen =
                     useParallel
                     resultsName =
 
-        CauseSpecSorters.rndStoHillClimb
-                ("sorterRndGen", sorterRndGen)
-                ("sorterCount", sorterCount)
+        CauseSpecSorterShc.sorterShcSpecRndGen
+                //("sorterRndGen", sorterRndGen)
+                //("sorterCount", sorterCount)
                 ("rndGen", rndGen)
-                ("switchUsePlan", switchUsePlan)
-                ("sortableSetType", sortableSetType)
+                //("switchUsePlan", switchUsePlan)
+                //("sortableSetType", sortableSetType)
                 ("useParallel", (UseParallel.value useParallel))
-                ("resultsName", resultsName)
+                //("resultsName", resultsName)
 
 
 
@@ -27,7 +27,6 @@ module SorterShcCauseSpecGen =
 
 
     let makeRunBatchSeq (seed:RandomSeed)
-                        (batchSize:int)
                         (outputDir:FilePath) = 
 
         let degree = Degree.fromInt 12

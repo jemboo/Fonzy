@@ -18,6 +18,9 @@
     <Compile Include="CauseSpec.fs" />
     <Compile Include="SorterPbCauseSpecGen.fs" />
     <Compile Include="SorterShcCauseSpecGen.fs" />
+    <Compile Include="Cause.fs" />
+    <Compile Include="CauseSorters.fs" />
+    <Compile Include="CauseSorterShc.fs" />
     <Compile Include="Causes.fs" />
     <Compile Include="Worlds.fs" />
     <Compile Include="Jobs.fs" />

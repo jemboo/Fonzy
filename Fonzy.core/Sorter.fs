@@ -12,7 +12,7 @@ type sorter =
 module Sorter =
 
     let makeId (s:sorter) = 
-        let gu = [s :> obj] |> GuidUtils.guidFromObjList
+        let gu = [s :> obj] |> GuidUtils.guidFromObjs
         SorterId.fromGuid gu
 
 

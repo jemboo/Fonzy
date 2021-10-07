@@ -291,3 +291,139 @@ module SorterShcSpecDto =
     let toJson (idt:sorterShcSpec) =
         idt |> toDto |> Json.serialize
 
+
+
+
+
+
+
+type sssrgTypeDto = 
+    {
+         baseSpec:sorterShcSpecDto;
+         sorter:sorterDto;
+         rngGen: rngGenDto;
+         count:int;
+     }
+module SssrgTypeDto =
+    let fromDto (dto:sorterShcSpecDto) =
+        result {
+            let! rng = dto.rngGen |> RngGenDto.fromDto
+            let! srt = dto.sorter |> SorterDto.fromDto
+            let! swx = dto.switchPfx |> Array.map(fun sw -> SwitchDto.fromDto sw)
+                                     |> Array.toList
+                                     |> Result.sequence
+            let! mutSpec = dto.mutSpec |> SorterMutSpecDto.fromDto
+            let! ssRs = dto.srtblStType |> SortableSetTypeDto.fromDto
+            let! swS = dto.stWgtSpec |> ShcStageWeightSpecDto.fromDto
+            let! evl = dto.evalSpec |> SorterEvalSpecDto.fromDto
+            let! ann = dto.annealer  |> AnnealerSpecDto.fromDto
+            let! updt = dto.updater  |> ShcSaveDetailsDto.fromDto
+            let! term = dto.term  |> ShcTermSpecDto.fromDto
+            return 
+             {
+                sorterShcSpec.rngGen = rng;
+                sorter = srt;
+                switchPfx = swx |> List.toArray;
+                sorterShcSpec.mutatorSpec = mutSpec;
+                srtblSetType = ssRs;
+                shcStageWeightSpec = swS;
+                sorterShcSpec.evalSpec = evl;
+                sorterShcSpec.annealerSpec = ann;
+                sorterShcSpec.updaterSpec = updt;
+                sorterShcSpec.termSpec = term;
+             }
+        }
+                     
+    let fromJson (jstr:string) =
+        result {
+            let! dto = Json.deserialize<sorterShcSpecDto> jstr
+            return! fromDto dto
+        }
+
+    let toDto (sss:sorterShcSpec) =
+            {
+                sorterShcSpecDto.rngGen = sss.rngGen |> RngGenDto.toDto;
+                sorter = sss.sorter |> SorterDto.toDto;
+                switchPfx = sss.switchPfx |> Array.map(SwitchDto.toDto);
+                mutSpec = sss.mutatorSpec |> SorterMutSpecDto.toDto
+                srtblStType = sss.srtblSetType |> SortableSetTypeDto.toDto
+                stWgtSpec = sss.shcStageWeightSpec |> ShcStageWeightSpecDto.toDto
+                evalSpec = sss.evalSpec |> SorterEvalSpecDto.toDto
+                annealer = sss.annealerSpec |> AnnealerSpecDto.toDto
+                updater = sss.updaterSpec |> ShcSaveDetailsDto.toDto
+                term = sss.termSpec  |> ShcTermSpecDto.toDto
+            }
+
+    let toJson (idt:sorterShcSpec) =
+        idt |> toDto |> Json.serialize
+
+
+
+
+
+
+
+
+
+
+
+type sorterShcSpecRndGenDto = 
+    {
+         baseSpec:sorterShcSpecDto;
+         sorter:sorterDto;
+         rngGen: rngGenDto;
+         count:int;
+     }
+module SorterShcSpecRndGenDto =
+    let fromDto (dto:sorterShcSpecDto) =
+        result {
+            let! rng = dto.rngGen |> RngGenDto.fromDto
+            let! srt = dto.sorter |> SorterDto.fromDto
+            let! swx = dto.switchPfx |> Array.map(fun sw -> SwitchDto.fromDto sw)
+                                     |> Array.toList
+                                     |> Result.sequence
+            let! mutSpec = dto.mutSpec |> SorterMutSpecDto.fromDto
+            let! ssRs = dto.srtblStType |> SortableSetTypeDto.fromDto
+            let! swS = dto.stWgtSpec |> ShcStageWeightSpecDto.fromDto
+            let! evl = dto.evalSpec |> SorterEvalSpecDto.fromDto
+            let! ann = dto.annealer  |> AnnealerSpecDto.fromDto
+            let! updt = dto.updater  |> ShcSaveDetailsDto.fromDto
+            let! term = dto.term  |> ShcTermSpecDto.fromDto
+            return 
+             {
+                sorterShcSpec.rngGen = rng;
+                sorter = srt;
+                switchPfx = swx |> List.toArray;
+                sorterShcSpec.mutatorSpec = mutSpec;
+                srtblSetType = ssRs;
+                shcStageWeightSpec = swS;
+                sorterShcSpec.evalSpec = evl;
+                sorterShcSpec.annealerSpec = ann;
+                sorterShcSpec.updaterSpec = updt;
+                sorterShcSpec.termSpec = term;
+             }
+        }
+                     
+    let fromJson (jstr:string) =
+        result {
+            let! dto = Json.deserialize<sorterShcSpecDto> jstr
+            return! fromDto dto
+        }
+
+    let toDto (sss:sorterShcSpec) =
+            {
+                sorterShcSpecDto.rngGen = sss.rngGen |> RngGenDto.toDto;
+                sorter = sss.sorter |> SorterDto.toDto;
+                switchPfx = sss.switchPfx |> Array.map(SwitchDto.toDto);
+                mutSpec = sss.mutatorSpec |> SorterMutSpecDto.toDto
+                srtblStType = sss.srtblSetType |> SortableSetTypeDto.toDto
+                stWgtSpec = sss.shcStageWeightSpec |> ShcStageWeightSpecDto.toDto
+                evalSpec = sss.evalSpec |> SorterEvalSpecDto.toDto
+                annealer = sss.annealerSpec |> AnnealerSpecDto.toDto
+                updater = sss.updaterSpec |> ShcSaveDetailsDto.toDto
+                term = sss.termSpec  |> ShcTermSpecDto.toDto
+            }
+
+    let toJson (idt:sorterShcSpec) =
+        idt |> toDto |> Json.serialize
+

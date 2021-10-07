@@ -7,6 +7,17 @@ open BenchmarkDotNet.Running
 let main argv =
 
     /// ******* runPerfBinBatchSeq ***********
+    Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq")
+
+    RunBatch.runPerfBinBatchSeq (FilePath.fromString "C:\\SimOutTst") 
+                                (RandomSeed.fromNow ())
+                                0
+                                 |> ignore
+    Console.Read() |> ignore
+    0
+
+
+    /// ******* runPerfBinBatchSeq ***********
     //Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq")
 
     //RunBatch.runPerfBinBatchSeq (FilePath.fromString "C:\\SimOutTst") 
@@ -27,12 +38,12 @@ let main argv =
     //0
 
 
-/// ******* Benchmark ***********
-    Console.WriteLine("Starting Benchmark.main")
-    let summary = BenchmarkRunner.Run<BenchmarkSorterSetOnBp64>()
-    printfn "%A" summary
-    Console.Read() |> ignore
-    0
+///// ******* Benchmark ***********
+//    Console.WriteLine("Starting Benchmark.main")
+//    let summary = BenchmarkRunner.Run<BenchmarkSorterSetOnBp64>()
+//    printfn "%A" summary
+//    Console.Read() |> ignore
+//    0
 
 
 /// ******* Migrate Data ***********
