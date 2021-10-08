@@ -18,9 +18,9 @@
     <Compile Include="SorterEvalDtoFixture.fs" />
     <Compile Include="SorterGenDtoFixture.fs" />
     <Compile Include="SorterSetDtoFixture.fs" />
+    <Compile Include="ShcDtoFixture.fs" />
     <Compile Include="SorterGaDtoFixture.fs" />
     <Compile Include="OrgsDtoFixture.fs" />
-    <Compile Include="yabDtoFixture.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

@@ -1,20 +1,21 @@
-namespace Fonzy.world.dto.test
-
-open System
+﻿namespace Fonzy.core.dto.test
 open Microsoft.VisualStudio.TestTools.UnitTesting
+open Newtonsoft.Json
 
 [<TestClass>]
 type ShcDtoFixture () =
-
+    
     let degree = Degree.fromInt 12
 
 
     [<TestMethod>]
-    member this.SorterSetDto() =
-        let sorterSetCereal = TestData.SorterSet.mediocreSorterSet |> SorterSetDto.toJson
-        let sorterSetBack = sorterSetCereal |> SorterSetDto.fromJson
-                                            |> Result.ExtractOrThrow
-        Assert.AreEqual(TestData.SorterSet.mediocreSorterSet, sorterSetBack);
+    member this.SerializeMap() =
+        let kvps = [|("a","a"); ("b", "b"); ("c", "c"); ("d", "d") |]
+                    |> Map.ofArray
+        let json = JsonConvert.SerializeObject(kvps)
+        let kvpsB = JsonConvert.DeserializeObject<Map<string,string>>(json)
+        Assert.AreEqual(kvps, kvpsB)
+
 
 
     [<TestMethod>]
@@ -58,7 +59,6 @@ type ShcDtoFixture () =
         Assert.AreEqual(ssD, ssDback);
 
 
-
     [<TestMethod>]
     member this.sorterShcArchDto () =
         let stp = StepNumber.fromInt 5
@@ -94,42 +94,21 @@ type ShcDtoFixture () =
         Assert.AreEqual(archie, archieBack);
 
 
-
     [<TestMethod>]
     member this.sorterShcSpecDto () =
-        let stp = StepNumber.fromInt 5
-        let rng = RngGen.createLcg (RandomSeed.fromInt 123)
-        let sorter = RefSorter.goodRefSorterForDegree degree
-                        |> Result.ExtractOrThrow
-        let wPfx = [|1;2;3;0;|] |> Switch.fromIntArray
-                   |> Seq.toArray
-        let pfxSc = SwitchCount.fromInt wPfx.Length
-        let mutRate = MutationRate.fromFloat 1.0
-        let mutSpec = (pfxSc, mutRate) |> sorterMutationType.ByStage
-                        |> sorterMutSpec.Constant
-        let srtbleSetType = sortableSetType.AllForDegree 
-                                (sortableSetRep.Integer degree)
-        let swS = shcStageWeightSpec.Constant (StageWeight.fromFloat 1.0)
-        let evl = sorterEvalSpec.PerfBin
-        let ann = annealerSpec.Constant (Temp.fromFloat 1.0)
-        let updt = shcSaveDetails.Always
-        let term = shcTermSpec.FixedLength (StepNumber.fromInt 10)
-        let sscSpec =
-          {
-            sorterShcSpec.rngGen = rng;
-            sorterShcSpec.sorter = sorter;
-            sorterShcSpec.switchPfx = wPfx;
-            sorterShcSpec.mutatorSpec = mutSpec;
-            sorterShcSpec.srtblSetType = srtbleSetType;
-            sorterShcSpec.shcStageWeightSpec = swS;
-            evalSpec = evl;
-            annealerSpec = ann;
-            updaterSpec = updt;
-            termSpec = term;
-          }
-
-        let dto = sscSpec |> SorterShcSpecDto.toDto
+        let dto =  TestData.SrtrShcSpec.sscSpec |> SorterShcSpecDto.toDto
         let sscSpecBack = dto |> SorterShcSpecDto.fromDto
                               |> Result.ExtractOrThrow
 
-        Assert.AreEqual(sscSpec, sscSpecBack);
+        Assert.AreEqual(TestData.SrtrShcSpec.sscSpec, sscSpecBack);
+
+
+
+
+
+
+
+
+
+
+

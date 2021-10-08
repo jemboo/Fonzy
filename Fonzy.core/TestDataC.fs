@@ -112,7 +112,6 @@ module TestData =
                             SorterParts.altEvenSorters
 
 
-
     module SorterActionRecords =
 
         let intSetsRolloutOfAll = IntSetsRollout.allBinary degree
@@ -137,7 +136,6 @@ module TestData =
                                 degree
                                 ia
                 |> Result.ExtractOrThrow
-
 
 
     open SortingEval
@@ -227,8 +225,6 @@ module TestData =
             [sorterCoverage1; sorterCoverage2; sorterCoverage3; sorterCoverage4; sorterCoverage5]
 
 
-
-
     module SorterGa =
 
         let permutationsCount = 10
@@ -253,3 +249,39 @@ module TestData =
                 (SorterSetId.fromGuid (Guid.Empty))
                 (Degree.fromInt 16)
                 sorterList
+
+
+    module SrtrShcSpec = 
+        let stp = StepNumber.fromInt 5
+        let rng = RngGen.createLcg (RandomSeed.fromInt 123)
+        let sorter = RefSorter.goodRefSorterForDegree degree
+                        |> Result.ExtractOrThrow
+        let wPfx = [|1;2;3;0;|] |> Switch.fromIntArray
+                   |> Seq.toArray
+        let pfxSc = SwitchCount.fromInt wPfx.Length
+        let mutRate = MutationRate.fromFloat 1.0
+        let mutSpec = (pfxSc, mutRate) |> sorterMutationType.ByStage
+                        |> sorterMutSpec.Constant
+        let srtbleSetType = sortableSetType.AllForDegree 
+                                (sortableSetRep.Integer degree)
+        let swS = shcStageWeightSpec.Constant (StageWeight.fromFloat 1.0)
+        let evl = sorterEvalSpec.PerfBin
+        let ann = annealerSpec.Constant (Temp.fromFloat 1.0)
+        let updt = shcSaveDetails.Always
+        let term = shcTermSpec.FixedLength (StepNumber.fromInt 10)
+        let sscSpec =
+          {
+            sorterShcSpec.rngGen = rng;
+            sorterShcSpec.sorter = sorter;
+            sorterShcSpec.switchPfx = wPfx;
+            sorterShcSpec.mutatorSpec = mutSpec;
+            sorterShcSpec.srtblSetType = srtbleSetType;
+            sorterShcSpec.shcStageWeightSpec = swS;
+            evalSpec = evl;
+            annealerSpec = ann;
+            updaterSpec = updt;
+            termSpec = term;
+          }
+
+
+

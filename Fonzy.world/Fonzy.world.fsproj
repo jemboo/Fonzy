@@ -24,7 +24,7 @@
     <Compile Include="Causes.fs" />
     <Compile Include="Worlds.fs" />
     <Compile Include="Jobs.fs" />
-    <Compile Include="TestData.fs" />
+    <Compile Include="TestDataW.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

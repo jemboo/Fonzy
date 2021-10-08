@@ -38,7 +38,7 @@
     <Compile Include="SorterGaOps.fs" />
     <Compile Include="Orgs.fs" />
     <Compile Include="SortersFromData.fs" />
-    <Compile Include="TestData.fs" />
+    <Compile Include="TestDataC.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

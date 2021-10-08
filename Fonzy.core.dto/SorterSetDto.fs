@@ -34,6 +34,14 @@ module SorterSetGenDto =
         else sprintf "cat: %s for SorterSetGenDto not found"
                         dto.cat |> Error
 
+    let fromJson (jstr:string) =
+        result {
+            let! dto = Json.deserialize<sorterSetGenDto> jstr
+            return! fromDto dto
+        }
+
+
+
     let toDto (ssg:sorterSetGen) =
         match ssg with
         | sorterSetGen.Mutate (smt, srtr, rng, sc) ->
@@ -58,3 +66,6 @@ module SorterSetGenDto =
                 sorterSetGenDto.cat = nameof sorterSetGen.Repo; 
                 value = ssid |> SorterSetId.value |> Json.serialize 
             }
+
+    let toJson (idt:sorterSetGen) =
+        idt |> toDto |> Json.serialize

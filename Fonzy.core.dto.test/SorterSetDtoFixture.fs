@@ -1,14 +1,16 @@
 namespace Fonzy.core.dto.test
-
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
 type SorterSetDtoFixture () =
 
     [<TestMethod>]
-    member this.yabba() =
+    member this.SorterSetDto() =
+        let sorterSetCereal = TestData.SorterSet.mediocreSorterSet |> SorterSetDto.toJson
+        let sorterSetBack = sorterSetCereal |> SorterSetDto.fromJson
+                                            |> Result.ExtractOrThrow
+        Assert.AreEqual(TestData.SorterSet.mediocreSorterSet, sorterSetBack);
 
-        Assert.AreEqual(1, 1);
 
 
     [<TestMethod>]

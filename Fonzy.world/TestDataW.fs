@@ -3,17 +3,13 @@ open System
 
 module TestData =
     let seed = 123
-    //let degreeW = Degree.fromInt 8
+    let degreeW = Degree.fromInt 14
     let rnGen = RngGen.createLcg (RandomSeed.fromInt seed)
     let randy = Rando.fromRngGen rnGen
     let nextRnGen() =
         RngGen.createLcg (RandomSeed.fromInt randy.NextPositiveInt)
 
-    module SortableSet =
-        let sorterSetGenId1 = SortableSetId.fromGuid (Guid.Parse "20000000-0000-0000-0000-000000000222")
-        let sorterSetGenId2 = SortableSetId.fromGuid (Guid.Parse "22000000-0000-0000-0000-000000000222")
-        let sortableCount = SortableCount.fromInt 5
-        let sortableCount2 = SortableCount.fromInt 6
+
 
     module CauseSpec =
 

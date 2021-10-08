@@ -404,23 +404,3 @@ module sHCset =
             }
 
         {sorterShcResults.members =  memberIds |> Array.map(_rpt) }
-
-
-
-//type sorterShcResult =
-//{
-//    spec:sorterShcSpec;
-//    cat:string
-//    report: string
-//}
-
-//type sorterShcResults =
-//    {
-//        members: array<sorterShcResult>
-//    }
-
-//type sHCset<'S,'T,'A> =  
-//    {
-//        specs:Map<ShcId,'S>;
-//        members:Map<ShcId, Result<sHC<'T,'A>, string>>;
-//    }
