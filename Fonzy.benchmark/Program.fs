@@ -6,21 +6,35 @@ open BenchmarkDotNet.Running
 [<EntryPoint>]
 let main argv =
 
-    /// ******* runPerfBinBatchSeq ***********
-    Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq")
+    ///// ******* runPerfBinBatchSeq ***********
+    //Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq")
 
-    RunBatch.runPerfBinBatchSeq (FilePath.fromString "C:\\SimOutTst") 
-                                (RandomSeed.fromNow ())
-                                0
-                                 |> ignore
+    //RunBatch.runShcSets (FileDir.fromString "C:\\SimOutTst") 
+    //                            (RandomSeed.fromNow ())
+    //                            0
+    //                             |> ignore
+
+    //Console.WriteLine(sprintf "Time: %s " 
+    //                             (System.DateTime.Now.ToLongTimeString()))
+    //Console.Read() |> ignore
+    //0
+
+/// ******* ShcReport ***********
+    Console.WriteLine("Starting ShcReport")
+    let res2 =  ShcReports.singleShcReport 
+                        (FileDir.fromString "C:\\SimOutTst") 
+                        (FileDir.fromString "C:\\SimOutReportsT")
+    Console.WriteLine(res2)
     Console.Read() |> ignore
     0
+
+
 
 
     /// ******* runPerfBinBatchSeq ***********
     //Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq")
 
-    //RunBatch.runPerfBinBatchSeq (FilePath.fromString "C:\\SimOutTst") 
+    //RunBatch.runPerfBinBatchSeq (FileDir.fromString "C:\\SimOutTst") 
     //                            (RandomSeed.fromNow ())
     //                            0
     //                             |> ignore
@@ -31,8 +45,8 @@ let main argv =
      /// ******* PerfBinsReport ***********
     //Console.WriteLine("Starting PerfBinsReport.main")
     //let res2 =  PerfBinReports.dirPerfBinBySorterGenReport 
-    //                    (FilePath.fromString "C:\\SimOutT") 
-    //                    (FilePath.fromString "C:\\SimOutReportsT")
+    //                    (FileDir.fromString "C:\\SimOutT") 
+    //                    (FileDir.fromString "C:\\SimOutReportsT")
     //Console.WriteLine(res2)
     //Console.Read() |> ignore
     //0
@@ -49,8 +63,8 @@ let main argv =
 /// ******* Migrate Data ***********
     //Console.WriteLine("Starting PerfBinsReport.migratePerfBinReports")
     //let res2 =  PerfBinReports.migratePerfBinReports 
-    //                    (FilePath.fromString "C:\\SimOut") 
-    //                    (FilePath.fromString "C:\\SimOutT")
+    //                    (FileDir.fromString "C:\\SimOut") 
+    //                    (FileDir.fromString "C:\\SimOutT")
     //Console.WriteLine(res2)
     //Console.Read() |> ignore
     //0

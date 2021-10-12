@@ -252,7 +252,7 @@ module TestData =
 
 
     module SrtrShcSpec = 
-        let stp = StepNumber.fromInt 5
+        let steps = StepNumber.fromInt 5
         let rng = RngGen.createLcg (RandomSeed.fromInt 123)
         let sorter = RefSorter.goodRefSorterForDegree degree
                         |> Result.ExtractOrThrow
@@ -268,7 +268,7 @@ module TestData =
         let evl = sorterEvalSpec.PerfBin
         let ann = annealerSpec.Constant (Temp.fromFloat 1.0)
         let updt = shcSaveDetails.Always
-        let term = shcTermSpec.FixedLength (StepNumber.fromInt 10)
+        let term = shcTermSpec.FixedLength steps
         let sscSpec =
           {
             sorterShcSpec.rngGen = rng;

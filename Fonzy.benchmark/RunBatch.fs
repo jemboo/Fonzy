@@ -4,9 +4,9 @@ open System
 module RunBatch =
 
     let runBatchSeq 
-            (rndCauseSpecGen : RandomSeed -> FilePath -> 
-                seq<string*FilePath*causeSpec>)
-            (outputDir:FilePath) 
+            (rndCauseSpecGen : FileDir -> RandomSeed -> 
+                seq<string*FileDir*causeSpec>)
+            (outputDir:FileDir) 
             (seed:RandomSeed) 
             (firstDex:int)  =
 
@@ -17,13 +17,13 @@ module RunBatch =
             | Ok b -> b |> ignore
             | Error m -> Console.WriteLine m
 
-        rndCauseSpecGen seed outputDir
+        rndCauseSpecGen outputDir seed 
             |> Seq.skip firstDex
             |> Seq.iter(runBatch)
 
     
     let runPerfBinBatchSeq 
-                    (outputDir:FilePath) 
+                    (outputDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
 
@@ -33,20 +33,19 @@ module RunBatch =
 
 
     let runShcSets
-                    (outputDir:FilePath) 
+                    (outputDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
 
-        runBatchSeq SorterPbCauseSpecGen.makeRunBatchSeq 
-                    outputDir seed firstDex
+        runBatchSeq SorterShcCauseSpecGen.makeRunBatchSeq 
+                       outputDir seed firstDex
 
 
 
   module PerfBinReports =
 
-
-    let dirPerfBinBySorterGenReport (outputDir:FilePath) 
-                                     (reportDir:FilePath) =
+    let dirPerfBinBySorterGenReport (outputDir:FileDir) 
+                                    (reportDir:FileDir) =
 
         let binResultsName = "sorterPerfBins"
         let reportDataSource = new DirectoryDataSource(outputDir) 
@@ -120,12 +119,120 @@ module RunBatch =
                         csvFile.records = rep }
 
         let res = CsvFile.writeCsvFile csvFile |> Result.ExtractOrThrow
-        sprintf "%s\\%s" (FilePath.value outputDir) fileName
+        sprintf "%s\\%s" (FileDir.value outputDir) fileName
+
+
+  module ShcReports = 
+  
+     let binResultsName = "sorterShcSet"
+
+     let shcArchsFromGuid (archDs:IDataSource) 
+                          (g:Guid) =
+         result {
+            let! ds = archDs.GetDataSource(g)
+            let! worldDto = ds |> DataStoreItem.getWorldDto
+            let! worldMerge = worldDto |> WorldDto.fromDto
+            let! sShcResDto =  
+                    Enviro.getDto<sorterShcResultsDto> 
+                                    worldMerge.enviro
+                                    binResultsName
+
+            let! sShcRes = sShcResDto |> SorterShcResultsDto.fromDto
+            return sShcRes.members
+        }
+
+     let unPackShcRes (shcr:sorterShcResult) =
+        result {
+            let spec = shcr.spec
+            let! res = shcr.report |> Json.deserialize<string[]>
+            let! archs = res |> Array.map(SorterShcArchDto.fromJson)
+                             |> Array.toList
+                             |> Result.sequence
+            return (shcr.spec, archs)
+        }
+  
+     let singleShcReport (outputDir:FileDir) 
+                         (reportDir:FileDir) =
+
+          let reportDataSource = new DirectoryDataSource(outputDir) 
+                                      :> IDataSource
+          let repId = reportDataSource.GetDataSourceIds()
+                      |> Result.ExtractOrThrow
+                      |> Array.toList
+                      |> List.head
+
+          let members = shcArchsFromGuid reportDataSource repId
+                        |> Result.ExtractOrThrow
+
+          let goodOnes = members 
+                         |> Array.filter(fun r -> r.cat = "arch")
+                         |> Array.map(unPackShcRes)
+                         |> Array.toList
+                         |> Result.sequence
+                         |> Result.ExtractOrThrow
+          None
+          //let perfBinsInfo = repNs |> List.map(perfBinsFromGuid)
+          //                         |> Result.sequence
+          //                         |> Result.ExtractOrThrow
+
+          //let listofPerfBinArrays = perfBinsInfo 
+          //                            |> List.map(procPbInfo)
+          //                            |> Result.sequence
+          //                            |> Result.ExtractOrThrow
+
+          //let perfBinGroups = listofPerfBinArrays 
+          //                            |> List.reduce(fun a b -> Array.append a b)
+          //                            |> Array.groupBy(fst)
+
+          //let perfBinTotals = perfBinGroups 
+          //                            |> Array.map(fun k ->
+          //                                    (fst k, (snd k) |> Array.sumBy(snd)))
+
+          //let rep = perfBinTotals |> Array.map(formatPerfBinTotal)
+          //let header = "Id Gen pfx len win degree switch stage count"
+          //let fileName = sprintf "%s.txt"  (System.DateTime.Now.Ticks |> string)
+          //let csvFile = { csvFile.header = header; 
+          //                csvFile.directory = reportDir;
+          //                csvFile.fileName = fileName;
+          //                csvFile.records = rep }
+
+          //let res = CsvFile.writeCsvFile csvFile |> Result.ExtractOrThrow
+          //sprintf "%s\\%s" (FileDir.value outputDir) fileName
 
 
 
-    //let migratePerfBinReports (sourceDir:FilePath)
-    //                          (destDir:FilePath) =
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //let migratePerfBinReports (sourceDir:FileDir)
+    //                          (destDir:FileDir) =
 
     //    let binResultsName = "sorterPerfBins"
 
@@ -197,8 +304,8 @@ module RunBatch =
 
 
 
-    //let dirPerfBinBySorterGenReport (outputDir:FilePath) 
-    //                                (reportDir:FilePath) =
+    //let dirPerfBinBySorterGenReport (outputDir:FileDir) 
+    //                                (reportDir:FileDir) =
 
     //    let binResultsName = "sorterPerfBins"
     //    let reportDataSource = new DirectoryDataSource(outputDir) 
@@ -268,13 +375,13 @@ module RunBatch =
     //                    csvFile.records = rep}
 
     //    let res = CsvFile.writeCsvFile csvFile |> Result.ExtractOrThrow
-    //    sprintf "%s\\%s" (FilePath.value outputDir) fileName
+    //    sprintf "%s\\%s" (FileDir.value outputDir) fileName
 
 
 
 
-    //let dirPerfBinBySorterGenReport2 (outputDir:FilePath) 
-    //                                 (reportDir:FilePath) =
+    //let dirPerfBinBySorterGenReport2 (outputDir:FileDir) 
+    //                                 (reportDir:FileDir) =
 
     //    let binResultsName = "sorterPerfBins"
     //    let reportDataSource = new DirectoryDataSource(outputDir) 
@@ -345,4 +452,4 @@ module RunBatch =
     //                    csvFile.records = rep }
 
     //    let res = CsvFile.writeCsvFile csvFile |> Result.ExtractOrThrow
-    //    sprintf "%s\\%s" (FilePath.value outputDir) fileName
+    //    sprintf "%s\\%s" (FileDir.value outputDir) fileName

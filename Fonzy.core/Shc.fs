@@ -413,17 +413,8 @@ type sHCset<'S,'T,'A> =
         specs:Map<ShcId,'S>;
         members:Map<ShcId, Result<sHC<'T,'A>, string>>;
     }
-    
-type sorterShcResult =
-    {
-        spec:sorterShcSpec;
-        arch: array<sorterShcArch>
-    }
 
-type sorterShcResults =
-    {
-        members: array<sorterShcResult>
-    }
+
 
 module SHC =
 
@@ -509,3 +500,16 @@ module sHCset =
                                |> Array.Parallel.map(fun tup -> _runn (fst tup) (snd tup))
                                |> Map.ofSeq
         {shcs with members = mms}
+
+
+type sorterShcResult =
+    {
+        spec:sorterShcSpec;
+        cat:string
+        report: string
+    }
+
+type sorterShcResults =
+    {
+        members: array<sorterShcResult>
+    }

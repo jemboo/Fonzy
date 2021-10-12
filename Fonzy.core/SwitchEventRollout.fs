@@ -75,7 +75,7 @@ module SwitchEventRolloutBp64 =
         let switchCt = (SwitchCount.value switchEvents.switchCount)
         let weights = switchEvents.useRoll.values
                        |> Array.map(fun l -> ByteUtils.trueBitCount64 l )
-                       |> CollectionUtils.chunkAndSum switchCt
+                       |> CollectionUtils.wrapAndSumCols switchCt
 
         { switchUses.weights = weights }
             

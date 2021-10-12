@@ -103,9 +103,11 @@ type UtilsFixture () =
 
     [<TestMethod>]
     member this.listToTransitionTuples() =
-        let ts = [1; 2; 1; 4; 5; 6]
-        let carty = CollectionUtils.listToTransitionTuples ts  |> Seq.toArray
-        Assert.IsTrue(true)
+        let ts = [1; 2; 1; 4;]
+        let expected = [(1,2);(2,1);(1,4)]
+        let res = CollectionUtils.listToTransitionTuples ts |> Seq.toList
+        Assert.AreEqual (expected, res)
+
 
     [<TestMethod>]
     member this.iterateCircular() =
@@ -117,9 +119,9 @@ type UtilsFixture () =
     [<TestMethod>]
     member this.addDictionary() =
         let tBase = seq {("k1","v1"); ("k2","v2")} 
-                        |> CollectionUtils.dictFromSeqOfTuples
+                        |> CollectionUtils.tuplesToDict
         let tAdd = seq {("k2","v2"); ("k3","v3"); ("k4","v4")}
-                        |> CollectionUtils.dictFromSeqOfTuples
+                        |> CollectionUtils.tuplesToDict
         let newItems = CollectionUtils.addDictionary tBase tAdd
 
         Assert.IsTrue(tBase.Count = 4)
@@ -127,28 +129,9 @@ type UtilsFixture () =
 
 
     [<TestMethod>]
-    member this.cumulate() =
-        let cumer = new Dictionary<int, Dictionary<string, string>>()
-        let l1 = CollectionUtils.cumulate cumer 1 "group1" "group1_1"
-        let l2 = CollectionUtils.cumulate cumer 2 "group1" "group1_2"
-        let l4 = CollectionUtils.cumulate cumer 1 "group2" "group2_1"
-        let l5 = CollectionUtils.cumulate cumer 3 "group2" "group2_3"
-        let l6 = CollectionUtils.cumulate cumer 1 "group3" "group3_4"
-        let l7 = CollectionUtils.cumulate cumer 4 "group3" "group3_4"
-        let ud = CollectionUtils.cumerBackFill cumer
-        Assert.IsTrue(true)
-
-    [<TestMethod>]
-    member this.cumerBackFill() =
-        let wab = [1;2;3;4;5]
-        let res = CollectionUtils.listToTransitionTuples wab
-        Assert.IsTrue(true)
-
-
-    [<TestMethod>]
     member this.chunkAndSum() =
         let wab = [1;2;3;4;5;6;7;8;9]
-        let res = CollectionUtils.chunkAndSum 3 wab
+        let res = CollectionUtils.wrapAndSumCols 3 wab
                   |> Array.toList
         Assert.AreEqual(res, [12; 15; 18])
 
@@ -202,3 +185,15 @@ type UtilsFixture () =
                         | Ok m -> "success"
                         | Error m -> m
         Assert.IsTrue((result = "success"))
+
+
+
+    [<TestMethod>]
+    member this.fromTransitionFormat() =
+        let kvps = seq { (1, "a"); (6, "b"); (3, "c"); }
+        let expected = ["q"; "a"; "a"; "c"; "c"; "c"; "b"; "b"; ]
+        let dv = "q"
+        let maxV = 8
+        let res = SizeOpt.fromTransitionFormat kvps dv maxV
+                  |> Array.toList
+        Assert.AreEqual(expected, res)

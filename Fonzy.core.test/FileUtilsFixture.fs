@@ -11,7 +11,7 @@ type FileUtilsFixture() =
         let csv =
             {
                 csvFile.header = "cat"; 
-                directory = FilePath.fromString "c:\\testFileUtils"; 
+                directory = FileDir.fromString "c:\\testFileUtils"; 
                 fileName = "fileName.txt"; 
                 records = [|"a"; "b"|]
             }

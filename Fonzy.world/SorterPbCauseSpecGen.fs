@@ -23,8 +23,6 @@ module SorterPbCauseSpecGen =
                 ("sorterSaving", sorterSaving)
                 ("useParallel", (UseParallel.value useParallel))
                 ("resultsName", resultsName)
-    
-
 
     let sorterCountForDegree (degree:Degree) = 
         if (Degree.value degree) = 8 then
@@ -45,8 +43,54 @@ module SorterPbCauseSpecGen =
              (SorterCount.fromInt 30000)
         else (SorterCount.fromInt 20000)
 
-    let sorterCountForDegreeTest (degree:Degree) = 
-        (SorterCount.fromInt 2)
+    let makeTriple (dex:int) 
+                   (sorterRndGen:sorterRndGen)
+                   (outputDir:FileDir)
+                   (u:UseParallel)
+                   (randy:IRando) =
+        let degree = sorterRndGen |> SorterRndGen.getDegree
+        let pfx = sorterRndGen |> SorterRndGen.getSwitchPrefix
+        let ssRep = sortableSetRep.Bp64 degree 
+        let srtableStType = sortableSetType.SwitchReduced 
+                             ((sortableSetType.AllForDegree ssRep), pfx)
+        let sorterCount = degree |> sorterCountForDegree
+        let rndGen = Rando.nextRnGen randy
+
+        let ssImplBps = SortableSetMaker.allZeroOnes
+                                (sortableSetRep.Binary degree)
+
+        let (sortableSetTrim, switchUses) = 
+            ssImplBps |> SortingOps.SortableSet.reduceBySorterRndGen sorterRndGen
+            |> Result.ExtractOrThrow
+
+        let totalSwitchCt = sorterRndGen |> SorterRndGen.getSwitchCount
+        let switchUsePlan = Sorting.SwitchUsePlan.makeIndexes 
+                                    switchUses
+                                    totalSwitchCt
+
+        let resultsName = "sorterPerfBins"
+
+        let perf10 = ((StageWeight.fromFloat 1.0), (SorterCount.fromInt 10)) |> sorterSaving.Perf
+        let causeSpec = makeCauseSpec
+                            sorterRndGen 
+                            sorterCount 
+                            rndGen 
+                            switchUsePlan
+                            srtableStType
+                            perf10
+                            u 
+                            resultsName
+
+        let csGu = causeSpec.id |> CauseSpecId.value
+        let causeSpecDescr = sprintf "%d: Time: %s SorterGen: %s SorterCount: %d" 
+                                dex
+                                (System.DateTime.Now.ToLongTimeString())
+                                (sorterRndGen |> SorterRndGen.reportString csGu) 
+                                (SorterCount.value sorterCount)
+
+        (causeSpecDescr, outputDir, causeSpec)
+
+
 
     let buddyStageWindows (degree:Degree) =
         let awys =
@@ -146,8 +190,8 @@ module SorterPbCauseSpecGen =
         (makeBuddyArgs900 [] degreesToTest) |> List.map(sorterRndGen.RandRflBuddies)
 
 
-    let makeRunBatchSeq (seed:RandomSeed) 
-                        (outputDir:FilePath)= 
+    let makeRunBatchSeq (outputDir:FileDir) 
+                        (seed:RandomSeed) = 
 
         let degreesToTest = 
             [ 8; 10; 12; 14; 16; 18; 20; 22; 24;]
@@ -161,56 +205,10 @@ module SorterPbCauseSpecGen =
                            //yield! (makeRandStages900 degreesToTest (StageCount.fromInt 2))
                      }
 
-
         let randy = RngGen.createLcg seed |> Rando.fromRngGen
-        let nextRnGen(randy:IRando) =
-            RngGen.createLcg (RandomSeed.fromInt randy.NextPositiveInt)
-
-        let sorterRndGenToCauseSpec (dex:int) 
-                                    (sorterRndGen:sorterRndGen) =
-            let degree = sorterRndGen |> SorterRndGen.getDegree
-            let pfx = sorterRndGen |> SorterRndGen.getSwitchPrefix
-            let ssRep = sortableSetRep.Bp64 degree 
-            let srtableStType = sortableSetType.SwitchReduced 
-                                 ((sortableSetType.AllForDegree ssRep), pfx)
-            let sorterCount = degree |> sorterCountForDegree
-            let rndGen = (nextRnGen(randy))
-
-            let ssImplBps = SortableSetMaker.allZeroOnes
-                                    (sortableSetRep.Binary degree)
-
-            let (sortableSetTrim, switchUses) = 
-                ssImplBps |> SortingOps.SortableSet.reduceBySorterRndGen sorterRndGen
-                |> Result.ExtractOrThrow
-
-            let totalSwitchCt = sorterRndGen |> SorterRndGen.getSwitchCount
-            let switchUsePlan = Sorting.SwitchUsePlan.makeIndexes 
-                                        switchUses
-                                        totalSwitchCt
-
-            let useParallel = UseParallel.create true
-            let resultsName = "sorterPerfBins"
-
-            let perf10 = ((StageWeight.fromFloat 1.0), (SorterCount.fromInt 10)) |> sorterSaving.Perf
-            let causeSpec = makeCauseSpec
-                                sorterRndGen 
-                                sorterCount 
-                                rndGen 
-                                switchUsePlan
-                                srtableStType
-                                perf10
-                                useParallel 
-                                resultsName
-
-            let csGu = causeSpec.id |> CauseSpecId.value
-
-            let causeSpecDescr = sprintf "%d: Time: %s SorterGen: %s SorterCount: %d" 
-                                    dex
-                                    (System.DateTime.Now.ToLongTimeString())
-                                    (sorterRndGen |> SorterRndGen.reportString csGu) 
-                                    (SorterCount.value sorterCount)
 
 
-            (causeSpecDescr, outputDir, causeSpec)
-
-        allSorterRndGens |> Seq.mapi(fun dex sg -> sorterRndGenToCauseSpec dex sg)
+        allSorterRndGens 
+        |> Seq.mapi(fun dex sg -> 
+                            makeTriple 
+                               dex sg outputDir (UseParallel.create true) randy)

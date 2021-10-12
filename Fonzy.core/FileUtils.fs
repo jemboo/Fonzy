@@ -7,36 +7,35 @@ open Newtonsoft.Json
 
 
 module FileUtils =
-    let fullTextFilePath (baseDir:string) (fn:string) =
-        Path.Combine(baseDir, fn + ".txt")
 
-    let makeDirectory (dirPath:string) = 
+    let makeDirectory (fd:FileDir) = 
         try
-            Directory.CreateDirectory(dirPath) |> ignore 
+            Directory.CreateDirectory(FileDir.value fd) |> ignore 
             true |> Ok
         with
             | ex -> ("error in makeDirectory: " + ex.Message ) |> Result.Error
 
-    let clearDirectory (baseDir:string) =
+
+    let clearDirectory (fd:FileDir) = 
         try
-            let files  = Directory.GetFiles(baseDir, "*.*")
+            let files  = Directory.GetFiles(FileDir.value fd, "*.*")
             files |> Array.map(fun f -> File.Delete(f)) |> ignore
-            //Threading.Thread.Sleep(100)
-            Directory.Delete(baseDir) |> Ok
+            Directory.Delete(FileDir.value fd) |> Ok
         with
             | ex -> ("error in clearDirectory: " + ex.Message ) |> Result.Error
 
-    let getFilesInDirectory path ext =
+
+    let getFilesInDirectory (fd:FileDir) ext =
         try
-            Directory.GetFiles((FilePath.value path), ext) 
+            Directory.GetFiles((FileDir.value fd), ext) 
             |> Array.map Path.GetFileName  |> Ok
         with
             | ex -> ("error in getFilesInDirectory: " + ex.Message ) |> Result.Error
 
-    let readFile (path:string) =
+
+    let readFile (fp:FilePath) = 
         try
-            //let dto = System.IO.File.ReadAllText(path)
-            use sr = new System.IO.StreamReader(path)
+            use sr = new System.IO.StreamReader(FilePath.value fp)
             let res = sr.ReadToEnd()
             sr.Dispose()
             res |> Ok
@@ -44,9 +43,9 @@ module FileUtils =
             | ex -> ("error in readFile: " + ex.Message ) |> Result.Error
 
 
-    let writeFile path item (append:bool) =
+    let writeFile (fp:FilePath) item (append:bool) =
         try
-            System.IO.File.WriteAllText(path, item)
+            System.IO.File.WriteAllText((FilePath.value fp), item)
             //use sw = new StreamWriter(path, append)
             //fprintfn sw "%s" item
             //sw.Dispose()
@@ -91,15 +90,15 @@ module Json =
 
 
 
-type csvFile = { header:string; records:string[]; directory:FilePath; fileName:string; }
+type csvFile = { header:string; records:string[]; directory:FileDir; fileName:string; }
 
 module CsvFile =
 
     let writeCsvFile (csv:csvFile) =
         try
-            Directory.CreateDirectory(FilePath.value(csv.directory)) |> ignore
-            let filePath = sprintf "%s\\%s" (FilePath.value(csv.directory)) csv.fileName
-            use sw = new StreamWriter(filePath, false)
+            Directory.CreateDirectory(FileDir.value(csv.directory)) |> ignore
+            let FileDir = sprintf "%s\\%s" (FileDir.value(csv.directory)) csv.fileName
+            use sw = new StreamWriter(FileDir, false)
             fprintfn sw "%s" csv.header
             csv.records |> Array.iter(fprintfn sw "%s")
             sw.Dispose()

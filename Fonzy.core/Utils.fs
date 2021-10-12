@@ -253,15 +253,9 @@ module CollectionUtils =
                  window <- window |> List.append [item]
                  yield window |> List.rev}
 
-    //let chunkAndSum<'T when 'T : (static member (+) : 'T -> 'T -> 'T )> (chunkSz:int) (vals:seq<'T>) =
-    //    let addArrays<'T when 'T : (static member (+) : 'T -> 'T -> 'T )> (a:'T[]) (b:'T[]) =
-    //        Array.init a.Length (fun dex -> a.[dex] + b.[dex])
-
-    //    vals |> Seq.chunkBySize chunkSz
-    //         |> Seq.toArray
-    //         |> Array.reduce addArrays
-
-    let chunkAndSum (chunkSz:int) (vals:seq<int>) =
+    // returns an array of length chunkSz, which is made by converting vals to a
+    // 2d array with chunkSz columns, and then summing over each column. 
+    let wrapAndSumCols (chunkSz:int) (vals:seq<int>) =
         let addArrays (a:int[]) (b:int[]) =
             Array.init a.Length (fun dex -> a.[dex] + b.[dex])
 
@@ -277,9 +271,6 @@ module CollectionUtils =
         |> Seq.toArray
 
 
-
-
-
     let listToTransitionTuples (ltt:'a list) =
         let rec yucko (last:'a) (tail:'a list) (tupes: ('a*'a) list) =
             match tail with
@@ -289,6 +280,7 @@ module CollectionUtils =
         | [] -> []
         | head::tail -> yucko head tail [] |> List.rev
 
+
     let repeater f (items:'a[]) (count:int) =
         let tt = seq {for i=0 to (items.Length-1) 
                         do yield! Seq.replicate count (f items.[i]) }
@@ -296,7 +288,7 @@ module CollectionUtils =
 
 
     // Converts seq of key - value pairs to mutable Dictionary
-    let dictFromSeqOfTuples(src:seq<'a * 'b>) = 
+    let tuplesToDict(src:seq<'a * 'b>) = 
        let dictionary = new Dictionary<'a,'b>()
        for (k,v) in src do
            dictionary.Add(k,v)
@@ -322,25 +314,6 @@ module CollectionUtils =
                 | true, true  -> ()                     // already seen at least twice
         }
 
-    // returns a list of the new items added
-    let cumulate (cumer:Dictionary<int, Dictionary<'a,'b>>) 
-                 (key:int) (group:'a) (item:'b) =
-        if cumer.ContainsKey(key) then
-            cumer.[key].Add(group, item)
-            [item]
-        else
-            let newDict = new Dictionary<'a,'b>()
-            newDict.Add(group, item)
-            cumer.Add(key, newDict)
-            [item]
-
-    let cumerBackFill (cumer:Dictionary<int, Dictionary<'a,'b>>) =
-        let backFill (dPrev:Dictionary<'a,'b>) (dNext:Dictionary<'a,'b>)
-                     (nextKey:int) =
-            addDictionary dNext dPrev  |> List.map(fun a->(nextKey, a))
-        let hops = cumer.Keys |> Seq.sort |> Seq.toList |> listToTransitionTuples
-        let ssts = hops |> List.map(fun (p,s) -> backFill cumer.[p] cumer.[s] s)
-        ssts |> List.concat
          
     let mapSubset (m:Map<'a,'v>) (keys:seq<'a>) = 
         keys |> Seq.map(fun k-> k, (m.[k]))
@@ -378,6 +351,66 @@ module CollectionUtils =
 
     let histoTotalCount<'a> (bins:('a*int)[]) = 
         bins |> Array.sumBy(snd)
+
+
+module SizeOpt =
+
+    let toSparseFormat (dfVal:'T) (aa:'T[] when 'T:equality)  =
+        seq { for i=1 to (aa.Length - 1) do
+                if aa.[i] <> dfVal then yield (i, aa.[i])  }
+
+
+    let fromSparseFormat (aa:seq<(int*'T)> when 'T:equality) 
+                         (dfVal:'T) (arraySz:int) =
+        let aB = Array.create arraySz dfVal
+        aa |> Seq.iter(fun tup -> aB.[fst tup] <- snd tup )
+        aB
+
+    // compresses a time series by producing (index, value) tuples
+    let toTransitionFormat (aa:seq<'T> when 'T:equality) =
+        seq {
+            let ee = aa.GetEnumerator()
+            let mutable dex = 0
+            let mutable lastVal = None
+            while ee.MoveNext() do
+                match lastVal with
+                | Some v -> if v <> ee.Current then
+                                yield (dex, ee.Current)
+                | None -> yield (dex, ee.Current)
+                lastVal <- Some ee.Current
+                dex <- dex + 1
+        }
+
+
+    let fromTransitionFormat (aa:seq<(int*'T)> when 'T:equality) 
+                             (dv:'T) (maxDex:int) =
+        let aB = Array.create maxDex dv
+        aa |> Seq.iter(fun tup -> aB.[fst tup] <- snd tup )
+        let mutable curV = aB.[0]
+        for i=0 to (maxDex - 1) do
+            if aB.[i] = dv then
+                aB.[i] <- curV
+            else
+                curV <- aB.[i]
+        aB
+
+    // returns an array of (index, value pairs) that express the 
+    // differences between the first and second arrays sndA must be
+    // at least as long as fstA
+    let getDiffs (fstA:'T[] when 'T:equality)
+                 (sndA:'T[] when 'T:equality) =
+        seq {
+            for dex = 0 to (fstA.Length - 1) do
+                if fstA.[dex] <> sndA.[dex] then
+                    yield (dex, sndA.[dex])
+        }
+
+    let restoreFromDiffs (fstA:'T[] when 'T:equality)
+                         (diffs: (int*'T)[]) =
+        let retA = fstA |> Array.copy
+        diffs |> Array.iter(fun tup -> retA.[fst tup] <- snd tup )
+        retA
+
 
 
 module ResultMap =

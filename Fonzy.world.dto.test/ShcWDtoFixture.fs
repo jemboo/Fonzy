@@ -4,18 +4,46 @@ open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
 
 [<TestClass>]
-type ShcDtoFixture () =
+type ShcWDtoFixture () =
 
     let degree = Degree.fromInt 12
 
     [<TestMethod>]
     member this.sorterShcResultDto() =
-        Assert.AreEqual(1, 1);
+        let sShcResult = 
+            {
+                sorterShcResult.spec = TestData.SrtrShcSpec.sscSpec;
+                sorterShcResult.cat = "cat"
+                sorterShcResult.report = "report"
+            }
+        let dto = sShcResult |> SorterShcResultDto.toDto
+        let sShcResultBack = dto |> SorterShcResultDto.fromDto
+                                 |> Result.ExtractOrThrow
+        Assert.AreEqual(sShcResult, sShcResultBack);
 
 
 
 
     [<TestMethod>]
-    member this.yabba2() =
-        Assert.AreEqual(1, 1);
+    member this.sorterShcResultsDto() =
+        let sShcResult = 
+            {
+                sorterShcResult.spec = TestData.SrtrShcSpec.sscSpec;
+                sorterShcResult.cat = "cat"
+                sorterShcResult.report = "report"
+            }
+        let sShcResult2 = 
+            {
+                sorterShcResult.spec = TestData.SrtrShcSpec.sscSpec;
+                sorterShcResult.cat = "cat2"
+                sorterShcResult.report = "report2"
+            }
+
+        let ssRs = { sorterShcResults.members = [|sShcResult; sShcResult2|] }
+
+        let dto = ssRs |> SorterShcResultsDto.toDto
+        let ssRsBack = dto |> SorterShcResultsDto.fromDto
+                           |> Result.ExtractOrThrow
+
+        Assert.AreEqual(ssRs, ssRsBack);
 

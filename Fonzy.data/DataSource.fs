@@ -8,22 +8,22 @@ type IDataSource =
    abstract member GetDataSourceIds: Unit -> Result<Guid[], string>
    abstract member AddNewDataStoreItem : DataStoreItem -> Result<bool, string>
 
-type DirectoryDataSource(dirPath:FilePath) =
+type DirectoryDataSource(dirPath:FileDir) =
     member this.DirectoryPath = dirPath
     member this.GuidToFilePath (id:Guid) =
-        Path.Combine(
-            (FilePath.value this.DirectoryPath), 
-            (string id) + ".txt")
+        let fn =  FileName.fromString ((string id) + ".txt")
+        FileName.toFilePath this.DirectoryPath fn
+           
     member this.AssureDirectory = 
-            FileUtils.makeDirectory (FilePath.value this.DirectoryPath)
+            FileUtils.makeDirectory this.DirectoryPath
 
     interface IDataSource with
 
         member this.GetDataSource (id:Guid) =
-            let filePath = this.GuidToFilePath id
+            let fp = this.GuidToFilePath id
             result {
                 let! assure = this.AssureDirectory
-                let! js = FileUtils.readFile filePath
+                let! js = FileUtils.readFile fp
                 let! dsi = js |> DataStoreItemDto.fromJson
                 return dsi
             }

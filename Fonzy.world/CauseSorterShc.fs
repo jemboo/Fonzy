@@ -7,30 +7,10 @@ module CauseSorterShc =
         let causer = fun (e:enviro) ->
             result {
 
-                let! sorterRndGen = 
+                let! sorterShcSpecRndGen = 
                         causeSpec.prams 
-                            |> ResultMap.procKeyedString "sorterRndGen" 
-                                                         (SorterRndGenDto.fromJson)
-                let! sorterCount = 
-                        causeSpec.prams 
-                            |> ResultMap.procKeyedInt "sorterCount" 
-                                                       (fun d -> SorterCount.create "" d)
-                let! rngGen = 
-                        causeSpec.prams 
-                            |> ResultMap.procKeyedString "rndGen" 
-                                                          (RngGenDto.fromJson)
-                let! switchUsePlan = 
-                        causeSpec.prams 
-                            |> ResultMap.procKeyedString "switchUsePlan" 
-                                                         (Json.deserialize<Sorting.switchUsePlan>)
-                let! sortableSetType = 
-                        causeSpec.prams 
-                            |> ResultMap.procKeyedString "sortableSetType" 
-                                                          (SortableSetTypeDto.fromJson)
-                let! sorterSaving = 
-                        causeSpec.prams 
-                        |> ResultMap.procKeyedString "sorterSaving" 
-                                                      (SorterSavingDto.fromJson)
+                            |> ResultMap.procKeyedString "sorterShcSpecRndGen" 
+                                                         (SorterShcSpecRndGenDto.fromJson)
                 let! useParallel = 
                         causeSpec.prams 
                             |> ResultMap.lookupKeyedBool "useParallel"
@@ -40,49 +20,17 @@ module CauseSorterShc =
                             |> ResultMap.procKeyedString "resultsName"
                                                          (id >> Result.Ok)
     
-                let randy = Rando.fromRngGen rngGen
-                let sorterArray = SorterRndGen.createRandomArray 
-                                                sorterRndGen 
-                                                sorterCount 
-                                                randy
+                let shcSet = SorterShcSpecRndGen.generate None None sorterShcSpecRndGen
+                             |> Result.ExtractOrThrow
+                             |> sHCset.makeSorterShcSet
 
-                let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
-                let sSet = SorterSet.fromSorters 
-                                            sorterSetId
-                                            (sorterRndGen |> SorterRndGen.getDegree)
-                                            sorterArray
-
-                let ssetMaker = SortableSetMaker.make None
-
-                let! srtblSt = SortableSet.make ssetMaker sortableSetType 
-
-                let! sorterCovs = SortingOps.SorterSet.getSorterCoverages
-                                        sSet
-                                        srtblSt
-                                        switchUsePlan
-                                        true
-                                        (UseParallel.create useParallel)
-
-                let perfBins = sorterCovs 
-                                |> SortingEval.SorterPerfBin.fromSorterCoverages
-                let perfBinsDto = perfBins |> SorterPerfBinDto.toDtos
-
-                let selectedCovs = sorterCovs
-                                    |> List.toArray
-                                    |> SorterSaving.chooseSorterCoverages
-                                            sSet.degree
-                                            sorterSaving
-                                    |> Array.map(SorterCoverageDto.toDto)
-
-                let! e2 = Enviro.addDto<sorterPerfBinDto[]>
-                            resultsName 
-                            perfBinsDto
-                            enviro.Empty 
-    
-                return! Enviro.addDto<sorterCoverageDto[]>
-                                    (nameof selectedCovs)
-                                    selectedCovs
-                                    e2 
+                let batchRes = sHCset.runBatch (UseParallel.create useParallel) shcSet
+                let shcRes = sHCset.getResults batchRes
+                let sShcResultsDto = shcRes |> SorterShcResultsDto.toDto
+                return! Enviro.addDto<sorterShcResultsDto>
+                                                resultsName 
+                                                sShcResultsDto 
+                                                e 
             }
 
         {Cause.causeSpec=causeSpec; op=causer}

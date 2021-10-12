@@ -252,17 +252,6 @@ type sHCset<'S,'T,'A> =
         members:Map<ShcId, Result<sHC<'T,'A>, string>>;
     }
     
-type sorterShcResult =
-    {
-        spec:sorterShcSpec;
-        cat:string
-        report: string
-    }
-
-type sorterShcResults =
-    {
-        members: array<sorterShcResult>
-    }
 
 module SHC =
 

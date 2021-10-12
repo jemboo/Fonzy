@@ -4,62 +4,81 @@ open System
 module SorterShcCauseSpecGen =
 
     let makeCauseSpec 
-                    sorterRndGen
-                    sorterCount
-                    rndGen
-                    switchUsePlan
-                    sortableSetType
-                    useParallel
+                    sorterShcSpecRndGen
+                    useParallel 
                     resultsName =
 
         CauseSpecSorterShc.sorterShcSpecRndGen
-                //("sorterRndGen", sorterRndGen)
-                //("sorterCount", sorterCount)
-                ("rndGen", rndGen)
-                //("switchUsePlan", switchUsePlan)
-                //("sortableSetType", sortableSetType)
+                ("sorterShcSpecRndGen", sorterShcSpecRndGen)
                 ("useParallel", (UseParallel.value useParallel))
-                //("resultsName", resultsName)
+                ("resultsName", resultsName)
+
+    
+    let makeTriple (dex:int)
+                   (outputDir:FileDir)
+                   (u:UseParallel)
+                   (sssRndGen:sorterShcSpecRndGen) = 
+        let causeSpecDescr = sprintf "%d: Time: %s " 
+                                 dex
+                                 (System.DateTime.Now.ToLongTimeString())
+
+        let resultsName = "sorterShcSet"
+        let causeSpec = makeCauseSpec sssRndGen u resultsName
+        (causeSpecDescr, outputDir, causeSpec)
 
 
+    let makeRunBatchSeq (outputDir:FileDir) 
+                        (seed:RandomSeed) =
+        let degree = Degree.fromInt 16
+        let shcCt = ShcCount.fromInt 100
+        let steps = StepNumber.fromInt 1000
+        let startingTemp = Temp.fromFloat 0.005
+        let stageW = StageWeight.fromFloat 2.0
+        let rng = RngGen.createLcg seed
+        let iRando = rng |> Rando.fromRngGen
+        let sRndGen = sorterRndGen.RandSymmetric
+                                    ([],
+                                     (StageCount.degreeTo999StageCount degree),
+                                     degree)
+                                     
+        let wPfx = [||] 
+        let sorter = SorterRndGen.createRandom sRndGen iRando
+        let pfxSc = SwitchCount.fromInt wPfx.Length
+        let mutRate = MutationRate.fromFloat 0.04
+        let mutSpec = (pfxSc, mutRate) |> sorterMutationType.ByStageRfl
+                        |> sorterMutSpec.Constant
+        let srtbleSetType = sortableSetType.AllForDegree 
+                                (sortableSetRep.Integer degree)
+        let swS = shcStageWeightSpec.Constant stageW
+        let evl = sorterEvalSpec.PerfBin
+        let ann = annealerSpec.Constant startingTemp
+        let updt = shcSaveDetails.Always
+        let term = shcTermSpec.FixedLength steps
+        let baseShcSpec =
+          {
+            sorterShcSpec.rngGen = rng;
+            sorterShcSpec.sorter = sorter;
+            sorterShcSpec.switchPfx = wPfx;
+            sorterShcSpec.mutatorSpec = mutSpec;
+            sorterShcSpec.srtblSetType = srtbleSetType;
+            sorterShcSpec.shcStageWeightSpec = swS;
+            evalSpec = evl;
+            annealerSpec = ann;
+            updaterSpec = updt;
+            termSpec = term;
+          }
+
+        let sssrgT = sssrgType.RndGen
 
 
+        let sorterShcSpecRndGens = 
+            seq {
+                { sorterShcSpecRndGen.baseSpec = baseShcSpec; 
+                  sorterShcSpecRndGen.sssrgType = sssrgT;
+                  sorterShcSpecRndGen.count = shcCt;
+                  sorterShcSpecRndGen.rndGen = rng } }
 
-
-    let makeRunBatchSeq (seed:RandomSeed)
-                        (outputDir:FilePath) = 
-
-        let degree = Degree.fromInt 12
-        let maxSteps = StepNumber.fromInt 10
-        let stageWght = StageWeight.fromFloat 1.0
-        let temp = Temp.fromFloat 1.0
-        let prefix = [||]
-        let pfxLen = SwitchCount.fromInt prefix.Length
-        let mutRate = MutationRate.fromFloat 0.1
-        let mutType = sorterMutationType.ByStage (pfxLen, mutRate)
-
-
-        let stgWghtSpec = stageWght |> shcStageWeightSpec.Constant
-        let evaluatorSpec = sorterEvalSpec.PerfBin
-        let annSpec = temp |> annealerSpec.Constant
-        let updaterSpec = shcSaveDetails.Always
-        let termSpec = maxSteps |> shcTermSpec.FixedLength
-        let mutSpec = mutType |> sorterMutSpec.Constant
-
-
-        let allSorterGens = 
-                //(makeRandSwitches degreesToTest) |> List.append
-                // (makeRandStages degreesToTest) |> List.append
-                // (makeRandCoComp degreesToTest) |> List.append
-                // (makeRandSymmetric degreesToTest) |> List.append
-                 //(makeRandStages999 degreesToTest) |> List.append
-                 // (makeRandStages900 degreesToTest) |> List.append
-                 // (makeRandSwitches900 degreesToTest)
-                 None
-
-
-        let randy = RngGen.createLcg seed |> Rando.fromRngGen
-        let nextRnGen(randy:IRando) =
-            RngGen.createLcg (RandomSeed.fromInt randy.NextPositiveInt)
-
-        None
+        sorterShcSpecRndGens
+        |> Seq.mapi(fun dex sg -> 
+                            makeTriple 
+                               dex outputDir (UseParallel.create true) sg )

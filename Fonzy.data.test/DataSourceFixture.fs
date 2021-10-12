@@ -63,14 +63,14 @@ type DataSourceFixture () =
     [<TestMethod>]
     member this.DirectoryDataSource_GetDs() =
         this.setupAllWorlds()
-        let dirDs = new DirectoryDataSource(FilePath.fromString this.testDir) :> IDataSource
+        let dirDs = new DirectoryDataSource(FileDir.fromString this.testDir) :> IDataSource
         let ds = dirDs.GetDataSource(WorldId.value this.world1.id) |> Result.ExtractOrThrow
         this.tearDownDataSource() 
         Assert.AreEqual(ds |> DataStoreItem.getId, WorldId.value this.world1.id);
 
     [<TestMethod>]
     member this.assureDirectory() =
-        let dirDs = new DirectoryDataSource(FilePath.fromString this.testDir)
+        let dirDs = new DirectoryDataSource(FileDir.fromString this.testDir)
         let res = dirDs.AssureDirectory |> Result.ExtractOrThrow
         let res2 = dirDs.AssureDirectory |> Result.ExtractOrThrow
         this.tearDownDataSource() 
@@ -80,7 +80,7 @@ type DataSourceFixture () =
     [<TestMethod>]
     member this.DirectoryDataSource_GetDsIds() =
         this.setupAllWorlds() |> ignore
-        let dirDs = new DirectoryDataSource(FilePath.fromString this.testDir) :> IDataSource
+        let dirDs = new DirectoryDataSource(FileDir.fromString this.testDir) :> IDataSource
         let ids = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow
         this.tearDownDataSource() 
         Assert.AreEqual(ids.Length, 3);
@@ -90,7 +90,7 @@ type DataSourceFixture () =
     member this.DirectoryDataSource_AddNewDataStoreItem() =
         this.setupDataStore (DataStoreItem.WorldDto (this.world1 |> WorldDto.toDto))
         this.setupDataStore (DataStoreItem.WorldDto (this.world2 |> WorldDto.toDto))
-        let dirDs = new DirectoryDataSource(FilePath.fromString this.testDir) :> IDataSource
+        let dirDs = new DirectoryDataSource(FileDir.fromString this.testDir) :> IDataSource
         let ids = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow
         Assert.AreEqual(ids.Length, 2)
 
@@ -106,7 +106,7 @@ type DataSourceFixture () =
     [<TestMethod>]
     member this.DirectoryDataSource_TurnWorldActionIntoWorld() =
         this.makeTestDirectory() |> ignore
-        let dirDs = new DirectoryDataSource(FilePath.fromString this.testDir) :> IDataSource
+        let dirDs = new DirectoryDataSource(FileDir.fromString this.testDir) :> IDataSource
         let randWorldAction = TestData.WorldAction.SorterGen.randWorldAction 
         let worldActionDto = randWorldAction |> WorldActionDto.toDto
         let dataStoreItem  = worldActionDto |> DataStoreItem.WorldActionDto
