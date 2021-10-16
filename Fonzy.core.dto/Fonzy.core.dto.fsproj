@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="RngGenDto.fs" />
     <Compile Include="ComboStructuresDto.fs" />
+    <Compile Include="ArrayStorageDto.fs" />
     <Compile Include="DistributionsDto.fs" />
     <Compile Include="AnnealerDto.fs" />
     <Compile Include="SortingTypesDto.fs" />
@@ -21,6 +22,10 @@
     <Compile Include="SorterGaDto.fs" />
     <Compile Include="OrgsDto.fs" />
     <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.FSharpLu.Json" Version="0.11.7" />
   </ItemGroup>
 
   <ItemGroup>

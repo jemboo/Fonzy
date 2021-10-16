@@ -1,49 +1,81 @@
 ﻿namespace global
 open System
 
-type sorterMutationTypeDto = {cat:string; value:string}
-module SorterMutationTypeDto =
+type sorterMutTypeDto = {cat:string; value:stringMapDto}
+module SorterMutTypeDto =
 
-    let fromDto (dto:sorterMutationTypeDto) =
+    let fromDto (dto:sorterMutTypeDto) =
         match dto.cat with
-        | nameof sorterMutationType.BySwitch -> 
+        | nameof sorterMutType.BySwitch -> 
                    result {
-                       let! b = Json.deserialize<Map<string, string>> dto.value
+                       let! b = dto.value |> StringMapDto.fromDto
                        let! pfxCtv = b.["pfxCount"] |> Json.deserialize<int>
                        let! pfxCt = pfxCtv |> SwitchCount.create ""
                        let! mrv = b.["mutationRate"] |> Json.deserialize<float>
                        let! mr = mrv |> MutationRate.create "" 
-                       return sorterMutationType.BySwitch (pfxCt, mr)
+                       return sorterMutType.BySwitch (pfxCt, mr)
                    }
-        | nameof sorterMutationType.ByStage -> 
+        | nameof sorterMutType.ByStage -> 
                     result {
-                        let! b = Json.deserialize<Map<string, string>> dto.value
+                        let! b = dto.value |> StringMapDto.fromDto
                         let! pfxCtv = b.["pfxCount"] |> Json.deserialize<int>
                         let! pfxCt = pfxCtv |> SwitchCount.create ""
                         let! mrv = b.["mutationRate"] |> Json.deserialize<float>
                         let! mr = mrv |> MutationRate.create "" 
-                        return sorterMutationType.ByStage (pfxCt, mr)
+                        return sorterMutType.ByStage (pfxCt, mr)
                     }
-        | nameof sorterMutationType.ByStageRfl -> 
+        | nameof sorterMutType.ByStageRfl -> 
                     result {
-                        let! b = Json.deserialize<Map<string, string>> dto.value
+                        let! b = dto.value |> StringMapDto.fromDto
                         let! pfxCtv = b.["pfxCount"] |> Json.deserialize<int>
                         let! pfxCt = pfxCtv |> SwitchCount.create ""
                         let! mrv = b.["mutationRate"] |> Json.deserialize<float>
                         let! mr = mrv |> MutationRate.create "" 
-                        return sorterMutationType.ByStageRfl (pfxCt, mr)
+                        return sorterMutType.ByStageRfl (pfxCt, mr)
                     }
-
-
         | t -> (sprintf "Invalid sorterMutationTypeDto: %s" t) |> Error
+
+
+    //let fromDto (dto:sorterMutTypeDto) =
+    //    match dto.cat with
+    //    | nameof sorterMutType.BySwitch -> 
+    //               result {
+    //                   let! b = Json.deserialize<Map<string, string>> dto.value
+    //                   let! pfxCtv = b.["pfxCount"] |> Json.deserialize<int>
+    //                   let! pfxCt = pfxCtv |> SwitchCount.create ""
+    //                   let! mrv = b.["mutationRate"] |> Json.deserialize<float>
+    //                   let! mr = mrv |> MutationRate.create "" 
+    //                   return sorterMutType.BySwitch (pfxCt, mr)
+    //               }
+    //    | nameof sorterMutType.ByStage -> 
+    //                result {
+    //                    let! b = Json.deserialize<Map<string, string>> dto.value
+    //                    let! pfxCtv = b.["pfxCount"] |> Json.deserialize<int>
+    //                    let! pfxCt = pfxCtv |> SwitchCount.create ""
+    //                    let! mrv = b.["mutationRate"] |> Json.deserialize<float>
+    //                    let! mr = mrv |> MutationRate.create "" 
+    //                    return sorterMutType.ByStage (pfxCt, mr)
+    //                }
+    //    | nameof sorterMutType.ByStageRfl -> 
+    //                result {
+    //                    let! b = Json.deserialize<Map<string, string>> dto.value
+    //                    let! pfxCtv = b.["pfxCount"] |> Json.deserialize<int>
+    //                    let! pfxCt = pfxCtv |> SwitchCount.create ""
+    //                    let! mrv = b.["mutationRate"] |> Json.deserialize<float>
+    //                    let! mr = mrv |> MutationRate.create "" 
+    //                    return sorterMutType.ByStageRfl (pfxCt, mr)
+    //                }
+    //    | t -> (sprintf "Invalid sorterMutationTypeDto: %s" t) |> Error
+
+
 
     let fromJson (js:string) =
         result {
-            let! dto = Json.deserialize<sorterMutationTypeDto> js
+            let! dto = Json.deserialize<sorterMutTypeDto> js
             return! fromDto dto
         }
 
-    let toDto (mutationType:sorterMutationType) =
+    let toDto (mutationType:sorterMutType) =
         let makePrams pfx mr = 
                 [
                      ("pfxCount", pfx |> SwitchCount.value |> Json.serialize);
@@ -51,28 +83,28 @@ module SorterMutationTypeDto =
                 ] |> Map.ofList
 
         match mutationType with
-        | sorterMutationType.BySwitch (pfx, mr) -> 
+        | sorterMutType.BySwitch (pfx, mr) ->  
             {
-                sorterMutationTypeDto.cat = nameof sorterMutationType.BySwitch; 
-                value = (makePrams pfx mr) |> Json.serialize;      
+                sorterMutTypeDto.cat = nameof sorterMutType.BySwitch; 
+                value = (makePrams pfx mr) |> StringMapDto.toDto;
             }
-        | sorterMutationType.ByStage (pfx, mr) ->
+        | sorterMutType.ByStage (pfx, mr) ->
             {
-                sorterMutationTypeDto.cat = nameof sorterMutationType.ByStage; 
-                value = (makePrams pfx mr) |> Json.serialize;    
-            }
-
-        | sorterMutationType.ByStageRfl (pfx, mr) ->
-            {
-                sorterMutationTypeDto.cat = nameof sorterMutationType.ByStageRfl; 
-                value = (makePrams pfx mr) |> Json.serialize;    
+                sorterMutTypeDto.cat = nameof sorterMutType.ByStage; 
+                value =  (makePrams pfx mr) |> StringMapDto.toDto;   
             }
 
-    let toJson (ss:sorterMutationType) =
+        | sorterMutType.ByStageRfl (pfx, mr) -> 
+            {
+                sorterMutTypeDto.cat = nameof sorterMutType.ByStageRfl; 
+                value = (makePrams pfx mr) |> StringMapDto.toDto;  
+            }
+
+    let toJson (ss:sorterMutType) =
         ss |> toDto |> Json.serialize
 
 
-type sorterRndGenDto = {cat:string; prams:Map<string,string>; switches:int[]} 
+type sorterRndGenDto = {cat:string; prams:stringMapDto; switches:int[]} 
 module SorterRndGenDto =
     let toDto (sg:sorterRndGen) =
         match sg with
@@ -86,7 +118,7 @@ module SorterRndGenDto =
                                 |> Array.map(fun sw -> SwitchDto.toDto sw)
             {
                 sorterRndGenDto.cat = nameof sorterRndGen.RandSwitches; 
-                prams=prams; 
+                prams = prams |> StringMapDto.toDto; 
                 switches=switchListDto; 
             } 
 
@@ -100,7 +132,7 @@ module SorterRndGenDto =
                                     |> Array.map(fun sw -> SwitchDto.toDto sw)
             { 
                 sorterRndGenDto.cat = nameof sorterRndGen.RandStages; 
-                prams=prams; 
+                prams = prams |> StringMapDto.toDto; 
                 switches=switchListDto; 
             } 
 
@@ -115,7 +147,7 @@ module SorterRndGenDto =
                                 |> Array.map(fun sw -> SwitchDto.toDto sw)
             { 
                 sorterRndGenDto.cat = nameof sorterRndGen.RandBuddies; 
-                prams=prams; 
+                prams = prams |> StringMapDto.toDto;
                 switches=switchListDto; 
             }
 
@@ -129,7 +161,7 @@ module SorterRndGenDto =
                                 |> Array.map(fun sw -> SwitchDto.toDto sw)
             { 
                 sorterRndGenDto.cat = nameof sorterRndGen.RandSymmetric; 
-                prams=prams; 
+                prams = prams |> StringMapDto.toDto;
                 switches=switchListDto; 
             } 
 
@@ -144,7 +176,7 @@ module SorterRndGenDto =
                                 |> Array.map(fun sw -> SwitchDto.toDto sw)
             { 
                 sorterRndGenDto.cat = nameof sorterRndGen.RandRflBuddies; 
-                prams=prams; 
+                prams = prams |> StringMapDto.toDto;  
                 switches=switchListDto; 
             } 
 
@@ -157,9 +189,10 @@ module SorterRndGenDto =
             match sgDto.cat with
             | nameof sorterRndGen.RandSwitches -> 
              result {
-                let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
-                                            (fun d -> Degree.create "" d)
-                let! switchCount = sgDto.prams |> ResultMap.procKeyedInt "switchCount" 
+                let! map = sgDto.prams |> StringMapDto.fromDto; 
+                let! degree = map |> ResultMap.procKeyedInt "degree" 
+                                             (fun d -> Degree.create "" d)
+                let! switchCount = map |> ResultMap.procKeyedInt "switchCount" 
                                             (fun d -> SwitchCount.create "" d)
 
                 let! switchList = sgDto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
@@ -170,9 +203,10 @@ module SorterRndGenDto =
 
             | nameof sorterRndGen.RandStages -> 
              result {
-                    let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
+                    let! map = sgDto.prams |> StringMapDto.fromDto; 
+                    let! stageCount = map |> ResultMap.procKeyedInt "stageCount" 
                                                 (fun d -> StageCount.create "" d)
-                    let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
+                    let! degree = map |> ResultMap.procKeyedInt "degree" 
                                                 (fun d -> Degree.create "" d)
 
                     let! switchList = sgDto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
@@ -184,11 +218,12 @@ module SorterRndGenDto =
 
             | nameof sorterRndGen.RandBuddies -> 
              result {
-                    let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
+                    let! map = sgDto.prams |> StringMapDto.fromDto; 
+                    let! degree = map |> ResultMap.procKeyedInt "degree" 
                                                 (fun d -> Degree.create "" d)
-                    let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
+                    let! stageCount = map |> ResultMap.procKeyedInt "stageCount" 
                                                 (fun d -> StageCount.create "" d) 
-                    let! windowSize = sgDto.prams |> ResultMap.procKeyedInt "windowSize" 
+                    let! windowSize = map |> ResultMap.procKeyedInt "windowSize" 
                                                 (fun d -> StageWindowSize.create "" d)
                     let! switchList = sgDto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
                                                     |> Array.toList
@@ -198,9 +233,10 @@ module SorterRndGenDto =
 
             | nameof sorterRndGen.RandSymmetric -> 
              result {
-                    let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
+                    let! map = sgDto.prams |> StringMapDto.fromDto; 
+                    let! stageCount = map |> ResultMap.procKeyedInt "stageCount" 
                                                 (fun d -> StageCount.create "" d)
-                    let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
+                    let! degree = map |> ResultMap.procKeyedInt "degree" 
                                                 (fun d -> Degree.create "" d)
                     let! switchList = sgDto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
                                                     |> Array.toList
@@ -210,11 +246,12 @@ module SorterRndGenDto =
                            
             | nameof sorterRndGen.RandRflBuddies -> 
              result {
-                    let! degree = sgDto.prams |> ResultMap.procKeyedInt "degree" 
+                    let! map = sgDto.prams |> StringMapDto.fromDto; 
+                    let! degree = map |> ResultMap.procKeyedInt "degree" 
                                                 (fun d -> Degree.create "" d)
-                    let! stageCount = sgDto.prams |> ResultMap.procKeyedInt "stageCount" 
+                    let! stageCount = map |> ResultMap.procKeyedInt "stageCount" 
                                                 (fun d -> StageCount.create "" d) 
-                    let! windowSize = sgDto.prams |> ResultMap.procKeyedInt "windowSize" 
+                    let! windowSize = map |> ResultMap.procKeyedInt "windowSize" 
                                                 (fun d -> StageWindowSize.create "" d)
                     let! switchList = sgDto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
                                                     |> Array.toList
@@ -231,13 +268,13 @@ module SorterRndGenDto =
             return! fromDto dto
         }
 
-//type sorterMutationSpecDto = {sorterMutationType:sorterMutationTypeDto; 
+//type sorterMutationSpecDto = {sorterMutType:sorterMutationTypeDto; 
 //                              rndGen:rngGenDto}
 //module SorterMutationSpecDto =
 
 //    let fromDto (dto:sorterMutationSpecDto) =
 //        result {
-//            let! smt = dto.sorterMutationType |> SorterMutationTypeDto.fromDto
+//            let! smt = dto.sorterMutType |> SorterMutTypeDto.fromDto
 //            let! rndg = dto.rndGen |> RngGenDto.fromDto
 //            return sorterMutationSpec (smt, rndg);
 //        }
@@ -245,6 +282,6 @@ module SorterRndGenDto =
 //    let toDto (mutationSpec:sorterMutationSpec) =
 //        let mutationType, rngGen = mutationSpec
 //        {
-//           sorterMutationType = mutationType |> SorterMutationTypeDto.toDto;
+//           sorterMutType = mutationType |> SorterMutTypeDto.toDto;
 //           rndGen = rngGen |> RngGenDto.toDto;
 //        }

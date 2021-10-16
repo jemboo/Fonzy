@@ -1,7 +1,7 @@
 ﻿namespace global
 open System
 
-type causeSpecDto = {id:Guid; genus:string[]; prams:Map<string,string>;}
+type causeSpecDto = {id:Guid; genus:string[]; prams:stringMapDto;}
 module CauseSpecDto =
     let toDto (cs:causeSpec) =
         {causeSpecDto.id = CauseSpecId.value cs.id;

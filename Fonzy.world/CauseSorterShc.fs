@@ -6,17 +6,18 @@ module CauseSorterShc =
     let sorterShcSpecRndGen (causeSpec:causeSpec) =
         let causer = fun (e:enviro) ->
             result {
+                let! map = causeSpec.prams |> StringMapDto.fromDto
 
                 let! sorterShcSpecRndGen = 
-                        causeSpec.prams 
+                        map
                             |> ResultMap.procKeyedString "sorterShcSpecRndGen" 
                                                          (SorterShcSpecRndGenDto.fromJson)
                 let! useParallel = 
-                        causeSpec.prams 
+                        map
                             |> ResultMap.lookupKeyedBool "useParallel"
     
                 let! resultsName = 
-                        causeSpec.prams 
+                        map
                             |> ResultMap.procKeyedString "resultsName"
                                                          (id >> Result.Ok)
     
@@ -40,7 +41,7 @@ module CauseSorterShc =
                       (causeSpec:causeSpec) = 
         match genus with
         | [] -> "No CauseSorterShc genus" |> Error
-        | ["sorterShcSpecRndGen"] -> sorterShcSpecRndGen causeSpec |> Ok
+        | [nameof sorterShcSpecRndGen] -> sorterShcSpecRndGen causeSpec |> Ok
         | a::b -> sprintf "CauseSpec: %s not handled" a |> Error
 
      

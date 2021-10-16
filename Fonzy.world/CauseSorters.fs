@@ -6,23 +6,24 @@ module CauseSorters =
     let rndGen (causeSpec:causeSpec) =
         let causer = fun (e:enviro) ->
             result {
+                let! map = causeSpec.prams |> StringMapDto.fromDto
                 let! sorterSetId = 
-                        causeSpec.prams 
+                        map
                         |> ResultMap.procKeyedGuid "sorterSetId" 
                                                    (SorterSetId.create)
                 let! sorterGen = 
-                        causeSpec.prams 
+                        map 
                         |> ResultMap.procKeyedString "sorterRndGen" 
                                                       (SorterRndGenDto.fromJson)
                 let! sorterCount = 
-                        causeSpec.prams 
+                        map 
                         |> ResultMap.procKeyedInt "sorterCount" 
                                                   (fun d -> SorterCount.create "" d)
-                let! rngGen = causeSpec.prams 
+                let! rngGen = map
                               |> ResultMap.procKeyedString "rndGen" 
                                                            (RngGenDto.fromJson)
                 let! outName = 
-                        ResultMap.read "rndSorterSetName" causeSpec.prams
+                        ResultMap.read "rndSorterSetName" map
 
                 let randy = Rando.fromRngGen rngGen
 
@@ -49,28 +50,29 @@ module CauseSorters =
     let evalToSorterPerfBins (causeSpec:causeSpec) =
         let causer = fun (e:enviro) ->
           result {
+                let! map = causeSpec.prams |> StringMapDto.fromDto
                 let! sorterSetName = 
-                        causeSpec.prams 
+                        map 
                             |> ResultMap.procKeyedString "sorterSetName"
                                                          (id >> Result.Ok)
                 let! switchUsePlan = 
-                        causeSpec.prams 
+                        map 
                         |> ResultMap.procKeyedString "switchUsePlan" 
                                                       (Json.deserialize<Sorting.switchUsePlan>)
                 let! sortableSetType = 
-                        causeSpec.prams 
+                        map 
                         |> ResultMap.procKeyedString "sortableSetType" 
                                                       (SortableSetTypeDto.fromJson)
                 let! sorterSaving = 
-                        causeSpec.prams 
+                        map
                         |> ResultMap.procKeyedString "sorterSaving" 
                                                       (SorterSavingDto.fromJson)
                 let! useParallel = 
-                        causeSpec.prams 
+                        map 
                         |> ResultMap.lookupKeyedBool "useParallel"
 
                 let! resultsName = 
-                        causeSpec.prams 
+                        map
                         |> ResultMap.procKeyedString "resultsName"
                                                       (id >> Result.Ok)
 
@@ -118,37 +120,38 @@ module CauseSorters =
     let rndGenToPerfBins (causeSpec:causeSpec) =
         let causer = fun (e:enviro) ->
             result {
+                let! map = causeSpec.prams |> StringMapDto.fromDto
 
                 let! sorterRndGen = 
-                        causeSpec.prams 
+                        map 
                             |> ResultMap.procKeyedString "sorterRndGen" 
                                                          (SorterRndGenDto.fromJson)
                 let! sorterCount = 
-                        causeSpec.prams 
+                        map 
                             |> ResultMap.procKeyedInt "sorterCount" 
                                                        (fun d -> SorterCount.create "" d)
                 let! rngGen = 
-                        causeSpec.prams 
+                        map 
                             |> ResultMap.procKeyedString "rndGen" 
                                                           (RngGenDto.fromJson)
                 let! switchUsePlan = 
-                        causeSpec.prams 
+                        map 
                             |> ResultMap.procKeyedString "switchUsePlan" 
                                                          (Json.deserialize<Sorting.switchUsePlan>)
                 let! sortableSetType = 
-                        causeSpec.prams 
+                        map
                             |> ResultMap.procKeyedString "sortableSetType" 
                                                           (SortableSetTypeDto.fromJson)
                 let! sorterSaving = 
-                        causeSpec.prams 
+                        map 
                         |> ResultMap.procKeyedString "sorterSaving" 
                                                       (SorterSavingDto.fromJson)
                 let! useParallel = 
-                        causeSpec.prams 
+                        map
                             |> ResultMap.lookupKeyedBool "useParallel"
     
                 let! resultsName = 
-                        causeSpec.prams 
+                        map 
                             |> ResultMap.procKeyedString "resultsName"
                                                          (id >> Result.Ok)
     

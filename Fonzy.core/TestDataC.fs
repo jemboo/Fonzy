@@ -260,7 +260,7 @@ module TestData =
                    |> Seq.toArray
         let pfxSc = SwitchCount.fromInt wPfx.Length
         let mutRate = MutationRate.fromFloat 1.0
-        let mutSpec = (pfxSc, mutRate) |> sorterMutationType.ByStage
+        let mutSpec = (pfxSc, mutRate) |> sorterMutType.ByStage
                         |> sorterMutSpec.Constant
         let srtbleSetType = sortableSetType.AllForDegree 
                                 (sortableSetRep.Integer degree)

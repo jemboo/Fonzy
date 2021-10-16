@@ -1,5 +1,5 @@
 ﻿namespace global
-
+open Microsoft.FSharpLu.Json
 
 type shcStageWeightSpecDto = {cat:string; value:string}
 module ShcStageWeightSpecDto =
@@ -36,7 +36,7 @@ module SorterMutSpecDto =
         match dto.cat with
         | nameof sorterMutSpec.Constant ->
                 result {
-                    let! smt = dto.value |> SorterMutationTypeDto.fromJson
+                    let! smt = dto.value |> SorterMutTypeDto.fromJson
                     return sorterMutSpec.Constant smt
                 }
         | t -> sprintf "cat: %s for sorterMutSpecDto not found"
@@ -52,7 +52,7 @@ module SorterMutSpecDto =
         match ssD with
         | sorterMutSpec.Constant smt -> 
                 { sorterMutSpecDto.cat = nameof sorterMutSpec.Constant; 
-                  value = smt |> SorterMutationTypeDto.toJson }
+                  value = smt |> SorterMutTypeDto.toJson }
 
     let toJson (idt:sorterMutSpec) =
         idt |> toDto |> Json.serialize
@@ -397,14 +397,21 @@ module SorterShcSpecRndGenDto =
 
 
 
-type sorterShcResultDto = {sorterShc:sorterShcSpecDto; cat:string; rept:string}
+type sorterShcResultDto = {
+    sorterShc:sorterShcSpecDto; 
+    msg:string; 
+    archives:sorterShcArchDto[]
+    }
 module SorterShcResultDto =
     let fromDto (dto:sorterShcResultDto) =
         result {
             let! spec = dto.sorterShc |> SorterShcSpecDto.fromDto
+            let! arch = dto.archives |> Array.map(SorterShcArchDto.fromDto)
+                                    |> Array.toList
+                                    |> Result.sequence
             return {sorterShcResult.spec = spec;
-                    sorterShcResult.cat = dto.cat;
-                    sorterShcResult.report = dto.rept}
+                    sorterShcResult.msg = dto.msg;
+                    sorterShcResult.archives = arch |> List.toArray}
         }
 
     let fromJson (jstr:string) =
@@ -415,8 +422,8 @@ module SorterShcResultDto =
 
     let toDto (ssR:sorterShcResult) =
         { sorterShcResultDto.sorterShc = ssR.spec |> SorterShcSpecDto.toDto;
-          cat=ssR.cat;
-          rept = ssR.report}
+          msg=ssR.msg;
+          archives = ssR.archives |> Array.map(SorterShcArchDto.toDto)}
 
     let toJson (ssR:sorterShcResult) =
         ssR |> toDto |> Json.serialize

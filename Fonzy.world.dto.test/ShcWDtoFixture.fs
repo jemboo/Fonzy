@@ -13,8 +13,8 @@ type ShcWDtoFixture () =
         let sShcResult = 
             {
                 sorterShcResult.spec = TestData.SrtrShcSpec.sscSpec;
-                sorterShcResult.cat = "cat"
-                sorterShcResult.report = "report"
+                sorterShcResult.msg = "OK"
+                sorterShcResult.archives = [||]
             }
         let dto = sShcResult |> SorterShcResultDto.toDto
         let sShcResultBack = dto |> SorterShcResultDto.fromDto
@@ -29,14 +29,14 @@ type ShcWDtoFixture () =
         let sShcResult = 
             {
                 sorterShcResult.spec = TestData.SrtrShcSpec.sscSpec;
-                sorterShcResult.cat = "cat"
-                sorterShcResult.report = "report"
+                sorterShcResult.msg = "OK"
+                sorterShcResult.archives = [||]
             }
         let sShcResult2 = 
             {
                 sorterShcResult.spec = TestData.SrtrShcSpec.sscSpec;
-                sorterShcResult.cat = "cat2"
-                sorterShcResult.report = "report2"
+                sorterShcResult.msg = "OK"
+                sorterShcResult.archives = [||]
             }
 
         let ssRs = { sorterShcResults.members = [|sShcResult; sShcResult2|] }

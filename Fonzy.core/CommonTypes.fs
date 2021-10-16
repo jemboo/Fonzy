@@ -38,6 +38,7 @@ module MutationRate =
 
 
 // Common
+type ArrayLength = private ArrayLength of int
 type EntityId = private EntityId of Guid
 type JsonString = private JsonString of string
 type FileDir = private FileDir of string
@@ -49,6 +50,17 @@ type ReportingFrequency = private ReportingFrequency of int
 type String50 = private String50 of string
 type UseEagerProc = private UseEagerProc of bool
 type UseParallel = private UseParallel of bool
+
+module ArrayLength =
+    let value (ArrayLength len) = len
+    let create fieldName (len:int) =
+        ConstrainedType.createInt fieldName ArrayLength 0 100000000 len
+    let fromInt v = create "" v |> Result.ExtractOrThrow
+    let fromKey (m:Map<'a, obj>) (key:'a) =
+        result {
+            let! gv = ResultMap.read key m
+            return! create "" (gv:?>int)
+        }
 
 module EntityId =
     let value (EntityId v) = v

@@ -30,8 +30,6 @@ module RunBatch =
         runBatchSeq SorterPbCauseSpecGen.makeRunBatchSeq 
                     outputDir seed firstDex
 
-
-
     let runShcSets
                     (outputDir:FileDir) 
                     (seed:RandomSeed) 
@@ -59,12 +57,13 @@ module RunBatch =
                 let! ds = reportDataSource.GetDataSource(g)
                 let! worldDto = ds |> DataStoreItem.getWorldDto
                 let! worldMerge = worldDto |> WorldDto.fromDto
+                let! map = worldMerge.cause.causeSpec.prams |> StringMapDto.fromDto
                 let! sorterPerfBinsDto =  
                         Enviro.getDto<sorterPerfBinDto[]> 
                                         worldMerge.enviro
                                         binResultsName
                 let! sorterRndGen = 
-                        worldMerge.cause.causeSpec.prams 
+                        map 
                         |> ResultMap.procKeyedString "sorterRndGen" 
                                                      (SorterRndGenDto.fromJson)
 
@@ -141,16 +140,23 @@ module RunBatch =
             return sShcRes.members
         }
 
+     //let unPackShcRes (shcr:sorterShcResult) =
+     //   result {
+     //       let spec = shcr.spec
+     //       let! res = shcr.report |> Json.deserialize<string[]>
+     //       let! archs = res |> Array.map(SorterShcArchDto.fromJson)
+     //                        |> Array.toList
+     //                        |> Result.sequence
+     //       return (shcr.spec, archs)
+     //   }
      let unPackShcRes (shcr:sorterShcResult) =
-        result {
-            let spec = shcr.spec
-            let! res = shcr.report |> Json.deserialize<string[]>
-            let! archs = res |> Array.map(SorterShcArchDto.fromJson)
-                             |> Array.toList
-                             |> Result.sequence
-            return (shcr.spec, archs)
-        }
-  
+       result {
+           return (shcr.spec, shcr.archives)
+       }
+
+
+
+
      let singleShcReport (outputDir:FileDir) 
                          (reportDir:FileDir) =
 
@@ -165,7 +171,7 @@ module RunBatch =
                         |> Result.ExtractOrThrow
 
           let goodOnes = members 
-                         |> Array.filter(fun r -> r.cat = "arch")
+                         |> Array.filter(fun r -> r.msg = "OK")
                          |> Array.map(unPackShcRes)
                          |> Array.toList
                          |> Result.sequence

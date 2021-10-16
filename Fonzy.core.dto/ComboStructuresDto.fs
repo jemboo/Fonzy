@@ -18,6 +18,9 @@ module PermutationDto =
             return! Permutation.createR degree dto.values
         }
 
+    let toJson (perm:permutation) = 
+        perm |> toDto |> Json.serialize
+
 
 type twoCyclePermDto =  {degree:int; values:int[] }
 module TwoCyclePermDto =
@@ -36,3 +39,6 @@ module TwoCyclePermDto =
             let! degree = Degree.create "" dto.degree
             return! TwoCyclePerm.create degree dto.values
         }
+
+    let toJson (perm:twoCyclePerm) = 
+        perm |> toDto |> Json.serialize

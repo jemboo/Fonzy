@@ -23,7 +23,7 @@ module SorterSet =
 
 
 type sorterSetGen =
-    | Mutate of sorterMutationType * sorter * RngGen * SorterCount
+    | Mutate of sorterMutType * sorter * RngGen * SorterCount
     | Rnd of sorterRndGen * RngGen * SorterCount
     | Repo of SorterSetId
 

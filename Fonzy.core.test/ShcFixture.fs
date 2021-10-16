@@ -27,10 +27,10 @@ type ShcFixture () =
     let pfxCt = (SwitchCount.fromInt (swPfx.Length))
     let mutRate = (MutationRate.fromFloat 0.02)
     let mutSpec = sorterMutSpec.Constant 
-                            (sorterMutationType.ByStage (pfxCt, mutRate))
+                            (sorterMutType.ByStage (pfxCt, mutRate))
 
     let mutSpec2 = sorterMutSpec.Constant 
-                            (sorterMutationType.ByStage (pfxCt, mutRate))
+                            (sorterMutType.ByStage (pfxCt, mutRate))
 
 
     let sstAllIntSets = sortableSetType.AllForDegree 

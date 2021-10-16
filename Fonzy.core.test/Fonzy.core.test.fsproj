@@ -15,6 +15,7 @@
     <Compile Include="RandomTypesFixture.fs" />
     <Compile Include="CombinatoricsFixture.fs" />
     <Compile Include="ComboStructuresFixture.fs" />
+    <Compile Include="ArrayStorageFixture.fs" />
     <Compile Include="TreeFixture.fs" />
     <Compile Include="AnnealerFixture.fs" />
     <Compile Include="SwitchFixture.fs" />

@@ -8,7 +8,7 @@ module SorterSetGenDto =
         if dto.cat = nameof sorterSetGen.Mutate then
             result {
                 let! aa = Json.deserialize<string[]> dto.value
-                let! smt = aa.[0] |> SorterMutationTypeDto.fromJson
+                let! smt = aa.[0] |> SorterMutTypeDto.fromJson
                 let! srtr = aa.[1] |> SorterDto.fromJson
                 let! rng = aa.[2] |> RngGenDto.fromJson
                 let! scv = aa.[3] |> Json.deserialize<int>
@@ -45,7 +45,7 @@ module SorterSetGenDto =
     let toDto (ssg:sorterSetGen) =
         match ssg with
         | sorterSetGen.Mutate (smt, srtr, rng, sc) ->
-            let cereal = [| smt |> SorterMutationTypeDto.toJson;
+            let cereal = [| smt |> SorterMutTypeDto.toJson;
                             srtr |> SorterDto.toJson;
                             rng |> RngGenDto.toJson;
                             sc |> SorterCount.value |> string|]

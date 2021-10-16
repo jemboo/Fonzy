@@ -8,19 +8,14 @@ module CauseRandGen =
     let intArray (causeSpec:causeSpec) = 
         let causer = fun (e:enviro) ->
             result {
-                let! count = 
-                    causeSpec.prams 
-                        |> ResultMap.lookupKeyedInt "count"
-                let! rngGen = 
-                    causeSpec.prams 
-                        |> ResultMap.procKeyedString "rngGen" 
-                                                          (RngGenDto.fromJson)
-                let! intDistType = 
-                    causeSpec.prams 
-                        |> ResultMap.procKeyedString "intDistType" 
+                let! map = causeSpec.prams |> StringMapDto.fromDto; 
+                let! count = map |> ResultMap.lookupKeyedInt "count"
+                let! rngGen = map |> ResultMap.procKeyedString "rngGen" 
+                                              (RngGenDto.fromJson)
+                let! intDistType = map |> ResultMap.procKeyedString "intDistType" 
                                                       (IntDistTypeDto.fromJson)
 
-                let! outName = ResultMap.read "outName" causeSpec.prams
+                let! outName = ResultMap.read "outName" map
 
                 let intDist = IntDist.makeRandom intDistType 
                                                  (rngGen |> Rando.fromRngGen) 
@@ -38,18 +33,12 @@ module CauseRandGen =
     let lattice2dArray (causeSpec:causeSpec) = 
         let causer = fun (e:enviro) ->
             result {
-                let count = 
-                    causeSpec.prams.["count"] 
-                        |> int
-                let! rngGen = 
-                    causeSpec.prams.["rngGen"] 
-                        |> RngGenDto.fromJson
-                let! l2dDistType = 
-                    causeSpec.prams.["lattice2dDistType"] 
-                        |> Int2dDistTypeDto.fromJson
+                let! map = causeSpec.prams |> StringMapDto.fromDto; 
+                let count = map.["count"] |> int
+                let! rngGen = map.["rngGen"] |> RngGenDto.fromJson
+                let! l2dDistType = map.["lattice2dDistType"] |> Int2dDistTypeDto.fromJson
 
-                let outName = 
-                    causeSpec.prams.["outName"]
+                let outName = map.["outName"]
                 let l2dDist = Int2dDist.makeRandom 
                                 l2dDistType 
                                 (rngGen |> Rando.fromRngGen) 

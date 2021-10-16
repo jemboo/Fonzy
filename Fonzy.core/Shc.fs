@@ -33,7 +33,7 @@ type shcStageWeightSpec =
 
 
 type sorterMutSpec =
-    | Constant of sorterMutationType
+    | Constant of sorterMutType
 
 
 type sorterEvalSpec =
@@ -505,8 +505,8 @@ module sHCset =
 type sorterShcResult =
     {
         spec:sorterShcSpec;
-        cat:string
-        report: string
+        msg:string
+        archives: sorterShcArch[]
     }
 
 type sorterShcResults =

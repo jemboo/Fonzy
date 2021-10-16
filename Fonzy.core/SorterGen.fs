@@ -65,7 +65,7 @@ module SorterGen =
         lret |> List.rev
 
 
-type sorterMutationType =
+type sorterMutType =
         | BySwitch of SwitchCount*MutationRate
         | ByStage of SwitchCount*MutationRate
         | ByStageRfl of SwitchCount*MutationRate
@@ -143,7 +143,7 @@ module SorterMutate =
 
 
     let mutate 
-        (mutate:sorterMutationType) 
+        (mutate:sorterMutType) 
         (rnd:IRando)
         (sorter:sorter) =
         match mutate with

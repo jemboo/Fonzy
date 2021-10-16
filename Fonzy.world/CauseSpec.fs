@@ -2,7 +2,7 @@
 open System
 
 
-type causeSpec = {id:CauseSpecId; genus:string list; prams:Map<string,string>;}
+type causeSpec = {id:CauseSpecId; genus:string list; prams:stringMapDto;}
 
 
 module CauseSpec = 
@@ -12,7 +12,7 @@ module CauseSpec =
 
     let noOpCauseSpecId = Guid.Parse "00000000-0000-0000-0000-000000000000"
     let noOpCauseSpec = { causeSpec.id = CauseSpecId.fromGuid noOpCauseSpecId; 
-                          genus=["NoOp"]; prams=Map.empty;}
+                          genus=["NoOp"]; prams={stringMapDto.vals = [||]};}
 
 
 module CauseSpecRandGen = 
@@ -24,11 +24,14 @@ module CauseSpecRandGen =
                        rndGen:> obj; outName:> obj; } 
                         |> GuidUtils.guidFromObjs
         let prams = [
-                     ("count", (string count)); 
-                     ("rngGen", rndGen |> RngGenDto.toJson);
-                     ("intDistType", idt |> IntDistTypeDto.toJson);
-                     ("outName", outName)
-                     ] |> Map.ofList
+                         ("count", (string count)); 
+                         ("rngGen", rndGen |> RngGenDto.toJson);
+                         ("intDistType", idt |> IntDistTypeDto.toJson);
+                         ("outName", outName)
+                     ] 
+                     |> Map.ofList
+                     |> StringMapDto.toDto
+
         {causeSpec.id = CauseSpecId.fromGuid id; genus=["RandGen"; "IntArray"]; prams=prams; }
 
     let int2dArray (idt:int2dDistType) (count:int) 
@@ -38,11 +41,13 @@ module CauseSpecRandGen =
                        rndGen:> obj; outName:> obj; } 
                         |> GuidUtils.guidFromObjs
         let prams = [
-                     ("count", (string count)); 
-                     ("rngGen", rndGen |> RngGenDto.toJson);
-                     ("lattice2dDistType", idt |> Int2dDistTypeDto.toJson);
-                     ("outName", outName)
-                     ] |> Map.ofList
+                         ("count", (string count)); 
+                         ("rngGen", rndGen |> RngGenDto.toJson);
+                         ("lattice2dDistType", idt |> Int2dDistTypeDto.toJson);
+                         ("outName", outName)
+                    ] 
+                     |> Map.ofList
+                     |> StringMapDto.toDto
         {causeSpec.id = CauseSpecId.fromGuid id; genus=["RandGen"; "Int2dArray"]; prams=prams;}
 
     let uniformInts (minVal:int) (maxVal:int) 
@@ -85,12 +90,14 @@ module CauseSpecSorters =
                        sorterSetName:> obj; } 
                         |> GuidUtils.guidFromObjs
         let prams = [
-                     (CauseSpec.tupOp sorterSetId (SorterSetId.value >> string));
-                     (CauseSpec.tupOp sorterGen SorterRndGenDto.toJson);
-                     (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
-                     (CauseSpec.tupOp rndGen RngGenDto.toJson);
-                     sorterSetName
-                     ] |> Map.ofList
+                         (CauseSpec.tupOp sorterSetId (SorterSetId.value >> string));
+                         (CauseSpec.tupOp sorterGen SorterRndGenDto.toJson);
+                         (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
+                         (CauseSpec.tupOp rndGen RngGenDto.toJson);
+                         sorterSetName
+                    ] 
+                     |> Map.ofList
+                     |> StringMapDto.toDto
         {
             causeSpec.id = CauseSpecId.fromGuid id; 
             genus=["Sorters"; "rndGen"]; 
@@ -115,14 +122,16 @@ module CauseSpecSorters =
                        resultsName:> obj; } 
                         |> GuidUtils.guidFromObjs
         let prams = [
-                     (CauseSpec.tupOp degree (Degree.value >> string));
-                     sorterSetName;
-                     (CauseSpec.tupOp switchUsePlan Json.serialize);
-                     (CauseSpec.tupOp sortableSet SortableSetTypeDto.toJson);
-                     (CauseSpec.tupOp sorterSaving SorterSavingDto.toJson);
-                     (CauseSpec.tupOp useParallel Json.serialize);
-                     resultsName
-                     ] |> Map.ofList
+                         (CauseSpec.tupOp degree (Degree.value >> string));
+                         sorterSetName;
+                         (CauseSpec.tupOp switchUsePlan Json.serialize);
+                         (CauseSpec.tupOp sortableSet SortableSetTypeDto.toJson);
+                         (CauseSpec.tupOp sorterSaving SorterSavingDto.toJson);
+                         (CauseSpec.tupOp useParallel Json.serialize);
+                         resultsName
+                    ] 
+                    |> Map.ofList
+                    |> StringMapDto.toDto
         {
             causeSpec.id = CauseSpecId.fromGuid id; 
             genus=["Sorters"; "evalToSorterPerfBins"]; 
@@ -150,15 +159,17 @@ module CauseSpecSorters =
                        resultsName:> obj; } 
                         |> GuidUtils.guidFromObjs
         let prams = [
-                     (CauseSpec.tupOp sorterGen SorterRndGenDto.toJson);
-                     (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
-                     (CauseSpec.tupOp rndGen RngGenDto.toJson);
-                     (CauseSpec.tupOp switchUsePlan Json.serialize);
-                     (CauseSpec.tupOp sortableSet SortableSetTypeDto.toJson);
-                     (CauseSpec.tupOp sorterSaving SorterSavingDto.toJson);
-                     (CauseSpec.tupOp useParallel Json.serialize);
-                     resultsName
-                     ] |> Map.ofList
+                         (CauseSpec.tupOp sorterGen SorterRndGenDto.toJson);
+                         (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
+                         (CauseSpec.tupOp rndGen RngGenDto.toJson);
+                         (CauseSpec.tupOp switchUsePlan Json.serialize);
+                         (CauseSpec.tupOp sortableSet SortableSetTypeDto.toJson);
+                         (CauseSpec.tupOp sorterSaving SorterSavingDto.toJson);
+                         (CauseSpec.tupOp useParallel Json.serialize);
+                         resultsName
+                     ] 
+                     |> Map.ofList
+                     |> StringMapDto.toDto
         {
             causeSpec.id = CauseSpecId.fromGuid id; 
             genus=["Sorters"; "genToSorterPerfBins"]; 
@@ -187,15 +198,17 @@ module CauseSpecSorters =
                        resultsName:> obj; } 
                         |> GuidUtils.guidFromObjs
         let prams = [
-                     (CauseSpec.tupOp sorterRndGen SorterRndGenDto.toJson);
-                     (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
-                     (CauseSpec.tupOp rndGen RngGenDto.toJson);
-                     (CauseSpec.tupOp switchUsePlan Json.serialize);
-                     (CauseSpec.tupOp sortableSet SortableSetTypeDto.toJson);
-                     (CauseSpec.tupOp sorterSaving SorterSavingDto.toJson);
-                     (CauseSpec.tupOp useParallel Json.serialize);
-                     resultsName
-                     ] |> Map.ofList
+                         (CauseSpec.tupOp sorterRndGen SorterRndGenDto.toJson);
+                         (CauseSpec.tupOp sorterCount (SorterCount.value >> string));
+                         (CauseSpec.tupOp rndGen RngGenDto.toJson);
+                         (CauseSpec.tupOp switchUsePlan Json.serialize);
+                         (CauseSpec.tupOp sortableSet SortableSetTypeDto.toJson);
+                         (CauseSpec.tupOp sorterSaving SorterSavingDto.toJson);
+                         (CauseSpec.tupOp useParallel Json.serialize);
+                         resultsName
+                     ] 
+                     |> Map.ofList
+                     |> StringMapDto.toDto
         {
             causeSpec.id = CauseSpecId.fromGuid id; 
             genus=["Sorters"; "rndGenToPerfBins"]; 
@@ -221,7 +234,9 @@ module CauseSpecSorterShc =
                         (CauseSpec.tupOp sorterShcSpecRndGen SorterShcSpecRndGenDto.toJson);
                         (CauseSpec.tupOp useParallel Json.serialize);
                         resultsName
-                    ] |> Map.ofList
+                    ] 
+                    |> Map.ofList
+                    |> StringMapDto.toDto
         {
             causeSpec.id = CauseSpecId.fromGuid id; 
             genus=["SorterShc"; "sorterShcSpecRndGen"]; 

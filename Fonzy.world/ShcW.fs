@@ -376,6 +376,7 @@ module sHCset =
         {shcs with members = mms}
 
 
+
     let getResults (shcs:sHCset<sorterShcSpec, sorterShc, sorterShcArch>) = 
         let memberIds = shcs.members |> Map.toArray |> Array.map(fst)
         let _rpt id = 
@@ -383,13 +384,12 @@ module sHCset =
             let aR = shcs.members.[id]
             let rpt = 
                 match aR with
-                | Ok m -> ("arch", m.archive |> List.map(SorterShcArchDto.toJson)
-                                    |> Json.serialize)
-                | Error m -> ("error", m)
+                | Ok m -> ("OK", m.archive |> List.toArray)
+                | Error m -> ("error", [||])
             {
                 sorterShcResult.spec = spec;
-                sorterShcResult.cat = (fst rpt)
-                sorterShcResult.report = (snd rpt)
+                sorterShcResult.msg = (fst rpt)
+                sorterShcResult.archives = (snd rpt)
             }
 
         {sorterShcResults.members =  memberIds |> Array.map(_rpt) }

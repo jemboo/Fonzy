@@ -356,13 +356,13 @@ module CollectionUtils =
 module SizeOpt =
 
     let toSparseFormat (dfVal:'T) (aa:'T[] when 'T:equality)  =
-        seq { for i=1 to (aa.Length - 1) do
+        seq { for i=0 to (aa.Length - 1) do
                 if aa.[i] <> dfVal then yield (i, aa.[i])  }
 
 
-    let fromSparseFormat (aa:seq<(int*'T)> when 'T:equality) 
-                         (dfVal:'T) (arraySz:int) =
-        let aB = Array.create arraySz dfVal
+    let fromSparseFormat (dfVal:'T) (arrayLen:int) 
+                         (aa:seq<(int*'T)> when 'T:equality) =
+        let aB = Array.create arrayLen dfVal
         aa |> Seq.iter(fun tup -> aB.[fst tup] <- snd tup )
         aB
 
@@ -397,7 +397,7 @@ module SizeOpt =
     // returns an array of (index, value pairs) that express the 
     // differences between the first and second arrays sndA must be
     // at least as long as fstA
-    let getDiffs (fstA:'T[] when 'T:equality)
+    let toDiffFormat (fstA:'T[] when 'T:equality)
                  (sndA:'T[] when 'T:equality) =
         seq {
             for dex = 0 to (fstA.Length - 1) do
@@ -405,8 +405,8 @@ module SizeOpt =
                     yield (dex, sndA.[dex])
         }
 
-    let restoreFromDiffs (fstA:'T[] when 'T:equality)
-                         (diffs: (int*'T)[]) =
+    let fromDiffFormat (fstA:'T[] when 'T:equality)
+                       (diffs: (int*'T)[]) =
         let retA = fstA |> Array.copy
         diffs |> Array.iter(fun tup -> retA.[fst tup] <- snd tup )
         retA

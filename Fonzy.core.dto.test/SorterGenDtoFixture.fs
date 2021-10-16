@@ -10,9 +10,9 @@ type SorterGenDtoFixture () =
     member this.SorterMutationTypeDto() =
         let switchCount = SwitchCount.fromInt 22
         let mutRate = MutationRate.fromFloat 0.55
-        let smt = sorterMutationType.ByStage (switchCount, mutRate)
-        let smtDto = SorterMutationTypeDto.toDto smt
-        let smtBack = SorterMutationTypeDto.fromDto smtDto
+        let smt = sorterMutType.ByStage (switchCount, mutRate)
+        let smtDto = SorterMutTypeDto.toDto smt
+        let smtBack = SorterMutTypeDto.fromDto smtDto
                       |> Result.ExtractOrThrow
         Assert.AreEqual(smt, smtBack);
 
