@@ -199,20 +199,6 @@ type UtilsFixture () =
 
 
 // ReportUtils
-
-    [<TestMethod>]
-    member this.ReportUtils_lbBVal() =
-        let tstTups = [|(1, "a_2"); (6, "a_6"); (10, "a_10");|]
-
-        let res0 = ReportUtils.lbBVal tstTups 0 "d"
-        let res1 = ReportUtils.lbBVal tstTups 1 "d"
-        let res3 = ReportUtils.lbBVal tstTups 3 "d"
-        let res7 = ReportUtils.lbBVal tstTups 7 "d"
-        let res10 = ReportUtils.lbBVal tstTups 10 "d"
-        let res20 = ReportUtils.lbBVal tstTups 20 "d"
-
-        Assert.AreEqual(1, 1)
-
         
     [<TestMethod>]
     member this.ReportUtils_padSeries() =

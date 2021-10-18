@@ -594,21 +594,6 @@ module FuncUtils =
 
 module ReportUtils = 
 
-    let rec lbBVal<'T> (seri:(int*'T)[]) (target:int) (defVal:'T) =
-
-        let rec _lbBVal (seri:(int*'T)[]) (target:int) (curDex:int) =
-            if (seri.Length - 1) < curDex then  
-                (target, seri.[seri.Length - 1] |> snd)
-            else
-                let curVal = seri.[curDex] |> fst
-                if curVal > target then (target, seri.[curDex - 1] |> snd)
-                else if curVal = target then (target, seri.[curDex] |> snd)
-                else _lbBVal seri target (curDex + 1)
-        
-        if seri.Length = 0 then (target, defVal)
-        else if (seri.[0] |> fst) > target then (target, defVal)
-        else   _lbBVal seri target 0
-
     // given a set of labeled time series: seq { startingA; startingB; startingC; startingD; }
     // with missing time markers:
     // let startingA = ("a", [|(1, "a_1"); (8, "a_8");|])
@@ -629,66 +614,19 @@ module ReportUtils =
                          (dData:'D->string)
                          (hRep:'H->string) =
 
-        let dRep (aa:'D[]) = 
-            aa |> Array.map(fun d -> (dDex d, dData d))
+        let rec _interpoVal (seri:(int*'T)[]) (target:int) (defVal:'T) =
 
-        let ldaMap = hdTups |> Seq.map(fun tup -> (tup |> fst |> hRep, tup |> snd |> dRep))
-                            |> Map.ofSeq
-
-        let allDexes = ldaMap.Values 
-                        |> Seq.map(Array.map(fst))
-                        |> Seq.concat
-                        |> CollectionUtils.sortedUnique
-                        |> Seq.toArray
-
-        let maxDex = allDexes |> Array.max
-
-        let repD = ldaMap.Keys 
-                   |> Seq.map(fun k -> (k, Array.create (maxDex + 1) (-1, "")))
-                   |> Map.ofSeq
-
-        let procDex dex =
-            ldaMap.Keys |> Seq.iter(fun k -> 
-                            let rptV = lbBVal ldaMap.[k] dex ""
-                            repD.[k].[dex] <- rptV)
+            let rec _lbBVal (seri:(int*'T)[]) (target:int) (curDex:int) =
+                if (seri.Length - 1) < curDex then  
+                    (target, seri.[seri.Length - 1] |> snd)
+                else
+                    let curVal = seri.[curDex] |> fst
+                    if curVal > target then (target, seri.[curDex - 1] |> snd)
+                    else if curVal = target then (target, seri.[curDex] |> snd)
+                    else _lbBVal seri target (curDex + 1)
             
-        [|0 .. maxDex|] |> Array.iter(procDex)
-        repD
-
-
-
-
-module ReportUtils2 = 
-
-    // given a set of labeled time series: seq { startingA; startingB; startingC; startingD; }
-    // with missing time markers:
-    // let startingA = ("a", [|(1, "a_1"); (8, "a_8");|])
-    // let startingB = ("b", [|(0, "b_0"); (7, "b_7");|])
-    // let startingC = ("c", [|(0, "c_0"); (3, "c_3"); (5, "c_5");|])
-    // let startingD = ("d", [|(0, "d_0");|])
-    //
-    // .. this function will fill in the gaps, to produce a dictionary of padded series:
-    //let expectedA = ("a", [|(0, ""); (1, "a_1"); (2, "a_1"); (3, "a_1"); (4, "a_1"); (5, "a_1"); (6, "a_1"); (7, "a_1"); (8, "a_8");|])
-    //let expectedB = ("b", [|(0, "b_0"); (1, "b_0"); (2, "b_0"); (3, "b_0"); (4, "b_0"); (5, "b_0"); (6, "b_0"); (7, "b_7"); (8, "b_7");|])
-    //let expectedC = ("c", [|(0, "c_0"); (1, "c_0"); (2, "c_0"); (3, "c_3"); (4, "c_3"); (5, "c_5"); (6, "c_5"); (7, "c_5"); (8, "c_5");|])
-    //let expectedD = ("d", [|(0, "d_0"); (1, "d_0"); (2, "d_0"); (3, "d_0"); (4, "d_0"); (5, "d_0"); (6, "d_0"); (7, "d_0"); (8, "d_0");|])
-
-    // The output series data will just be a tuple containing the outputs of dDex and dData, the starting data can be different.
-
-    let padSeries<'H,'D> (hdTups: seq<'H*'D[]>) 
-                         (dDex:'D->int)
-                         (dData:'D->string)
-                         (hRep:'H->string) =
-        
-        let rec _interpoVal (seri:(int*'T)[]) (target:int) (curDex:int) =
-            if (seri.Length - 1) < curDex then  
-                (target, seri.[seri.Length - 1] |> snd)
-            else
-                let curVal = seri.[curDex] |> fst
-                if curVal > target then (target, seri.[curDex - 1] |> snd)
-                else if curVal = target then (target, seri.[curDex] |> snd)
-                else _interpoVal seri target (curDex + 1)
-
+            if (seri.[0] |> fst) > target then (target, defVal)
+            else   _lbBVal seri target 0
 
         let ldaMap = hdTups 
                      |> Seq.map(fun tup -> 
@@ -708,7 +646,7 @@ module ReportUtils2 =
 
         let procDex dex =
             ldaMap.Keys |> Seq.iter(fun k -> 
-                            let rptV = _interpoVal ldaMap.[k] dex 0
+                            let rptV = _interpoVal ldaMap.[k] dex ""
                             resMap.[k].[dex] <- rptV)
             
         [|0 .. maxDex|] |> Array.iter(procDex)
