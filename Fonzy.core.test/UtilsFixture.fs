@@ -213,19 +213,28 @@ type UtilsFixture () =
 
         Assert.AreEqual(1, 1)
 
-
+        
     [<TestMethod>]
     member this.ReportUtils_padSeries() =
 
-        let hdTup = seq { ("a", [|(1, "a_2"); (10, "a_10");|]); 
-                          ("b", [|(1, "b_1"); (10, "b_6");|]); 
-                          ("c", [|(0, "c_0"); (4, "c_4");|]); 
-                          ("d", [|(0, "d_0");|]) }
+        let startingA = ("a", [|(1, "a_1"); (8, "a_8");|])
+        let startingB = ("b", [|(0, "b_0"); (7, "b_7");|])
+        let startingC = ("c", [|(0, "c_0"); (3, "c_3"); (5, "c_5");|])
+        let startingD = ("d", [|(0, "d_0");|])
+        
+        let expectedA = ("a", [|(0, ""); (1, "a_1"); (2, "a_1"); (3, "a_1"); (4, "a_1"); (5, "a_1"); (6, "a_1"); (7, "a_1"); (8, "a_8");|])
+        let expectedB = ("b", [|(0, "b_0"); (1, "b_0"); (2, "b_0"); (3, "b_0"); (4, "b_0"); (5, "b_0"); (6, "b_0"); (7, "b_7"); (8, "b_7");|])
+        let expectedC = ("c", [|(0, "c_0"); (1, "c_0"); (2, "c_0"); (3, "c_3"); (4, "c_3"); (5, "c_5"); (6, "c_5"); (7, "c_5"); (8, "c_5");|])
+        let expectedD = ("d", [|(0, "d_0"); (1, "d_0"); (2, "d_0"); (3, "d_0"); (4, "d_0"); (5, "d_0"); (6, "d_0"); (7, "d_0"); (8, "d_0");|])
+
+        let hdTup = seq { startingA; startingB; startingC; startingD; }
+        let hdExpected = [ expectedA; expectedB; expectedC; expectedD; ]
+                         |> List.sortBy(fst)
 
         let dDexer = fun d -> fst d
         let dData = fun d -> snd d
         let hRep = id
         let res = ReportUtils.padSeries hdTup dDexer dData hRep
-
-        Assert.AreEqual(1, 1)
+        let hdResult = res.Keys |> Seq.sort |> Seq.map(fun k -> (k, res.[k])) |> Seq.toList
+        Assert.AreEqual(hdExpected, hdResult)
 
