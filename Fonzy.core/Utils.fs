@@ -660,21 +660,6 @@ module ReportUtils =
 
 module ReportUtils2 = 
 
-    let rec lbBVal<'T> (seri:(int*'T)[]) (target:int) (defVal:'T) =
-
-        let rec _lbBVal (seri:(int*'T)[]) (target:int) (curDex:int) =
-            if (seri.Length - 1) < curDex then  
-                (target, seri.[seri.Length - 1] |> snd)
-            else
-                let curVal = seri.[curDex] |> fst
-                if curVal > target then (target, seri.[curDex - 1] |> snd)
-                else if curVal = target then (target, seri.[curDex] |> snd)
-                else _lbBVal seri target (curDex + 1)
-        
-        if seri.Length = 0 then (target, defVal)
-        else if (seri.[0] |> fst) > target then (target, defVal)
-        else   _lbBVal seri target 0
-
     // given a set of labeled time series: seq { startingA; startingB; startingC; startingD; }
     // with missing time markers:
     // let startingA = ("a", [|(1, "a_1"); (8, "a_8");|])
@@ -694,29 +679,37 @@ module ReportUtils2 =
                          (dDex:'D->int)
                          (dData:'D->string)
                          (hRep:'H->string) =
+        
+        let rec _interpoVal (seri:(int*'T)[]) (target:int) (curDex:int) =
+            if (seri.Length - 1) < curDex then  
+                (target, seri.[seri.Length - 1] |> snd)
+            else
+                let curVal = seri.[curDex] |> fst
+                if curVal > target then (target, seri.[curDex - 1] |> snd)
+                else if curVal = target then (target, seri.[curDex] |> snd)
+                else _interpoVal seri target (curDex + 1)
 
-        let dRep (aa:'D[]) = 
-            aa |> Array.map(fun d -> (dDex d, dData d))
 
-        let ldaMap = hdTups |> Seq.map(fun tup -> (tup |> fst |> hRep, tup |> snd |> dRep))
-                            |> Map.ofSeq
+        let ldaMap = hdTups 
+                     |> Seq.map(fun tup -> 
+                        ( tup |> fst |> hRep, 
+                          tup |> snd |> Array.map(fun d -> (dDex d, dData d)))
+                        )
+                     |> Map.ofSeq
 
-        let allDexes = ldaMap.Values 
+        let maxDex = ldaMap.Values 
                         |> Seq.map(Array.map(fst))
                         |> Seq.concat
-                        |> CollectionUtils.sortedUnique
-                        |> Seq.toArray
+                        |> Seq.max
 
-        let maxDex = allDexes |> Array.max
-
-        let repD = ldaMap.Keys 
+        let resMap = ldaMap.Keys 
                    |> Seq.map(fun k -> (k, Array.create (maxDex + 1) (-1, "")))
                    |> Map.ofSeq
 
         let procDex dex =
             ldaMap.Keys |> Seq.iter(fun k -> 
-                            let rptV = lbBVal ldaMap.[k] dex ""
-                            repD.[k].[dex] <- rptV)
+                            let rptV = _interpoVal ldaMap.[k] dex 0
+                            resMap.[k].[dex] <- rptV)
             
         [|0 .. maxDex|] |> Array.iter(procDex)
-        repD
+        resMap
