@@ -329,7 +329,7 @@ module CollectionUtils =
             |> Seq.concat
 
 
-    let sortedUnique (items:int seq) =
+    let sortedUnique<'T when 'T:equality and 'T:comparison> (items:'T seq) =
         items |> Seq.distinct |> Seq.sort
 
     // get a seq of key-value pairs for easy iteration with for (k,v) in d do...
@@ -351,6 +351,7 @@ module CollectionUtils =
 
     let histoTotalCount<'a> (bins:('a*int)[]) = 
         bins |> Array.sumBy(snd)
+
 
 
 module SizeOpt =
@@ -524,6 +525,7 @@ module ResultMap =
         }
 
 
+
 module StringUtils =
 
     let printIntArray (d:int[]) =
@@ -569,6 +571,7 @@ module StringUtils =
         | None -> None
 
 
+
 module FuncUtils = 
     let memoization f =
         // The dictionary is used to store values for every parameter that has been seen
@@ -587,3 +590,53 @@ module FuncUtils =
                 cache.Add (c, value)
                 value
 
+
+
+module ReportUtils = 
+
+    let rec lbBVal<'T> (seri:(int*'T)[]) (target:int) (defVal:'T) =
+
+        let rec _lbBVal (seri:(int*'T)[]) (target:int) (curDex:int) =
+            if (seri.Length - 1) < curDex then  
+                seri.[seri.Length - 1] |> snd
+            else
+                let curVal = seri.[curDex] |> fst
+                if curVal > target then seri.[curDex - 1] |> snd
+                else if curVal = target then seri.[curDex] |> snd
+                else _lbBVal seri target (curDex + 1)
+        
+        if seri.Length = 0 then defVal
+        else if (seri.[0] |> fst) > target then defVal
+        else   _lbBVal seri target 0
+
+
+    let padSeries<'H,'D> (hdTups: seq<'H*'D[]>) 
+                         (dDex:'D->int)
+                         (dData:'D->string)
+                         (hRep:'H->string) =
+
+        let dRep (aa:'D[]) = 
+            aa |> Array.map(fun d -> (dDex d, dData d))
+
+        let ldaMap = hdTups |> Seq.map(fun tup -> (tup |> fst |> hRep, tup |> snd |> dRep))
+                            |> Map.ofSeq
+
+        let allDexes = ldaMap.Values 
+                        |> Seq.map(Array.map(fst))
+                        |> Seq.concat
+                        |> CollectionUtils.sortedUnique
+                        |> Seq.toArray
+
+        let maxDex = allDexes |> Array.max
+
+        let repD = ldaMap.Keys 
+                   |> Seq.map(fun k -> (k, Array.create (maxDex + 1) ""))
+                   |> Map.ofSeq
+
+        let procDex dex =
+            ldaMap.Keys |> Seq.iter(fun k -> 
+                            let rptV = lbBVal ldaMap.[k] dex ""
+                            repD.[k].[dex] <- rptV)
+            
+        [|0 .. maxDex|] |> Array.iter(procDex)
+        repD

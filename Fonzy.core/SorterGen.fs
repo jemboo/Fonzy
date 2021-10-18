@@ -70,6 +70,14 @@ type sorterMutType =
         | ByStage of SwitchCount*MutationRate
         | ByStageRfl of SwitchCount*MutationRate
 
+module SorterMutType =
+    let colHdr (smt:sorterMutType) =
+        match smt with
+        | BySwitch (wc, mr) -> sprintf "w_%f" (MutationRate.value mr)
+        | ByStage (wc, mr) -> sprintf "t_%f" (MutationRate.value mr)
+        | ByStageRfl (wc, mr) -> sprintf "r_%f" (MutationRate.value mr)
+
+
 
 module SorterMutate =
 

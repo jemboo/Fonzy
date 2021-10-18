@@ -6,27 +6,29 @@ open BenchmarkDotNet.Running
 [<EntryPoint>]
 let main argv =
 
-    ///// ******* runPerfBinBatchSeq ***********
-    Console.WriteLine("Starting RunBatch.runShcSets")
+    ///// ******* RunBatch.runShcSets ***********
+    //Console.WriteLine("Starting RunBatch.runShcSets")
 
-    RunBatch.runShcSets (FileDir.fromString "C:\\SimOutTst") 
-                                (RandomSeed.fromNow ())
-                                0
-                                 |> ignore
+    //RunBatch.runShcSets (FileDir.fromString "C:\\SimOutTst") 
+    //                            (RandomSeed.fromNow ())
+    //                            0
+    //                             |> ignore
 
-    Console.WriteLine(sprintf "Time: %s " 
+    //Console.WriteLine(sprintf "Finished: %s " 
+    //                             (System.DateTime.Now.ToLongTimeString()))
+    //Console.Read() |> ignore
+    //0
+
+/// ******* ShcReport ***********
+    Console.WriteLine("Starting ShcReport")
+    let res2 =  ShcReports.singleShcReport 
+                        (FileDir.fromString "C:\\SimOutTst") 
+                        (FileDir.fromString "C:\\SimOutReportsT")
+    Console.WriteLine(res2)
+    Console.WriteLine(sprintf "Finished: %s " 
                                  (System.DateTime.Now.ToLongTimeString()))
     Console.Read() |> ignore
     0
-
-/// ******* ShcReport ***********
-    //Console.WriteLine("Starting ShcReport")
-    //let res2 =  ShcReports.singleShcReport 
-    //                    (FileDir.fromString "C:\\SimOutTst") 
-    //                    (FileDir.fromString "C:\\SimOutReportsT")
-    //Console.WriteLine(res2)
-    //Console.Read() |> ignore
-    //0
 
 
 

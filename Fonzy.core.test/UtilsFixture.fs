@@ -46,8 +46,6 @@ type UtilsFixture () =
             Assert.AreEqual(srcUla.[i], destUla.[i])
 
 
-    
-
 
 
     // GuidUtils
@@ -197,3 +195,37 @@ type UtilsFixture () =
         let res = SizeOpt.fromTransitionFormat kvps dv maxV
                   |> Array.toList
         Assert.AreEqual(expected, res)
+
+
+
+// ReportUtils
+
+    [<TestMethod>]
+    member this.ReportUtils_lbBVal() =
+        let tstTups = [|(1, "a_2"); (6, "a_6"); (10, "a_10");|]
+
+        let res0 = ReportUtils.lbBVal tstTups 0 "d"
+        let res1 = ReportUtils.lbBVal tstTups 1 "d"
+        let res3 = ReportUtils.lbBVal tstTups 3 "d"
+        let res7 = ReportUtils.lbBVal tstTups 7 "d"
+        let res10 = ReportUtils.lbBVal tstTups 10 "d"
+        let res20 = ReportUtils.lbBVal tstTups 20 "d"
+
+        Assert.AreEqual(1, 1)
+
+
+    [<TestMethod>]
+    member this.ReportUtils_padSeries() =
+
+        let hdTup = seq { ("a", [|(1, "a_2"); (10, "a_10");|]); 
+                          ("b", [|(1, "b_1"); (10, "b_6");|]); 
+                          ("c", [|(0, "c_0"); (4, "c_4");|]); 
+                          ("d", [|(0, "d_0");|]) }
+
+        let dDexer = fun d -> fst d
+        let dData = fun d -> snd d
+        let hRep = id
+        let res = ReportUtils.padSeries hdTup dDexer dData hRep
+
+        Assert.AreEqual(1, 1)
+

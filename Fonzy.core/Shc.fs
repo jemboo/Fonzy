@@ -7,6 +7,7 @@ module ShcId =
     let create id = Ok (ShcId id)
     let fromGuid (id:Guid) = create id |> Result.ExtractOrThrow
 
+
 type ShcCount = private ShcCount of int
 module ShcCount =
     let value (ShcCount v) = v
@@ -34,6 +35,12 @@ type shcStageWeightSpec =
 
 type sorterMutSpec =
     | Constant of sorterMutType
+
+
+module SorterMutSpec =
+    let colHdr (ms:sorterMutSpec) =
+        match ms with
+        | Constant smt -> smt |> SorterMutType.colHdr 
 
 
 type sorterEvalSpec =
@@ -110,6 +117,7 @@ module SorterShcArch =
             toFull shc
             else
             toPartial shc
+
 
 module ShcStageWeightSpec =
     let constantWeight wgt =
@@ -252,7 +260,6 @@ module SorterShcSpec =
                             |> Ok
 
 
-
     let makeTerminator (spec:shcTermSpec) =
         match spec with
         | FixedLength x -> fun (shc:sorterShc) -> 
@@ -263,6 +270,10 @@ module SorterShcSpec =
              (Energy.value (shc.energy |> Option.get)) < (Energy.value e))
             ||
             (StepNumber.value shc.step) > (StepNumber.value x)
+
+    
+    let mutReport (s:sorterShcSpec) =
+        "mutReport"
 
 
 type sssrgType = 
@@ -476,6 +487,7 @@ module SHC =
     let runBatch (shcs:sHC<'T,'A>[]) =
         let ree = shcs |> Array.Parallel.map(run)
         ree
+
 
 
 module sHCset = 

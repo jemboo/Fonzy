@@ -183,6 +183,7 @@ type sorterShcArchDto =
      switchUses:switchUsesDto option;
      perf:sorterPerfDto;
      energy:float; }
+
 module SorterShcArchDto =
     let fromDto (dto:sorterShcArchDto) =
         result {

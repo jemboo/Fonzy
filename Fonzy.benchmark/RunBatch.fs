@@ -176,7 +176,25 @@ module RunBatch =
                          |> Array.toList
                          |> Result.sequence
                          |> Result.ExtractOrThrow
-          None
+
+          
+
+          let header = "The detailed description part\nHere is more stuff you might be interested in\nId Gen pfx len win degree switch stage count"
+          let rep = [|"yab"|]
+          let fileName = sprintf "%s.txt"  (System.DateTime.Now.Ticks |> string)
+          let csvFile = { csvFile.header = header; 
+                          csvFile.directory = reportDir;
+                          csvFile.fileName = fileName;
+                          csvFile.records = rep }
+
+          let res = CsvFile.writeCsvFile csvFile
+          let msg = match res with
+                    | Ok _ -> "success"
+                    | Error m -> m
+
+          sprintf "%s: %s\\%s" msg (FileDir.value outputDir) fileName
+
+
           //let perfBinsInfo = repNs |> List.map(perfBinsFromGuid)
           //                         |> Result.sequence
           //                         |> Result.ExtractOrThrow

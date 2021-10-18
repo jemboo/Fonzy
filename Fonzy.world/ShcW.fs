@@ -119,6 +119,7 @@ module SorterShcSpec =
             "bad updater" |> Error
 
 
+
 module SorterShcSpecRndGen =
 
     let swapAnnealers  rndG 
@@ -233,26 +234,6 @@ module SorterShcSpecRndGen =
 
 
 
-type sHC<'T,'A> = 
-    {
-       id:ShcId;
-       current: 'T;
-       archive: 'A list;
-       mutator: 'T -> Result<'T, string>
-       evaluator: 'T -> Result<'T, string>
-       annealer: 'T -> 'T -> Result<'T, string>
-       updater: 'A list -> 'T -> Result<'A list, string>
-       terminator: 'T -> bool
-    }
-
-    
-type sHCset<'S,'T,'A> =  
-    {
-        specs:Map<ShcId,'S>;
-        members:Map<ShcId, Result<sHC<'T,'A>, string>>;
-    }
-    
-
 module SHC =
 
     let fromSorterShcSpec (spec:sorterShcSpec) =
@@ -282,61 +263,6 @@ module SHC =
             }
         }
 
-
-    let newGen  (mutator:'A -> Result<'A, string>)
-                (evaluator:'A -> Result<'A, string>) 
-                (curGen:'A) =
-        result {
-            let! aMut = curGen |> mutator
-            return! aMut |> evaluator
-        }
-
-    let update (shc:sHC<'T,'A>) =
-        if shc.archive.Length = 0 then
-            result {
-                let! updated = shc.current |> shc.evaluator
-                let! aNext = shc.annealer shc.current updated
-                let! aLst = aNext |> shc.updater shc.archive
-                return
-                    {
-                        sHC.id = shc.id;
-                        sHC.current = aNext;
-                        sHC.archive = aLst;
-                        sHC.mutator = shc.mutator;
-                        sHC.updater = shc.updater;
-                        sHC.evaluator = shc.evaluator;
-                        sHC.annealer = shc.annealer;
-                        sHC.terminator = shc.terminator;
-                    }
-            }
-        else
-            result {
-                let! updated = shc.current |> newGen shc.mutator shc.evaluator
-                let! aNext = shc.annealer shc.current updated
-                let! aLst = aNext |> shc.updater shc.archive
-                return
-                    {
-                        sHC.id = shc.id;
-                        sHC.current = aNext;
-                        sHC.archive = aLst;
-                        sHC.mutator = shc.mutator;
-                        sHC.updater = shc.updater;
-                        sHC.evaluator = shc.evaluator;
-                        sHC.annealer = shc.annealer;
-                        sHC.terminator = shc.terminator;
-                    }
-            }
-
-    let run (shc:sHC<'T,'A>) =
-        let goOn (s) = 
-            not (s.terminator s.current)
-        result {
-            let mutable shcCur = shc
-            while (goOn shcCur) do
-                let! shcNew = shcCur |> update
-                shcCur <- shcNew
-            return shcCur
-        }
 
 
 module sHCset = 

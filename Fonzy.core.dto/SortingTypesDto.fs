@@ -36,11 +36,12 @@ module SwitchOrStageCountDto =
         }
 
 
-type switchUsesDto = {switchCount:int; weights:int[]}
+type switchUsesDto = {switchCount:int; weights:sparseIntArrayDto}
 module SwitchUsesDto =
     let fromDto (dto:switchUsesDto) =
         result {
-            return SwitchUses.init dto.weights
+            let! yab = dto.weights |> SparseIntArrayDto.fromDto
+            return SwitchUses.init (yab |> SparseArray.fromSparse)
         }
 
     let fromJson (cereal:string) =
@@ -50,8 +51,32 @@ module SwitchUsesDto =
         }
 
     let toDto (switchUses:switchUses) =
+        let yab = SwitchUses.getWeights switchUses 
+                  |> SparseArray.toSparse 0
+                  |> SparseIntArrayDto.toDto
         {switchUsesDto.switchCount= (SwitchUses.switchCount switchUses); 
-         weights = (SwitchUses.getWeights switchUses)}
+         weights = yab}
 
     let toJson (switchUses:switchUses) =
         switchUses |> toDto |> Json.serialize
+
+
+//type switchUsesDto = {switchCount:int; weights:int[]}
+//module SwitchUsesDto =
+//    let fromDto (dto:switchUsesDto) =
+//        result {
+//            return SwitchUses.init dto.weights
+//        }
+
+//    let fromJson (cereal:string) =
+//        result {
+//            let! sorterDto = cereal |> Json.deserialize<switchUsesDto>
+//            return! fromDto sorterDto
+//        }
+
+//    let toDto (switchUses:switchUses) =
+//        {switchUsesDto.switchCount= (SwitchUses.switchCount switchUses); 
+//         weights = (SwitchUses.getWeights switchUses)}
+
+//    let toJson (switchUses:switchUses) =
+//        switchUses |> toDto |> Json.serialize
