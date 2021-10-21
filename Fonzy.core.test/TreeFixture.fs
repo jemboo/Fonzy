@@ -110,16 +110,16 @@ type TreeFixture () =
         let hist = CollectionUtils.histogram (id) rese
                    |> Map.toSeq |> Seq.sortBy(fun tup -> -(snd tup)) |> Seq.toArray
 
-        let rep = StringUtils.printIntArray (hist |> Array.map(snd))
+       //let rep = StringUtils.printSeqToRow (hist |> Seq.map(snd))
 
         let tcps = rese |> Array.map(Combinatorics.fixedCount)
                         |> CollectionUtils.histogram (id)
         let fxTup = tcps |> Map.toArray
-        let fxRep = fxTup |> StringUtils.printLinesOfArrayf 
-                             (fun tup -> (sprintf "%d\t%d" (fst tup) (snd tup)))
+        //let fxRep = fxTup |> StringUtils.printSeqfToColumn 
+        //                     (fun tup -> (sprintf "%d\t%d" (fst tup) (snd tup)))
 
-        Console.WriteLine fxRep
-        Console.WriteLine rep
+        //Console.WriteLine fxRep
+       // Console.WriteLine rep
         Assert.AreEqual(1, 1)
 
 

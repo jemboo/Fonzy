@@ -527,48 +527,27 @@ module ResultMap =
 
 
 module StringUtils =
-
-    let printIntArray (d:int[]) =
+    
+    let printSeqfWithDelim<'a> (delimiter:string) f (d:seq<'a>) =
         let sb = new System.Text.StringBuilder()
-        d |> Seq.map(fun i -> sb.Append(sprintf "%d%s" i Environment.NewLine))
+        sb.Append(sprintf "%A" (f (d |> Seq.head))) |> ignore
+        d |> Seq.skip(1)
+          |> Seq.map(fun q -> sb.Append(sprintf "%s%A" delimiter q))
           |> Seq.toArray
           |> ignore
         sb.ToString()
 
-    let printArray (d:'a[]) (delimiter:string) =
-        let sb = new System.Text.StringBuilder()
-        d |> Seq.map(fun i -> sb.Append(sprintf "%A%s" i delimiter))
-          |> Seq.toArray
-          |> ignore
-        sb.ToString()
+    let printSeqfToColumn<'a> f (d:seq<'a>) =
+        printSeqfWithDelim Environment.NewLine f d
 
-    let printLinesOfArray (d:'a[]) =
-        printArray d Environment.NewLine
+    let printSeqfToRow<'a> f (d:seq<'a>) =
+        printSeqfWithDelim "\t" f d
 
-    let printArrayAsTabDelimited (d:'a[]) =
-        printArray d "\t"
+    let printSeqToColumn (d:seq<'a>) =
+        printSeqfWithDelim Environment.NewLine id d
 
-    let printArrayf f (d:'a[]) (delimiter:string) =
-        let sb = new System.Text.StringBuilder()
-        d |> Seq.map(fun i -> sb.Append(sprintf "%A%s" (f i) delimiter))
-          |> Seq.toArray
-          |> ignore
-        sb.ToString()
-
-    let printLinesOfArrayf f (d:'a[]) =
-        printArrayf f d Environment.NewLine
-
-    let printTupes (d:seq<string*'A>) =
-       let sb = new System.Text.StringBuilder()
-       d |> Seq.map(fun i -> sb.Append(sprintf "%s=%A, " (fst i) (snd i)))
-         |> Seq.toArray
-         |> ignore
-       sb.ToString()
-       
-    let optDto (v:'a option) (f:'a->'b) =
-        match v with
-        | Some av -> Some (f av)
-        | None -> None
+    let printSeqToRow (d:seq<'a>) =
+        printSeqfWithDelim<'a> "\t" id d
 
 
 
@@ -609,14 +588,14 @@ module ReportUtils =
 
     // The output series data will just be a tuple containing the outputs of dDex and dData, the starting data can be different.
 
-    let padSeries<'H,'D> (hdTups: seq<'H*'D[]>) 
+    let padSeries<'H,'D,'Q> (hdTups: seq<'H*'D[]>) 
                          (dDex:'D->int)
-                         (dData:'D->string)
+                         (dData:'D->'Q option)
                          (hRep:'H->string) =
 
-        let rec _interpoVal (seri:(int*'T)[]) (target:int) (defVal:'T) =
+        let rec _interpoVal (seri:(int*'T option)[]) (target:int) =
 
-            let rec _lbBVal (seri:(int*'T)[]) (target:int) (curDex:int) =
+            let rec _lbBVal (seri:(int*'T option)[]) (target:int) (curDex:int) =
                 if (seri.Length - 1) < curDex then  
                     (target, seri.[seri.Length - 1] |> snd)
                 else
@@ -625,7 +604,7 @@ module ReportUtils =
                     else if curVal = target then (target, seri.[curDex] |> snd)
                     else _lbBVal seri target (curDex + 1)
             
-            if (seri.[0] |> fst) > target then (target, defVal)
+            if (seri.[0] |> fst) > target then (target, None)
             else   _lbBVal seri target 0
 
         let ldaMap = hdTups 
@@ -641,13 +620,44 @@ module ReportUtils =
                         |> Seq.max
 
         let resMap = ldaMap.Keys 
-                   |> Seq.map(fun k -> (k, Array.create (maxDex + 1) (-1, "")))
+                   |> Seq.map(fun k -> 
+                        (k, 
+                         Array.create<int*('Q option)> (maxDex + 1) (-1, None)))
                    |> Map.ofSeq
 
         let procDex dex =
             ldaMap.Keys |> Seq.iter(fun k -> 
-                            let rptV = _interpoVal ldaMap.[k] dex ""
+                            let rptV = _interpoVal ldaMap.[k] dex
                             resMap.[k].[dex] <- rptV)
             
         [|0 .. maxDex|] |> Array.iter(procDex)
         resMap
+
+
+    let formatPaddedSeries (fmt:'Q->string)  
+                           (ps:Map<string, (int*'Q option)[]>) =
+        let qV (oQ:'Q option) = 
+            match oQ with
+            | Some lq -> fmt lq
+            | None -> ""
+        
+        let expV (k:string) (v:(int*'Q option)[]) =
+             v |> Seq.map(fun vv-> ((k, fst vv), vv |> snd |> qV))
+      
+            
+        let kks = ps.Keys |> Seq.toArray
+        let tupMap = kks |> Seq.map(fun k -> expV k ps.[k])
+                         |> Seq.concat |> Map.ofSeq
+        
+        let allDex = tupMap.Keys |> Seq.map(snd) 
+                                 |> Seq.distinct
+                                 |> Seq.toArray
+                                 |> Array.sort
+
+        let hdr = kks |> StringUtils.printSeqToRow
+        let dataRow dex =
+            kks |> Seq.map(fun k-> tupMap.[(k, dex)])
+                |> StringUtils.printSeqToRow
+        allDex |> Seq.map(dataRow)
+               |> Seq.append (seq { hdr })
+               |> StringUtils.printSeqToColumn

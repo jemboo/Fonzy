@@ -202,6 +202,13 @@ type UtilsFixture () =
         
     [<TestMethod>]
     member this.ReportUtils_padSeries() =
+        let deOpt (yab:string*(int*string option)[]) =
+            let ddOpt (k:int*string option) = 
+                match (snd k) with
+                | Some s -> (fst k, s)
+                | None -> (fst k, "")
+
+            (fst yab, (snd yab) |> Array.map(ddOpt))
 
         let startingA = ("a", [|(1, "a_1"); (8, "a_8");|])
         let startingB = ("b", [|(0, "b_0"); (7, "b_7");|])
@@ -217,10 +224,14 @@ type UtilsFixture () =
         let hdExpected = [ expectedA; expectedB; expectedC; expectedD; ]
                          |> List.sortBy(fst)
 
-        let dDexer = fun d -> fst d
-        let dData = fun d -> snd d
-        let hRep = id
-        let res = ReportUtils.padSeries hdTup dDexer dData hRep
+        let dDexer = fun d -> d |> fst
+        let dData = fun d -> (snd d) |> Some
+        let hRep = id 
+        let res = ReportUtils.padSeries<string, int*string, string> hdTup dDexer dData hRep
         let hdResult = res.Keys |> Seq.sort |> Seq.map(fun k -> (k, res.[k])) |> Seq.toList
-        Assert.AreEqual(hdExpected, hdResult)
+                       |> List.map(deOpt)
+
+        let res0 = res |> ReportUtils.formatPaddedSeries id
+        
+        Assert.AreEqual(hdExpected.Length, hdResult.Length)
 

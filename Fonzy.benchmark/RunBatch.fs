@@ -154,7 +154,18 @@ module RunBatch =
            return (shcr.spec, shcr.archives)
        }
 
+     let padSeries (haTups: seq<sorterShcSpec*sorterShcArch[]>) =
+         
+          let dexer (arch:sorterShcArch) =
+             arch.step |> StepNumber.value
 
+          let archRep (arch:sorterShcArch) = 
+              Some (arch :> obj) //.energy |> Energy.value |> string
+          
+          let specRep (spec:sorterShcSpec) = 
+            spec |> SorterShcSpec.mutReport
+
+          ReportUtils.padSeries haTups dexer archRep specRep
 
 
      let singleShcReport (outputDir:FileDir) 

@@ -55,12 +55,6 @@ module SorterShc =
                     }
           }
     
-    let isCurrentBest (shc:sorterShc) =
-        match shc.energy, shc.bestEnergy  with
-        | Some e, Some be -> Energy.value be > Energy.value e 
-                        // current energy is better than best (until now)
-        | None, Some _ -> true
-        | _, None -> failwith "sorterShc bestEnergy missing"
 
 
 module SorterShcSpec = 
@@ -72,52 +66,6 @@ module SorterShcSpec =
                         spec.shcStageWeightSpec
                         spec.srtblSetType
                   
-
-    let makeUpdater (saveDetails:shcSaveDetails) =
-        fun (arch:sorterShcArch list) 
-            (newT:sorterShc) ->
-            if arch.Length = 0 then
-                [newT |> SorterShcArch.toFull] |> Ok
-            else
-                let lastArch = arch |> List.head
-
-                let improvement = Energy.isBetterThan 
-                                            (newT.energy |> Option.get)
-                                            lastArch.energy
-
-                if newT.revision = lastArch.revision || not improvement then
-                    arch |> Ok 
-                else
-                    let curBest = newT |> SorterShc.isCurrentBest
-
-                    let threshB (thresh:Energy) =  
-                        Energy.isBetterThan 
-                                    (newT.energy |> Option.get)
-                                    thresh
-                    match saveDetails with
-                        | Always -> 
-                            (newT |> SorterShcArch.toFull) :: arch 
-                            |> Ok
-                        | IfBest ->  
-                            (newT |> SorterShcArch.toSorterShcArch curBest) :: arch 
-                            |> Ok
-                        | BetterThanLast ->  
-                            (newT |> SorterShcArch.toSorterShcArch improvement) :: arch 
-                            |> Ok
-                        | EnergyThresh e -> 
-                            let useNew = (threshB e) && improvement
-                            (newT |> SorterShcArch.toSorterShcArch useNew) :: arch 
-                            |> Ok
-                        | Never -> 
-                            (newT |> SorterShcArch.toPartial) :: arch 
-                            |> Ok
-
-
-    let makeBadUpdater (saveDetails:shcSaveDetails) =
-        fun (arch:sorterShcArch list) 
-            (newT:sorterShc) ->
-            "bad updater" |> Error
-
 
 
 module SorterShcSpecRndGen =

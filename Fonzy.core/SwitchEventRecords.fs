@@ -108,7 +108,7 @@ module SwitchUses =
 
 
    let reportResultStats stats =
-       StringUtils.printArrayf 
+       StringUtils.printSeqfToRow 
            (fun res ->
            match res with
            | Ok (s,a,b,c,d) -> sprintf "%f %d %d %d" 
@@ -120,7 +120,7 @@ module SwitchUses =
 
 
    let reportStats stats =
-       StringUtils.printArrayf 
+       StringUtils.printSeqfToRow 
            (fun (s,a,b,c,d) -> sprintf "%f %d %d %d" 
                                            a b 
                                            (SwitchCount.value c) 

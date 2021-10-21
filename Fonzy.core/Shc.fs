@@ -155,6 +155,7 @@ module SorterShc =
         | _, None -> failwith "sorterShc bestEnergy missing"
 
 
+
 module SorterShcSpec = 
 
     let makeId (s:sorterShcSpec) = 
@@ -271,9 +272,21 @@ module SorterShcSpec =
             ||
             (StepNumber.value shc.step) > (StepNumber.value x)
 
+
+    let makeBadUpdater (saveDetails:shcSaveDetails) =
+        fun (arch:sorterShcArch list) 
+            (newT:sorterShc) ->
+            "bad updater" |> Error
+
+
     
     let mutReport (s:sorterShcSpec) =
         "mutReport"
+
+
+
+
+
 
 
 type sssrgType = 
