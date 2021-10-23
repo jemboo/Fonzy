@@ -140,36 +140,70 @@ module RunBatch =
             return sShcRes.members
         }
 
-     //let unPackShcRes (shcr:sorterShcResult) =
-     //   result {
-     //       let spec = shcr.spec
-     //       let! res = shcr.report |> Json.deserialize<string[]>
-     //       let! archs = res |> Array.map(SorterShcArchDto.fromJson)
-     //                        |> Array.toList
-     //                        |> Result.sequence
-     //       return (shcr.spec, archs)
-     //   }
      let unPackShcRes (shcr:sorterShcResult) =
        result {
            return (shcr.spec, shcr.archives)
        }
 
-     let padSeries (haTups: seq<sorterShcSpec*sorterShcArch[]>) =
+
+
+     let seedSeries (haTups: seq<sorterShcSpec*sorterShcArch[]>) =
+    
+         let dexer (arch:sorterShcArch) =
+            arch.step |> StepNumber.value
+
+         let archRep (arch:sorterShcArch) = 
+             Some arch
+     
+         let specRep (spec:sorterShcSpec) = 
+           [spec |> SorterShcSpec.seedReport]
+
+         ReportUtils.padSeries haTups dexer specRep
+
+
+     let energySeries (haTups: seq<sorterShcSpec*sorterShcArch[]>) =
          
           let dexer (arch:sorterShcArch) =
              arch.step |> StepNumber.value
 
-          let archRep (arch:sorterShcArch) = 
-              Some (arch :> obj) //.energy |> Energy.value |> string
-          
           let specRep (spec:sorterShcSpec) = 
-            spec |> SorterShcSpec.mutReport
+            [spec |> SorterShcSpec.seedReport]
 
-          ReportUtils.padSeries haTups dexer archRep specRep
+          ReportUtils.padSeries haTups dexer specRep
 
 
-     let singleShcReport (outputDir:FileDir) 
-                         (reportDir:FileDir) =
+     let wSeries (haTups: seq<sorterShcSpec*sorterShcArch[]>) =
+    
+         let dexer (arch:sorterShcArch) =
+            arch.step |> StepNumber.value
+
+         let archRep (arch:sorterShcArch) = 
+             Some (sprintf "%d" (arch.perf.usedSwitchCount |> SwitchCount.value))
+     
+         let specRep (spec:sorterShcSpec) = 
+           [spec |> SorterShcSpec.seedReport]
+
+         ReportUtils.padSeries haTups dexer specRep
+
+
+     let tSeries (haTups: seq<sorterShcSpec*sorterShcArch[]>) =
+    
+        let dexer (arch:sorterShcArch) =
+           arch.step |> StepNumber.value
+
+        let archRep (arch:sorterShcArch) = 
+            Some (sprintf "%d" (arch.perf.usedStageCount |> StageCount.value))
+
+        let specRep (spec:sorterShcSpec) = 
+          [spec |> SorterShcSpec.seedReport]
+
+        ReportUtils.padSeries haTups dexer specRep
+
+
+
+
+     let singleShcFatTable (outputDir:FileDir) 
+                           (reportDir:FileDir) =
 
           let reportDataSource = new DirectoryDataSource(outputDir) 
                                       :> IDataSource
@@ -188,15 +222,32 @@ module RunBatch =
                          |> Result.sequence
                          |> Result.ExtractOrThrow
 
-          
+          let recordsE = goodOnes 
+                         |> energySeries 
+                         |> ReportUtils.paddedSeriesToFatTable 
+                            (fun arch -> (sprintf "%.5f" (arch.energy |> Energy.value)))
+          let recordsW = goodOnes 
+                         |> wSeries 
+                         |> ReportUtils.paddedSeriesToFatTable 
+                            (fun arch -> (sprintf "%d" (arch.perf.usedSwitchCount |> SwitchCount.value)))
+          let recordsT = goodOnes 
+                         |> tSeries 
+                         |> ReportUtils.paddedSeriesToFatTable 
+                            (fun arch -> (sprintf "%d" (arch.perf.usedStageCount |> StageCount.value)))
+
+
+          let records = recordsE 
+                        |> Array.append [|""|] 
+                        |> Array.append recordsW 
+                        |> Array.append [|""|] 
+                        |> Array.append recordsT
 
           let header = "The detailed description part\nHere is more stuff you might be interested in\nId Gen pfx len win degree switch stage count"
-          let rep = [|"yab"|]
           let fileName = sprintf "%s.txt"  (System.DateTime.Now.Ticks |> string)
           let csvFile = { csvFile.header = header; 
                           csvFile.directory = reportDir;
                           csvFile.fileName = fileName;
-                          csvFile.records = rep }
+                          csvFile.records = records }
 
           let res = CsvFile.writeCsvFile csvFile
           let msg = match res with
@@ -206,53 +257,51 @@ module RunBatch =
           sprintf "%s: %s\\%s" msg (FileDir.value outputDir) fileName
 
 
-          //let perfBinsInfo = repNs |> List.map(perfBinsFromGuid)
-          //                         |> Result.sequence
-          //                         |> Result.ExtractOrThrow
 
-          //let listofPerfBinArrays = perfBinsInfo 
-          //                            |> List.map(procPbInfo)
-          //                            |> Result.sequence
-          //                            |> Result.ExtractOrThrow
 
-          //let perfBinGroups = listofPerfBinArrays 
-          //                            |> List.reduce(fun a b -> Array.append a b)
-          //                            |> Array.groupBy(fst)
 
-          //let perfBinTotals = perfBinGroups 
-          //                            |> Array.map(fun k ->
-          //                                    (fst k, (snd k) |> Array.sumBy(snd)))
 
-          //let rep = perfBinTotals |> Array.map(formatPerfBinTotal)
-          //let header = "Id Gen pfx len win degree switch stage count"
-          //let fileName = sprintf "%s.txt"  (System.DateTime.Now.Ticks |> string)
-          //let csvFile = { csvFile.header = header; 
+
+
+     let singleShcPivotTable (outputDir:FileDir) 
+                             (reportDir:FileDir) =
+          let outFileName = sprintf "%s.txt"  (System.DateTime.Now.Ticks |> string)
+          let reportDataSource = new DirectoryDataSource(outputDir) 
+                                      :> IDataSource
+          let repId = reportDataSource.GetDataSourceIds()
+                      |> Result.ExtractOrThrow
+                      |> Array.toList
+                      |> List.head
+
+          let members = shcArchsFromGuid reportDataSource repId
+                        |> Result.ExtractOrThrow
+
+          let goodOnes = members 
+                         |> Array.filter(fun r -> r.msg = "OK")
+                         |> Array.map(unPackShcRes)
+                         |> Array.toList
+                         |> Result.sequence
+                         |> Result.ExtractOrThrow
+
+          //let records = goodOnes |> energySeries |> ReportUtils.paddedSeriesToPivotTable
+          //                                              (fun o -> seq { o |> string })
+          //                                              (seq {"Seed"; })
+
+          //let header = "The detailed description part\nHere is more stuff you might be interested in\nId Gen pfx len win degree switch stage count"
+
+          //let csvFile = { csvFile.header = ""; 
           //                csvFile.directory = reportDir;
-          //                csvFile.fileName = fileName;
-          //                csvFile.records = rep }
+          //                csvFile.fileName = outFileName;
+          //                csvFile.records = [|""|] }
 
-          //let res = CsvFile.writeCsvFile csvFile |> Result.ExtractOrThrow
-          //sprintf "%s\\%s" (FileDir.value outputDir) fileName
+          //let res = CsvFile.writeCsvFile csvFile
+          //let msg = match res with
+          //          | Ok _ -> "success"
+          //          | Error m -> m
 
+          //sprintf "%s: %s\\%s" msg (FileDir.value outputDir) outFileName
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+          ""
 
 
 

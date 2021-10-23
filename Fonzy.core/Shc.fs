@@ -279,11 +279,11 @@ module SorterShcSpec =
             "bad updater" |> Error
 
 
-    
     let mutReport (s:sorterShcSpec) =
-        "mutReport"
+        s.mutatorSpec |> SorterMutSpec.colHdr
 
-
+    let seedReport (s:sorterShcSpec) =
+        s.rngGen.seed |> RandomSeed.value |> string
 
 
 

@@ -21,7 +21,7 @@ let main argv =
 
 /// ******* ShcReport ***********
     Console.WriteLine("Starting ShcReport")
-    let res2 =  ShcReports.singleShcReport 
+    let res2 =  ShcReports.singleShcFatTable 
                         (FileDir.fromString "C:\\SimOutTst") 
                         (FileDir.fromString "C:\\SimOutReportsT")
     Console.WriteLine(res2)

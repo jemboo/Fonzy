@@ -30,10 +30,10 @@ module SorterShcCauseSpecGen =
     let makeRunBatchSeq (outputDir:FileDir) 
                         (seed:RandomSeed) =
         let degree = Degree.fromInt 16
-        let shcCt = ShcCount.fromInt 10
-        let steps = StepNumber.fromInt 100
+        let shcCt = ShcCount.fromInt 100
+        let steps = StepNumber.fromInt 2000
         let startingTemp = Temp.fromFloat 0.005
-        let stageW = StageWeight.fromFloat 2.0
+        let stageW = StageWeight.fromFloat 1.0
         let rng = RngGen.createLcg seed
         let iRando = rng |> Rando.fromRngGen
         let sRndGen = sorterRndGen.RandSymmetric
@@ -44,7 +44,7 @@ module SorterShcCauseSpecGen =
         let wPfx = [||] 
         let sorter = SorterRndGen.createRandom sRndGen iRando
         let pfxSc = SwitchCount.fromInt wPfx.Length
-        let mutRate = MutationRate.fromFloat 0.04
+        let mutRate = MutationRate.fromFloat 0.025
         let mutSpec = (pfxSc, mutRate) |> sorterMutType.ByStageRfl
                         |> sorterMutSpec.Constant
         let srtbleSetType = sortableSetType.AllForDegree 
