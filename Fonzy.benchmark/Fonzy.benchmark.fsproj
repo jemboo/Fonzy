@@ -10,8 +10,8 @@
     <Compile Include="VecBench.fs" />
     <Compile Include="RunBatch.fs" />
     <Compile Include="Md5Bench.fs" />
-    <Compile Include="SorterBenchmarks.fs" />
-    <Compile Include="SorterBenchmarks2.fs" />
+    <Compile Include="SorterBench.fs" />
+    <Compile Include="ShcBench.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

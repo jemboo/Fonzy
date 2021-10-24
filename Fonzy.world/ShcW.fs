@@ -71,13 +71,13 @@ module SorterShcSpec =
 module SorterShcSpecRndGen =
 
     let swapAnnealers  rndG 
-                       (shc:sorterShcSpec)
+                       (baseSpec:sorterShcSpec)
                        (count: ShcCount)
                        (endPt:annealerSpec) = 
         let annAc randy =
             result {
                return! 
-                   match shc.annealerSpec, endPt with
+                   match baseSpec.annealerSpec, endPt with
                    | annealerSpec.Constant c1, annealerSpec.Constant c2  -> 
                         Combinatorics.draw1D (Temp.value c1) (Temp.value c2) randy
                         |> Seq.map(fun t -> (Temp.fromFloat t) |> annealerSpec.Constant)
@@ -97,7 +97,7 @@ module SorterShcSpecRndGen =
             let! anns = annAc randy
             return anns 
                     |> Seq.map(fun an ->  
-                        { shc with 
+                        { baseSpec with 
                               rngGen = (randy |> Rando.toRngGen);
                               annealerSpec = an })
         }
@@ -186,7 +186,7 @@ module SHC =
 
     let fromSorterShcSpec (spec:sorterShcSpec) =
 
-        let sshcI = {
+        let sshcInitial = {
             sorterShc.step = StepNumber.fromInt 0;
             sorterShc.revision = RevNumber.fromInt 0;
             sorterShc.energy = None;
@@ -201,7 +201,7 @@ module SHC =
             let! evaluator = SorterShcSpec.makeEvaluator spec
             return  {
                id = SorterShcSpec.makeId spec;
-               current = sshcI;
+               current = sshcInitial;
                archive = [];
                mutator = SorterShcSpec.makeMutator spec.mutatorSpec;
                evaluator = evaluator;
@@ -214,25 +214,26 @@ module SHC =
 
 
 module sHCset = 
-    let make<'S,'T,'A> (idGen: 'S->ShcId)
-                       (maker: 'S->Result<sHC<'T,'A>, string>) 
-                       (specs: seq<'S>) =
-        let specA = specs |> Seq.toArray
-        let specMap = specA |> Array.map(fun s -> (idGen s, s))
-                            |> Map.ofSeq
-        let memberMap = specA |> Array.map(fun s -> (idGen s, maker s))
-                              |> Map.ofSeq
+    //let make<'S,'T,'A> (idGen: 'S->ShcId)
+    //                   (maker: 'S->Result<sHC<'T,'A>, string>) 
+    //                   (specs: seq<'S>) =
+    //    let specA = specs |> Seq.toArray
+    //    let specMap = specA |> Array.map(fun s -> (idGen s, s))
+    //                        |> Map.ofSeq
+    //    let memberMap = specA |> Array.map(fun s -> (idGen s, maker s))
+    //                          |> Map.ofSeq
 
-        {sHCset.specs= specMap; sHCset.members = memberMap}
+    //    {sHCset.specs= specMap; sHCset.members = memberMap}
 
     let makeSorterShcSet (specs: seq<sorterShcSpec>) =
-        make (SorterShcSpec.makeId) (SHC.fromSorterShcSpec) specs
+        sHCset.make (SorterShcSpec.makeId) (SHC.fromSorterShcSpec) specs
 
     let runBatch (useP:UseParallel) 
                  (shcs:sHCset<'S,'T,'A>) = 
         let _runn (id:ShcId) (shcr:Result<sHC<'T,'A>, string>) =
             match shcr with
-            | Ok shc -> (id, SHC.run shc)
+            | Ok shc -> Console.WriteLine(sprintf "%A" id)
+                        (id, SHC.run shc)
             | Error m -> (id, sprintf "error creating spec: %s" m |> Error)
             
 

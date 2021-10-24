@@ -226,9 +226,12 @@ type UtilsFixture () =
 
         let dDexer = fun d -> d |> fst
         let dData = fun d -> (snd d) |> Some
-        let hRep = fun d -> [d]
-        let res = ReportUtils.padSeries<string, int*string> hdTup dDexer hRep
-        //let hdResult = res.Keys |> Seq.sort |> Seq.map(fun k -> (k, res.[k])) |> Seq.toList
+        let specRep = fun d -> [d]
+        let res = ReportUtils.padSeries<string, int*string> hdTup dDexer specRep
+        let hdResult = res.Keys |> Seq.sort |> Seq.map(fun k -> res.[k]) |> Seq.toList
+
+
+       // let hdResult = res.Keys |> Seq.sort |> Seq.map(fun k -> (k, res.[k])) |> Seq.toList
         //               |> List.map(deOpt)
 
         //let res0 = res |> ReportUtils.paddedSeriesToFatTable id

@@ -278,14 +278,14 @@ module SorterShcSpec =
             (newT:sorterShc) ->
             "bad updater" |> Error
 
+    let sorterReport (s:sorterShcSpec) =
+        s.sorter |> Sorter.makeId |> SorterId.value |> string
 
     let mutReport (s:sorterShcSpec) =
         s.mutatorSpec |> SorterMutSpec.colHdr
 
     let seedReport (s:sorterShcSpec) =
         s.rngGen.seed |> RandomSeed.value |> string
-
-
 
 
 
@@ -297,6 +297,7 @@ type sssrgType =
     | StageWeight of shcStageWeightSpec
 
 
+
 type sorterShcSpecRndGen = 
     {
        baseSpec:sorterShcSpec;
@@ -304,7 +305,6 @@ type sorterShcSpecRndGen =
        rndGen:RngGen;
        count:ShcCount
     }
-
 
 module SorterShcSpecRndGen =
 
@@ -504,9 +504,9 @@ module SHC =
 
 
 module sHCset = 
-    let make<'S,'T,'A> (specs: seq<'S>)
-                       (idGen: 'S->ShcId)
-                       (maker: 'S->Result<sHC<'T,'A>, string>) =
+    let make<'S,'T,'A> (idGen: 'S->ShcId)
+                       (maker: 'S->Result<sHC<'T,'A>, string>) 
+                       (specs: seq<'S>)=
         let specMap = specs |> Seq.map(fun s -> (idGen s, s))
                             |> Map.ofSeq
         let memberMap = specs |> Seq.map(fun s -> (idGen s, maker s))

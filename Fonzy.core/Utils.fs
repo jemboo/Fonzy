@@ -546,7 +546,7 @@ module StringUtils =
     let printSeqToColumn (d:seq<'a>) =
         printSeqfWithDelim Environment.NewLine id d
 
-    let printSeqToRow (d:seq<'a>) =
+    let printSeqToRow (d:seq<string>) =
         printSeqfWithDelim<'a> "\t" id d
 
 
@@ -597,14 +597,14 @@ module ReportUtils =
 
             let rec _lbBVal (seri:(int*'D option)[]) (target:int) (curDex:int) =
                 if (seri.Length - 1) < curDex then  
-                    (target, seri.[seri.Length - 1] |> snd)
+                    seri.[seri.Length - 1] |> snd
                 else
                     let curVal = seri.[curDex] |> fst
-                    if curVal > target then (target, seri.[curDex - 1] |> snd)
-                    else if curVal = target then (target, seri.[curDex] |> snd)
+                    if curVal > target then seri.[curDex - 1] |> snd
+                    else if curVal = target then seri.[curDex] |> snd
                     else _lbBVal seri target (curDex + 1)
         
-            if (seri.[0] |> fst) > target then (target, None)
+            if (seri.[0] |> fst) > target then None
             else   _lbBVal seri target 0
 
         let ldaMap = hdTups 
@@ -625,7 +625,7 @@ module ReportUtils =
         let resMap = ldaMap.Keys 
                    |> Seq.map(fun k -> 
                         (k, 
-                         Array.create<int*('D option)> (maxDex + 1) (-1, None)))
+                         Array.create<'D option> (maxDex + 1) None))
                    |> Map.ofSeq
 
         let procDex dex =
@@ -637,77 +637,3 @@ module ReportUtils =
         resMap
 
 
-    let paddedSeriesToFatTable (fmt:'Q->string)  
-                               (ps:Map<string list, (int*'Q option)[]>) =
-        let qV (oQ:'Q option) = 
-            match oQ with
-            | Some lq -> fmt lq
-            | None -> ""
-        
-        let expV (k:string list) 
-                 (v:(int*'Q option)[]) =
-             v |> Seq.map(fun vv-> ((k, fst vv), vv |> snd |> qV))
-      
-            
-        let kks = ps.Keys |> Seq.toArray
-        let tupMap = kks |> Seq.map(fun k -> expV k ps.[k])
-                         |> Seq.concat |> Map.ofSeq
-        
-        let allDex = tupMap.Keys |> Seq.map(snd) 
-                                 |> Seq.distinct
-                                 |> Seq.toArray
-                                 |> Array.sort
-
-        let hdr = kks |> Array.append  [| ["gen"]|]
-                      |> List.concat
-                      |> StringUtils.printSeqToRow
-        let dataRow dex =
-              let filling = kks |> Seq.map(fun k-> tupMap.[(k, dex)])
-              seq { yield dex |> string; yield! filling }
-                    |> StringUtils.printSeqToRow
-              
-        allDex |> Seq.map(dataRow)
-               |> Seq.append (seq { hdr })
-               |> Seq.toArray
-
-
-
-    let paddedSeriesToPivotTable (attr:'Q -> string seq)  
-                                 (attrLbls: string seq)
-                                 (ps:Map<string list, (int*'Q option)[]>) =
-                                
-        let hdrs = (seq {"gen"; "Switches"; "Stages"; "Energy"}) 
-                   |> Seq.append attrLbls
-                   |> Seq.toArray
-
-
-        let qV (oQ:'Q option) = 
-            match oQ with
-            | Some lq -> attr lq
-            | None -> (seq {""})
-        
-
-        None
-
-        //let expV (k:string) (v:(int*'Q option)[]) =
-        //     v |> Seq.map(fun vv-> ((k, fst vv), vv |> snd |> qV))
-      
-            
-        //let kks = ps.Keys |> Seq.toArray
-        //let tupMap = kks |> Seq.map(fun k -> expV k ps.[k])
-        //                 |> Seq.concat |> Map.ofSeq
-        
-        //let allDex = tupMap.Keys |> Seq.map(snd) 
-        //                         |> Seq.distinct
-        //                         |> Seq.toArray
-        //                         |> Array.sort
-
-        //let hdr = kks |> Array.append  [|"gen"|]  |> StringUtils.printSeqToRow
-        //let dataRow dex =
-        //      let filling = kks |> Seq.map(fun k-> tupMap.[(k, dex)])
-        //      seq { yield dex |> string; yield! filling }
-        //            |> StringUtils.printSeqToRow
-              
-        //allDex |> Seq.map(dataRow)
-        //       |> Seq.append (seq { hdr })
-        //       |> Seq.toArray

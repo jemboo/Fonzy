@@ -151,70 +151,66 @@ module RunBatch =
     
          let dexer (arch:sorterShcArch) =
             arch.step |> StepNumber.value
-
-         let archRep (arch:sorterShcArch) = 
-             Some arch
      
          let specRep (spec:sorterShcSpec) = 
-           [spec |> SorterShcSpec.seedReport]
+           [
+            spec |> SorterShcSpec.seedReport;
+            spec |> SorterShcSpec.mutReport;
+            spec |> SorterShcSpec.sorterReport;
+           ]
 
-         ReportUtils.padSeries haTups dexer specRep
-
-
-     let energySeries (haTups: seq<sorterShcSpec*sorterShcArch[]>) =
-         
-          let dexer (arch:sorterShcArch) =
-             arch.step |> StepNumber.value
-
-          let specRep (spec:sorterShcSpec) = 
-            [spec |> SorterShcSpec.seedReport]
-
-          ReportUtils.padSeries haTups dexer specRep
-
-
-     let wSeries (haTups: seq<sorterShcSpec*sorterShcArch[]>) =
-    
-         let dexer (arch:sorterShcArch) =
-            arch.step |> StepNumber.value
-
-         let archRep (arch:sorterShcArch) = 
-             Some (sprintf "%d" (arch.perf.usedSwitchCount |> SwitchCount.value))
-     
-         let specRep (spec:sorterShcSpec) = 
-           [spec |> SorterShcSpec.seedReport]
-
-         ReportUtils.padSeries haTups dexer specRep
-
-
-     let tSeries (haTups: seq<sorterShcSpec*sorterShcArch[]>) =
-    
-        let dexer (arch:sorterShcArch) =
-           arch.step |> StepNumber.value
-
-        let archRep (arch:sorterShcArch) = 
-            Some (sprintf "%d" (arch.perf.usedStageCount |> StageCount.value))
-
-        let specRep (spec:sorterShcSpec) = 
-          [spec |> SorterShcSpec.seedReport]
-
-        ReportUtils.padSeries haTups dexer specRep
+         (ReportUtils.padSeries haTups dexer specRep, ["seed"; "mut"; "sorter"])
 
 
 
+     let singleShcPivotTable (outputDir:FileDir) 
+                             (reportDir:FileDir) =
 
-     let singleShcFatTable (outputDir:FileDir) 
-                           (reportDir:FileDir) =
+          let attrLabels = [ "Energy"; "Stages"; "Switches";]
+          let attrF (sArch:sorterShcArch option) = 
+              match sArch with
+              | Some arch ->
+                    [
+                        sprintf "%.5f" (arch.energy |> Energy.value);
+                        sprintf "%d" (arch.perf.usedStageCount |> StageCount.value);
+                        sprintf "%d" (arch.perf.usedSwitchCount |> SwitchCount.value);
+                    ]
+              | None -> [""; ""; ""]
+          
 
+          let catSeriesRept ((cats:string list),
+                             (ts:sorterShcArch option[])) = 
+               ts |> Array.mapi (fun dex arch -> 
+                        seq {yield! cats; yield (dex|>string); yield! (attrF arch)}
+                        |> StringUtils.printSeqToRow)
+
+
+          let outFileName = sprintf "%s.txt"  (System.DateTime.Now.Ticks |> string)
           let reportDataSource = new DirectoryDataSource(outputDir) 
                                       :> IDataSource
-          let repId = reportDataSource.GetDataSourceIds()
+          //let repId = reportDataSource.GetDataSourceIds()
+          //            |> Result.ExtractOrThrow
+          //            |> Array.toList
+          //            |> List.head
+
+          //let members = shcArchsFromGuid reportDataSource repId
+          //              |> Result.ExtractOrThrow
+
+          //let goodOnes = members 
+          //               |> Array.filter(fun r -> r.msg = "OK")
+          //               |> Array.map(unPackShcRes)
+          //               |> Array.toList
+          //               |> Result.sequence
+          //               |> Result.ExtractOrThrow
+
+          let repIds = reportDataSource.GetDataSourceIds()
                       |> Result.ExtractOrThrow
                       |> Array.toList
-                      |> List.head
 
-          let members = shcArchsFromGuid reportDataSource repId
-                        |> Result.ExtractOrThrow
-
+          let members = repIds |> List.map(shcArchsFromGuid reportDataSource)
+                               |> Result.sequence
+                               |> Result.ExtractOrThrow
+                               |> Array.concat
           let goodOnes = members 
                          |> Array.filter(fun r -> r.msg = "OK")
                          |> Array.map(unPackShcRes)
@@ -222,31 +218,27 @@ module RunBatch =
                          |> Result.sequence
                          |> Result.ExtractOrThrow
 
-          let recordsE = goodOnes 
-                         |> energySeries 
-                         |> ReportUtils.paddedSeriesToFatTable 
-                            (fun arch -> (sprintf "%.5f" (arch.energy |> Energy.value)))
-          let recordsW = goodOnes 
-                         |> wSeries 
-                         |> ReportUtils.paddedSeriesToFatTable 
-                            (fun arch -> (sprintf "%d" (arch.perf.usedSwitchCount |> SwitchCount.value)))
-          let recordsT = goodOnes 
-                         |> tSeries 
-                         |> ReportUtils.paddedSeriesToFatTable 
-                            (fun arch -> (sprintf "%d" (arch.perf.usedStageCount |> StageCount.value)))
 
+          let resMap, catLabels = goodOnes |> seedSeries
 
-          let records = recordsE 
-                        |> Array.append [|""|] 
-                        |> Array.append recordsW 
-                        |> Array.append [|""|] 
-                        |> Array.append recordsT
+          let tblContent = resMap 
+                            |> Map.toSeq
+                            |> Seq.map(catSeriesRept)
+                            |> Array.concat
 
-          let header = "The detailed description part\nHere is more stuff you might be interested in\nId Gen pfx len win degree switch stage count"
-          let fileName = sprintf "%s.txt"  (System.DateTime.Now.Ticks |> string)
-          let csvFile = { csvFile.header = header; 
+          let colHdrs = seq { yield! catLabels; yield "index"; yield! attrLabels; }
+                       |> Seq.toArray
+                       |> StringUtils.printSeqToRow
+
+          let records = tblContent 
+                        |> Array.append [|colHdrs|]
+
+          //let header = "The detailed description part\nHere is more stuff you might be 
+          // interested in\nId Gen pfx len win degree switch stage count"
+
+          let csvFile = { csvFile.header = ""; 
                           csvFile.directory = reportDir;
-                          csvFile.fileName = fileName;
+                          csvFile.fileName = outFileName;
                           csvFile.records = records }
 
           let res = CsvFile.writeCsvFile csvFile
@@ -254,54 +246,7 @@ module RunBatch =
                     | Ok _ -> "success"
                     | Error m -> m
 
-          sprintf "%s: %s\\%s" msg (FileDir.value outputDir) fileName
-
-
-
-
-
-
-
-
-     let singleShcPivotTable (outputDir:FileDir) 
-                             (reportDir:FileDir) =
-          let outFileName = sprintf "%s.txt"  (System.DateTime.Now.Ticks |> string)
-          let reportDataSource = new DirectoryDataSource(outputDir) 
-                                      :> IDataSource
-          let repId = reportDataSource.GetDataSourceIds()
-                      |> Result.ExtractOrThrow
-                      |> Array.toList
-                      |> List.head
-
-          let members = shcArchsFromGuid reportDataSource repId
-                        |> Result.ExtractOrThrow
-
-          let goodOnes = members 
-                         |> Array.filter(fun r -> r.msg = "OK")
-                         |> Array.map(unPackShcRes)
-                         |> Array.toList
-                         |> Result.sequence
-                         |> Result.ExtractOrThrow
-
-          //let records = goodOnes |> energySeries |> ReportUtils.paddedSeriesToPivotTable
-          //                                              (fun o -> seq { o |> string })
-          //                                              (seq {"Seed"; })
-
-          //let header = "The detailed description part\nHere is more stuff you might be interested in\nId Gen pfx len win degree switch stage count"
-
-          //let csvFile = { csvFile.header = ""; 
-          //                csvFile.directory = reportDir;
-          //                csvFile.fileName = outFileName;
-          //                csvFile.records = [|""|] }
-
-          //let res = CsvFile.writeCsvFile csvFile
-          //let msg = match res with
-          //          | Ok _ -> "success"
-          //          | Error m -> m
-
-          //sprintf "%s: %s\\%s" msg (FileDir.value outputDir) outFileName
-
-          ""
+          sprintf "%s: %s\\%s" msg (FileDir.value outputDir) outFileName
 
 
 

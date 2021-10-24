@@ -75,7 +75,7 @@ module SorterMutType =
         match smt with
         | BySwitch (wc, mr) -> sprintf "w_%f" (MutationRate.value mr)
         | ByStage (wc, mr) -> sprintf "t_%f" (MutationRate.value mr)
-        | ByStageRfl (wc, mr) -> sprintf "r_%f" (MutationRate.value mr)
+        | ByStageRfl (wc, mr) -> sprintf "r_%0.4f" (MutationRate.value mr)
 
 
 
