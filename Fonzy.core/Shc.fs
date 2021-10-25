@@ -506,10 +506,11 @@ module SHC =
 module sHCset = 
     let make<'S,'T,'A> (idGen: 'S->ShcId)
                        (maker: 'S->Result<sHC<'T,'A>, string>) 
-                       (specs: seq<'S>)=
-        let specMap = specs |> Seq.map(fun s -> (idGen s, s))
+                       (specs: seq<'S>) =
+        let specA = specs |> Seq.toArray
+        let specMap = specA |> Seq.map(fun s -> (idGen s, s))
                             |> Map.ofSeq
-        let memberMap = specs |> Seq.map(fun s -> (idGen s, maker s))
+        let memberMap = specA |> Seq.map(fun s -> (idGen s, maker s))
                               |> Map.ofSeq
 
         {sHCset.specs= specMap; sHCset.members = memberMap}
