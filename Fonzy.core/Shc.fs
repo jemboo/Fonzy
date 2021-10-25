@@ -53,7 +53,7 @@ type sorterShc =
         revision:RevNumber;
         rngGen:RngGen; 
         sorter:sorter;
-        switchPfx:Switch[];
+        //switchPfx:Switch[];
         switchUses:switchUses option
         perf:SortingEval.sorterPerf option
         energy:Energy option;
@@ -64,7 +64,7 @@ type sorterShcSpec =
     {
        rngGen:RngGen; 
        sorter:sorter;
-       switchPfx:Switch[];
+       //switchPfx:Switch[];
        mutatorSpec:sorterMutSpec;
        srtblSetType:sortableSetType;
        shcStageWeightSpec:shcStageWeightSpec;
@@ -167,7 +167,7 @@ module SorterShcSpec =
                        s.shcStageWeightSpec :> obj; 
                        s.sorter :> obj;
                        s.srtblSetType :> obj;
-                       s.switchPfx :> obj;
+                     //  s.switchPfx :> obj;
                        s.termSpec :> obj;
                        s.updaterSpec :> obj;} 
 
@@ -212,7 +212,7 @@ module SorterShcSpec =
                     revision = shcCurrent.revision |> RevNumber.increment;
                     rngGen = randy |> Rando.toRngGen; 
                     sorter = sorterMut;
-                    switchPfx = shcCurrent.switchPfx;
+                    //switchPfx = shcCurrent.switchPfx;
                     switchUses = None;
                     perf = None;
                     energy = None;

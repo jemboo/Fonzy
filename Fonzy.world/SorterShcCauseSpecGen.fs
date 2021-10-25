@@ -27,23 +27,24 @@ module SorterShcCauseSpecGen =
         (causeSpecDescr, outputDir, causeSpec)
 
 
-
-
-
     let makeMutSpec (mutRate:MutationRate)
                     (steps: StepNumber)
                     (degree:Degree)
-                    (dispPfx:Switch list)
+                   // (dispPfx:Switch list)
                     (dispSorter:sorter)
                     (dispRngGen:RngGen) = 
 
         let startingTemp = Temp.fromFloat 0.005
         let stageW = StageWeight.fromFloat 1.0
-        let dispSc = SwitchCount.fromInt dispPfx.Length
-        let mutSpec = (dispSc, mutRate) |> sorterMutType.ByStageRfl
-                        |> sorterMutSpec.Constant
+
         let srtbleSetType = sortableSetType.AllForDegree 
                                 (sortableSetRep.Integer degree)
+
+        let dispSc = SwitchCount.fromInt (srtbleSetType |> SortableSetType.getPrefix).Length  
+        let mutSpec = (dispSc, mutRate) |> sorterMutType.ByStageRfl
+                        |> sorterMutSpec.Constant
+
+
         let swS = shcStageWeightSpec.Constant stageW
         let evl = sorterEvalSpec.PerfBin
         let ann = annealerSpec.Constant startingTemp
@@ -52,7 +53,7 @@ module SorterShcCauseSpecGen =
         {
             sorterShcSpec.rngGen = dispRngGen;
             sorterShcSpec.sorter = dispSorter;
-            sorterShcSpec.switchPfx = dispPfx |> List.toArray;
+          //  sorterShcSpec.switchPfx = dispPfx |> List.toArray;
             sorterShcSpec.mutatorSpec = mutSpec;
             sorterShcSpec.srtblSetType = srtbleSetType;
             sorterShcSpec.shcStageWeightSpec = swS;
@@ -135,7 +136,7 @@ module SorterShcCauseSpecGen =
                             makeMutSpec
                                  (MutationRate.fromFloat 0.024)
                                  steps
-                                 degree wPfx dispSorter rng; 
+                                 degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = rng } 
@@ -144,7 +145,7 @@ module SorterShcCauseSpecGen =
                             makeMutSpec
                                  (MutationRate.fromFloat 0.026)
                                  steps
-                                 degree wPfx dispSorter rng; 
+                                 degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = rng } 
@@ -153,7 +154,7 @@ module SorterShcCauseSpecGen =
                             makeMutSpec
                                  (MutationRate.fromFloat 0.028)
                                  steps
-                                 degree wPfx dispSorter rng; 
+                                 degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = rng } 
@@ -163,7 +164,7 @@ module SorterShcCauseSpecGen =
                             makeMutSpec
                                  (MutationRate.fromFloat 0.030)
                                  steps
-                                 degree wPfx dispSorter rng; 
+                                 degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = rng } 
@@ -172,7 +173,7 @@ module SorterShcCauseSpecGen =
                             makeMutSpec
                                  (MutationRate.fromFloat 0.032)
                                  steps
-                                 degree wPfx dispSorter rng; 
+                                 degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = rng } 
@@ -181,7 +182,7 @@ module SorterShcCauseSpecGen =
                             makeMutSpec
                                  (MutationRate.fromFloat 0.034)
                                  steps
-                                 degree wPfx dispSorter rng; 
+                                 degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = rng } 
@@ -191,7 +192,7 @@ module SorterShcCauseSpecGen =
                             makeMutSpec
                                 (MutationRate.fromFloat 0.036)
                                 steps
-                                degree wPfx dispSorter rng; 
+                                degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = rng } 
@@ -202,7 +203,7 @@ module SorterShcCauseSpecGen =
                             makeMutSpec
                                 (MutationRate.fromFloat 0.038)
                                 steps
-                                degree wPfx dispSorter rng; 
+                                degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = rng } 

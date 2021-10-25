@@ -273,7 +273,7 @@ module TestData =
           {
             sorterShcSpec.rngGen = rng;
             sorterShcSpec.sorter = sorter;
-            sorterShcSpec.switchPfx = wPfx;
+           // sorterShcSpec.switchPfx = wPfx;
             sorterShcSpec.mutatorSpec = mutSpec;
             sorterShcSpec.srtblSetType = srtbleSetType;
             sorterShcSpec.shcStageWeightSpec = swS;

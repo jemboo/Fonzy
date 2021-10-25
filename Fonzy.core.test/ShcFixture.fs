@@ -44,7 +44,7 @@ type ShcFixture () =
         {
            sorterShcSpec.rngGen = rnG; 
            sorter = srter;
-           switchPfx = swPfx;
+           //switchPfx = swPfx;
            mutatorSpec = mutSpec;
            srtblSetType = sstAllIntSets;
            shcStageWeightSpec = stageWspec;
@@ -57,7 +57,7 @@ type ShcFixture () =
         {
            sorterShcSpec.rngGen = rnG; 
            sorter = srter;
-           switchPfx = swPfx;
+          // switchPfx = swPfx;
            mutatorSpec = mutSpec;
            srtblSetType = sstAllIntSets;
            shcStageWeightSpec = stageWspec;

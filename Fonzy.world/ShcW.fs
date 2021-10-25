@@ -49,7 +49,7 @@ module SorterShc =
                             sorterShc.sorter = sShc.sorter
                             sorterShc.step = sShc.step
                             sorterShc.revision = sShc.revision
-                            sorterShc.switchPfx = sShc.switchPfx
+                          //  sorterShc.switchPfx = sShc.switchPfx
                             sorterShc.switchUses = Some switchUses
                         }
                     }
@@ -192,7 +192,7 @@ module SHC =
             sorterShc.energy = None;
             sorterShc.perf = None;
             sorterShc.rngGen = spec.rngGen;
-            sorterShc.switchPfx = spec.switchPfx;
+           // sorterShc.switchPfx = spec.switchPfx;
             sorterShc.sorter = spec.sorter;
             sorterShc.switchUses = None;
             bestEnergy = None;
@@ -213,17 +213,7 @@ module SHC =
 
 
 
-module sHCset = 
-    //let make<'S,'T,'A> (idGen: 'S->ShcId)
-    //                   (maker: 'S->Result<sHC<'T,'A>, string>) 
-    //                   (specs: seq<'S>) =
-    //    let specA = specs |> Seq.toArray
-    //    let specMap = specA |> Array.map(fun s -> (idGen s, s))
-    //                        |> Map.ofSeq
-    //    let memberMap = specA |> Array.map(fun s -> (idGen s, maker s))
-    //                          |> Map.ofSeq
-
-    //    {sHCset.specs= specMap; sHCset.members = memberMap}
+module sHCset =
 
     let makeSorterShcSet (specs: seq<sorterShcSpec>) =
         sHCset.make (SorterShcSpec.makeId) (SHC.fromSorterShcSpec) specs

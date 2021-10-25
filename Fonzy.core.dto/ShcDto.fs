@@ -231,7 +231,7 @@ type sorterShcSpecDto =
     {
      rngGen:rngGenDto;
      sorter:sorterDto;
-     switchPfx: int[];
+     //switchPfx: int[];
      mutSpec:sorterMutSpecDto;
      srtblStType:sortableSetTypeDto
      stWgtSpec:shcStageWeightSpecDto
@@ -244,9 +244,9 @@ module SorterShcSpecDto =
         result {
             let! rng = dto.rngGen |> RngGenDto.fromDto
             let! srt = dto.sorter |> SorterDto.fromDto
-            let! swx = dto.switchPfx |> Array.map(fun sw -> SwitchDto.fromDto sw)
-                                     |> Array.toList
-                                     |> Result.sequence
+            //let! swx = dto.switchPfx |> Array.map(fun sw -> SwitchDto.fromDto sw)
+            //                         |> Array.toList
+            //                         |> Result.sequence
             let! mutSpec = dto.mutSpec |> SorterMutSpecDto.fromDto
             let! ssRs = dto.srtblStType |> SortableSetTypeDto.fromDto
             let! swS = dto.stWgtSpec |> ShcStageWeightSpecDto.fromDto
@@ -258,7 +258,7 @@ module SorterShcSpecDto =
              {
                 sorterShcSpec.rngGen = rng;
                 sorter = srt;
-                switchPfx = swx |> List.toArray;
+              //  switchPfx = swx |> List.toArray;
                 sorterShcSpec.mutatorSpec = mutSpec;
                 srtblSetType = ssRs;
                 shcStageWeightSpec = swS;
@@ -279,7 +279,7 @@ module SorterShcSpecDto =
             {
                 sorterShcSpecDto.rngGen = sss.rngGen |> RngGenDto.toDto;
                 sorter = sss.sorter |> SorterDto.toDto;
-                switchPfx = sss.switchPfx |> Array.map(SwitchDto.toDto);
+              //  switchPfx = sss.switchPfx |> Array.map(SwitchDto.toDto);
                 mutSpec = sss.mutatorSpec |> SorterMutSpecDto.toDto
                 srtblStType = sss.srtblSetType |> SortableSetTypeDto.toDto
                 stWgtSpec = sss.shcStageWeightSpec |> ShcStageWeightSpecDto.toDto
