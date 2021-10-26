@@ -34,7 +34,7 @@ module SorterShcCauseSpecGen =
                     (dispSorter:sorter)
                     (dispRngGen:RngGen) = 
 
-        let startingTemp = Temp.fromFloat 0.005
+        let startingTemp = Temp.fromFloat 0.00005
         let stageW = StageWeight.fromFloat 1.0
 
         let srtbleSetType = sortableSetType.AllForDegree 
@@ -107,9 +107,9 @@ module SorterShcCauseSpecGen =
         //    termSpec = term;
         //  }
 
-        let degree = Degree.fromInt 16
+        let degree = Degree.fromInt 14
         let shcCt = ShcCount.fromInt 100
-        let sorterCt = SorterCount.fromInt 100
+        let sorterCt = SorterCount.fromInt 10
         let steps = StepNumber.fromInt 500
         let seedF = (777) |> RandomSeed.fromInt
         let wPfx = []
@@ -132,42 +132,42 @@ module SorterShcCauseSpecGen =
         let sorterShcSpecRndGens = 
             seq {
 
-                    { sorterShcSpecRndGen.baseSpec = 
-                            makeMutSpec
-                                 (MutationRate.fromFloat 0.016)
-                                 steps
-                                 degree dispSorter rng; 
-                      sorterShcSpecRndGen.sssrgType = sssrgT;
-                      sorterShcSpecRndGen.count = shcCt;
-                      sorterShcSpecRndGen.rndGen = rng } 
+                    //{ sorterShcSpecRndGen.baseSpec = 
+                    //        makeMutSpec
+                    //             (MutationRate.fromFloat 0.016)
+                    //             steps
+                    //             degree dispSorter rng; 
+                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
+                    //  sorterShcSpecRndGen.count = shcCt;
+                    //  sorterShcSpecRndGen.rndGen = rng } 
 
-                    { sorterShcSpecRndGen.baseSpec = 
-                            makeMutSpec
-                                 (MutationRate.fromFloat 0.018)
-                                 steps
-                                 degree dispSorter rng; 
-                      sorterShcSpecRndGen.sssrgType = sssrgT;
-                      sorterShcSpecRndGen.count = shcCt;
-                      sorterShcSpecRndGen.rndGen = rng } 
+                    //{ sorterShcSpecRndGen.baseSpec = 
+                    //        makeMutSpec
+                    //             (MutationRate.fromFloat 0.018)
+                    //             steps
+                    //             degree dispSorter rng; 
+                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
+                    //  sorterShcSpecRndGen.count = shcCt;
+                    //  sorterShcSpecRndGen.rndGen = rng } 
                   
-                    { sorterShcSpecRndGen.baseSpec = 
-                            makeMutSpec
-                                 (MutationRate.fromFloat 0.020)
-                                 steps
-                                 degree dispSorter rng; 
-                      sorterShcSpecRndGen.sssrgType = sssrgT;
-                      sorterShcSpecRndGen.count = shcCt;
-                      sorterShcSpecRndGen.rndGen = rng } 
+                    //{ sorterShcSpecRndGen.baseSpec = 
+                    //        makeMutSpec
+                    //             (MutationRate.fromFloat 0.020)
+                    //             steps
+                    //             degree dispSorter rng; 
+                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
+                    //  sorterShcSpecRndGen.count = shcCt;
+                    //  sorterShcSpecRndGen.rndGen = rng } 
 
 
-                    { sorterShcSpecRndGen.baseSpec = 
-                            makeMutSpec
-                                 (MutationRate.fromFloat 0.022)
-                                 steps
-                                 degree dispSorter rng; 
-                      sorterShcSpecRndGen.sssrgType = sssrgT;
-                      sorterShcSpecRndGen.count = shcCt;
-                      sorterShcSpecRndGen.rndGen = rng } 
+                    //{ sorterShcSpecRndGen.baseSpec = 
+                    //        makeMutSpec
+                    //             (MutationRate.fromFloat 0.022)
+                    //             steps
+                    //             degree dispSorter rng; 
+                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
+                    //  sorterShcSpecRndGen.count = shcCt;
+                    //  sorterShcSpecRndGen.rndGen = rng } 
 
 
 
@@ -211,18 +211,18 @@ module SorterShcCauseSpecGen =
                     //  sorterShcSpecRndGen.count = shcCt;
                     //  sorterShcSpecRndGen.rndGen = rng } 
 
-                    //{ sorterShcSpecRndGen.baseSpec =
-                    //        makeMutSpec
-                    //             (MutationRate.fromFloat 0.032)
-                    //             steps
-                    //             degree dispSorter rng; 
-                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
-                    //  sorterShcSpecRndGen.count = shcCt;
-                    //  sorterShcSpecRndGen.rndGen = rng } 
+                    { sorterShcSpecRndGen.baseSpec =
+                            makeMutSpec
+                                 (MutationRate.fromFloat 0.020)
+                                 steps
+                                 degree dispSorter rng; 
+                      sorterShcSpecRndGen.sssrgType = sssrgT;
+                      sorterShcSpecRndGen.count = shcCt;
+                      sorterShcSpecRndGen.rndGen = rng } 
 
                     { sorterShcSpecRndGen.baseSpec = 
                             makeMutSpec
-                                 (MutationRate.fromFloat 0.034)
+                                 (MutationRate.fromFloat 0.040)
                                  steps
                                  degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
@@ -232,7 +232,7 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                             makeMutSpec
-                                (MutationRate.fromFloat 0.036)
+                                (MutationRate.fromFloat 0.060)
                                 steps
                                 degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
@@ -243,7 +243,7 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                             makeMutSpec
-                                (MutationRate.fromFloat 0.038)
+                                (MutationRate.fromFloat 0.080)
                                 steps
                                 degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
@@ -254,7 +254,7 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                                makeMutSpec
-                                   (MutationRate.fromFloat 0.040)
+                                   (MutationRate.fromFloat 0.1)
                                    steps
                                    degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
@@ -265,7 +265,7 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                                makeMutSpec
-                                   (MutationRate.fromFloat 0.042)
+                                   (MutationRate.fromFloat 0.12)
                                    steps
                                    degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
@@ -274,14 +274,9 @@ module SorterShcCauseSpecGen =
 
 
 
-
-
-
-
-
                     { sorterShcSpecRndGen.baseSpec = 
                             makeMutSpec
-                                 (MutationRate.fromFloat 0.034)
+                                 (MutationRate.fromFloat 0.14)
                                  steps
                                  degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
@@ -291,7 +286,7 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                             makeMutSpec
-                                (MutationRate.fromFloat 0.036)
+                                (MutationRate.fromFloat 0.17)
                                 steps
                                 degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
@@ -302,7 +297,7 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                             makeMutSpec
-                                (MutationRate.fromFloat 0.038)
+                                (MutationRate.fromFloat 0.2)
                                 steps
                                 degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
@@ -313,7 +308,7 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                                makeMutSpec
-                                   (MutationRate.fromFloat 0.040)
+                                   (MutationRate.fromFloat 0.25)
                                    steps
                                    degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
@@ -324,7 +319,7 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                                makeMutSpec
-                                   (MutationRate.fromFloat 0.042)
+                                   (MutationRate.fromFloat 0.4)
                                    steps
                                    degree dispSorter rng; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
