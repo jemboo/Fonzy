@@ -49,7 +49,7 @@ type ShcFixture () =
                     }
         let shcSet = SorterShcSpecRndGen.generate None None sssrg
                      |> Result.ExtractOrThrow
-                     |> SorterSHCset.makeSorterShcSet
+                     |> SorterSHCset.make
 
         let batchRes = sHCset.runBatch (UseParallel.create true) shcSet
         let shcRes = SorterSHCset.getResults batchRes

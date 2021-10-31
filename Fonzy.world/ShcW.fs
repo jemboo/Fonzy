@@ -215,31 +215,8 @@ module SHC =
 
 module SorterSHCset =
 
-    let makeSorterShcSet (specs: seq<sorterShcSpec>) =
+    let make (specs: seq<sorterShcSpec>) =
         sHCset.make (SorterShcSpec.makeId) (SHC.fromSorterShcSpec) specs
-
-    //let runBatch (useP:UseParallel) 
-    //             (shcs:sHCset<'S,'T,'A>) = 
-    //    let _runn (id:ShcId) (shcr:Result<sHC<'T,'A>, string>) =
-    //        match shcr with
-    //        | Ok shc -> Console.WriteLine(sprintf "%A" id)
-    //                    (id, SHC.run shc)
-    //        | Error m -> (id, sprintf "error creating spec: %s" m |> Error)
-            
-
-    //    let mms = 
-    //        match UseParallel.value(useP) with
-    //        | true  -> shcs.members 
-    //                    |> Map.toArray
-    //                    |> Array.Parallel.map(fun tup -> _runn (fst tup) (snd tup))
-    //                    |> Map.ofSeq
-    //        | false -> shcs.members 
-    //                    |> Map.toArray
-    //                    |> Array.map(fun tup -> _runn (fst tup) (snd tup))
-    //                    |> Map.ofSeq
-
-    //    {shcs with members = mms}
-
 
 
     let getResults (shcs:sHCset<sorterShcSpec, sorterShc, sorterShcArch>) = 

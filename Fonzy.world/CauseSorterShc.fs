@@ -23,7 +23,7 @@ module CauseSorterShc =
     
                 let shcSet = SorterShcSpecRndGen.generate None None sorterShcSpecRndGen
                              |> Result.ExtractOrThrow
-                             |> SorterSHCset.makeSorterShcSet
+                             |> SorterSHCset.make
 
                 let batchRes = sHCset.runBatch (UseParallel.create useParallel) shcSet
                 let shcRes = SorterSHCset.getResults batchRes

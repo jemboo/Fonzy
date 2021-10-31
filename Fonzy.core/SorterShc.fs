@@ -167,8 +167,7 @@ module SorterShcSpec =
                        s.srtblSetType :> obj;
                        s.termSpec :> obj;
                        s.updaterSpec :> obj;} 
-
-                        |> GuidUtils.guidFromObjs
+                  |> GuidUtils.guidFromObjs
         ShcId.fromGuid gu
 
 
