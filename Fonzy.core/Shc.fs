@@ -53,7 +53,6 @@ type sorterShc =
         revision:RevNumber;
         rngGen:RngGen; 
         sorter:sorter;
-        //switchPfx:Switch[];
         switchUses:switchUses option
         perf:SortingEval.sorterPerf option
         energy:Energy option;
@@ -64,7 +63,6 @@ type sorterShcSpec =
     {
        rngGen:RngGen; 
        sorter:sorter;
-       //switchPfx:Switch[];
        mutatorSpec:sorterMutSpec;
        srtblSetType:sortableSetType;
        shcStageWeightSpec:shcStageWeightSpec;
@@ -167,7 +165,6 @@ module SorterShcSpec =
                        s.shcStageWeightSpec :> obj; 
                        s.sorter :> obj;
                        s.srtblSetType :> obj;
-                     //  s.switchPfx :> obj;
                        s.termSpec :> obj;
                        s.updaterSpec :> obj;} 
 
@@ -212,7 +209,6 @@ module SorterShcSpec =
                     revision = shcCurrent.revision |> RevNumber.increment;
                     rngGen = randy |> Rando.toRngGen; 
                     sorter = sorterMut;
-                    //switchPfx = shcCurrent.switchPfx;
                     switchUses = None;
                     perf = None;
                     energy = None;
@@ -486,16 +482,28 @@ module SHC =
                     }
             }
 
+    //let run (shc:sHC<'T,'A>) =
+    //    let goOn (s) = 
+    //        not (s.terminator s.current)
+    //    result {
+    //        let mutable shcCur = shc
+    //        while (goOn shcCur) do
+    //            let! shcNew = shcCur |> update
+    //            shcCur <- shcNew
+    //        return shcCur
+    //    }
+
     let run (shc:sHC<'T,'A>) =
         let goOn (s) = 
             not (s.terminator s.current)
-        result {
-            let mutable shcCur = shc
-            while (goOn shcCur) do
-                let! shcNew = shcCur |> update
-                shcCur <- shcNew
-            return shcCur
-        }
+        let mutable shcCur = shc
+        while (goOn shcCur) do
+            let shcNew = shcCur |> update |> Result.ExtractOrThrow
+            shcCur <- shcNew
+        shcCur |> Ok
+
+
+
 
     let runBatch (shcs:sHC<'T,'A>[]) =
         let ree = shcs |> Array.Parallel.map(run)

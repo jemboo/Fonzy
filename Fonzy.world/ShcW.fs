@@ -13,6 +13,7 @@ module SorterShc =
             return
                 fun (sShc:sorterShc) ->
                     result {
+                       // Console.WriteLine(sprintf "%d" (StepNumber.value sShc.step))
                         let stageW = ShcStageWeightSpec.getStageWeight swPk sShc       
                         let suPlan = Sorting.SwitchUsePlan.makeIndexes
                                         pfxUses
@@ -49,7 +50,6 @@ module SorterShc =
                             sorterShc.sorter = sShc.sorter
                             sorterShc.step = sShc.step
                             sorterShc.revision = sShc.revision
-                          //  sorterShc.switchPfx = sShc.switchPfx
                             sorterShc.switchUses = Some switchUses
                         }
                     }

@@ -24,9 +24,6 @@ module Permutation =
     let arrayValues perm = perm.values
     let degree perm = perm.degree
 
-    let areEqual (permA:permutation) (permB:permutation) =
-        true
-
     let isTwoCycle (perm:permutation) =
         Combinatorics.isTwoCycle perm.values
 
@@ -89,25 +86,31 @@ module TwoCyclePerm =
                       values.Length |> Error 
         else { degree=degree; values=values } |> Ok
 
+
     let identity (degree:Degree) = 
         {degree=degree; values=[|0 .. (Degree.value degree)-1|] }
+
 
     let arrayValues perm = perm.values
     let degree perm = perm.degree
 
+
     let toPermutation (tcp:twoCyclePerm) =
         { permutation.degree = tcp.degree; 
           values = tcp.values }
+
 
     let product (pA:twoCyclePerm) (pB:twoCyclePerm) =
         create pA.degree  (Combinatorics.composeMapIntArrays 
                                 (pA |> arrayValues) 
                                 (pB |> arrayValues))
 
+
     let conjugate (pA:twoCyclePerm) (conj:permutation) =
         create pA.degree  (Combinatorics.conjugateIntArrays 
                                 (pA |> arrayValues) 
                                 (conj |> Permutation.arrayValues))
+
 
     let toTwoCycle (perm:permutation) =
         if (Permutation.isTwoCycle perm) then
@@ -116,11 +119,40 @@ module TwoCyclePerm =
         else
             "Not a two cycle" |> Error
 
+
     let makeMonoCycle (degree:Degree) (hi:int) (low:int) =
         if ((Permutation.inRange degree hi) && (Permutation.inRange degree low)) then
             {degree=degree; 
              values=(Combinatorics.makeMonoTwoCycle degree low hi)} |> Ok
         else Error "low or hi is out of range" 
+
+
+    let reflect (tcp:twoCyclePerm) =
+        let deg = (Degree.value tcp.degree)
+        let refV pos = 
+            Combinatorics.reflect deg pos
+
+        let refl = Array.init 
+                    deg
+                    (fun dex -> tcp.values.[refV dex] |> refV)
+        {
+            degree = tcp.degree; 
+            values = refl 
+        }
+
+
+    let hasAfixedPoint (tcp:twoCyclePerm) =
+        tcp.values |> Seq.mapi(fun dex v -> dex = v)
+                   |> Seq.contains(true)
+
+
+    let isReflectionSymmetric (tcp:twoCyclePerm) =
+        tcp = (reflect tcp)
+
+
+    let isSymmetricTwoCycle (tcp:twoCyclePerm) =
+        (isReflectionSymmetric tcp) &&
+        (Combinatorics.isTwoCycle tcp.values)
 
 
     let makeAllMonoCycles (degree:Degree) =
@@ -173,7 +205,13 @@ module TwoCyclePerm =
         
     let mutateByReflPair (pairs: seq<(int*int)>) 
                          (tcp:twoCyclePerm) =
-        let mutato (pair:int*int) = 
+        //true if _mutato will always turn this into
+        //another twoCyclePerm
+        let _isMutatoCompatable (mut:twoCyclePerm) =
+            (isSymmetricTwoCycle mut) &&
+            not (hasAfixedPoint mut)
+
+        let _mutato (pair:int*int) = 
             let tca = tcp |> arrayValues |> Array.copy
             let dv = tcp.degree |> Degree.value
             let pA, pB = pair
@@ -196,9 +234,9 @@ module TwoCyclePerm =
             { tcp with values=tca}
 
         //let muts =
-        pairs |> Seq.map(fun pr -> mutato pr)
-              |> Seq.filter(fun mut -> Combinatorics.isTwoCycle mut.values)
-              |> Seq.head
+        pairs |> Seq.map(fun pr -> _mutato pr)
+                |> Seq.filter(_isMutatoCompatable)
+                |> Seq.head
         //if muts.Length > 0 then
         //    muts.[0]
         //else
@@ -239,21 +277,6 @@ module TwoCyclePerm =
                             rnd 
                             (Degree.value degree)
         }
-
-
-    let reflect (twoCyclePerm:twoCyclePerm) =
-        let deg = (Degree.value twoCyclePerm.degree)
-        let refV pos = 
-            Combinatorics.reflect deg pos
-
-        let refl = Array.init 
-                    deg
-                    (fun dex -> twoCyclePerm.values.[refV dex] |> refV)
-        {
-            degree = twoCyclePerm.degree; 
-            values = refl 
-        }
-
 
     let rndSymmetric (degree:Degree) 
                      (rnd:IRando) =

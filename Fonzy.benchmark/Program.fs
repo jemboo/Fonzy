@@ -6,7 +6,7 @@ open BenchmarkDotNet.Running
 [<EntryPoint>]
 let main argv =
 
-    ///// ******* RunBatch.runShcSets ***********
+    /////// ******* RunBatch.runShcSets ***********
     Console.WriteLine("Starting RunBatch.runShcSets")
 
     RunBatch.runShcSets (FileDir.fromString "C:\\SimOutShc") 

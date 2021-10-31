@@ -134,11 +134,9 @@ type ComboStructuresFixture () =
                     |> Seq.toArray
        
        Assert.AreEqual(smyr.Length, 2)
-       let rr = refSyms |> Array.map(fun tcp -> 
-                (tcp, tcp = (tcp |> TwoCyclePerm.reflect)))
-
-       Assert.IsTrue(true)
-
+       let rr = refSyms |> Array.map(TwoCyclePerm.isSymmetricTwoCycle)
+                        |> Array.countBy(id)
+       Assert.AreEqual(rr.Length, 1)
 
 
     [<TestMethod>]
@@ -165,6 +163,22 @@ type ComboStructuresFixture () =
                  |> Array.countBy(snd)
 
        Assert.IsTrue(true)
+
+
+
+    [<TestMethod>]
+    member this.TwoCyclePerm_mutateReflSymmetricB() =
+       let degree = Degree.fromInt 10
+       //let tcp = TwoCyclePerm.create degree [|6;1;4;5;2;3;0;12;11;9;13;8;7;10|]
+       //             |> Result.ExtractOrThrow
+       let tcp = TwoCyclePerm.create degree [|0;1;2;3;4;5;6;7;8;9;|]
+                     |> Result.ExtractOrThrow
+
+       let testSeq = seq { (6,8); }
+       let res = TwoCyclePerm.mutateByReflPair testSeq tcp
+
+       Assert.IsTrue(true)
+
 
 
     [<TestMethod>]

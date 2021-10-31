@@ -40,7 +40,8 @@ type CombinatoricsFixture () =
       let degree = Degree.create "" 5 |> Result.ExtractOrThrow
       let dd = Combinatorics.makeAllMonoTwoCycles degree |> Seq.toArray
       Assert.IsTrue (dd.Length = 10)
-      
+
+
 
     [<TestMethod>]
     member this.TestCompareArrays() =
@@ -204,10 +205,6 @@ type CombinatoricsFixture () =
         let m = 5
         let res = Combinatorics.enumNchooseM n m |> Seq.toList
         Assert.AreEqual(res.Length, 56)
-
-
-
-
 
 
 

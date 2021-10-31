@@ -36,7 +36,9 @@ module RunBatch =
                     (firstDex:int) =
 
         runBatchSeq SorterShcCauseSpecGen.makeRunBatchSeq 
-                       outputDir seed firstDex
+                       outputDir 
+                       seed
+                       firstDex
 
 
 
