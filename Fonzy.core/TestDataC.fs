@@ -264,7 +264,7 @@ module TestData =
                         |> sorterMutSpec.Constant
         let srtbleSetType = sortableSetType.AllForDegree 
                                 (sortableSetRep.Integer degree)
-        let swS = shcStageWeightSpec.Constant (StageWeight.fromFloat 1.0)
+        let swS = sorterStageWeightSpec.Constant (StageWeight.fromFloat 1.0)
         let evl = sorterEvalSpec.PerfBin
         let ann = annealerSpec.Constant (Temp.fromFloat 1.0)
         let updt = shcSaveDetails.Always
@@ -276,7 +276,7 @@ module TestData =
            // sorterShcSpec.switchPfx = wPfx;
             sorterShcSpec.mutatorSpec = mutSpec;
             sorterShcSpec.srtblSetType = srtbleSetType;
-            sorterShcSpec.shcStageWeightSpec = swS;
+            sorterShcSpec.sorterStageWeightSpec = swS;
             evalSpec = evl;
             annealerSpec = ann;
             updaterSpec = updt;

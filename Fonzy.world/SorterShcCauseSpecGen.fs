@@ -44,7 +44,7 @@ module SorterShcCauseSpecGen =
                         |> sorterMutSpec.Constant
 
 
-        let swS = shcStageWeightSpec.Constant stageW
+        let swS = sorterStageWeightSpec.Constant stageW
         let evl = sorterEvalSpec.PerfBin
         let ann = annealerSpec.Constant startingTemp
         let updt = shcSaveDetails.Never
@@ -54,7 +54,7 @@ module SorterShcCauseSpecGen =
             sorterShcSpec.sorter = dispSorter;
             sorterShcSpec.mutatorSpec = mutSpec;
             sorterShcSpec.srtblSetType = srtbleSetType;
-            sorterShcSpec.shcStageWeightSpec = swS;
+            sorterShcSpec.sorterStageWeightSpec = swS;
             evalSpec = evl;
             annealerSpec = ann;
             updaterSpec = updt;

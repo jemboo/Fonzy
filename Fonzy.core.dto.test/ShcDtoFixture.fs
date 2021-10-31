@@ -21,7 +21,7 @@ type ShcDtoFixture () =
     [<TestMethod>]
     member this.ShcStageWeightSpecLu () =
         let sw = StageWeight.fromFloat 2.2
-        let sws = shcStageWeightSpec.Constant sw
+        let sws = sorterStageWeightSpec.Constant sw
         let lulu = sw |> Compact.serialize
         let swsB = lulu |> Compact.deserialize
 
@@ -33,7 +33,7 @@ type ShcDtoFixture () =
     [<TestMethod>]
     member this.ShcStageWeightSpecDto () =
         let sw = StageWeight.fromFloat 2.2
-        let sws = shcStageWeightSpec.Constant sw
+        let sws = sorterStageWeightSpec.Constant sw
         let swsDto = sws |> ShcStageWeightSpecDto.toDto
         let swsBack = swsDto |> ShcStageWeightSpecDto.fromDto
                              |> Result.ExtractOrThrow

@@ -35,7 +35,7 @@ type ShcFixture () =
 
     let sstAllIntSets = sortableSetType.AllForDegree 
                             (sortableSetRep.Bp64 degree)
-    let stageWspec = shcStageWeightSpec.Constant (StageWeight.fromFloat 1.0)
+    let stageWspec = sorterStageWeightSpec.Constant (StageWeight.fromFloat 1.0)
     let evlSpec = sorterEvalSpec.PerfBin
     let annSpec = annealerSpec.Exp ((Temp.fromFloat 0.00005), 20000.0)
     let updtSpec = shcSaveDetails.BetterThanLast
@@ -47,7 +47,7 @@ type ShcFixture () =
            //switchPfx = swPfx;
            mutatorSpec = mutSpec;
            srtblSetType = sstAllIntSets;
-           shcStageWeightSpec = stageWspec;
+           sorterStageWeightSpec = stageWspec;
            evalSpec = evlSpec;
            annealerSpec = annSpec;
            updaterSpec = updtSpec;
@@ -60,7 +60,7 @@ type ShcFixture () =
           // switchPfx = swPfx;
            mutatorSpec = mutSpec;
            srtblSetType = sstAllIntSets;
-           shcStageWeightSpec = stageWspec;
+           sorterStageWeightSpec = stageWspec;
            evalSpec = evlSpec;
            annealerSpec = annSpec;
            updaterSpec = updtSpec;

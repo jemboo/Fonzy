@@ -23,10 +23,10 @@ module CauseSorterShc =
     
                 let shcSet = SorterShcSpecRndGen.generate None None sorterShcSpecRndGen
                              |> Result.ExtractOrThrow
-                             |> sHCset.makeSorterShcSet
+                             |> SorterSHCset.makeSorterShcSet
 
                 let batchRes = sHCset.runBatch (UseParallel.create useParallel) shcSet
-                let shcRes = sHCset.getResults batchRes
+                let shcRes = SorterSHCset.getResults batchRes
                 let sShcResultsDto = shcRes |> SorterShcResultsDto.toDto
                 return! Enviro.addDto<sorterShcResultsDto>
                                                 resultsName 

@@ -5,11 +5,11 @@ type shcStageWeightSpecDto = {cat:string; value:string}
 module ShcStageWeightSpecDto =
     let fromDto (dto:shcStageWeightSpecDto) =
         match dto.cat with
-        | nameof shcStageWeightSpec.Constant ->
+        | nameof sorterStageWeightSpec.Constant ->
                 result {
                     let! b = Json.deserialize<float> dto.value
                     let! sw = b |> StageWeight.create
-                    return shcStageWeightSpec.Constant sw
+                    return sorterStageWeightSpec.Constant sw
                 }
         | t -> sprintf "cat: %s for shcStageWeightSpecDto not found"
                      dto.cat |> Error
@@ -20,13 +20,13 @@ module ShcStageWeightSpecDto =
             return! fromDto dto
         }
 
-    let toDto (ssD:shcStageWeightSpec) =
+    let toDto (ssD:sorterStageWeightSpec) =
         match ssD with
-        | shcStageWeightSpec.Constant sw -> 
-                { shcStageWeightSpecDto.cat = nameof shcStageWeightSpec.Constant; 
+        | sorterStageWeightSpec.Constant sw -> 
+                { shcStageWeightSpecDto.cat = nameof sorterStageWeightSpec.Constant; 
                     value = (StageWeight.value sw) |> Json.serialize}
 
-    let toJson (idt:shcStageWeightSpec) =
+    let toJson (idt:sorterStageWeightSpec) =
         idt |> toDto |> Json.serialize
 
 
@@ -261,7 +261,7 @@ module SorterShcSpecDto =
               //  switchPfx = swx |> List.toArray;
                 sorterShcSpec.mutatorSpec = mutSpec;
                 srtblSetType = ssRs;
-                shcStageWeightSpec = swS;
+                sorterStageWeightSpec = swS;
                 sorterShcSpec.evalSpec = evl;
                 sorterShcSpec.annealerSpec = ann;
                 sorterShcSpec.updaterSpec = updt;
@@ -282,7 +282,7 @@ module SorterShcSpecDto =
               //  switchPfx = sss.switchPfx |> Array.map(SwitchDto.toDto);
                 mutSpec = sss.mutatorSpec |> SorterMutSpecDto.toDto
                 srtblStType = sss.srtblSetType |> SortableSetTypeDto.toDto
-                stWgtSpec = sss.shcStageWeightSpec |> ShcStageWeightSpecDto.toDto
+                stWgtSpec = sss.sorterStageWeightSpec |> ShcStageWeightSpecDto.toDto
                 evalSpec = sss.evalSpec |> SorterEvalSpecDto.toDto
                 annealer = sss.annealerSpec |> AnnealerSpecDto.toDto
                 updater = sss.updaterSpec |> ShcSaveDetailsDto.toDto
