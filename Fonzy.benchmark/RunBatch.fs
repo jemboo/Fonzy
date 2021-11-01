@@ -161,7 +161,7 @@ module RunBatch =
             spec |> SorterShcSpec.sorterReport;
            ]
 
-         (ReportUtils.padSeries haTups dexer specRep, ["seed"; "mut"; "sorter"])
+         (ReportUtils.partialyPadSeries haTups dexer specRep, ["seed"; "mut"; "sorter"])
 
 
 

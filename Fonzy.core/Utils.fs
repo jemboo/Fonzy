@@ -580,7 +580,7 @@ module ReportUtils =
     // The output series data will just be a tuple containing the outputs of dDex and dData, the starting data can be different.
 
 
-    let padSeries<'H,'D> (hdTups: seq<'H*'D[]>) 
+    let completelyPadSeries<'H,'D> (hdTups: seq<'H*'D[]>) 
                           (dDex:'D->int)
                           (specRep:'H->string list) =
 
@@ -600,11 +600,11 @@ module ReportUtils =
 
         let ldaMap = hdTups 
                      |> Seq.map(fun tup -> 
-                        ( tup |> fst |> specRep, 
-                          tup |> snd 
-                              |> Array.map(fun d -> (dDex d, Some d))
-                              |> Array.sortBy(fst)
-                        )
+                            ( tup |> fst |> specRep, 
+                              tup |> snd 
+                                  |> Array.map(fun d -> (dDex d, Some d))
+                                  |> Array.sortBy(fst)
+                            )
                         )
                      |> Map.ofSeq
 
@@ -625,6 +625,58 @@ module ReportUtils =
                             resMap.[k].[dex] <- rptV)
         
         [|0 .. maxDex|] |> Array.iter(procDex)
+        resMap
+
+
+
+
+    let partialyPadSeries<'H,'D> (hdTups: seq<'H*'D[]>) 
+                          (dDex:'D->int)
+                          (specRep:'H->string list) =
+
+        let rec _interpoVal (seri:(int*'D option)[]) (target:int) =
+
+            let rec _lbBVal (seri:(int*'D option)[]) (target:int) (curDex:int) =
+                if (seri.Length - 1) < curDex then  
+                    seri.[seri.Length - 1] |> snd
+                else
+                    let curVal = seri.[curDex] |> fst
+                    if curVal > target then seri.[curDex - 1] |> snd
+                    else if curVal = target then seri.[curDex] |> snd
+                    else _lbBVal seri target (curDex + 1)
+        
+            if (seri.[0] |> fst) > target then None
+            else   _lbBVal seri target 0
+
+        let ldaMap = hdTups 
+                     |> Seq.map(fun tup -> 
+                            ( tup |> fst |> specRep, 
+                              tup |> snd 
+                                  |> Array.map(fun d -> (dDex d, Some d))
+                                  |> Array.sortBy(fst)
+                            )
+                        )
+                     |> Map.ofSeq
+
+        let allSteps = ldaMap.Values 
+                        |> Seq.map(Array.map(fst))
+                        |> Seq.concat
+                        |> CollectionUtils.sortedUnique
+                        |> Seq.toArray
+
+        let resMap = ldaMap.Keys 
+                   |> Seq.map(fun k -> 
+                        (k, 
+                         Array.create<'D option> (allSteps.Length) None))
+                   |> Map.ofSeq
+
+
+        let procDex dex step =
+            ldaMap.Keys |> Seq.iter(fun k -> 
+                            let rptV = _interpoVal ldaMap.[k] step
+                            resMap.[k].[dex] <- rptV)
+        
+        allSteps |> Array.iteri(procDex)
         resMap
 
 

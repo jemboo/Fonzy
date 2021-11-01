@@ -37,10 +37,10 @@ module SorterShcCauseSpecGen =
         let stageW = StageWeight.fromFloat 1.0
 
         let srtbleSetType = sortableSetType.AllForDegree 
-                                (sortableSetRep.Integer degree)
+                                (sortableSetRep.Bp64 degree)
 
         let dispSc = SwitchCount.fromInt (srtbleSetType |> SortableSetType.getPrefix).Length  
-        let mutSpec = (dispSc, mutRate) |> sorterMutType.ByStageRfl
+        let mutSpec = (dispSc, mutRate) |> sorterMutType.ByStage
                         |> sorterMutSpec.Constant
 
 
@@ -68,14 +68,26 @@ module SorterShcCauseSpecGen =
 
 
         let degree = Degree.fromInt 14
-        let shcCt = ShcCount.fromInt 50
-        let sorterCt = SorterCount.fromInt 50
-        let steps = StepNumber.fromInt 5000
+        let shcCt = ShcCount.fromInt 5
+        let sorterCt = SorterCount.fromInt 5
+        let steps = StepNumber.fromInt 50000
         let seedF = (777) |> RandomSeed.fromInt
         let wPfx = []
         let rngF = RngGen.createLcg seedF
         let rng = RngGen.createLcg seed
-        let sRndGen = sorterRndGen.RandSymmetric
+        //let sRndGen = sorterRndGen.RandSymmetric
+        //                            (wPfx,
+        //                             (StageCount.degreeTo999StageCount degree),
+        //                             degree)
+        
+        //let dispSorter = SorterRndGen.createRandom 
+        //                        sRndGen 
+        //                        (rng |> Rando.fromRngGen)
+
+
+        //let ssGen = sorterSetGen.Rnd (sRndGen, rngF, sorterCt)
+        //let sssrgT = sssrgType.Sorters ssGen
+        let sRndGen = sorterRndGen.RandStages
                                     (wPfx,
                                      (StageCount.degreeTo999StageCount degree),
                                      degree)
@@ -87,7 +99,6 @@ module SorterShcCauseSpecGen =
 
         let ssGen = sorterSetGen.Rnd (sRndGen, rngF, sorterCt)
         let sssrgT = sssrgType.Sorters ssGen
-
 
         let sorterShcSpecRndGens = 
             seq {
@@ -120,14 +131,14 @@ module SorterShcCauseSpecGen =
                     //  sorterShcSpecRndGen.rndGen = rng } 
 
 
-                    //{ sorterShcSpecRndGen.baseSpec = 
-                    //        makeMutSpec
-                    //             (MutationRate.fromFloat 0.14)
-                    //             steps
-                    //             degree dispSorter rng; 
-                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
-                    //  sorterShcSpecRndGen.count = shcCt;
-                    //  sorterShcSpecRndGen.rndGen = rng } 
+                    { sorterShcSpecRndGen.baseSpec = 
+                            makeMutSpec
+                                 (MutationRate.fromFloat 0.14)
+                                 steps
+                                 degree dispSorter rng; 
+                      sorterShcSpecRndGen.sssrgType = sssrgT;
+                      sorterShcSpecRndGen.count = shcCt;
+                      sorterShcSpecRndGen.rndGen = rng } 
 
 
                     { sorterShcSpecRndGen.baseSpec = 
