@@ -14,7 +14,8 @@ module Switch =
 
     let getIndex (switch:Switch) =
         (switch.hi * (switch.hi + 1)) / 2 + switch.low
-
+    
+    // all the switches of degree that have lowVal as the low switch index
     let lowOverlapping (degree:Degree) 
                        (lowVal:int) =
         let dm = (Degree.value degree) - 1
@@ -25,6 +26,7 @@ module Switch =
                    yield (lowVal * (lowVal + 1)) / 2 + blv 
             }
 
+    // all the switches of degree that have hiVal as the hi switch index
     let hiOverlapping (degree:Degree) 
                       (hiVal:int) =
         let dm = (Degree.value degree) - 1
@@ -55,9 +57,21 @@ module Switch =
     let switchCountForDegree (order:Degree)  =
         uint32 ((Degree.value order)*(Degree.value order + 1) / 2)
 
+
+    let makeAltEvenOdd (degree:Degree) (stageCt:StageCount) =
+        result {
+            let! stages = TwoCycleGen.makeAltEvenOdd degree 
+                                      (Permutation.identity degree)
+                        |> Seq.take(StageCount.value stageCt)
+                        |> Seq.toList
+                        |> Result.sequence
+            return stages |> List.map(fromTwoCyclePerm)
+                          |> Seq.concat
+        }
+
     // IRando dependent
     let rndNonDegenSwitchesOfDegree (degree:Degree) 
-                               (rnd:IRando) =
+                                    (rnd:IRando) =
         let maxDex = switchCountForDegree degree
         seq { while true do 
                     let p = (int (rnd.NextUInt % maxDex))

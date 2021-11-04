@@ -36,39 +36,6 @@ module SorterMutTypeDto =
         | t -> (sprintf "Invalid sorterMutationTypeDto: %s" t) |> Error
 
 
-    //let fromDto (dto:sorterMutTypeDto) =
-    //    match dto.cat with
-    //    | nameof sorterMutType.BySwitch -> 
-    //               result {
-    //                   let! b = Json.deserialize<Map<string, string>> dto.value
-    //                   let! pfxCtv = b.["pfxCount"] |> Json.deserialize<int>
-    //                   let! pfxCt = pfxCtv |> SwitchCount.create ""
-    //                   let! mrv = b.["mutationRate"] |> Json.deserialize<float>
-    //                   let! mr = mrv |> MutationRate.create "" 
-    //                   return sorterMutType.BySwitch (pfxCt, mr)
-    //               }
-    //    | nameof sorterMutType.ByStage -> 
-    //                result {
-    //                    let! b = Json.deserialize<Map<string, string>> dto.value
-    //                    let! pfxCtv = b.["pfxCount"] |> Json.deserialize<int>
-    //                    let! pfxCt = pfxCtv |> SwitchCount.create ""
-    //                    let! mrv = b.["mutationRate"] |> Json.deserialize<float>
-    //                    let! mr = mrv |> MutationRate.create "" 
-    //                    return sorterMutType.ByStage (pfxCt, mr)
-    //                }
-    //    | nameof sorterMutType.ByStageRfl -> 
-    //                result {
-    //                    let! b = Json.deserialize<Map<string, string>> dto.value
-    //                    let! pfxCtv = b.["pfxCount"] |> Json.deserialize<int>
-    //                    let! pfxCt = pfxCtv |> SwitchCount.create ""
-    //                    let! mrv = b.["mutationRate"] |> Json.deserialize<float>
-    //                    let! mr = mrv |> MutationRate.create "" 
-    //                    return sorterMutType.ByStageRfl (pfxCt, mr)
-    //                }
-    //    | t -> (sprintf "Invalid sorterMutationTypeDto: %s" t) |> Error
-
-
-
     let fromJson (js:string) =
         result {
             let! dto = Json.deserialize<sorterMutTypeDto> js
@@ -179,7 +146,6 @@ module SorterRndGenDto =
                 prams = prams |> StringMapDto.toDto;  
                 switches=switchListDto; 
             } 
-
 
 
     let toJson (cs:sorterRndGen) =

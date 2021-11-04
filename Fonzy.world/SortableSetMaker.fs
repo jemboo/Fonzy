@@ -111,6 +111,7 @@ module SortableSetMaker =
             }
 
     let makeNoRepo (sortableSetType:sortableSetType) =
+        let yab = make None
         SortableSet.make (make None) sortableSetType
 
     let makeTNoRepo (sortableSetType:sortableSetType) =

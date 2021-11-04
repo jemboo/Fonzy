@@ -372,45 +372,45 @@ module SorterRndGen =
         fromSwitchesAndPrefix degree wPfx switches
 
 
-    let createRandom (sorterGen:sorterRndGen) 
+    let createRandom (sorterRndGen:sorterRndGen) 
                      (randy:IRando) =
-        match sorterGen with
-        | sorterRndGen.RandSwitches  (swl, switchCount, degree) -> 
+        match sorterRndGen with
+        | sorterRndGen.RandSwitches  (wPfx, switchCount, degree) -> 
             randomSwitches 
                     degree
-                    swl
+                    wPfx
                     switchCount 
                     randy
 
-        | sorterRndGen.RandStages (swl, stageCount, degree) ->
+        | sorterRndGen.RandStages (wPfx, stageCount, degree) ->
             let sc = SwitchFrequency.fromFloat 1.0
             randomStages 
                     degree 
-                    swl
+                    wPfx
                     stageCount 
                     sc
                     randy
 
-        | sorterRndGen.RandBuddies (swl, stageCount, windowSize, degree) ->
+        | sorterRndGen.RandBuddies (wPfx, stageCount, windowSize, degree) ->
             randomBuddies
                            degree
-                           swl
+                           wPfx
                            stageCount
                            windowSize
                            randy
 
-        | sorterRndGen.RandSymmetric (swl, stageCount, degree) ->
+        | sorterRndGen.RandSymmetric (wPfx, stageCount, degree) ->
             randomSymmetric 
                            degree
-                           swl
+                           wPfx
                            stageCount
                            randy
             |> Result.ExtractOrThrow
 
-        | sorterRndGen.RandRflBuddies (swl, stageCount, windowSize, degree) ->
+        | sorterRndGen.RandRflBuddies (wPfx, stageCount, windowSize, degree) ->
             randomReflBuddies
                            degree
-                           swl
+                           wPfx
                            stageCount
                            windowSize
                            randy

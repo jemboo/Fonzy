@@ -192,7 +192,6 @@ module SHC =
             sorterShc.energy = None;
             sorterShc.perf = None;
             sorterShc.rngGen = spec.rngGen;
-           // sorterShc.switchPfx = spec.switchPfx;
             sorterShc.sorter = spec.sorter;
             sorterShc.switchUses = None;
             bestEnergy = None;

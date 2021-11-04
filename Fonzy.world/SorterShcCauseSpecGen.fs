@@ -27,28 +27,34 @@ module SorterShcCauseSpecGen =
         (causeSpecDescr, outputDir, causeSpec)
 
 
-    let makeMutSpec (mutRate:MutationRate)
+    let makeBaseSpecVarByMut 
+                    (mutRate:MutationRate)
                     (steps: StepNumber)
                     (degree:Degree)
                     (dispSorter:sorter)
-                    (dispRngGen:RngGen) = 
+                    (dispRngGen:RngGen) 
+                    (swPfx:Switch list) = 
 
         let startingTemp = Temp.fromFloat 0.00005
         let stageW = StageWeight.fromFloat 1.0
 
-        let srtbleSetType = sortableSetType.AllForDegree 
+        let srtbleSetTypeB = sortableSetType.AllForDegree 
                                 (sortableSetRep.Bp64 degree)
 
-        let dispSc = SwitchCount.fromInt (srtbleSetType |> SortableSetType.getPrefix).Length  
-        let mutSpec = (dispSc, mutRate) |> sorterMutType.ByStage
-                        |> sorterMutSpec.Constant
 
+        let srtbleSetType = sortableSetType.SwitchReduced 
+                                (srtbleSetTypeB, swPfx)
+
+        let swPfxCt = SwitchCount.fromInt (srtbleSetType |> SortableSetType.getPrefix).Length  
+        let mutSpec = (swPfxCt, mutRate) |> sorterMutType.ByStage
+                        |> sorterMutSpec.Constant
 
         let swS = sorterStageWeightSpec.Constant stageW
         let evl = sorterEvalSpec.PerfBin
         let ann = annealerSpec.Constant startingTemp
         let updt = shcSaveDetails.Never
         let term = shcTermSpec.FixedLength steps
+
         {
             sorterShcSpec.rngGen = dispRngGen;
             sorterShcSpec.sorter = dispSorter;
@@ -66,29 +72,18 @@ module SorterShcCauseSpecGen =
     let makeRunBatchSeq (outputDir:FileDir) 
                         (seed:RandomSeed) =
 
-
-        let degree = Degree.fromInt 14
-        let shcCt = ShcCount.fromInt 5
-        let sorterCt = SorterCount.fromInt 5
-        let steps = StepNumber.fromInt 50000
+        let degree = Degree.fromInt 16
+        let shcCt = ShcCount.fromInt 50
+        let sorterCt = SorterCount.fromInt 25
+        let steps = StepNumber.fromInt 15000
         let seedF = (777) |> RandomSeed.fromInt
-        let wPfx = []
+        let swPfx = Switch.makeAltEvenOdd degree (StageCount.fromInt 1)
+                    |> Result.ExtractOrThrow
+                    |> Seq.toList
         let rngF = RngGen.createLcg seedF
         let rng = RngGen.createLcg seed
-        //let sRndGen = sorterRndGen.RandSymmetric
-        //                            (wPfx,
-        //                             (StageCount.degreeTo999StageCount degree),
-        //                             degree)
-        
-        //let dispSorter = SorterRndGen.createRandom 
-        //                        sRndGen 
-        //                        (rng |> Rando.fromRngGen)
-
-
-        //let ssGen = sorterSetGen.Rnd (sRndGen, rngF, sorterCt)
-        //let sssrgT = sssrgType.Sorters ssGen
-        let sRndGen = sorterRndGen.RandStages
-                                    (wPfx,
+        let sRndGen = sorterRndGen.RandSymmetric
+                                    (swPfx,
                                      (StageCount.degreeTo999StageCount degree),
                                      degree)
         
@@ -99,88 +94,94 @@ module SorterShcCauseSpecGen =
 
         let ssGen = sorterSetGen.Rnd (sRndGen, rngF, sorterCt)
         let sssrgT = sssrgType.Sorters ssGen
+        //let sRndGen = sorterRndGen.RandStages
+        //                            (swPfx,
+        //                             (StageCount.degreeTo999StageCount degree),
+        //                             degree)
+        
+        //let dispSorter = SorterRndGen.createRandom 
+        //                        sRndGen 
+        //                        (rng |> Rando.fromRngGen)
+
+
+        let ssGen = sorterSetGen.Rnd (sRndGen, rngF, sorterCt)
+        let sssrgT = sssrgType.Sorters ssGen
 
         let sorterShcSpecRndGens = 
             seq {
+            
+                    { sorterShcSpecRndGen.baseSpec = 
+                        makeBaseSpecVarByMut
+                             (MutationRate.fromFloat 0.06)
+                             steps
+                             degree dispSorter rng swPfx; 
+                      sorterShcSpecRndGen.sssrgType = sssrgT;
+                      sorterShcSpecRndGen.count = shcCt;
+                      sorterShcSpecRndGen.rndGen = rng } 
 
-                    //{ sorterShcSpecRndGen.baseSpec = 
-                    //        makeMutSpec
-                    //             (MutationRate.fromFloat 0.16)
-                    //             steps
-                    //             degree dispSorter rng; 
-                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
-                    //  sorterShcSpecRndGen.count = shcCt;
-                    //  sorterShcSpecRndGen.rndGen = rng } 
 
-                    //{ sorterShcSpecRndGen.baseSpec = 
-                    //        makeMutSpec
-                    //             (MutationRate.fromFloat 0.018)
-                    //             steps
-                    //             degree dispSorter rng; 
-                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
-                    //  sorterShcSpecRndGen.count = shcCt;
-                    //  sorterShcSpecRndGen.rndGen = rng } 
-                  
-                    //{ sorterShcSpecRndGen.baseSpec = 
-                    //        makeMutSpec
-                    //             (MutationRate.fromFloat 0.020)
-                    //             steps
-                    //             degree dispSorter rng; 
-                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
-                    //  sorterShcSpecRndGen.count = shcCt;
-                    //  sorterShcSpecRndGen.rndGen = rng } 
+              
+                    { sorterShcSpecRndGen.baseSpec = 
+                          makeBaseSpecVarByMut
+                               (MutationRate.fromFloat 0.08)
+                               steps
+                               degree dispSorter rng swPfx; 
+                      sorterShcSpecRndGen.sssrgType = sssrgT;
+                      sorterShcSpecRndGen.count = shcCt;
+                      sorterShcSpecRndGen.rndGen = rng } 
+
 
 
                     { sorterShcSpecRndGen.baseSpec = 
-                            makeMutSpec
-                                 (MutationRate.fromFloat 0.14)
+                            makeBaseSpecVarByMut
+                                 (MutationRate.fromFloat 0.10)
                                  steps
-                                 degree dispSorter rng; 
+                                 degree dispSorter rng swPfx; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = rng } 
 
 
                     { sorterShcSpecRndGen.baseSpec = 
-                            makeMutSpec
-                                 (MutationRate.fromFloat 0.18)
+                            makeBaseSpecVarByMut
+                                 (MutationRate.fromFloat 0.12)
                                  steps
-                                 degree dispSorter rng; 
+                                 degree dispSorter rng swPfx; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = rng } 
 
 
-                    { sorterShcSpecRndGen.baseSpec = 
-                            makeMutSpec
-                                (MutationRate.fromFloat 0.22)
-                                steps
-                                degree dispSorter rng; 
-                      sorterShcSpecRndGen.sssrgType = sssrgT;
-                      sorterShcSpecRndGen.count = shcCt;
-                      sorterShcSpecRndGen.rndGen = rng } 
+                    //{ sorterShcSpecRndGen.baseSpec = 
+                    //        makeBaseSpecVarByMut
+                    //            (MutationRate.fromFloat 0.22)
+                    //            steps
+                    //            degree dispSorter rng swPfx; 
+                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
+                    //  sorterShcSpecRndGen.count = shcCt;
+                    //  sorterShcSpecRndGen.rndGen = rng } 
 
 
 
-                    { sorterShcSpecRndGen.baseSpec = 
-                            makeMutSpec
-                                (MutationRate.fromFloat 0.26)
-                                steps
-                                degree dispSorter rng; 
-                      sorterShcSpecRndGen.sssrgType = sssrgT;
-                      sorterShcSpecRndGen.count = shcCt;
-                      sorterShcSpecRndGen.rndGen = rng } 
+                    //{ sorterShcSpecRndGen.baseSpec = 
+                    //        makeBaseSpecVarByMut
+                    //            (MutationRate.fromFloat 0.26)
+                    //            steps
+                    //            degree dispSorter rng swPfx; 
+                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
+                    //  sorterShcSpecRndGen.count = shcCt;
+                    //  sorterShcSpecRndGen.rndGen = rng } 
 
 
 
-                    { sorterShcSpecRndGen.baseSpec = 
-                               makeMutSpec
-                                   (MutationRate.fromFloat 0.3)
-                                   steps
-                                   degree dispSorter rng; 
-                      sorterShcSpecRndGen.sssrgType = sssrgT;
-                      sorterShcSpecRndGen.count = shcCt;
-                      sorterShcSpecRndGen.rndGen = rng } 
+                    //{ sorterShcSpecRndGen.baseSpec = 
+                    //           makeBaseSpecVarByMut
+                    //               (MutationRate.fromFloat 0.3)
+                    //               steps
+                    //               degree dispSorter rng swPfx; 
+                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
+                    //  sorterShcSpecRndGen.count = shcCt;
+                    //  sorterShcSpecRndGen.rndGen = rng } 
 
                 }
 

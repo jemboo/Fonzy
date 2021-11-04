@@ -44,7 +44,6 @@ type ShcFixture () =
         {
            sorterShcSpec.rngGen = rnG; 
            sorter = srter;
-           //switchPfx = swPfx;
            mutatorSpec = mutSpec;
            srtblSetType = sstAllIntSets;
            sorterStageWeightSpec = stageWspec;
@@ -57,7 +56,6 @@ type ShcFixture () =
         {
            sorterShcSpec.rngGen = rnG; 
            sorter = srter;
-          // switchPfx = swPfx;
            mutatorSpec = mutSpec;
            srtblSetType = sstAllIntSets;
            sorterStageWeightSpec = stageWspec;
@@ -71,7 +69,8 @@ type ShcFixture () =
     member this.SHC_id() =
         let id1 = srtrShcSpec |> SorterShcSpec.makeId
         let id2 = srtrShcSpec2 |> SorterShcSpec.makeId
-
+        let woop = srtrShcSpec :> obj
+        let yab = sprintf "%A" woop
 
         let im1 = seq { mutSpec :> obj } |> GuidUtils.guidFromObjs
         let im2 = seq { mutSpec2 :> obj } |> GuidUtils.guidFromObjs

@@ -61,14 +61,14 @@ module SortableSet =
     let make (sortableSetMaker:sortableSetMaker) 
              (sortableSetType:sortableSetType) =
         result {
-            let! rep = sortableSetMaker sortableSetType
+            let! impl = sortableSetMaker sortableSetType
             let! ssId = seq { sortableSetType:> obj; } 
                          |> GuidUtils.guidFromObjs
                          |>  SortableSetId.create
             return {
                 sortableSet.id = ssId;
                 sortableSetType = sortableSetType;
-                sortableSetImpl = rep}
+                sortableSetImpl = impl}
         }
 
     let makeT (sortableSetMakerT:sortableSetMakerT) 

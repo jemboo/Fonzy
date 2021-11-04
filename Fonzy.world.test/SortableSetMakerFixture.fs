@@ -80,7 +80,6 @@ type SortableSetMakerFixture () =
     [<TestMethod>]
     member this.SortableSetSpecReduced_make() =
         let degree = Degree.fromInt 4
-        let prefixNot = []
         let prefix1a = [{Switch.hi=3; low=0;}]
         let prefix1b = [{Switch.hi=2; low=1;}]
         let prefix2 = [{Switch.hi=3; low=0;}; {Switch.hi=2; low=1;}]
@@ -92,26 +91,10 @@ type SortableSetMakerFixture () =
         let ssAllBitSets = SortableSetMaker.makeNoRepo sstAllBitSets
                             |> Result.ExtractOrThrow
                             
-        //let trimUn = ssAllBitSets.sortableSetImpl 
-        //                            |> SortableSetImpl.getIntSets 
-        //                            |> Seq.length
-
-        //let sstRedxNot = sortableSetType.SwitchReduced  
-        //                            (sstAllBitSets, prefixNot)
-        //let ssRedxNot = SortableSetMaker.makeNoRepo sstRedxNot
-        //                     |> Result.ExtractOrThrow
-        
-        //let trimNot = ssRedxNot.sortableSetImpl 
-        //                    |> SortableSetImpl.getIntSets 
-        //                    |> Seq.length
-        
-        //Assert.AreEqual (trimUn, trimNot)
-
         let sstRedx1a = sortableSetType.SwitchReduced  
                                     (sstAllBitSets, prefix1a)
         let ssRedx1a = SortableSetMaker.makeNoRepo sstRedx1a
                              |> Result.ExtractOrThrow
-
 
 
         let sstRedx1ab = sortableSetType.SwitchReduced  
@@ -124,17 +107,17 @@ type SortableSetMakerFixture () =
         let ssRedx2 = SortableSetMaker.makeNoRepo sstRedx2
                              |> Result.ExtractOrThrow
                              
-        let trim1a = ssRedx1a.sortableSetImpl |> SortableSetImpl.getIntSets |> Seq.length
+        let trim1a = ssRedx1a.sortableSetImpl |> SortableSetImpl.getIntSets |> Seq.toArray
 
-        let trim1ab = ssRedx1ab.sortableSetImpl |> SortableSetImpl.getIntSets |> Seq.length 
-        let trim2 = ssRedx2.sortableSetImpl |> SortableSetImpl.getIntSets |> Seq.length 
+        let trim1ab = ssRedx1ab.sortableSetImpl |> SortableSetImpl.getIntSets |> Seq.toArray 
+        let trim2 = ssRedx2.sortableSetImpl |> SortableSetImpl.getIntSets |> Seq.toArray 
 
-        Assert.AreEqual (trim1ab, trim2)
+        Assert.AreEqual (trim1ab.Length, trim2.Length)
 
 
     [<TestMethod>]
     member this.SortableSetSpecReduced_makeT() =
-        let degree = Degree.fromInt 6
+        let degree = Degree.fromInt 4
         let prefix1a = [{Switch.hi=2; low=0;}]
         let prefix1b = [{Switch.hi=1; low=2;}]
         let prefix2 = [{Switch.hi=2; low=0;}; {Switch.hi=1; low=2;}]
@@ -158,12 +141,12 @@ type SortableSetMakerFixture () =
         let ssRedx2, uses2 = SortableSetMaker.makeTNoRepo sstRedx2
                              |> Result.ExtractOrThrow
                          
-        let trim1a = ssRedx1a.sortableSetImpl |> SortableSetImpl.getIntSets |> Seq.length
+        let trim1a = ssRedx1a.sortableSetImpl |> SortableSetImpl.getIntSets |> Seq.toArray
 
-        let trim1ab = ssRedx1ab.sortableSetImpl |> SortableSetImpl.getIntSets |> Seq.length 
-        let trim2 = ssRedx2.sortableSetImpl |> SortableSetImpl.getIntSets |> Seq.length 
+        let trim1ab = ssRedx1ab.sortableSetImpl |> SortableSetImpl.getIntSets |> Seq.toArray
+        let trim2 = ssRedx2.sortableSetImpl |> SortableSetImpl.getIntSets |> Seq.toArray
 
-        Assert.AreEqual (trim1ab, trim2)
+        Assert.AreEqual (trim1ab.Length, trim2.Length)
         Assert.AreEqual (uses1ab.weights.Length, uses2.weights.Length)
 
 

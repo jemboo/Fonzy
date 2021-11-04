@@ -77,19 +77,6 @@ type UtilsFixture () =
 
 
 
-    [<TestMethod>]
-    member this.guidFromObjs2() =
-        let d1 = sortableSetRep.Bp64 (Degree.fromInt 5)
-        let d2 = sortableSetRep.Bp64 (Degree.fromInt 5)
-
-        let objsA = seq { d1:>obj; }
-        let objsB = seq { d2:>obj; }
-        let gA = objsA |> GuidUtils.guidFromObjs
-        let gB = objsB |> GuidUtils.guidFromObjs
-        Assert.AreEqual(gA, gB)
-
-
-
 // CollectionUtils
 
     [<TestMethod>]
@@ -239,3 +226,13 @@ type UtilsFixture () =
         //Assert.AreEqual(hdExpected.Length, hdResult.Length)
         Assert.AreEqual(1, 1)
 
+
+
+    [<TestMethod>]
+    member this.reportValueAt() =
+        let max = 16.0
+        let ticCt = 40.0
+        let tics = Array.init (ticCt |> int) (fun dex -> (Math.Pow(2.0, ((dex |> float) * max) / ticCt)) |> int)
+        let data = seq {3; 4; 10}
+        let res = ReportUtils.reportValueAu 0 tics data (fun d t -> t > d) |> Seq.toArray
+        Assert.AreEqual(1, 1)
