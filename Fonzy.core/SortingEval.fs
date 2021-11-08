@@ -27,7 +27,12 @@ module SortingEval =
         }
 
     module SorterPerf =
-
+        let dflt = 
+            {
+                usedSwitchCount = SwitchCount.fromInt 0;
+                usedStageCount = StageCount.fromInt 0;
+                successful = None
+            }
         let report (perf:sorterPerf) =
             let fbo (v:bool option) =
                 match v with
@@ -156,7 +161,6 @@ module SortingEval =
 
 
             
-type Fitness = private Fitness of float
 type StageWeight = private StageWeight of float
 
 module StageWeight =
@@ -172,22 +176,23 @@ type sorterSaving =
         | Perf of StageWeight*SorterCount
 
 
-module Fitness =
-    let value (Fitness v) = v
-    let create fieldName v = 
-        ConstrainedType.createFloat fieldName Fitness 0.0 10.0 v
-    let fromFloat v = create "" v |> Result.ExtractOrThrow
-    let repStr v = match v with
-                            |Some r -> sprintf "%.4f" (value r)
-                            |None -> ""
-    let fromKey (m:Map<'a, obj>) (key:'a) =
-        result {
-            let! gv = ResultMap.read key m
-            return! create "" (gv:?>float)
-        }
+//type Fitness = private Fitness of float
+//module Fitness =
+//    let value (Fitness v) = v
+//    let create fieldName v = 
+//        ConstrainedType.createFloat fieldName Fitness 0.0 10.0 v
+//    let fromFloat v = create "" v |> Result.ExtractOrThrow
+//    let repStr v = match v with
+//                            |Some r -> sprintf "%.4f" (value r)
+//                            |None -> ""
+//    let fromKey (m:Map<'a, obj>) (key:'a) =
+//        result {
+//            let! gv = ResultMap.read key m
+//            return! create "" (gv:?>float)
+//        }
 
-    let failure = 
-        Double.MaxValue |> fromFloat
+//    let failure = 
+//        Double.MaxValue |> fromFloat
 
 
 // Positive valued - zero is the best value

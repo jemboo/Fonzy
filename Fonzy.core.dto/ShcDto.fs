@@ -89,7 +89,12 @@ module ShcSaveDetailsDto =
         | nameof shcSaveDetails.Always -> shcSaveDetails.Always |> Ok
         | nameof shcSaveDetails.IfBest -> shcSaveDetails.IfBest |> Ok
         | nameof shcSaveDetails.BetterThanLast -> shcSaveDetails.BetterThanLast |> Ok
-        | nameof shcSaveDetails.Never -> shcSaveDetails.Never |> Ok
+        | nameof shcSaveDetails.ForSteps -> 
+            result {
+                let! sav = dto.value |> Json.deserialize<int[]>
+                let sl = sav |> Array.map(StepNumber.fromInt)
+                return shcSaveDetails.ForSteps sl
+            }
         | nameof shcSaveDetails.EnergyThresh ->
                 result {
                     let! b = dto.value |> Json.deserialize<float>
@@ -119,9 +124,10 @@ module ShcSaveDetailsDto =
         | shcSaveDetails.EnergyThresh e -> 
                 { shcSaveDetailsDto.cat = nameof shcSaveDetails.EnergyThresh; 
                   value = (Energy.value e) |> Json.serialize }
-        | shcSaveDetails.Never -> 
-                { shcSaveDetailsDto.cat = nameof shcSaveDetails.Never; 
-                  value = "" }
+        | shcSaveDetails.ForSteps stps -> 
+                { shcSaveDetailsDto.cat = nameof shcSaveDetails.ForSteps; 
+                  value = stps |> Array.map(StepNumber.value) 
+                               |> Json.serialize}
 
     let toJson (idt:shcSaveDetails) =
         idt |> toDto |> Json.serialize

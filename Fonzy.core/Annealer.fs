@@ -32,11 +32,12 @@ module Energy =
                      (rhs:Energy) = 
         (value lhs) < (value rhs)
 
+
 type Temp = private Temp of float
 module Temp =
     let value (Temp v) = v
     let create fieldName v = 
-        ConstrainedType.createFloat fieldName Temp 0.0 1.0 v
+        ConstrainedType.createFloat fieldName Temp 0.0 10.0 v
     let fromFloat v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
@@ -51,6 +52,14 @@ module StepNumber =
         ConstrainedType.createInt fieldName StepNumber 0 100000000 v
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let increment gen = fromInt ((value gen) + 1)
+    let ticsPerLog = 20.0
+    let logReporting (StepNumber totSteps) =
+        let padding = 0.5
+        let logSteps = (totSteps |> float |> Math.Log2) + padding
+        let ticCt =  ticsPerLog * logSteps
+        Array.init (ticCt |> int) 
+                   (fun dex -> (Math.Pow(2.0, ((dex |> float) * logSteps) / ticCt))
+                                |> int |> fromInt)
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
             let! gv = ResultMap.read key m
@@ -76,6 +85,13 @@ module RevNumber =
 type annealerSpec = 
     | Constant of Temp
     | Exp of Temp * float
+
+module AnnealerSpec =
+    let report (a:annealerSpec) =
+        match a with
+        | Constant t -> sprintf "c_%0.5f" (t |> Temp.value)
+        | Exp (t,d) -> sprintf "e_%0.5f_%0.0f" (t |> Temp.value) d
+
 
 module Annealer =
 

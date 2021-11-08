@@ -143,9 +143,7 @@ module RunBatch =
         }
 
      let unPackShcRes (shcr:sorterShcResult) =
-       result {
-           return (shcr.spec, shcr.archives)
-       }
+         (shcr.spec, shcr.archives)
 
 
 
@@ -161,7 +159,7 @@ module RunBatch =
             spec |> SorterShcSpec.sorterReport;
            ]
 
-         (ReportUtils.partialyPadSeries haTups dexer specRep, ["seed"; "mut"; "sorter"])
+         (ReportUtils.partialyPadSeries haTups dexer specRep, ["seed"; "mut"; "sorter"; "temp"])
 
 
 
@@ -169,7 +167,7 @@ module RunBatch =
                              (reportDir:FileDir) =
 
           let attrLabels = [ "Energy"; "Stages"; "Switches";]
-          let attrF (sArch:sorterShcArch option) = 
+          let _attrF (sArch:sorterShcArch option) = 
               match sArch with
               | Some arch ->
                     [
@@ -180,10 +178,10 @@ module RunBatch =
               | None -> [""; ""; ""]
           
 
-          let catSeriesRept ((cats:string list),
+          let _catSeriesRept ((cats:string list),
                              (ts:sorterShcArch option[])) = 
                ts |> Array.mapi (fun dex arch -> 
-                        seq {yield! cats; yield (dex|>string); yield! (attrF arch)}
+                        seq {yield! cats; yield (dex|>string); yield! (_attrF arch)}
                         |> StringUtils.printSeqToRow)
 
 
@@ -217,15 +215,13 @@ module RunBatch =
                          |> Array.filter(fun r -> r.msg = "OK")
                          |> Array.map(unPackShcRes)
                          |> Array.toList
-                         |> Result.sequence
-                         |> Result.ExtractOrThrow
 
 
           let resMap, catLabels = goodOnes |> seedSeries
 
           let tblContent = resMap 
                             |> Map.toSeq
-                            |> Seq.map(catSeriesRept)
+                            |> Seq.map(_catSeriesRept)
                             |> Array.concat
 
           let colHdrs = seq { yield! catLabels; yield "index"; yield! attrLabels; }
@@ -252,11 +248,97 @@ module RunBatch =
 
 
 
+     let shcRunSeries (haTup: sorterShcSpec*sorterShcArch[]) =
+         let totReptSteps = (haTup |> fst).termSpec |> ShcTermSpec.getSteps
+         let tics = StepNumber.logReporting totReptSteps |> Array.map(StepNumber.value)
+         let dexer (arch:sorterShcArch) =
+            arch.step |> StepNumber.value
+         let specRep (spec:sorterShcSpec) = 
+           [
+            spec |> SorterShcSpec.seedReport;
+            spec |> SorterShcSpec.mutReport;
+            spec |> SorterShcSpec.tempReport;
+            spec |> SorterShcSpec.sorterReport;
+           ]
+         let specs = haTup |> fst |> specRep
+         let archies = haTup |> snd |> ReportUtils.fixedIndexReport dexer SorterShcArch.dflt tics 
+         archies |> Array.map(fun arch -> (specs, arch))
+
+
+     let getOkShcResults (outputDir:FileDir) =
+
+        let _getOkRes (rvs:Result<sorterShcResult array,string> seq) = 
+                let _filter (sqs: sorterShcResult seq) =
+                    seq {
+                            for sq in sqs do
+                                if sq.msg = "OK" then yield sq
+                    }
+                seq {
+                        for rv in rvs do
+                            match rv with
+                            | Result.Ok gr -> yield! (_filter gr)
+                            | Result.Error msg -> msg |> ignore
+                }
+        result {
+            let reportDataSource = new DirectoryDataSource(outputDir) :> IDataSource
+            let! repIds =  reportDataSource.GetDataSourceIds()
+            return repIds |> Seq.map(shcArchsFromGuid reportDataSource)
+                          |> _getOkRes
+        }
 
 
 
+     let fixedIndexSeries (outputDir:FileDir) 
+                          (reportDir:FileDir) =
+
+        let attrLabels = [ "Energy"; "Stages"; "Switches"; ]
+        let specLabels = [ "seed"; "mut"; "temp"; "sorter"; "index"; ]
+        let colHdrs = attrLabels |> List.append specLabels |> StringUtils.printSeqToRow
+
+        let _attrF (tup:int*sorterShcArch) = 
+                    let arch = tup |> snd
+                    [
+                        sprintf "%d" (tup |> fst);
+                        sprintf "%.5f" (arch.energy |> Energy.value);
+                        sprintf "%d" (arch.perf.usedStageCount |> StageCount.value);
+                        sprintf "%d" (arch.perf.usedSwitchCount |> SwitchCount.value);
+                    ]
 
 
+        let yark = result {
+            let! goodOnes = (getOkShcResults outputDir)
+                               
+            let y = goodOnes 
+                       //|> Seq.take(2)
+                       |> Seq.map(fun shcr -> (shcr.spec, shcr.archives))
+                       |> Seq.map(shcRunSeries)
+                       |> Seq.concat
+                       |> Seq.map(fun tup -> (tup |> snd |> _attrF) 
+                                             |> List.append (fst tup)
+                                             |> StringUtils.printSeqToRow)
+            return y |> Seq.toArray
+        }
+
+        let tblContent = yark |> Result.ExtractOrThrow
+
+        let records = tblContent 
+                      |> Array.append [|colHdrs|]
+
+        //let header = "The detailed description part\nHere is more stuff you might be 
+        // interested in\nId Gen pfx len win degree switch stage count"
+        
+        let outFileName = sprintf "%s.txt"  (System.DateTime.Now.Ticks |> string)
+        let csvFile = { csvFile.header = ""; 
+                        csvFile.directory = reportDir;
+                        csvFile.fileName = outFileName;
+                        csvFile.records = records }
+
+        let res = CsvFile.writeCsvFile csvFile
+        let msg = match res with
+                  | Ok _ -> "success"
+                  | Error m -> m
+        
+        sprintf "%s: %s\\%s" "msg" (FileDir.value outputDir) outFileName
 
 
 

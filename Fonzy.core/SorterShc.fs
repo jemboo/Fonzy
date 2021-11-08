@@ -21,13 +21,18 @@ type shcSaveDetails =
     | IfBest
     | BetterThanLast
     | EnergyThresh of Energy
-    | Never
+    | ForSteps of StepNumber array
 
 
 type shcTermSpec = 
     | FixedLength of StepNumber
     | EnergyBased of Energy*StepNumber*StepNumber
 
+module ShcTermSpec =
+    let getSteps (termSpec:shcTermSpec) = 
+        match termSpec with
+        | shcTermSpec.EnergyBased (e,sa,sb) -> sb
+        | shcTermSpec.FixedLength st -> st
 
 type sorterStageWeightSpec =
     | Constant of StageWeight
@@ -86,6 +91,17 @@ type sorterShcArch =
 
 
 module SorterShcArch = 
+
+    let dflt = 
+        {
+            sorterShcArch.step = StepNumber.fromInt 0;
+            sorterShcArch.revision = RevNumber.fromInt 0;
+            sorterShcArch.rngGen = None;
+            sorterShcArch.sorter = None;
+            sorterShcArch.switchUses = None;
+            sorterShcArch.perf = SortingEval.SorterPerf.dflt;
+            sorterShcArch.energy = Energy.fromFloat Double.MaxValue;
+        }
 
     let toFull (shc:sorterShc) =
         {
@@ -215,45 +231,33 @@ module SorterShcSpec =
                 }
             }
 
-
     let makeUpdater (saveDetails:shcSaveDetails) =
         fun (arch:sorterShcArch list) 
             (newT:sorterShc) ->
+            
+            let _threshB (thresh:Energy) =  
+                Energy.isBetterThan 
+                            (newT.energy |> Option.get)
+                            thresh
+            let _addItOn (doAdd:bool) =
+                if doAdd then
+                    (newT |> SorterShcArch.toPartial) :: arch |> Ok
+                else    
+                    arch |> Ok
+
             if arch.Length = 0 then
-                [newT |> SorterShcArch.toFull] |> Ok
+                _addItOn true
             else
-                let lastArch = arch |> List.head
-
-                let improvement = Energy.isBetterThan 
-                                            (newT.energy |> Option.get)
-                                            lastArch.energy
-
-                if newT.revision = lastArch.revision || not improvement then
-                    arch |> Ok 
-                else
-                    let curBest = newT |> SorterShc.isCurrentBest
-
-                    let threshB (thresh:Energy) =  
-                        Energy.isBetterThan 
-                                    (newT.energy |> Option.get)
-                                    thresh
-                    match saveDetails with
-                        | Always -> 
-                            (newT |> SorterShcArch.toFull) :: arch 
-                            |> Ok
-                        | IfBest ->  
-                            (newT |> SorterShcArch.toSorterShcArch curBest) :: arch 
-                            |> Ok
-                        | BetterThanLast ->  
-                            (newT |> SorterShcArch.toSorterShcArch improvement) :: arch 
-                            |> Ok
-                        | EnergyThresh e -> 
-                            let useNew = (threshB e) && improvement
-                            (newT |> SorterShcArch.toSorterShcArch useNew) :: arch 
-                            |> Ok
-                        | Never -> 
-                            (newT |> SorterShcArch.toPartial) :: arch 
-                            |> Ok
+                match saveDetails with
+                    | Always -> _addItOn true
+                    | IfBest ->  
+                        _addItOn (newT |> SorterShc.isCurrentBest)
+                    | BetterThanLast ->  
+                        _addItOn (_threshB (arch |> List.head).energy)
+                    | EnergyThresh e -> 
+                        _addItOn (_threshB e)
+                    | ForSteps stps -> 
+                        _addItOn (stps |> Array.contains newT.step)
 
 
     let makeTerminator (spec:shcTermSpec) =
@@ -281,6 +285,9 @@ module SorterShcSpec =
 
     let seedReport (s:sorterShcSpec) =
         s.rngGen.seed |> RandomSeed.value |> string
+
+    let tempReport (s:sorterShcSpec) =
+        s.annealerSpec |> AnnealerSpec.report
 
 
 

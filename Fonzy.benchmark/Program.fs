@@ -6,7 +6,7 @@ open BenchmarkDotNet.Running
 [<EntryPoint>]
 let main argv =
 
-    ///////// ******* RunBatch.runShcSets ***********
+    /////// ******* RunBatch.runShcSets ***********
     Console.WriteLine("Starting RunBatch.runShcSets")
 
     RunBatch.runShcSets (FileDir.fromString "C:\\SimOutShc") 
@@ -20,9 +20,9 @@ let main argv =
     0
 
 
-/// ******* ShcReport ***********
+///// ******* ShcReport ***********
     //Console.WriteLine("Starting ShcReport")
-    //let res2 =  ShcReports.singleShcPivotTable 
+    //let res2 =  ShcReports.fixedIndexSeries 
     //                    (FileDir.fromString "C:\\SimOutShc") 
     //                    (FileDir.fromString "C:\\SimOutReportsT")
     //Console.WriteLine(res2)

@@ -694,7 +694,7 @@ module ReportUtils =
     // the tics sequence, when the trigger condition is met. Works best when the
     // tics and data sequences are sorted as desired. Choose a value of defT that
     // will not trigger the trigger
-    let reportValueAu<'T,'D> (defD:'D)
+    let reportValuesAt<'T,'D> (defD:'D)
                              (tics:seq<'T>) 
                              (data:seq<'D>) 
                              (trigger:'D->'T->bool) =
@@ -713,47 +713,25 @@ module ReportUtils =
 
         seq {
             let mutable dCur = defD
-            let mutable moreDs = true
             let eTics = tics.GetEnumerator()
             let eData = data.GetEnumerator()
+            let mutable moreDs = eData.MoveNext()
             while eTics.MoveNext() do
                 if moreDs then
                     let res = findDTrigger dCur eData eTics.Current
                     dCur <- fst res
                     moreDs <- snd res
-                    yield dCur
+                    yield (eTics.Current, dCur)
                 else
-                    yield dCur
+                    yield (eTics.Current, dCur)
         }
 
+    let fixedIndexReport<'D> 
+                        (dDex:'D->int)
+                        (defD:'D) 
+                        (tics: int array)
+                        (hdTup: 'D[]) =
 
-
-
-
-
-    //let reportValueAu<'T,'D> (defD:'D)
-    //                     (tics:seq<'T>) 
-    //                     (data:seq<'D>) 
-    //                     (trigger:'D->'T->bool) =
-
-    //    let findDTrigger (curD:'D) (dnumer:IEnumerator<'D>) (curT:'T) =
-    //        let mutable nextD = curD
-    //        let mutable checkNext = true
-    //        if trigger nextD curT then
-    //            while checkNext do
-    //                checkNext <- trigger dnumer.Current curT
-    //                if checkNext then
-    //                    nextD <- dnumer.Current
-    //                    checkNext <- dnumer.MoveNext()
-    //        nextD
-
-    //    seq {
-    //        let mutable dCur = defD
-    //        let eTics = tics.GetEnumerator()
-    //        let eData = data.GetEnumerator()
-    //        while eTics.MoveNext() do
-    //            dCur <- findDTrigger dCur eData eTics.Current
-    //            yield dCur    
-    //    }
-
-
+        let repT (d:'D) (t:int) =  t >= (dDex d)
+        let dexOrdered = hdTup |> Array.sortBy(dDex)
+        reportValuesAt defD tics dexOrdered repT |> Seq.toArray

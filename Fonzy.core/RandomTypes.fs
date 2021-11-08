@@ -31,7 +31,8 @@ module RandomSeed =
 module RngGen =
     let createLcg (seed:RandomSeed) =
         {rngType=RngType.Lcg; seed=seed}
-
+    let lcgFromNow() =
+        RandomSeed.fromNow() |> createLcg
     let createNet (seed:RandomSeed) =
         {rngType=RngType.Net; seed=seed}
 
