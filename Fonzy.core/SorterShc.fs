@@ -55,6 +55,7 @@ type sorterEvalSpec =
 type sorterShc = 
     {
         step:StepNumber;
+        isNew:bool;
         revision:RevNumber;
         rngGen:RngGen; 
         sorter:sorter;
@@ -163,7 +164,7 @@ module SorterShc =
     
     let isCurrentBest (shc:sorterShc) =
         match shc.energy, shc.bestEnergy  with
-        | Some e, Some be -> Energy.value be > Energy.value e 
+        | Some e, Some be -> Energy.value be >= Energy.value e 
                         // current energy is better than best (until now)
         | None, Some _ -> true
         | _, None -> failwith "sorterShc bestEnergy missing"
@@ -208,6 +209,7 @@ module SorterShcSpec =
                                         |> Rando.toRngGen
                         return { shcCurrent with 
                                     step = shcNew.step;
+                                    isNew = false;
                                     rngGen = newRng }
                 }
 
@@ -220,7 +222,8 @@ module SorterShcSpec =
                 let randy = shcCurrent.rngGen |> Rando.fromRngGen
                 let sorterMut = SorterMutate.mutate smt randy shcCurrent.sorter
                 return {
-                    step = shcCurrent.step |> StepNumber.increment;
+                    sorterShc.step = shcCurrent.step |> StepNumber.increment;
+                    isNew = true;
                     revision = shcCurrent.revision |> RevNumber.increment;
                     rngGen = randy |> Rando.toRngGen; 
                     sorter = sorterMut;
@@ -257,7 +260,10 @@ module SorterShcSpec =
                     | EnergyThresh e -> 
                         _addItOn (_threshB e)
                     | ForSteps stps -> 
-                        _addItOn (stps |> Array.contains newT.step)
+                        if (newT |> SorterShc.isCurrentBest) && (newT.isNew) then
+                            (newT |> SorterShcArch.toFull) :: arch |> Ok
+                        else
+                            _addItOn (stps |> Array.contains newT.step)
 
 
     let makeTerminator (spec:shcTermSpec) =

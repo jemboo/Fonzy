@@ -42,16 +42,11 @@ module SorterShc =
                         let energy = perf |> SorterFitness.fromSorterPerf sShc.sorter.degree stageW
                                           |> Some
                         let bestEnergy = Energy.betterEnergy energy sShc.bestEnergy
-                        return  {
-                            sorterShc.bestEnergy = bestEnergy
-                            sorterShc.energy = energy
-                            sorterShc.perf = Some perf
-                            sorterShc.rngGen = sShc.rngGen
-                            sorterShc.sorter = sShc.sorter
-                            sorterShc.step = sShc.step
-                            sorterShc.revision = sShc.revision
-                            sorterShc.switchUses = Some switchUses
-                        }
+                        return {sShc with 
+                                    bestEnergy = bestEnergy;
+                                    energy = energy;
+                                    perf = Some perf;
+                                    }
                     }
           }
     
@@ -188,12 +183,13 @@ module SHC =
 
         let sshcInitial = {
             sorterShc.step = StepNumber.fromInt 0;
-            sorterShc.revision = RevNumber.fromInt 0;
-            sorterShc.energy = None;
-            sorterShc.perf = None;
-            sorterShc.rngGen = spec.rngGen;
-            sorterShc.sorter = spec.sorter;
-            sorterShc.switchUses = None;
+            isNew = true;
+            revision = RevNumber.fromInt 0;
+            energy = None;
+            perf = None;
+            rngGen = spec.rngGen;
+            sorter = spec.sorter;
+            switchUses = None;
             bestEnergy = None;
         }
         result {

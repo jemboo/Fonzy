@@ -2,6 +2,8 @@ namespace Fonzy.core.dto.test
 
 open System
 open Microsoft.VisualStudio.TestTools.UnitTesting
+open System.Runtime.Serialization.Formatters.Binary
+open System.IO
 
 [<TestClass>]
 type SorterDtoFixture () =
@@ -21,6 +23,14 @@ type SorterDtoFixture () =
         let sorterBack = sorterDto |> SorterDto.fromDto
                                    |> Result.ExtractOrThrow
         Assert.AreEqual(sorter, sorterBack);
+
+
+    [<TestMethod>]
+    member this.SorterBinSerialize() =
+        let sorter = TestData.SorterParts.makeRandomSorter()
+        let bbs = ByteUtils.base64FromObj sorter
+        let sorterBack = (ByteUtils.base64ToObj bbs)
+        Assert.AreEqual(sorter, sorterBack)
 
 
     [<TestMethod>]

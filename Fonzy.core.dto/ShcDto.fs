@@ -237,7 +237,6 @@ type sorterShcSpecDto =
     {
      rngGen:rngGenDto;
      sorter:sorterDto;
-     //switchPfx: int[];
      mutSpec:sorterMutSpecDto;
      srtblStType:sortableSetTypeDto
      stWgtSpec:shcStageWeightSpecDto
@@ -250,9 +249,6 @@ module SorterShcSpecDto =
         result {
             let! rng = dto.rngGen |> RngGenDto.fromDto
             let! srt = dto.sorter |> SorterDto.fromDto
-            //let! swx = dto.switchPfx |> Array.map(fun sw -> SwitchDto.fromDto sw)
-            //                         |> Array.toList
-            //                         |> Result.sequence
             let! mutSpec = dto.mutSpec |> SorterMutSpecDto.fromDto
             let! ssRs = dto.srtblStType |> SortableSetTypeDto.fromDto
             let! swS = dto.stWgtSpec |> ShcStageWeightSpecDto.fromDto
@@ -264,14 +260,13 @@ module SorterShcSpecDto =
              {
                 sorterShcSpec.rngGen = rng;
                 sorter = srt;
-              //  switchPfx = swx |> List.toArray;
-                sorterShcSpec.mutatorSpec = mutSpec;
+                mutatorSpec = mutSpec;
                 srtblSetType = ssRs;
                 sorterStageWeightSpec = swS;
-                sorterShcSpec.evalSpec = evl;
-                sorterShcSpec.annealerSpec = ann;
-                sorterShcSpec.updaterSpec = updt;
-                sorterShcSpec.termSpec = term;
+                evalSpec = evl;
+                annealerSpec = ann;
+                updaterSpec = updt;
+                termSpec = term;
              }
         }
                      
@@ -285,7 +280,6 @@ module SorterShcSpecDto =
             {
                 sorterShcSpecDto.rngGen = sss.rngGen |> RngGenDto.toDto;
                 sorter = sss.sorter |> SorterDto.toDto;
-              //  switchPfx = sss.switchPfx |> Array.map(SwitchDto.toDto);
                 mutSpec = sss.mutatorSpec |> SorterMutSpecDto.toDto
                 srtblStType = sss.srtblSetType |> SortableSetTypeDto.toDto
                 stWgtSpec = sss.sorterStageWeightSpec |> ShcStageWeightSpecDto.toDto
@@ -300,18 +294,19 @@ module SorterShcSpecDto =
 
 
 
+
 type sssrgTypeDto  = {cat:string; value:string}
 module SssrgTypeDto =
     let fromDto (dto:sssrgTypeDto) =
         match dto.cat with
         | nameof sssrgType.Annealer -> 
             result {
-                let! spec = dto.value |> AnnealerSpecDto.fromJson
+                let! spec = dto.value |> ByteUtils.base64ToObj |> Ok
                 return sssrgType.Annealer spec
             }
         | nameof sssrgType.Mutation -> 
             result {
-                let! spec = dto.value |> SorterMutSpecDto.fromJson
+                let! spec = dto.value |> ByteUtils.base64ToObj  |> Ok
                 return sssrgType.Mutation spec
             }
         | nameof sssrgType.RndGen -> 
@@ -320,12 +315,12 @@ module SssrgTypeDto =
             }
         | nameof sssrgType.Sorters -> 
             result {
-                let! spec = dto.value |> SorterSetGenDto.fromJson
+                let! spec = dto.value |> ByteUtils.base64ToObj  |> Ok
                 return sssrgType.Sorters spec
             }
         | nameof sssrgType.StageWeight ->
             result {
-                let! spec = dto.value |> ShcStageWeightSpecDto.fromJson
+                let! spec = dto.value |> ByteUtils.base64ToObj  |> Ok
                 return sssrgType.StageWeight spec
             }
         | t -> sprintf "cat: %s for sssrgTypeDto not found"
@@ -343,23 +338,22 @@ module SssrgTypeDto =
         match sss with
         | sssrgType.Annealer anlrs -> 
                 { sssrgTypeDto.cat = nameof sssrgType.Annealer; 
-                    value= anlrs |> AnnealerSpecDto.toJson }
+                    value= anlrs |> ByteUtils.base64FromObj }
         | sssrgType.Mutation srtMutsp -> 
                 { sssrgTypeDto.cat = nameof sssrgType.Mutation; 
-                    value= srtMutsp |> SorterMutSpecDto.toJson }
+                    value= srtMutsp |> ByteUtils.base64FromObj}
         | sssrgType.RndGen -> 
                 { sssrgTypeDto.cat = nameof sssrgType.RndGen; 
                   value=""}
         | sssrgType.Sorters ssg -> 
                 { sssrgTypeDto.cat = nameof sssrgType.Sorters; 
-                  value = ssg |> SorterSetGenDto.toJson }
+                  value = ssg |> ByteUtils.base64FromObj}
         | sssrgType.StageWeight swsp -> 
                 { sssrgTypeDto.cat = nameof sssrgType.StageWeight; 
-                  value = (swsp |> ShcStageWeightSpecDto.toJson) }
+                  value = swsp |> ByteUtils.base64FromObj}
 
     let toJson (idt:sssrgType) =
         idt |> toDto |> Json.serialize
-
 
 
 type sorterShcSpecRndGenDto = 
@@ -374,7 +368,7 @@ module SorterShcSpecRndGenDto =
         result {
             let! rng = dto.rngGen |> RngGenDto.fromDto
             let! srt = dto.sssrgT |> SssrgTypeDto.fromDto
-            let! bs = dto.baseSpec |>SorterShcSpecDto.fromDto
+            let! bs = dto.baseSpec |> SorterShcSpecDto.fromDto
             let! shcCt = dto.count |> ShcCount.create ""
             return 
              {
@@ -401,6 +395,23 @@ module SorterShcSpecRndGenDto =
 
     let toJson (idt:sorterShcSpecRndGen) =
         idt |> toDto |> Json.serialize
+
+
+    let fromBase64 (jstr:string) =
+        result {
+            let! dto = jstr |> ByteUtils.base64ToObj |> Ok
+            return dto
+        }
+
+
+    let toBase64 (idt:sorterShcSpecRndGen) =
+        idt |> ByteUtils.base64FromObj
+
+
+
+
+
+
 
 
 

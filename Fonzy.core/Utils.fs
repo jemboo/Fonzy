@@ -5,23 +5,36 @@ open System
 open System.Security.Cryptography
 open System.Runtime.Serialization.Formatters.Binary
 open System.IO
-open System.Numerics
+
+module TypeUtils = 
+
+ let tryCast<'a>  (value:obj) = 
+     match value with
+     | :? 'a as a -> a |> Ok
+     | _ -> (sprintf "Can't cast to %s"  typeof<'a>.Name) |> Error
 
 
 module ByteUtils =
 
-    //let bytesForObj (o:obj) =
-    //    let bf = new BinaryFormatter()
-    //    use ms = new MemoryStream()
-    //    bf.Serialize(ms, o);
-    //    let rv = ms.ToArray()
-    //    ms.Dispose()
-    //    rv
+    let bytesFromObj (o:obj) =
+        let bf = new BinaryFormatter()
+        use ms = new MemoryStream()
+        bf.Serialize(ms, o);
+        let rv = ms.ToArray()
+        ms.Dispose()
+        rv
+
     
-    
-    //let structHash (o:obj) =
-    //    let md5 = MD5.Create();
-    //    md5.ComputeHash(bytesForObj o)
+    let base64FromObj (o:obj) =
+        let bytes = bytesFromObj o
+        bytes |> System.Convert.ToBase64String
+
+
+    let base64ToObj<'T> (b64:string) =
+        let bback = System.Convert.FromBase64String b64
+        let bf = new BinaryFormatter()
+        use ms = new MemoryStream(bback)
+        bf.Deserialize(ms) :?> 'T
     
     
     let structHash (o:obj) =

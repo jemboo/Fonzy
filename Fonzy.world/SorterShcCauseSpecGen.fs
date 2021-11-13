@@ -46,7 +46,7 @@ module SorterShcCauseSpecGen =
                                 (srtbleSetTypeB, swPfx)
 
         let swPfxCt = SwitchCount.fromInt (srtbleSetType |> SortableSetType.getPrefix).Length  
-        let mutSpec = (swPfxCt, mutRate) |> sorterMutType.ByStage
+        let mutSpec = (swPfxCt, mutRate) |> sorterMutType.ByStageRfl
                         |> sorterMutSpec.Constant
 
         let swS = sorterStageWeightSpec.Constant stageW
@@ -74,23 +74,27 @@ module SorterShcCauseSpecGen =
     let makeRunBatchSeq (outputDir:FileDir) 
                         (seed:RandomSeed) =
 
-        let degree = Degree.fromInt 16
-        let shcCt = ShcCount.fromInt 10
+        let degree = Degree.fromInt 20
+        let shcCt = ShcCount.fromInt 2
         let sorterCt = SorterCount.fromInt 10
-        let steps = StepNumber.fromInt 10000
+        let steps = StepNumber.fromInt 500
         //let seedF = (777) |> RandomSeed.fromInt
        // let seedF = (555) |> RandomSeed.fromInt
-        let seedF = (8556) |> RandomSeed.fromInt
-        let swPfx = Switch.makeAltEvenOdd degree (StageCount.fromInt 1)
-                    |> Result.ExtractOrThrow
-                    |> Seq.toList
+        let seedF = (9556) |> RandomSeed.fromInt
+        let refSorter = RefSorter.goodRefSorterForDegree degree |> Result.ExtractOrThrow
+        let swPfx2 = refSorter |> Sorter.getSwitchPrefix (StageCount.fromInt 2)
+                               |> Seq.toList
+        //let swPfx2 = Switch.makeAltEvenOdd degree (StageCount.fromInt 1)
+        //            |> Result.ExtractOrThrow
+        //            |> Seq.toList
+        //let swPfx2 = []
         let rngF = RngGen.createLcg seedF
         let rng = RngGen.createLcg seed
         let randy = rng |> Rando.fromRngGen
 
         let sRndGen = sorterRndGen.RandSymmetric
-                                    (swPfx,
-                                     (StageCount.degreeTo999StageCount degree),
+                                    (swPfx2,
+                                    (StageCount.degreeTo999StageCount degree),
                                      degree)
         
         let dispSorter = SorterRndGen.createRandom 
@@ -100,6 +104,10 @@ module SorterShcCauseSpecGen =
 
         let ssGen = sorterSetGen.Rnd (sRndGen, rngF, sorterCt)
         let sssrgT = sssrgType.Sorters ssGen
+
+
+
+
         //let sRndGen = sorterRndGen.RandStages
         //                            (swPfx,
         //                             (StageCount.degreeTo999StageCount degree),
@@ -110,37 +118,51 @@ module SorterShcCauseSpecGen =
         //                        (rng |> Rando.fromRngGen)
 
 
-        let ssGen = sorterSetGen.Rnd (sRndGen, rngF, sorterCt)
-        let sssrgT = sssrgType.Sorters ssGen
+        //let ssGen = sorterSetGen.Rnd (sRndGen, rngF, sorterCt)
+        //let sssrgT = sssrgType.Sorters ssGen
+
+
+
 
         let sorterShcSpecRndGens = 
             seq {
                     //{ sorterShcSpecRndGen.baseSpec = 
                     //        makeBaseSpecVar
-                    //            (Temp.fromFloat 5.0)
-                    //            (MutationRate.fromFloat 0.09)
+                    //            (Temp.fromFloat 0.0015)
+                    //            (MutationRate.fromFloat 0.12)
                     //            steps
-                    //            degree dispSorter rng swPfx; 
+                    //            degree dispSorter rng swPfx2; 
+                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
+                    //  sorterShcSpecRndGen.count = shcCt;
+                    //  sorterShcSpecRndGen.rndGen = makeRng(randy) } 
+
+                    //{ sorterShcSpecRndGen.baseSpec = 
+                    //        makeBaseSpecVar
+                    //            (Temp.fromFloat 0.002)
+                    //            (MutationRate.fromFloat 0.12)
+                    //            steps
+                    //            degree dispSorter rng swPfx2; 
                     //  sorterShcSpecRndGen.sssrgType = sssrgT;
                     //  sorterShcSpecRndGen.count = shcCt;
                     //  sorterShcSpecRndGen.rndGen = makeRng(randy) } 
             
                     //{ sorterShcSpecRndGen.baseSpec = 
                     //        makeBaseSpecVar
-                    //            (Temp.fromFloat 2.0)
-                    //            (MutationRate.fromFloat 0.09)
+                    //            (Temp.fromFloat 0.0025)
+                    //            (MutationRate.fromFloat 0.12)
                     //            steps
-                    //            degree dispSorter rng swPfx; 
+                    //            degree dispSorter rng swPfx2; 
                     //  sorterShcSpecRndGen.sssrgType = sssrgT;
                     //  sorterShcSpecRndGen.count = shcCt;
                     //  sorterShcSpecRndGen.rndGen = makeRng(randy) } 
 
+
                     { sorterShcSpecRndGen.baseSpec = 
                             makeBaseSpecVar
-                                (Temp.fromFloat 1.0)
-                                (MutationRate.fromFloat 0.09)
+                                (Temp.fromFloat 0.0015)
+                                (MutationRate.fromFloat 0.12)
                                 steps
-                                degree dispSorter rng swPfx; 
+                                degree dispSorter rng swPfx2; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = makeRng(randy) } 
@@ -148,10 +170,33 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                             makeBaseSpecVar
-                                 (Temp.fromFloat 0.5)
-                                 (MutationRate.fromFloat 0.09)
+                                (Temp.fromFloat 0.0015)
+                                (MutationRate.fromFloat 0.15)
+                                steps
+                                degree dispSorter rng swPfx2; 
+                      sorterShcSpecRndGen.sssrgType = sssrgT;
+                      sorterShcSpecRndGen.count = shcCt;
+                      sorterShcSpecRndGen.rndGen = makeRng(randy) } 
+
+
+
+                    { sorterShcSpecRndGen.baseSpec = 
+                            makeBaseSpecVar
+                                (Temp.fromFloat 0.0015)
+                                (MutationRate.fromFloat 0.18)
+                                steps
+                                degree dispSorter rng swPfx2; 
+                      sorterShcSpecRndGen.sssrgType = sssrgT;
+                      sorterShcSpecRndGen.count = shcCt;
+                      sorterShcSpecRndGen.rndGen = makeRng(randy) } 
+
+
+                    { sorterShcSpecRndGen.baseSpec = 
+                            makeBaseSpecVar
+                                 (Temp.fromFloat 0.0020)
+                                 (MutationRate.fromFloat 0.12)
                                  steps
-                                 degree dispSorter rng swPfx; 
+                                 degree dispSorter rng swPfx2; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = makeRng(randy) } 
@@ -159,20 +204,42 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                             makeBaseSpecVar
-                                (Temp.fromFloat 0.2)
-                                (MutationRate.fromFloat 0.09)
+                                (Temp.fromFloat 0.0020)
+                                (MutationRate.fromFloat 0.15)
                                 steps
-                                degree dispSorter rng swPfx; 
+                                degree dispSorter rng swPfx2; 
+                      sorterShcSpecRndGen.sssrgType = sssrgT;
+                      sorterShcSpecRndGen.count = shcCt;
+                      sorterShcSpecRndGen.rndGen = makeRng(randy) } 
+
+
+                    { sorterShcSpecRndGen.baseSpec = 
+                            makeBaseSpecVar
+                                (Temp.fromFloat 0.0020)
+                                (MutationRate.fromFloat 0.18)
+                                steps
+                                degree dispSorter rng swPfx2; 
+                      sorterShcSpecRndGen.sssrgType = sssrgT;
+                      sorterShcSpecRndGen.count = shcCt;
+                      sorterShcSpecRndGen.rndGen = makeRng(randy) } 
+
+
+                    { sorterShcSpecRndGen.baseSpec = 
+                            makeBaseSpecVar
+                                (Temp.fromFloat 0.0025)
+                                (MutationRate.fromFloat 0.12)
+                                steps
+                                degree dispSorter rng swPfx2; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = makeRng(randy) } 
             
                     { sorterShcSpecRndGen.baseSpec = 
                         makeBaseSpecVar
-                             (Temp.fromFloat 0.1)
-                             (MutationRate.fromFloat 0.09)
+                             (Temp.fromFloat 0.0025)
+                             (MutationRate.fromFloat 0.15)
                              steps
-                             degree dispSorter rng swPfx; 
+                             degree dispSorter rng swPfx2; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = makeRng(randy) } 
@@ -180,10 +247,10 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                           makeBaseSpecVar
-                               (Temp.fromFloat 0.05)
-                               (MutationRate.fromFloat 0.09)
+                               (Temp.fromFloat 0.025)
+                               (MutationRate.fromFloat 0.18)
                                steps
-                               degree dispSorter rng swPfx; 
+                               degree dispSorter rng swPfx2; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = makeRng(randy) } 
@@ -192,10 +259,10 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                             makeBaseSpecVar
-                                 (Temp.fromFloat 0.04)
-                                 (MutationRate.fromFloat 0.09)
+                                 (Temp.fromFloat 0.030)
+                                 (MutationRate.fromFloat 0.12)
                                  steps
-                                 degree dispSorter rng swPfx; 
+                                 degree dispSorter rng swPfx2; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = makeRng(randy) } 
@@ -203,10 +270,10 @@ module SorterShcCauseSpecGen =
 
                     { sorterShcSpecRndGen.baseSpec = 
                             makeBaseSpecVar
-                                 (Temp.fromFloat 0.03)
-                                 (MutationRate.fromFloat 0.09)
+                                 (Temp.fromFloat 0.030)
+                                 (MutationRate.fromFloat 0.15)
                                  steps
-                                 degree dispSorter rng swPfx; 
+                                 degree dispSorter rng swPfx2; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = makeRng(randy) } 
@@ -214,47 +281,47 @@ module SorterShcCauseSpecGen =
               
                     { sorterShcSpecRndGen.baseSpec = 
                           makeBaseSpecVar
-                               (Temp.fromFloat 0.02)
-                               (MutationRate.fromFloat 0.02)
+                               (Temp.fromFloat 0.030)
+                               (MutationRate.fromFloat 0.18)
                                steps
-                               degree dispSorter rng swPfx; 
+                               degree dispSorter rng swPfx2; 
                       sorterShcSpecRndGen.sssrgType = sssrgT;
                       sorterShcSpecRndGen.count = shcCt;
                       sorterShcSpecRndGen.rndGen = makeRng(randy) } 
 
 
 
-                    { sorterShcSpecRndGen.baseSpec = 
-                            makeBaseSpecVar
-                                 (Temp.fromFloat 0.01)
-                                 (MutationRate.fromFloat 0.09)
-                                 steps
-                                 degree dispSorter rng swPfx; 
-                      sorterShcSpecRndGen.sssrgType = sssrgT;
-                      sorterShcSpecRndGen.count = shcCt;
-                      sorterShcSpecRndGen.rndGen = makeRng(randy) } 
+                    //{ sorterShcSpecRndGen.baseSpec = 
+                    //        makeBaseSpecVar
+                    //             (Temp.fromFloat 0.01)
+                    //             (MutationRate.fromFloat 0.2)
+                    //             steps
+                    //             degree dispSorter rng swPfx; 
+                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
+                    //  sorterShcSpecRndGen.count = shcCt;
+                    //  sorterShcSpecRndGen.rndGen = makeRng(randy) } 
 
 
-                    { sorterShcSpecRndGen.baseSpec = 
-                            makeBaseSpecVar
-                                 (Temp.fromFloat 0.005)
-                                 (MutationRate.fromFloat 0.09)
-                                 steps
-                                 degree dispSorter rng swPfx; 
-                      sorterShcSpecRndGen.sssrgType = sssrgT;
-                      sorterShcSpecRndGen.count = shcCt;
-                      sorterShcSpecRndGen.rndGen = makeRng(randy) } 
+                    //{ sorterShcSpecRndGen.baseSpec = 
+                    //        makeBaseSpecVar
+                    //             (Temp.fromFloat 0.005)
+                    //             (MutationRate.fromFloat 0.2)
+                    //             steps
+                    //             degree dispSorter rng swPfx; 
+                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
+                    //  sorterShcSpecRndGen.count = shcCt;
+                    //  sorterShcSpecRndGen.rndGen = makeRng(randy) } 
 
 
-                    { sorterShcSpecRndGen.baseSpec = 
-                            makeBaseSpecVar
-                                (Temp.fromFloat 0.0000005)
-                                (MutationRate.fromFloat 0.09)
-                                steps
-                                degree dispSorter rng swPfx; 
-                      sorterShcSpecRndGen.sssrgType = sssrgT;
-                      sorterShcSpecRndGen.count = shcCt;
-                      sorterShcSpecRndGen.rndGen = makeRng(randy) } 
+                    //{ sorterShcSpecRndGen.baseSpec = 
+                    //        makeBaseSpecVar
+                    //            (Temp.fromFloat 0.0000005)
+                    //            (MutationRate.fromFloat 0.2)
+                    //            steps
+                    //            degree dispSorter rng swPfx; 
+                    //  sorterShcSpecRndGen.sssrgType = sssrgT;
+                    //  sorterShcSpecRndGen.count = shcCt;
+                    //  sorterShcSpecRndGen.rndGen = makeRng(randy) } 
 
 
 

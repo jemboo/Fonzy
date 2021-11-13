@@ -6,13 +6,13 @@ open BenchmarkDotNet.Running
 [<EntryPoint>]
 let main argv =
 
-    /////// ******* RunBatch.runShcSets ***********
+    ///// ******* RunBatch.runShcSets ***********
     Console.WriteLine("Starting RunBatch.runShcSets")
 
     RunBatch.runShcSets (FileDir.fromString "C:\\SimOutShc") 
                                 (RandomSeed.fromNow ())
                                 0
-                                 |> ignore
+                         |> ignore
 
     Console.WriteLine(sprintf "Finished: %s " 
                                  (System.DateTime.Now.ToLongTimeString()))
@@ -26,8 +26,8 @@ let main argv =
     //                    (FileDir.fromString "C:\\SimOutShc") 
     //                    (FileDir.fromString "C:\\SimOutReportsT")
     //Console.WriteLine(res2)
-    //Console.WriteLine(sprintf "Finished: %s " 
-    //                             (System.DateTime.Now.ToLongTimeString()))
+    //Console.WriteLine(sprintf "Finished: %s "
+    //                          (System.DateTime.Now.ToLongTimeString()))
     //Console.Read() |> ignore
     //0
 

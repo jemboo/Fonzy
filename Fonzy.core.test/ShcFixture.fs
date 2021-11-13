@@ -69,10 +69,11 @@ type ShcFixture () =
     member this.SHC_id() =
         let id1 = srtrShcSpec |> SorterShcSpec.makeId
         let id2 = srtrShcSpec2 |> SorterShcSpec.makeId
-        let woop = srtrShcSpec :> obj
-        let yab = sprintf "%A" woop
+        Assert.AreEqual(id1, id2)
 
-        let im1 = seq { mutSpec :> obj } |> GuidUtils.guidFromObjs
-        let im2 = seq { mutSpec2 :> obj } |> GuidUtils.guidFromObjs
-        Assert.IsTrue(true)
 
+    [<TestMethod>]
+    member this.cereal_mutSpec() =
+        let id1 = mutSpec |> ByteUtils.base64FromObj
+        let msBack = id1 |> ByteUtils.base64ToObj
+        Assert.AreEqual(mutSpec, msBack)

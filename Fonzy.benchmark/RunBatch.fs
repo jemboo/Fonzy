@@ -248,41 +248,43 @@ module RunBatch =
 
 
 
-     let shcRunSeries (haTup: sorterShcSpec*sorterShcArch[]) =
-         let totReptSteps = (haTup |> fst).termSpec |> ShcTermSpec.getSteps
+     let shcRunSeries (haTup: Guid*sorterShcSpec*sorterShcArch[]) =
+         let (gu, spec, archies) = haTup
+         let totReptSteps = spec.termSpec |> ShcTermSpec.getSteps
          let tics = StepNumber.logReporting totReptSteps |> Array.map(StepNumber.value)
          let dexer (arch:sorterShcArch) =
             arch.step |> StepNumber.value
          let specRep (spec:sorterShcSpec) = 
            [
+            gu |> string;
             spec |> SorterShcSpec.seedReport;
             spec |> SorterShcSpec.mutReport;
             spec |> SorterShcSpec.tempReport;
             spec |> SorterShcSpec.sorterReport;
            ]
-         let specs = haTup |> fst |> specRep
-         let archies = haTup |> snd |> ReportUtils.fixedIndexReport dexer SorterShcArch.dflt tics 
+         let specs = spec |> specRep
+         let archies = archies |> ReportUtils.fixedIndexReport dexer SorterShcArch.dflt tics 
          archies |> Array.map(fun arch -> (specs, arch))
 
 
      let getOkShcResults (outputDir:FileDir) =
 
-        let _getOkRes (rvs:Result<sorterShcResult array,string> seq) = 
-                let _filter (sqs: sorterShcResult seq) =
+        let _getOkRes (rvs:(Guid*Result<sorterShcResult array,string>) seq) = 
+                let _filter (gu: Guid) (sqs: sorterShcResult seq) =
                     seq {
                             for sq in sqs do
-                                if sq.msg = "OK" then yield sq
+                                if sq.msg = "OK" then yield (gu, sq)
                     }
                 seq {
                         for rv in rvs do
                             match rv with
-                            | Result.Ok gr -> yield! (_filter gr)
-                            | Result.Error msg -> msg |> ignore
+                            | (gu, Result.Ok gr) -> yield! (_filter gu gr)
+                            | (gu, Result.Error msg) -> msg |> ignore
                 }
         result {
             let reportDataSource = new DirectoryDataSource(outputDir) :> IDataSource
             let! repIds =  reportDataSource.GetDataSourceIds()
-            return repIds |> Seq.map(shcArchsFromGuid reportDataSource)
+            return repIds |> Seq.map(fun gu -> (gu, shcArchsFromGuid reportDataSource gu))
                           |> _getOkRes
         }
 
@@ -292,7 +294,7 @@ module RunBatch =
                           (reportDir:FileDir) =
 
         let attrLabels = [ "Energy"; "Stages"; "Switches"; ]
-        let specLabels = [ "seed"; "mut"; "temp"; "sorter"; "index"; ]
+        let specLabels = [ "fileName"; "seed"; "mut"; "temp"; "sorter"; "index"; ]
         let colHdrs = attrLabels |> List.append specLabels |> StringUtils.printSeqToRow
 
         let _attrF (tup:int*sorterShcArch) = 
@@ -309,8 +311,7 @@ module RunBatch =
             let! goodOnes = (getOkShcResults outputDir)
                                
             let y = goodOnes 
-                       //|> Seq.take(2)
-                       |> Seq.map(fun shcr -> (shcr.spec, shcr.archives))
+                       |> Seq.map(fun (gu, shcr) -> (gu, shcr.spec, shcr.archives))
                        |> Seq.map(shcRunSeries)
                        |> Seq.concat
                        |> Seq.map(fun tup -> (tup |> snd |> _attrF) 
