@@ -89,9 +89,6 @@ module Rando =
         | Some rando -> _NextGuid2 curr1 rando
         | None -> _NextGuid curr1
 
-    let nextRnGen (randy:IRando) =
-        RngGen.createLcg (RandomSeed.fromInt randy.NextPositiveInt)
-
     let fromSeed rngtype seed =
         match rngtype with
         | RngType.Lcg -> LcgFromSeed seed
@@ -112,7 +109,7 @@ module Rando =
         | RngType.Net -> NetFromSeed rngGen.seed
 
 
-    let toRngGen (randy:IRando) =
+    let nextRngGen (randy:IRando) =
         match (randy.RngType) with
         | RngType.Lcg -> { RngGen.rngType = RngType.Lcg; 
                            seed = (RandomSeed.fromInt randy.NextPositiveInt) }

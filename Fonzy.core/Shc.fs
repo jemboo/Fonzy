@@ -9,15 +9,15 @@ type sHC<'T,'A> =
        mutator: 'T -> Result<'T, string>
        evaluator: 'T -> Result<'T, string>
        annealer: 'T -> 'T -> Result<'T, string>
-       updater: 'A list -> 'T -> Result<'A list, string>
+       logger: 'A list -> 'T -> Result<'A list, string>
        terminator: 'T -> bool
     }
 
     
 type sHCset<'S,'T,'A> =  
     {
-        specs:Map<ShcId,'S>;
-        members:Map<ShcId, Result<sHC<'T,'A>, string>>;
+        specMap:Map<ShcId,'S>;
+        memberMap:Map<ShcId, Result<sHC<'T,'A>, string>>;
     }
 
 
@@ -35,16 +35,16 @@ module SHC =
     let update (shc:sHC<'T,'A>) =
         if shc.archive.Length = 0 then
             result {
-                let! updated = shc.current |> shc.evaluator
-                let! aNext = shc.annealer shc.current updated
-                let! aLst = aNext |> shc.updater shc.archive
+                let! evaluated = shc.current |> shc.evaluator
+                let! aNext = shc.annealer evaluated evaluated
+                let! aLst = aNext |> shc.logger shc.archive
                 return
                     {
                         sHC.id = shc.id;
                         sHC.current = aNext;
                         sHC.archive = aLst;
                         sHC.mutator = shc.mutator;
-                        sHC.updater = shc.updater;
+                        sHC.logger = shc.logger;
                         sHC.evaluator = shc.evaluator;
                         sHC.annealer = shc.annealer;
                         sHC.terminator = shc.terminator;
@@ -54,14 +54,14 @@ module SHC =
             result {
                 let! updated = shc.current |> newGen shc.mutator shc.evaluator
                 let! aNext = shc.annealer shc.current updated
-                let! aLst = aNext |> shc.updater shc.archive
+                let! aLst = aNext |> shc.logger shc.archive
                 return
                     {
                         sHC.id = shc.id;
                         sHC.current = aNext;
                         sHC.archive = aLst;
                         sHC.mutator = shc.mutator;
-                        sHC.updater = shc.updater;
+                        sHC.logger = shc.logger;
                         sHC.evaluator = shc.evaluator;
                         sHC.annealer = shc.annealer;
                         sHC.terminator = shc.terminator;
@@ -106,7 +106,7 @@ module sHCset =
         let memberMap = specA |> Seq.map(fun s -> (idGen s, maker s))
                               |> Map.ofSeq
 
-        {sHCset.specs= specMap; sHCset.members = memberMap}
+        {sHCset.specMap= specMap; sHCset.memberMap = memberMap}
 
 
     let runBatch (useP:UseParallel) 
@@ -120,16 +120,16 @@ module sHCset =
 
         let mms = 
             match UseParallel.value(useP) with
-            | true  -> shcs.members 
+            | true  -> shcs.memberMap 
                         |> Map.toArray
                         |> Array.Parallel.map(fun tup -> _runn (fst tup) (snd tup))
                         |> Map.ofSeq
-            | false -> shcs.members 
+            | false -> shcs.memberMap 
                         |> Map.toArray
                         |> Array.map(fun tup -> _runn (fst tup) (snd tup))
                         |> Map.ofSeq
 
-        {shcs with members = mms}
+        {shcs with memberMap = mms}
 
 
 

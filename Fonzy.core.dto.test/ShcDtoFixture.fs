@@ -103,9 +103,9 @@ type ShcDtoFixture () =
         let archie = {
             sorterShcArch.step = stp;
             sorterShcArch.revision = rev;
-            rngGen = Some rng;
-            sorter = Some sorter;
-            switchUses = Some switchUses;
+            rngGen = rng;
+            sorter = sorter;
+            switchUses = switchUses;
             perf = sorterPerf;
             energy = energy;
           }

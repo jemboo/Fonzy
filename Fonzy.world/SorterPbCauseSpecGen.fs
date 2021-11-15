@@ -54,7 +54,7 @@ module SorterPbCauseSpecGen =
         let srtableStType = sortableSetType.SwitchReduced 
                              ((sortableSetType.AllForDegree ssRep), pfx)
         let sorterCount = degree |> sorterCountForDegree
-        let rndGen = Rando.nextRnGen randy
+        let rndGen = Rando.nextRngGen randy
 
         let ssImplBps = SortableSetMaker.allZeroOnes
                                 (sortableSetRep.Binary degree)

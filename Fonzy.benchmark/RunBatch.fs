@@ -248,22 +248,23 @@ module RunBatch =
 
 
 
-     let shcRunSeries (haTup: Guid*sorterShcSpec*sorterShcArch[]) =
-         let (gu, spec, archies) = haTup
-         let totReptSteps = spec.termSpec |> ShcTermSpec.getSteps
-         let tics = StepNumber.logReporting totReptSteps |> Array.map(StepNumber.value)
+     let shcRunSeries (haTup: Guid*sorterShcResult) =
+         let (gu, shcRes) = haTup
+         let totReptSteps = shcRes.spec.termSpec |> ShcTermSpec.getSteps
+         let ticsPerLog = 20.0
+         let tics = StepNumber.logReporting totReptSteps ticsPerLog |> Array.map(StepNumber.value)
          let dexer (arch:sorterShcArch) =
             arch.step |> StepNumber.value
-         let specRep (spec:sorterShcSpec) = 
+         let specs = 
            [
             gu |> string;
-            spec |> SorterShcSpec.seedReport;
-            spec |> SorterShcSpec.mutReport;
-            spec |> SorterShcSpec.tempReport;
-            spec |> SorterShcSpec.sorterReport;
+            shcRes.id |> ShcId.value |> string
+            shcRes.spec |> SorterShcSpec.seedReport;
+            shcRes.spec |> SorterShcSpec.mutReport;
+            shcRes.spec |> SorterShcSpec.tempReport;
+            shcRes.spec |> SorterShcSpec.sorterReport;
            ]
-         let specs = spec |> specRep
-         let archies = archies |> ReportUtils.fixedIndexReport dexer SorterShcArch.dflt tics 
+         let archies = shcRes.archives  |> ReportUtils.fixedIndexReport dexer SorterShcArch.dflt tics 
          archies |> Array.map(fun arch -> (specs, arch))
 
 
@@ -294,7 +295,7 @@ module RunBatch =
                           (reportDir:FileDir) =
 
         let attrLabels = [ "Energy"; "Stages"; "Switches"; ]
-        let specLabels = [ "fileName"; "seed"; "mut"; "temp"; "sorter"; "index"; ]
+        let specLabels = [ "fileName"; "shcId"; "seed"; "mut"; "temp"; "sorter"; "index"; ]
         let colHdrs = attrLabels |> List.append specLabels |> StringUtils.printSeqToRow
 
         let _attrF (tup:int*sorterShcArch) = 
@@ -311,7 +312,7 @@ module RunBatch =
             let! goodOnes = (getOkShcResults outputDir)
                                
             let y = goodOnes 
-                       |> Seq.map(fun (gu, shcr) -> (gu, shcr.spec, shcr.archives))
+                       |> Seq.map(fun (gu, shcr) -> (gu, shcr))
                        |> Seq.map(shcRunSeries)
                        |> Seq.concat
                        |> Seq.map(fun tup -> (tup |> snd |> _attrF) 

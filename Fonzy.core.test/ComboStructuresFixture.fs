@@ -7,6 +7,21 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 type ComboStructuresFixture () =
 
     [<TestMethod>]
+    member this.IntSequence_expoB() =
+        let aMax = 100
+        let yab = Array.init aMax (fun dex -> (dex, IntSequence.expoB 5.0 dex))
+
+        Assert.AreEqual(1,1)
+
+    [<TestMethod>]
+    member this.IntSequence_logTics() =
+        let ticsPerLog = 5.5
+        let endVal = 1000
+        let away = IntSequence.logTics ticsPerLog endVal |> Seq.toArray
+        Assert.IsTrue(away.Length > 0)
+
+
+    [<TestMethod>]
     member this.TestIdentityPermutation() =
       let expectedLen = (Degree.value TestData.degree)
       let expectedSum = ( expectedLen * (expectedLen - 1)) / 2
@@ -23,7 +38,7 @@ type ComboStructuresFixture () =
         Assert.IsTrue (arA.Length > 0)
         Assert.IsTrue (arA.Length < maxPower)
         Assert.AreEqual(
-            arA.[(Degree.value TestData.degree) - 1], 
+            arA.[(Degree.value TestData.degree) - 1],
             Permutation.identity TestData.degree)
 
 

@@ -28,6 +28,18 @@ module Energy =
         | Some e, None -> Some e
         | _, None -> failwith "energy missing"
 
+    let worst = 
+        fromFloat Double.MaxValue
+
+    let delta (oldE:Energy option) 
+              (newE:Energy option) = 
+        match oldE, newE  with
+        | Some (Energy ov), Some (Energy nv) -> Some (fromFloat (nv - ov))
+        | None, Some (Energy nv) ->
+                        Some (fromFloat (nv - (value worst)))
+        | _, _ -> None
+    
+
     let isBetterThan (lhs:Energy) 
                      (rhs:Energy) = 
         (value lhs) < (value rhs)
@@ -52,14 +64,10 @@ module StepNumber =
         ConstrainedType.createInt fieldName StepNumber 0 100000000 v
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let increment gen = fromInt ((value gen) + 1)
-    let ticsPerLog = 20.0
-    let logReporting (StepNumber totSteps) =
-        let padding = 0.5
-        let logSteps = (totSteps |> float |> Math.Log2) + padding
-        let ticCt =  ticsPerLog * logSteps
-        Array.init (ticCt |> int) 
-                   (fun dex -> (Math.Pow(2.0, ((dex |> float) * logSteps) / ticCt))
-                                |> int |> fromInt)
+    let logReporting (StepNumber totSteps) (ticsPerLog) =
+        IntSequence.logTics ticsPerLog (totSteps * 2)
+                    |> Seq.map(fromInt)
+                    |> Seq.toArray
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
             let! gv = ResultMap.read key m

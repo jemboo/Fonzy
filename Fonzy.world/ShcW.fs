@@ -41,12 +41,13 @@ module SorterShc =
 
                         let energy = perf |> SorterFitness.fromSorterPerf sShc.sorter.degree stageW
                                           |> Some
-                        let bestEnergy = Energy.betterEnergy energy sShc.bestEnergy
                         return {sShc with 
-                                    bestEnergy = bestEnergy;
+                                    bestEnergy = None;
                                     energy = energy;
+                                    energyDelta = None
                                     perf = Some perf;
-                                    }
+                                    switchUses = Some switchUses
+                               }
                     }
           }
     
@@ -93,7 +94,7 @@ module SorterShcSpecRndGen =
             return anns 
                     |> Seq.map(fun an ->  
                         { baseSpec with 
-                              rngGen = (randy |> Rando.toRngGen);
+                              rngGen = (randy |> Rando.nextRngGen);
                               annealerSpec = an })
         }
 
@@ -112,7 +113,7 @@ module SorterShcSpecRndGen =
         seq {0 .. ((ShcCount.value count) - 1) }
         |> Seq.map( fun _ -> 
                 { shc with 
-                      rngGen = (randy |> Rando.toRngGen)})
+                      rngGen = (randy |> Rando.nextRngGen)})
 
 
     let swapSorters (srSrepo: (SorterSetId->sorterSet) option) 
@@ -127,7 +128,7 @@ module SorterShcSpecRndGen =
             return seq { 0 .. ((ShcCount.value count) - 1) }
             |> Seq.map( fun dex -> 
                     { baseSpec with 
-                          rngGen = (randy |> Rando.toRngGen);
+                          rngGen = (randy |> Rando.nextRngGen);
                           sorter = srtrA.[dex % srtrA.Length]})
         }
 
@@ -191,17 +192,18 @@ module SHC =
             sorter = spec.sorter;
             switchUses = None;
             bestEnergy = None;
+            energyDelta = None;
         }
         result {
             let! evaluator = SorterShcSpec.makeEvaluator spec
             return  {
-               id = SorterShcSpec.makeId spec;
+               sHC.id = SorterShcSpec.makeId spec;
                current = sshcInitial;
                archive = [];
                mutator = SorterShcSpec.makeMutator spec.mutatorSpec;
                evaluator = evaluator;
                annealer = SorterShcSpec.makeAnnealer spec.annealerSpec;
-               updater = SorterShcSpec.makeUpdater spec.updaterSpec;
+               logger = SorterShcSpec.makeLogger spec.loggerSpec;
                terminator = SorterShcSpec.makeTerminator spec.termSpec;
             }
         }
@@ -215,18 +217,19 @@ module SorterSHCset =
 
 
     let getResults (shcs:sHCset<sorterShcSpec, sorterShc, sorterShcArch>) = 
-        let memberIds = shcs.members |> Map.toArray |> Array.map(fst)
+        let memberIds = shcs.memberMap |> Map.toArray |> Array.map(fst)
         let _rpt id = 
-            let spec = shcs.specs.[id]
-            let aR = shcs.members.[id]
+            let spec = shcs.specMap.[id]
+            let aR = shcs.memberMap.[id]
             let rpt = 
                 match aR with
                 | Ok m -> ("OK", m.archive |> List.toArray)
                 | Error m -> ("error", [||])
             {
-                sorterShcResult.spec = spec;
-                sorterShcResult.msg = (fst rpt)
-                sorterShcResult.archives = (snd rpt)
+                sorterShcResult.id = id;
+                spec = spec;
+                msg = (fst rpt)
+                archives = (snd rpt)
             }
 
         {sorterShcResults.members =  memberIds |> Array.map(_rpt) }

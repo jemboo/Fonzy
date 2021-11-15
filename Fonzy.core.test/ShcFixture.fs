@@ -49,7 +49,7 @@ type ShcFixture () =
            sorterStageWeightSpec = stageWspec;
            evalSpec = evlSpec;
            annealerSpec = annSpec;
-           updaterSpec = updtSpec;
+           loggerSpec = updtSpec;
            termSpec = termSpec;
         }
     let srtrShcSpec2 =
@@ -61,7 +61,7 @@ type ShcFixture () =
            sorterStageWeightSpec = stageWspec;
            evalSpec = evlSpec;
            annealerSpec = annSpec;
-           updaterSpec = updtSpec;
+           loggerSpec = updtSpec;
            termSpec = termSpec;
         }
 

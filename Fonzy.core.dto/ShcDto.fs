@@ -1,5 +1,6 @@
 ﻿namespace global
 open Microsoft.FSharpLu.Json
+open System
 
 type shcStageWeightSpecDto = {cat:string; value:string}
 module ShcStageWeightSpecDto =
@@ -184,9 +185,9 @@ module ShcTermSpecDto =
 type sorterShcArchDto = 
     {step:int;
      rev:int; 
-     rngGen:rngGenDto option;
-     sorter:sorterDto option;
-     switchUses:switchUsesDto option;
+     rngGen:rngGenDto;
+     sorter:sorterDto;
+     switchUses:switchUsesDto;
      perf:sorterPerfDto;
      energy:float; }
 
@@ -195,9 +196,9 @@ module SorterShcArchDto =
         result {
             let! st = dto.step |> StepNumber.create "";
             let! rev = dto.rev |> RevNumber.create "";
-            let! rng = dto.rngGen |> Result.bindOption RngGenDto.fromDto
-            let! srt = dto.sorter |> Result.bindOption SorterDto.fromDto
-            let! swu = dto.switchUses |> Result.bindOption SwitchUsesDto.fromDto
+            let! rng = dto.rngGen |> RngGenDto.fromDto
+            let! srt = dto.sorter |> SorterDto.fromDto
+            let! swu = dto.switchUses |> SwitchUsesDto.fromDto
             let! prf = dto.perf  |> SorterPerfDto.fromDto
             let! e = dto.energy  |> Energy.create ""
             return 
@@ -222,9 +223,9 @@ module SorterShcArchDto =
             {
                  sorterShcArchDto.step = (StepNumber.value ssA.step);
                  rev = (RevNumber.value ssA.revision);
-                 rngGen = ssA.rngGen |> Option.bind (RngGenDto.toDto >> Some);
-                 sorter = ssA.sorter |> Option.bind (SorterDto.toDto >> Some);
-                 switchUses = ssA.switchUses |> Option.bind (SwitchUsesDto.toDto >> Some);
+                 rngGen = ssA.rngGen |> RngGenDto.toDto;
+                 sorter = ssA.sorter |> SorterDto.toDto;
+                 switchUses = ssA.switchUses |> SwitchUsesDto.toDto;
                  perf = ssA.perf |> SorterPerfDto.toDto
                  energy = (Energy.value ssA.energy); 
            }
@@ -265,7 +266,7 @@ module SorterShcSpecDto =
                 sorterStageWeightSpec = swS;
                 evalSpec = evl;
                 annealerSpec = ann;
-                updaterSpec = updt;
+                loggerSpec = updt;
                 termSpec = term;
              }
         }
@@ -285,7 +286,7 @@ module SorterShcSpecDto =
                 stWgtSpec = sss.sorterStageWeightSpec |> ShcStageWeightSpecDto.toDto
                 evalSpec = sss.evalSpec |> SorterEvalSpecDto.toDto
                 annealer = sss.annealerSpec |> AnnealerSpecDto.toDto
-                updater = sss.updaterSpec |> ShcSaveDetailsDto.toDto
+                updater = sss.loggerSpec |> ShcSaveDetailsDto.toDto
                 term = sss.termSpec  |> ShcTermSpecDto.toDto
             }
 
@@ -411,25 +412,26 @@ module SorterShcSpecRndGenDto =
 
 
 
-
-
-
-
 type sorterShcResultDto = {
-    sorterShc:sorterShcSpecDto; 
-    msg:string; 
-    archives:sorterShcArchDto[]
+        shcId:string;
+        sorterShc:sorterShcSpecDto; 
+        msg:string; 
+        archives:sorterShcArchDto[]
     }
 module SorterShcResultDto =
     let fromDto (dto:sorterShcResultDto) =
         result {
+            let! id =  dto.shcId |> Json.deserialize<Guid> 
             let! spec = dto.sorterShc |> SorterShcSpecDto.fromDto
             let! arch = dto.archives |> Array.map(SorterShcArchDto.fromDto)
                                     |> Array.toList
                                     |> Result.sequence
-            return {sorterShcResult.spec = spec;
-                    sorterShcResult.msg = dto.msg;
-                    sorterShcResult.archives = arch |> List.toArray}
+            return {
+                        sorterShcResult.id = id |> ShcId.fromGuid
+                        sorterShcResult.spec = spec;
+                        msg = dto.msg;
+                        archives = arch |> List.toArray
+                    }
         }
 
     let fromJson (jstr:string) =
@@ -440,6 +442,7 @@ module SorterShcResultDto =
 
     let toDto (ssR:sorterShcResult) =
         { sorterShcResultDto.sorterShc = ssR.spec |> SorterShcSpecDto.toDto;
+          shcId =  ssR.id |> ShcId.value |> Json.serialize;
           msg=ssR.msg;
           archives = ssR.archives |> Array.map(SorterShcArchDto.toDto)}
 

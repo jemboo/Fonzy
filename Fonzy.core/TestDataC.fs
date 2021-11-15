@@ -279,7 +279,7 @@ module TestData =
             sorterShcSpec.sorterStageWeightSpec = swS;
             evalSpec = evl;
             annealerSpec = ann;
-            updaterSpec = updt;
+            loggerSpec = updt;
             termSpec = term;
           }
 

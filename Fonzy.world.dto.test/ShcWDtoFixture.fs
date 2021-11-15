@@ -12,9 +12,10 @@ type ShcWDtoFixture () =
     member this.sorterShcResultDto() =
         let sShcResult = 
             {
-                sorterShcResult.spec = TestData.SrtrShcSpec.sscSpec;
-                sorterShcResult.msg = "OK"
-                sorterShcResult.archives = [||]
+                sorterShcResult.id = ShcId.fromGuid (Guid.NewGuid())
+                spec = TestData.SrtrShcSpec.sscSpec;
+                msg = "OK"
+                archives = [||]
             }
         let dto = sShcResult |> SorterShcResultDto.toDto
         let sShcResultBack = dto |> SorterShcResultDto.fromDto
@@ -28,15 +29,17 @@ type ShcWDtoFixture () =
     member this.sorterShcResultsDto() =
         let sShcResult = 
             {
-                sorterShcResult.spec = TestData.SrtrShcSpec.sscSpec;
-                sorterShcResult.msg = "OK"
-                sorterShcResult.archives = [||]
+                sorterShcResult.id = ShcId.fromGuid (Guid.NewGuid())
+                spec = TestData.SrtrShcSpec.sscSpec;
+                msg = "OK"
+                archives = [||]
             }
         let sShcResult2 = 
             {
-                sorterShcResult.spec = TestData.SrtrShcSpec.sscSpec;
-                sorterShcResult.msg = "OK"
-                sorterShcResult.archives = [||]
+                sorterShcResult.id = ShcId.fromGuid (Guid.NewGuid())
+                spec = TestData.SrtrShcSpec.sscSpec;
+                msg = "OK"
+                archives = [||]
             }
 
         let ssRs = { sorterShcResults.members = [|sShcResult; sShcResult2|] }

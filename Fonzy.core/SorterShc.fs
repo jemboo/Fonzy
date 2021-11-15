@@ -62,6 +62,7 @@ type sorterShc =
         switchUses:switchUses option
         perf:SortingEval.sorterPerf option
         energy:Energy option;
+        energyDelta:Energy option;
         bestEnergy:Energy option;
     }
 
@@ -74,7 +75,7 @@ type sorterShcSpec =
        sorterStageWeightSpec:sorterStageWeightSpec;
        evalSpec: sorterEvalSpec;
        annealerSpec:annealerSpec;
-       updaterSpec: shcSaveDetails;
+       loggerSpec: shcSaveDetails;
        termSpec:shcTermSpec;
     }
 
@@ -83,23 +84,23 @@ type sorterShcArch =
     {
         step:StepNumber;
         revision:RevNumber;
-        rngGen:RngGen option; 
-        sorter:sorter option;
-        switchUses:switchUses option
+        rngGen:RngGen; 
+        sorter:sorter;
+        switchUses:switchUses
         perf:SortingEval.sorterPerf
         energy:Energy;
     }
 
 
 module SorterShcArch = 
-
+    
     let dflt = 
         {
             sorterShcArch.step = StepNumber.fromInt 0;
             sorterShcArch.revision = RevNumber.fromInt 0;
-            sorterShcArch.rngGen = None;
-            sorterShcArch.sorter = None;
-            sorterShcArch.switchUses = None;
+            sorterShcArch.rngGen = RngGen.createLcg (RandomSeed.fromInt 1);
+            sorterShcArch.sorter = Sorter.fromSwitches (Degree.fromInt 2) [];
+            sorterShcArch.switchUses = SwitchUses.createEmpty (SwitchCount.fromInt 0);
             sorterShcArch.perf = SortingEval.SorterPerf.dflt;
             sorterShcArch.energy = Energy.fromFloat Double.MaxValue;
         }
@@ -108,30 +109,30 @@ module SorterShcArch =
         {
             sorterShcArch.step = shc.step;
             sorterShcArch.revision = shc.revision;
-            sorterShcArch.rngGen = Some shc.rngGen;
-            sorterShcArch.sorter = Some shc.sorter;
-            sorterShcArch.switchUses = shc.switchUses;
+            sorterShcArch.rngGen = shc.rngGen;
+            sorterShcArch.sorter = shc.sorter;
+            sorterShcArch.switchUses = shc.switchUses |> Option.get;
             sorterShcArch.perf = shc.perf |> Option.get;
             sorterShcArch.energy= shc.energy |> Option.get;
         }
 
-    let toPartial (shc:sorterShc) =
-        {
-            sorterShcArch.step = shc.step;
-            sorterShcArch.revision = shc.revision;
-            sorterShcArch.rngGen = None;
-            sorterShcArch.sorter = None;
-            sorterShcArch.switchUses = None;
-            sorterShcArch.perf = shc.perf |> Option.get;
-            sorterShcArch.energy= shc.energy |> Option.get;
-        }
+    //let toPartial (shc:sorterShc) =
+    //    {
+    //        sorterShcArch.step = shc.step;
+    //        sorterShcArch.revision = shc.revision;
+    //        sorterShcArch.rngGen = None;
+    //        sorterShcArch.sorter = None;
+    //        sorterShcArch.switchUses = None;
+    //        sorterShcArch.perf = shc.perf |> Option.get;
+    //        sorterShcArch.energy= shc.energy |> Option.get;
+    //    }
 
-    let toSorterShcArch (doFull:bool) 
-                        (shc:sorterShc) =
-        if doFull then 
-            toFull shc
-            else
-            toPartial shc
+    //let toSorterShcArch (doFull:bool) 
+    //                    (shc:sorterShc) =
+    //    if doFull then 
+    //        toFull shc
+    //        else
+    //        toPartial shc
 
 
 module ShcStageWeightSpec =
@@ -164,12 +165,26 @@ module SorterShc =
     
     let isCurrentBest (shc:sorterShc) =
         match shc.energy, shc.bestEnergy  with
-        | Some e, Some be -> Energy.value be >= Energy.value e 
+        | Some e, Some be -> if Energy.value be >= Energy.value e then
+                                true
+                             else
+                                false
                         // current energy is better than best (until now)
         | None, Some _ -> true
         | _, None -> failwith "sorterShc bestEnergy missing"
 
+    let logPolicy0 (shc:sorterShc) =
+        match shc.energyDelta with
+        | Some (Energy e) -> (shc |> isCurrentBest) && (shc.isNew) && (e < 0)
+        | None -> true
 
+//let logPolicy0 (shc:sorterShc) =
+//    if shc.step |> StepNumber.value = 0 then
+//        true
+//    else
+//        match shc.energyDelta with
+//        | Some (Energy e) -> (shc |> isCurrentBest) && (shc.isNew) && (e < 0)
+//        | None -> true
 
 module SorterShcSpec = 
 
@@ -183,7 +198,7 @@ module SorterShcSpec =
                        s.sorter :> obj;
                        s.srtblSetType :> obj;
                        s.termSpec :> obj;
-                       s.updaterSpec :> obj;} 
+                       s.loggerSpec :> obj;} 
                   |> GuidUtils.guidFromObjs
         ShcId.fromGuid gu
 
@@ -191,9 +206,9 @@ module SorterShcSpec =
     let makeAnnealer (anSpec:annealerSpec) = 
         fun (shcCurrent:sorterShc)
             (shcNew:sorterShc) -> 
-            if ((StepNumber.value shcCurrent.step) = 0) then
-                shcNew |> Ok
-            else
+            //if ((StepNumber.value shcCurrent.step) = 0) then
+            //    shcNew |> Ok
+            //else
                 result {
                     let! curE = shcCurrent |> SorterShc.getEnergy
                     let! newE = shcNew |> SorterShc.getEnergy
@@ -202,13 +217,20 @@ module SorterShcSpec =
                         randy.NextFloat
                     let annF = Annealer.make anSpec
                     let pickNew = annF curE newE chooser shcNew.step
+                    
+                    let newRng = shcCurrent.rngGen 
+                                    |> Rando.fromRngGen
+                                    |> Rando.nextRngGen
+
                     if pickNew then 
-                        return shcNew else
-                        let newRng = shcCurrent.rngGen 
-                                        |> Rando.fromRngGen
-                                        |> Rando.toRngGen
+                        return { shcNew with
+                                   bestEnergy = Energy.betterEnergy shcNew.energy shcCurrent.bestEnergy
+                                   energyDelta  = Energy.delta shcCurrent.energy shcNew.energy
+                                   rngGen = newRng
+                               }
+                    else
                         return { shcCurrent with 
-                                    step = shcNew.step;
+                                    sorterShc.step = shcCurrent.step |> StepNumber.increment;
                                     isNew = false;
                                     rngGen = newRng }
                 }
@@ -225,45 +247,46 @@ module SorterShcSpec =
                     sorterShc.step = shcCurrent.step |> StepNumber.increment;
                     isNew = true;
                     revision = shcCurrent.revision |> RevNumber.increment;
-                    rngGen = randy |> Rando.toRngGen; 
+                    rngGen = randy |> Rando.nextRngGen; 
                     sorter = sorterMut;
                     switchUses = None;
                     perf = None;
                     energy = None;
-                    bestEnergy = shcCurrent.bestEnergy;
+                    energyDelta = None;
+                    bestEnergy = None;
                 }
             }
 
-    let makeUpdater (saveDetails:shcSaveDetails) =
+    let makeLogger (saveDetails:shcSaveDetails) =
         fun (arch:sorterShcArch list) 
-            (newT:sorterShc) ->
+            (newShc:sorterShc) ->
             
             let _threshB (thresh:Energy) =  
                 Energy.isBetterThan 
-                            (newT.energy |> Option.get)
+                            (newShc.energy |> Option.get)
                             thresh
-            let _addItOn (doAdd:bool) =
-                if doAdd then
-                    (newT |> SorterShcArch.toPartial) :: arch |> Ok
+            let _addItOn (full:bool) =
+                if full then
+                    (newShc |> SorterShcArch.toFull) :: arch |> Ok
                 else    
                     arch |> Ok
 
-            if arch.Length = 0 then
-                _addItOn true
-            else
-                match saveDetails with
-                    | Always -> _addItOn true
-                    | IfBest ->  
-                        _addItOn (newT |> SorterShc.isCurrentBest)
-                    | BetterThanLast ->  
-                        _addItOn (_threshB (arch |> List.head).energy)
-                    | EnergyThresh e -> 
-                        _addItOn (_threshB e)
-                    | ForSteps stps -> 
-                        if (newT |> SorterShc.isCurrentBest) && (newT.isNew) then
-                            (newT |> SorterShcArch.toFull) :: arch |> Ok
-                        else
-                            _addItOn (stps |> Array.contains newT.step)
+            //if arch.Length = 0 then
+            //    _addItOn true
+            //else
+            match saveDetails with
+                | Always -> _addItOn true
+                | IfBest ->  
+                    _addItOn (newShc |> SorterShc.isCurrentBest)
+                | BetterThanLast ->  
+                    _addItOn (_threshB (arch |> List.head).energy)
+                | EnergyThresh e -> 
+                    _addItOn (_threshB e)
+                | ForSteps stps -> 
+                    if (newShc |> SorterShc.logPolicy0) then
+                        _addItOn true
+                    else
+                        _addItOn (stps |> Array.contains newShc.step)
 
 
     let makeTerminator (spec:shcTermSpec) =
@@ -344,7 +367,7 @@ module SorterShcSpecRndGen =
             return anns 
                     |> Seq.map(fun an ->  
                         { shc with 
-                              rngGen = (randy |> Rando.toRngGen);
+                              rngGen = (randy |> Rando.nextRngGen);
                               annealerSpec = an })
         }
 
@@ -363,7 +386,7 @@ module SorterShcSpecRndGen =
         seq {0 .. ((ShcCount.value count) - 1) }
         |> Seq.map( fun _ -> 
                 { shc with 
-                      rngGen = (randy |> Rando.toRngGen)})
+                      rngGen = (randy |> Rando.nextRngGen)})
 
 
     let swapSorters (srSrepo: (SorterSetId->sorterSet) option) 
@@ -378,7 +401,7 @@ module SorterShcSpecRndGen =
             return seq { 0 .. ((ShcCount.value count) - 1) }
             |> Seq.map( fun dex -> 
                     { baseSpec with 
-                          rngGen = (randy |> Rando.toRngGen);
+                          rngGen = (randy |> Rando.nextRngGen);
                           sorter = srtrA.[dex % srtrA.Length]})
         }
 
@@ -428,9 +451,10 @@ module SorterShcSpecRndGen =
 
 type sorterShcResult =
     {
+        id:ShcId;
         spec:sorterShcSpec;
-        msg:string
-        archives: sorterShcArch[]
+        msg:string;
+        archives: sorterShcArch[];
     }
 
 type sorterShcResults =
