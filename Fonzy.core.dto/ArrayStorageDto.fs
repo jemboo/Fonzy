@@ -21,6 +21,8 @@ type intDiffDto = int[] //[|diffIndex; diffValue;|]
 type sparseIntArrayDto = { defaultVal:int; len:int; diffs:intDiffDto[] }
 module SparseIntArrayDto =
 
+    let empty = {sparseIntArrayDto.defaultVal=0; len=0; diffs = [||]}
+
     let fromDto (dto:sparseIntArrayDto) =
         result {
             let diffs = dto.diffs |> Array.map(fun aa -> (aa.[0], aa.[1]))

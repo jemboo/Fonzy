@@ -1,27 +1,27 @@
 ﻿namespace global
 
 
-type DataStoreItem =
+type WorldStorage =
       | WorldDto of worldDto
       | WorldActionDto of worldActionDto
       | WorldMergeDto of worldMergeDto
 
-module DataStoreItem =
+module WorldStorage =
 
-    let getId (dsi:DataStoreItem) =
+    let getId (dsi:WorldStorage) =
         match dsi with
-        | DataStoreItem.WorldDto dto -> dto.id
-        | DataStoreItem.WorldActionDto dto -> dto.childId
-        | DataStoreItem.WorldMergeDto dto -> dto.id
+        | WorldStorage.WorldDto dto -> dto.id
+        | WorldStorage.WorldActionDto dto -> dto.childId
+        | WorldStorage.WorldMergeDto dto -> dto.id
 
-    let getWorldDto (dsi:DataStoreItem) =
+    let getWorldDto (dsi:WorldStorage) =
         match dsi with
         | WorldDto w -> w |> Ok
         | WorldActionDto _ -> "WorldActionDto is not a WorldDto" |> Error
         | WorldMergeDto _ -> "WorldMergeDto is not a WorldDto" |> Error
 
 
-    let getWorldActionDto (dsi:DataStoreItem) =
+    let getWorldActionDto (dsi:WorldStorage) =
         match dsi with
         | WorldActionDto wa -> wa |> Ok
         | WorldDto _ -> "WorldDto is not a WorldActionDto" |> Error
@@ -29,61 +29,61 @@ module DataStoreItem =
 
 
 
-type DataStoreItemDto = {cat:string; value:string}
+type WorldStorageDto = {cat:string; value:string}
 
-module DataStoreItemDto =
+module WorldStorageDto =
 
-    let toDto (dsi:DataStoreItem) =
+    let toDto (dsi:WorldStorage) =
         match dsi with
-        | DataStoreItem.WorldDto wDto -> {
+        | WorldStorage.WorldDto wDto -> {
                         cat="WorldDto"; 
                         value = Json.serialize wDto}
 
-        | DataStoreItem.WorldActionDto waDto -> {
+        | WorldStorage.WorldActionDto waDto -> {
                         cat = "WorldActionDto"; 
                         value = Json.serialize waDto}
 
-        | DataStoreItem.WorldMergeDto waDto -> {
+        | WorldStorage.WorldMergeDto waDto -> {
                         cat = "WorldMergeDto"; 
                         value = Json.serialize waDto}
 
 
 
-    let toJson (idt:DataStoreItem) =
+    let toJson (idt:WorldStorage) =
         idt |> toDto |> Json.serialize
 
 
     let storeWorld (w:world) = 
             let dto = w |> WorldDto.toDto 
-            DataStoreItem.WorldDto dto |> toDto
+            WorldStorage.WorldDto dto |> toDto
 
     let storeWorldAction (wa:WorldAction) = 
             wa |> WorldActionDto.toDto 
-               |> DataStoreItem.WorldActionDto 
+               |> WorldStorage.WorldActionDto 
 
     let storeWorldMerge (wa:WorldMerge) = 
             wa |> WorldMergeDto.toDto 
-               |> DataStoreItem.WorldMergeDto 
+               |> WorldStorage.WorldMergeDto 
 
 
 
-    let fromDto (eDto:DataStoreItemDto) =
+    let fromDto (eDto:WorldStorageDto) =
         if eDto.cat = "WorldDto" then
             result {
                 let! b = Json.deserialize<worldDto> eDto.value
-                return DataStoreItem.WorldDto b
+                return WorldStorage.WorldDto b
             }
 
         else if eDto.cat = "WorldActionDto" then
             result {
                 let! b = Json.deserialize<worldActionDto> eDto.value
-                return DataStoreItem.WorldActionDto b
+                return WorldStorage.WorldActionDto b
             }
 
         else if eDto.cat = "WorldMergeDto" then
             result {
                 let! b = Json.deserialize<worldMergeDto> eDto.value
-                return DataStoreItem.WorldMergeDto b
+                return WorldStorage.WorldMergeDto b
                 }
 
         else sprintf "cat: %s for DataStoreItemDto not found"
@@ -91,6 +91,6 @@ module DataStoreItemDto =
 
     let fromJson (js:string) =
         result {
-            let! dto = Json.deserialize<DataStoreItemDto> js
+            let! dto = Json.deserialize<WorldStorageDto> js
             return! fromDto dto
         }

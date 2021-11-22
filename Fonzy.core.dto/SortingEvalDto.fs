@@ -59,8 +59,8 @@ module SorterPerfBinDto =
     let fromDtos (dtos:sorterPerfBinDto[]) =
         result {
                 let! tups = dtos |> Array.map(toTup)
-                                    |> Array.toList
-                                    |> Result.sequence
+                                 |> Array.toList
+                                 |> Result.sequence
 
                 return tups |> List.toArray
             }

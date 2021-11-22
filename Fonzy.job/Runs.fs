@@ -9,15 +9,15 @@ module Runs =
                     (causeSpec:causeSpec) =
         result {
     
-            let directoryDataSource = new DirectoryDataSource(outputDir) 
-                                            :> IDataSource
+            let directoryDataSource = new WorldStorageDirectory(outputDir) 
+                                            :> IWorldStorage
             let! cause = causeSpec |> Causes.fromCauseSpec
 
             let! binSpecWorld = World.createFromParent World.empty
                                                        cause
             let dataStore = binSpecWorld
                             |> WorldDto.toDto
-                            |> DataStoreItem.WorldDto
+                            |> WorldStorage.WorldDto
 
             return! dataStore |> directoryDataSource.AddNewDataStoreItem         
         }

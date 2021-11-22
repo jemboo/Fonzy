@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="basicDtoFixture.fs" />
     <Compile Include="RngGenDtoFixture.fs" />
     <Compile Include="ComboStructuresDtoFixture.fs" />
     <Compile Include="ArrayStorageDtoFixture.fs" />

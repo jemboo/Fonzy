@@ -27,9 +27,9 @@ type ShcFixture () =
 
         shcN.archive |> List.iter(fun a -> 
                     Console.WriteLine(sprintf "%d\t%s\t%f" 
-                                (StepNumber.value a.step) 
-                                (a.perf |> SorterPerf.report) 
-                                (Energy.value a.energy)))
+                                (StepNumber.value (a |> SorterShcArch.getStep))
+                                ((a |> SorterShcArch.getPerf) |> SorterPerf.report) 
+                                (Energy.value (a |> SorterShcArch.getEnergy))))
 
         Assert.IsTrue(true)
 

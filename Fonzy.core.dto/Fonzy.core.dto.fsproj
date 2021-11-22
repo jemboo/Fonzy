@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="basidDto.fs" />
     <Compile Include="RngGenDto.fs" />
     <Compile Include="ComboStructuresDto.fs" />
     <Compile Include="ArrayStorageDto.fs" />

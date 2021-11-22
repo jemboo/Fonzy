@@ -7,8 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="DataStoreItem.fs" />
-    <Compile Include="DataSource.fs" />
+    <Compile Include="FolderScheme.fs" />
+    <Compile Include="WorldStorage.fs" />
+    <Compile Include="WorldStorageDirectory.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

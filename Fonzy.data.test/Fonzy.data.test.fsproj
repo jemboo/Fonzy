@@ -9,7 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="DataSourceFixture.fs" />
+    <Compile Include="FolderSchemeFixture.fs" />
+    <Compile Include="WorldStorageFixture.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

@@ -104,9 +104,9 @@ module AnnealerSpec =
 module Annealer =
 
     let makeConst (temp:Temp) =
-        fun curFitness newFitness (caster:unit->float) _ ->
-            let cfv = curFitness |> Energy.value
-            let nfv = newFitness |> Energy.value
+        fun curEnergy newEnergy (caster:unit->float) _ ->
+            let cfv = curEnergy |> Energy.value
+            let nfv = newEnergy |> Energy.value
             if (cfv >= nfv) then
                 true
             else
@@ -117,9 +117,9 @@ module Annealer =
 
         
     let makeExp (temp:Temp) (decay:float) =
-        fun curFitness newFitness (caster:unit->float) step ->
-            let cfv = curFitness |> Energy.value
-            let nfv = newFitness |> Energy.value
+        fun curEnergy newEnergy (caster:unit->float) step ->
+            let cfv = curEnergy |> Energy.value
+            let nfv = newEnergy |> Energy.value
             if (cfv >= nfv) then
                 true
             else

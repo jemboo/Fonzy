@@ -4,9 +4,9 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 open System.IO
 
 [<TestClass>]
-type DataSourceFixture () =
+type WorldStorageFixture () =
 
-    member this.testDir = "c:\\testDirForDataSourceFixture"
+    member this.testDir = "c:\\testDirForWorldStorageFixture"
 
     member this.fullPath(fn:string) =
         Path.Combine(this.testDir, fn + ".txt")
@@ -40,17 +40,17 @@ type DataSourceFixture () =
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
 
-    member this.setupDataStore(d:DataStoreItem) =
+    member this.setupDataStore(d:WorldStorage) =
         this.makeTestDirectory() |> ignore
-        use sw = new StreamWriter(this.fullPath(d |> DataStoreItem.getId |> string))
-        fprintfn sw "%s" (d |> DataStoreItemDto.toJson)
+        use sw = new StreamWriter(this.fullPath(d |> WorldStorage.getId |> string))
+        fprintfn sw "%s" (d |> WorldStorageDto.toJson)
         sw.Dispose()
 
 
     member this.setupAllWorlds() =
-        this.setupDataStore (DataStoreItem.WorldDto (this.world1 |> WorldDto.toDto))
-        this.setupDataStore (DataStoreItem.WorldDto (this.world2 |> WorldDto.toDto))
-        this.setupDataStore (DataStoreItem.WorldDto (this.world3 |> WorldDto.toDto))
+        this.setupDataStore (WorldStorage.WorldDto (this.world1 |> WorldDto.toDto))
+        this.setupDataStore (WorldStorage.WorldDto (this.world2 |> WorldDto.toDto))
+        this.setupDataStore (WorldStorage.WorldDto (this.world3 |> WorldDto.toDto))
 
 
     member this.tearDownDataSource() =
@@ -63,14 +63,14 @@ type DataSourceFixture () =
     [<TestMethod>]
     member this.DirectoryDataSource_GetDs() =
         this.setupAllWorlds()
-        let dirDs = new DirectoryDataSource(FileDir.fromString this.testDir) :> IDataSource
+        let dirDs = new WorldStorageDirectory(FileDir.fromString this.testDir) :> IWorldStorage
         let ds = dirDs.GetDataSource(WorldId.value this.world1.id) |> Result.ExtractOrThrow
         this.tearDownDataSource() 
-        Assert.AreEqual(ds |> DataStoreItem.getId, WorldId.value this.world1.id);
+        Assert.AreEqual(ds |> WorldStorage.getId, WorldId.value this.world1.id);
 
     [<TestMethod>]
     member this.assureDirectory() =
-        let dirDs = new DirectoryDataSource(FileDir.fromString this.testDir)
+        let dirDs = new WorldStorageDirectory(FileDir.fromString this.testDir)
         let res = dirDs.AssureDirectory |> Result.ExtractOrThrow
         let res2 = dirDs.AssureDirectory |> Result.ExtractOrThrow
         this.tearDownDataSource() 
@@ -80,7 +80,7 @@ type DataSourceFixture () =
     [<TestMethod>]
     member this.DirectoryDataSource_GetDsIds() =
         this.setupAllWorlds() |> ignore
-        let dirDs = new DirectoryDataSource(FileDir.fromString this.testDir) :> IDataSource
+        let dirDs = new WorldStorageDirectory(FileDir.fromString this.testDir) :> IWorldStorage
         let ids = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow
         this.tearDownDataSource() 
         Assert.AreEqual(ids.Length, 3);
@@ -88,14 +88,14 @@ type DataSourceFixture () =
 
     [<TestMethod>]
     member this.DirectoryDataSource_AddNewDataStoreItem() =
-        this.setupDataStore (DataStoreItem.WorldDto (this.world1 |> WorldDto.toDto))
-        this.setupDataStore (DataStoreItem.WorldDto (this.world2 |> WorldDto.toDto))
-        let dirDs = new DirectoryDataSource(FileDir.fromString this.testDir) :> IDataSource
+        this.setupDataStore (WorldStorage.WorldDto (this.world1 |> WorldDto.toDto))
+        this.setupDataStore (WorldStorage.WorldDto (this.world2 |> WorldDto.toDto))
+        let dirDs = new WorldStorageDirectory(FileDir.fromString this.testDir) :> IWorldStorage
         let ids = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow
         Assert.AreEqual(ids.Length, 2)
 
         let res = dirDs.AddNewDataStoreItem (
-                            this.world3 |> WorldDto.toDto |> DataStoreItem.WorldDto) 
+                            this.world3 |> WorldDto.toDto |> WorldStorage.WorldDto) 
                         |> Result.ExtractOrThrow 
         Assert.IsTrue(res)
         let ids2 = dirDs.GetDataSourceIds() |> Result.ExtractOrThrow 
@@ -106,10 +106,10 @@ type DataSourceFixture () =
     [<TestMethod>]
     member this.DirectoryDataSource_TurnWorldActionIntoWorld() =
         this.makeTestDirectory() |> ignore
-        let dirDs = new DirectoryDataSource(FileDir.fromString this.testDir) :> IDataSource
+        let dirDs = new WorldStorageDirectory(FileDir.fromString this.testDir) :> IWorldStorage
         let randWorldAction = TestData.WorldAction.SorterGen.randWorldAction 
         let worldActionDto = randWorldAction |> WorldActionDto.toDto
-        let dataStoreItem  = worldActionDto |> DataStoreItem.WorldActionDto
+        let dataStoreItem  = worldActionDto |> WorldStorage.WorldActionDto
         dirDs.AddNewDataStoreItem dataStoreItem
                                           |> Result.ExtractOrThrow 
                                           |> ignore
@@ -118,7 +118,7 @@ type DataSourceFixture () =
         let dataStoreItemBack = dirDs.GetDataSource ids.[0]
                                         |> Result.ExtractOrThrow
         let worldActionDto = dataStoreItemBack 
-                                        |> DataStoreItem.getWorldActionDto
+                                        |> WorldStorage.getWorldActionDto
                                         |> Result.ExtractOrThrow
 
         let worldActionBack = worldActionDto
@@ -130,7 +130,7 @@ type DataSourceFixture () =
         let dataStoreWorldDto = WorldAction.createWorld worldActionBack 
                                     |> Result.ExtractOrThrow
                                     |> WorldDto.toDto
-                                    |> DataStoreItem.WorldDto
+                                    |> WorldStorage.WorldDto
         dirDs.AddNewDataStoreItem dataStoreWorldDto
                                     |> Result.ExtractOrThrow
                                     |> ignore

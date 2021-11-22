@@ -41,9 +41,17 @@ module FileUtils =
             res |> Ok
         with
             | ex -> ("error in readFile: " + ex.Message ) |> Result.Error
+            
+
+    let readLines<'T> (fp:FilePath) = 
+        try
+            System.IO.File.ReadAllLines (FilePath.value fp)
+                            |> Ok
+        with
+            | ex -> ("error in readFile: " + ex.Message ) |> Result.Error
 
 
-    let writeFile (fp:FilePath) item (append:bool) =
+    let makeFile (fp:FilePath) item =
         try
             System.IO.File.WriteAllText((FilePath.value fp), item)
             //use sw = new StreamWriter(path, append)
@@ -52,6 +60,23 @@ module FileUtils =
             true |> Ok
         with
             | ex -> ("error in writeFile: " + ex.Message ) |> Result.Error
+
+
+    let makeFileFromLines (fp:FilePath) (lines:seq<string>) =
+        try
+            System.IO.File.WriteAllLines((FilePath.value fp), lines)
+            true |> Ok
+        with
+            | ex -> ("error in writeFile: " + ex.Message ) |> Result.Error
+
+
+    let appendToFile (fp:FilePath) (lines:seq<string>) =
+        try
+            System.IO.File.AppendAllLines((FilePath.value fp), lines)
+            true |> Ok
+        with
+            | ex -> ("error in writeFile: " + ex.Message ) |> Result.Error
+
 
     //returns a cumer
     //let logFileKeyHeader path item =

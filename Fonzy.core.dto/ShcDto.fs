@@ -182,35 +182,90 @@ module ShcTermSpecDto =
         idt |> toDto |> Json.serialize
 
 
+//type sorterShcArchDto = 
+//    {step:int;
+//     rev:int; 
+//     rngGen:rngGenDto;
+//     sorter:sorterDto;
+//     switchUses:switchUsesDto;
+//     perf:sorterPerfDto;
+//     energy:float; }
+
+//type sorterShcArchDto = 
+//    {pOrF:string;
+//     step:int;
+//     rev:int; 
+//     rngType:string; 
+//     seed:int;
+//     degree:int; 
+//     switches:int[]
+//     weights:sparseIntArrayDto;
+//     switchesUsed:int; 
+//     stagesUsed:int; 
+//     successful:string;
+//     energy:float; }
+
 type sorterShcArchDto = 
-    {step:int;
-     rev:int; 
-     rngGen:rngGenDto;
-     sorter:sorterDto;
-     switchUses:switchUsesDto;
-     perf:sorterPerfDto;
+    {pOrF:string;
+     step:int;
+     adv:int; 
+     ret:int; 
+     rngType:string; 
+     seed:int;
+     degree:int; 
+     switches:int[]
+     weights:sparseIntArrayDto;
+     switchesUsed:int; 
+     stagesUsed:int; 
+     successful:string;
      energy:float; }
+
+
 
 module SorterShcArchDto =
     let fromDto (dto:sorterShcArchDto) =
         result {
             let! st = dto.step |> StepNumber.create "";
-            let! rev = dto.rev |> RevNumber.create "";
-            let! rng = dto.rngGen |> RngGenDto.fromDto
-            let! srt = dto.sorter |> SorterDto.fromDto
-            let! swu = dto.switchUses |> SwitchUsesDto.fromDto
-            let! prf = dto.perf  |> SorterPerfDto.fromDto
+            let! tc = StageCount.create "" dto.stagesUsed
+            let! wc = SwitchCount.create "" dto.switchesUsed
+            let! sf = dto.successful |> BasicDto.fromCereal
+            let perf = { SortingEval.sorterPerf.usedStageCount = tc;
+                         SortingEval.sorterPerf.usedSwitchCount = wc;
+                         SortingEval.sorterPerf.successful = sf}
             let! e = dto.energy  |> Energy.create ""
-            return 
-             {
-                sorterShcArch.step = st;
-                revision = rev;
-                rngGen = rng;
-                sorter = srt;
-                switchUses = swu;
-                perf = prf;
-                energy = e;
-             }
+
+            if dto.pOrF = "Full" then
+                let! typ = RngType.create dto.rngType
+                let! rs = RandomSeed.create "" dto.seed
+                let rng = {
+                    RngGen.rngType = typ;
+                    seed = rs
+                }
+                let! degree = Degree.create "" dto.degree
+                let! switches = dto.switches |> Array.map(fun sw -> SwitchDto.fromDto sw)
+                                             |> Array.toList
+                                             |> Result.sequence
+                let! sprsArray = dto.weights |> SparseIntArrayDto.fromDto
+                return 
+                 {
+                    sorterShcArchFull.step = st;
+                    advanceCount = dto.adv;
+                    retreatCount = dto.ret;
+                    rngGen = rng;
+                    sorter = Sorter.fromSwitches degree switches;
+                    switchUses = SwitchUses.init (sprsArray |> SparseArray.fromSparse);
+                    perf = perf;
+                    energy = e;
+                 } |> sorterShcArch.Full
+            else
+                return 
+                 {
+                    sorterShcArchPartial.step = st;
+                    advanceCount = dto.adv;
+                    retreatCount = dto.ret;
+                    perf = perf;
+                    energy = e;
+                 } |> sorterShcArch.Partial
         }
                      
     let fromJson (jstr:string) =
@@ -220,15 +275,42 @@ module SorterShcArchDto =
         }
 
     let toDto (ssA:sorterShcArch) =
-            {
-                 sorterShcArchDto.step = (StepNumber.value ssA.step);
-                 rev = (RevNumber.value ssA.revision);
-                 rngGen = ssA.rngGen |> RngGenDto.toDto;
-                 sorter = ssA.sorter |> SorterDto.toDto;
-                 switchUses = ssA.switchUses |> SwitchUsesDto.toDto;
-                 perf = ssA.perf |> SorterPerfDto.toDto
-                 energy = (Energy.value ssA.energy); 
-           }
+            match ssA with
+            | sorterShcArch.Full ssaF -> 
+                let siaDto = SwitchUses.getWeights ssaF.switchUses 
+                             |> SparseArray.toSparse 0
+                             |> SparseIntArrayDto.toDto
+                { 
+                  sorterShcArchDto.pOrF = "Full";
+                  step = (StepNumber.value ssaF.step);
+                  adv = ssaF.advanceCount;
+                  ret = ssaF.retreatCount; 
+                  rngType = (RngType.toDto ssaF.rngGen.rngType);
+                  seed = (RandomSeed.value ssaF.rngGen.seed);
+                  degree = (Degree.value ssaF.sorter.degree); 
+                  switches = ssaF.sorter.switches |> Array.map(SwitchDto.toDto);
+                  weights = siaDto;
+                  switchesUsed = ssaF.perf.usedSwitchCount |> SwitchCount.value; 
+                  stagesUsed = ssaF.perf.usedStageCount |> StageCount.value; 
+                  successful = ssaF.perf.successful |> BasicDto.toCereal;
+                  energy = (Energy.value ssaF.energy); 
+                }
+            | sorterShcArch.Partial ssaP ->
+                { 
+                  sorterShcArchDto.pOrF = "Partial";
+                  step = (StepNumber.value ssaP.step);
+                  adv = ssaP.advanceCount;
+                  ret = ssaP.retreatCount; 
+                  rngType = "";
+                  seed = 0;
+                  degree = 0; 
+                  switches = [||];
+                  weights = SparseIntArrayDto.empty;
+                  switchesUsed = ssaP.perf.usedSwitchCount |> SwitchCount.value; 
+                  stagesUsed = ssaP.perf.usedStageCount |> StageCount.value; 
+                  successful = ssaP.perf.successful |> BasicDto.toCereal;
+                  energy = (Energy.value ssaP.energy); 
+                }
 
     let toJson (idt:sorterShcArch) =
         idt |> toDto |> Json.serialize

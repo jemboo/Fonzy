@@ -48,8 +48,8 @@ module RunBatch =
                                     (reportDir:FileDir) =
 
         let binResultsName = "sorterPerfBins"
-        let reportDataSource = new DirectoryDataSource(outputDir) 
-                                    :> IDataSource
+        let reportDataSource = new WorldStorageDirectory(outputDir) 
+                                    :> IWorldStorage
         let repNs = reportDataSource.GetDataSourceIds()
                     |> Result.ExtractOrThrow
                     |> Array.toList
@@ -57,7 +57,7 @@ module RunBatch =
         let perfBinsFromGuid (g:Guid) =
             result {
                 let! ds = reportDataSource.GetDataSource(g)
-                let! worldDto = ds |> DataStoreItem.getWorldDto
+                let! worldDto = ds |> WorldStorage.getWorldDto
                 let! worldMerge = worldDto |> WorldDto.fromDto
                 let! map = worldMerge.cause.causeSpec.prams |> StringMapDto.fromDto
                 let! sorterPerfBinsDto =  
@@ -127,11 +127,11 @@ module RunBatch =
   
      let binResultsName = "sorterShcSet"
 
-     let shcArchsFromGuid (archDs:IDataSource) 
+     let shcArchsFromGuid (archDs:IWorldStorage) 
                           (g:Guid) =
          result {
             let! ds = archDs.GetDataSource(g)
-            let! worldDto = ds |> DataStoreItem.getWorldDto
+            let! worldDto = ds |> WorldStorage.getWorldDto
             let! worldMerge = worldDto |> WorldDto.fromDto
             let! sShcResDto =  
                     Enviro.getDto<sorterShcResultsDto> 
@@ -150,7 +150,7 @@ module RunBatch =
      let seedSeries (haTups: seq<sorterShcSpec*sorterShcArch[]>) =
     
          let dexer (arch:sorterShcArch) =
-            arch.step |> StepNumber.value
+             arch |> SorterShcArch.getStep |> StepNumber.value
      
          let specRep (spec:sorterShcSpec) = 
            [
@@ -170,10 +170,12 @@ module RunBatch =
           let _attrF (sArch:sorterShcArch option) = 
               match sArch with
               | Some arch ->
+                    let e = arch |> SorterShcArch.getEnergy
+                    let perf = arch |> SorterShcArch.getPerf
                     [
-                        sprintf "%.5f" (arch.energy |> Energy.value);
-                        sprintf "%d" (arch.perf.usedStageCount |> StageCount.value);
-                        sprintf "%d" (arch.perf.usedSwitchCount |> SwitchCount.value);
+                        sprintf "%.5f" (e|> Energy.value);
+                        sprintf "%d" (perf.usedStageCount |> StageCount.value);
+                        sprintf "%d" (perf.usedSwitchCount |> SwitchCount.value);
                     ]
               | None -> [""; ""; ""]
           
@@ -186,8 +188,8 @@ module RunBatch =
 
 
           let outFileName = sprintf "%s.txt"  (System.DateTime.Now.Ticks |> string)
-          let reportDataSource = new DirectoryDataSource(outputDir) 
-                                      :> IDataSource
+          let reportDataSource = new WorldStorageDirectory(outputDir) 
+                                      :> IWorldStorage
           //let repId = reportDataSource.GetDataSourceIds()
           //            |> Result.ExtractOrThrow
           //            |> Array.toList
@@ -254,7 +256,7 @@ module RunBatch =
          let ticsPerLog = 20.0
          let tics = StepNumber.logReporting totReptSteps ticsPerLog |> Array.map(StepNumber.value)
          let dexer (arch:sorterShcArch) =
-            arch.step |> StepNumber.value
+            (arch |> SorterShcArch.getStep) |> StepNumber.value
          let specs = 
            [
             gu |> string;
@@ -264,7 +266,11 @@ module RunBatch =
             shcRes.spec |> SorterShcSpec.tempReport;
             shcRes.spec |> SorterShcSpec.sorterReport;
            ]
-         let archies = shcRes.archives  |> ReportUtils.fixedIndexReport dexer SorterShcArch.dflt tics 
+         let archies = shcRes.archives 
+                       |> ReportUtils.fixedIndexReport 
+                            dexer 
+                            SorterShcArch.dfltPartial 
+                            tics 
          archies |> Array.map(fun arch -> (specs, arch))
 
 
@@ -283,7 +289,7 @@ module RunBatch =
                             | (gu, Result.Error msg) -> msg |> ignore
                 }
         result {
-            let reportDataSource = new DirectoryDataSource(outputDir) :> IDataSource
+            let reportDataSource = new WorldStorageDirectory(outputDir) :> IWorldStorage
             let! repIds =  reportDataSource.GetDataSourceIds()
             return repIds |> Seq.map(fun gu -> (gu, shcArchsFromGuid reportDataSource gu))
                           |> _getOkRes
@@ -294,17 +300,23 @@ module RunBatch =
      let fixedIndexSeries (outputDir:FileDir) 
                           (reportDir:FileDir) =
 
-        let attrLabels = [ "Energy"; "Stages"; "Switches"; ]
-        let specLabels = [ "fileName"; "shcId"; "seed"; "mut"; "temp"; "sorter"; "index"; ]
+        let attrLabels = [ "index"; "adv" ; "ret"; "Energy"; "Stages"; "Switches"; ]
+        let specLabels = [ "fileName"; "shcId"; "seed"; "mut"; "temp"; "sorter"; ]
         let colHdrs = attrLabels |> List.append specLabels |> StringUtils.printSeqToRow
 
         let _attrF (tup:int*sorterShcArch) = 
                     let arch = tup |> snd
+                    let e = arch |> SorterShcArch.getEnergy
+                    let adv = arch |> SorterShcArch.getAdvanceCount
+                    let ret = arch |> SorterShcArch.getRetreatCount
+                    let perf = arch |> SorterShcArch.getPerf
                     [
                         sprintf "%d" (tup |> fst);
-                        sprintf "%.5f" (arch.energy |> Energy.value);
-                        sprintf "%d" (arch.perf.usedStageCount |> StageCount.value);
-                        sprintf "%d" (arch.perf.usedSwitchCount |> SwitchCount.value);
+                        sprintf "%d" adv;
+                        sprintf "%d" ret;
+                        sprintf "%.5f" (e|> Energy.value);
+                        sprintf "%d" (perf.usedStageCount |> StageCount.value);
+                        sprintf "%d" (perf.usedSwitchCount |> SwitchCount.value);
                     ]
 
 

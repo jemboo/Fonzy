@@ -74,6 +74,7 @@ module JsonString =
     let createOption fieldName str = 
         ConstrainedType.createStringOption fieldName JsonString 50 str
 
+// directory name (full path to folder)
 module FileDir =
     let value (FileDir str) = str
     let create fieldName str = 
@@ -83,6 +84,17 @@ module FileDir =
     let fromString v = create "" v |> Result.ExtractOrThrow
 
 
+// file name only, (no path)
+module FileName =
+    let value (FileName str) = str
+    let create fieldName str = 
+        ConstrainedType.createString fieldName FileName 100 str
+    let createOption fieldName str = 
+        ConstrainedType.createStringOption fieldName FileName 100 str
+    let fromString v = create "" v |> Result.ExtractOrThrow
+
+
+// FileDir + FileName
 module FilePath =
     let value (FilePath str) = str
     let create fieldName str = 
@@ -94,17 +106,16 @@ module FilePath =
         Path.GetDirectoryName (value fp)
     let toFileName (fp:FilePath) =
         Path.GetFileName (value fp)
-
-
-module FileName =
-    let value (FileName str) = str
-    let create fieldName str = 
-        ConstrainedType.createString fieldName FileName 100 str
-    let createOption fieldName str = 
-        ConstrainedType.createStringOption fieldName FileName 100 str
-    let fromString v = create "" v |> Result.ExtractOrThrow
-    let toFilePath (fd:FileDir) (fn:FileName) =
-        FilePath.fromString (Path.Combine((FileDir.value fd), (value fn)))
+    let appendFolder (fd:FileDir) (fn:string) =
+        try
+            FileDir.fromString (Path.Combine((FileDir.value fd), fn)) |> Ok
+        with
+            | ex -> ("error in addFolderName: " + ex.Message ) |> Result.Error
+    let appendFileName (fd:FileDir) (fn:FileName) =
+        try
+            fromString (Path.Combine((FileDir.value fd), (FileName.value fn))) |> Ok
+        with
+            | ex -> ("error in addFolderName: " + ex.Message ) |> Result.Error
 
 
 module ReportingFrequency =

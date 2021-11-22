@@ -56,7 +56,8 @@ type sorterShc =
     {
         step:StepNumber;
         isNew:bool;
-        revision:RevNumber;
+        advanceCount:int;
+        retreatCount:int;
         rngGen:RngGen; 
         sorter:sorter;
         switchUses:switchUses option
@@ -80,10 +81,11 @@ type sorterShcSpec =
     }
 
 
-type sorterShcArch = 
+type sorterShcArchFull = 
     {
         step:StepNumber;
-        revision:RevNumber;
+        advanceCount:int;
+        retreatCount:int;
         rngGen:RngGen; 
         sorter:sorter;
         switchUses:switchUses
@@ -91,48 +93,78 @@ type sorterShcArch =
         energy:Energy;
     }
 
+type sorterShcArchPartial = 
+    {
+        step:StepNumber;
+        advanceCount:int;
+        retreatCount:int;
+        perf:SortingEval.sorterPerf
+        energy:Energy;
+    }
+
+type sorterShcArch = 
+    | Full of sorterShcArchFull
+    | Partial of sorterShcArchPartial
+
 
 module SorterShcArch = 
     
-    let dflt = 
+    let dfltPartial = 
         {
-            sorterShcArch.step = StepNumber.fromInt 0;
-            sorterShcArch.revision = RevNumber.fromInt 0;
-            sorterShcArch.rngGen = RngGen.createLcg (RandomSeed.fromInt 1);
-            sorterShcArch.sorter = Sorter.fromSwitches (Degree.fromInt 2) [];
-            sorterShcArch.switchUses = SwitchUses.createEmpty (SwitchCount.fromInt 0);
-            sorterShcArch.perf = SortingEval.SorterPerf.dflt;
-            sorterShcArch.energy = Energy.fromFloat Double.MaxValue;
-        }
+            sorterShcArchPartial.step = StepNumber.fromInt 0;
+            advanceCount = 0;
+            retreatCount = 0;
+            perf = SortingEval.SorterPerf.dflt;
+            energy = Energy.fromFloat Double.MaxValue;
+        } |> sorterShcArch.Partial
 
     let toFull (shc:sorterShc) =
         {
-            sorterShcArch.step = shc.step;
-            sorterShcArch.revision = shc.revision;
-            sorterShcArch.rngGen = shc.rngGen;
-            sorterShcArch.sorter = shc.sorter;
-            sorterShcArch.switchUses = shc.switchUses |> Option.get;
-            sorterShcArch.perf = shc.perf |> Option.get;
-            sorterShcArch.energy= shc.energy |> Option.get;
-        }
+            sorterShcArchFull.step = shc.step;
+            advanceCount = shc.advanceCount;
+            retreatCount = shc.retreatCount;
+            rngGen = shc.rngGen;
+            sorter = shc.sorter;
+            switchUses = shc.switchUses |> Option.get;
+            perf = shc.perf |> Option.get;
+            energy= shc.energy |> Option.get;
+        } |> sorterShcArch.Full
 
-    //let toPartial (shc:sorterShc) =
-    //    {
-    //        sorterShcArch.step = shc.step;
-    //        sorterShcArch.revision = shc.revision;
-    //        sorterShcArch.rngGen = None;
-    //        sorterShcArch.sorter = None;
-    //        sorterShcArch.switchUses = None;
-    //        sorterShcArch.perf = shc.perf |> Option.get;
-    //        sorterShcArch.energy= shc.energy |> Option.get;
-    //    }
+    let toPartial (shc:sorterShc) =
+        {
+            sorterShcArchPartial.step = shc.step;
+            advanceCount = shc.advanceCount;
+            retreatCount = shc.retreatCount;
+            perf = shc.perf |> Option.get;
+            energy= shc.energy |> Option.get;
+        }  |> sorterShcArch.Partial
 
-    //let toSorterShcArch (doFull:bool) 
-    //                    (shc:sorterShc) =
-    //    if doFull then 
-    //        toFull shc
-    //        else
-    //        toPartial shc
+    let getEnergy (arch:sorterShcArch) = 
+        match arch with
+        | Full fa -> fa.energy
+        | Partial pa -> pa.energy
+
+    let getStep (arch:sorterShcArch) = 
+        match arch with
+        | Full fa -> fa.step
+        | Partial pa -> pa.step
+
+    let getAdvanceCount (arch:sorterShcArch) = 
+        match arch with
+        | Full fa -> fa.advanceCount
+        | Partial pa -> pa.advanceCount
+
+    let getRetreatCount (arch:sorterShcArch) = 
+        match arch with
+        | Full fa -> fa.retreatCount
+        | Partial pa -> pa.retreatCount
+
+    let getPerf (arch:sorterShcArch) = 
+        match arch with
+        | Full fa -> fa.perf
+        | Partial pa -> pa.perf
+
+
 
 
 module ShcStageWeightSpec =
@@ -206,9 +238,6 @@ module SorterShcSpec =
     let makeAnnealer (anSpec:annealerSpec) = 
         fun (shcCurrent:sorterShc)
             (shcNew:sorterShc) -> 
-            //if ((StepNumber.value shcCurrent.step) = 0) then
-            //    shcNew |> Ok
-            //else
                 result {
                     let! curE = shcCurrent |> SorterShc.getEnergy
                     let! newE = shcNew |> SorterShc.getEnergy
@@ -223,13 +252,24 @@ module SorterShcSpec =
                                     |> Rando.nextRngGen
 
                     if pickNew then 
-                        return { shcNew with
+                       let ceV = curE |> Energy.value
+                       let neV = newE |> Energy.value
+                       let advInc = match (ceV > neV) with
+                                    | true -> 1
+                                    | false -> 0
+                       let retInc = match (ceV < neV) with
+                                    | true -> 1
+                                    | false -> 0
+
+                       return { shcNew with
                                    bestEnergy = Energy.betterEnergy shcNew.energy shcCurrent.bestEnergy
                                    energyDelta  = Energy.delta shcCurrent.energy shcNew.energy
+                                   advanceCount = shcNew.advanceCount + advInc
+                                   retreatCount = shcNew.retreatCount + retInc
                                    rngGen = newRng
                                }
                     else
-                        return { shcCurrent with 
+                       return { shcCurrent with 
                                     sorterShc.step = shcCurrent.step |> StepNumber.increment;
                                     isNew = false;
                                     rngGen = newRng }
@@ -246,7 +286,8 @@ module SorterShcSpec =
                 return {
                     sorterShc.step = shcCurrent.step |> StepNumber.increment;
                     isNew = true;
-                    revision = shcCurrent.revision |> RevNumber.increment;
+                    advanceCount = shcCurrent.advanceCount;
+                    retreatCount = shcCurrent.retreatCount;
                     rngGen = randy |> Rando.nextRngGen; 
                     sorter = sorterMut;
                     switchUses = None;
@@ -269,24 +310,24 @@ module SorterShcSpec =
                 if full then
                     (newShc |> SorterShcArch.toFull) :: arch |> Ok
                 else    
-                    arch |> Ok
+                    (newShc |> SorterShcArch.toPartial) :: arch |> Ok
 
-            //if arch.Length = 0 then
-            //    _addItOn true
-            //else
             match saveDetails with
                 | Always -> _addItOn true
                 | IfBest ->  
                     _addItOn (newShc |> SorterShc.isCurrentBest)
                 | BetterThanLast ->  
-                    _addItOn (_threshB (arch |> List.head).energy)
+                    _addItOn (_threshB ((arch |> List.head) |> SorterShcArch.getEnergy))
                 | EnergyThresh e -> 
                     _addItOn (_threshB e)
                 | ForSteps stps -> 
                     if (newShc |> SorterShc.logPolicy0) then
-                        _addItOn true
+                        //_addItOn true
+                        arch |> Ok
+                    else if  (stps |> Array.contains newShc.step) then
+                        _addItOn false
                     else
-                        _addItOn (stps |> Array.contains newShc.step)
+                        arch |> Ok
 
 
     let makeTerminator (spec:shcTermSpec) =

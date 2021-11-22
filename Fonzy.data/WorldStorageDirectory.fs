@@ -3,28 +3,28 @@ open System
 open System.IO
 
 
-type IDataSource =
-   abstract member GetDataSource: Guid -> Result<DataStoreItem, string>
+type IWorldStorage =
+   abstract member GetDataSource: Guid -> Result<WorldStorage, string>
    abstract member GetDataSourceIds: Unit -> Result<Guid[], string>
-   abstract member AddNewDataStoreItem : DataStoreItem -> Result<bool, string>
+   abstract member AddNewDataStoreItem : WorldStorage -> Result<bool, string>
 
-type DirectoryDataSource(dirPath:FileDir) =
+type WorldStorageDirectory(dirPath:FileDir) =
     member this.DirectoryPath = dirPath
     member this.GuidToFilePath (id:Guid) =
         let fn =  FileName.fromString ((string id) + ".txt")
-        FileName.toFilePath this.DirectoryPath fn
+        FilePath.appendFileName this.DirectoryPath fn
            
     member this.AssureDirectory = 
             FileUtils.makeDirectory this.DirectoryPath
 
-    interface IDataSource with
+    interface IWorldStorage with
 
         member this.GetDataSource (id:Guid) =
-            let fp = this.GuidToFilePath id
             result {
+                let! fp = this.GuidToFilePath id
                 let! assure = this.AssureDirectory
                 let! js = FileUtils.readFile fp
-                let! dsi = js |> DataStoreItemDto.fromJson
+                let! dsi = js |> WorldStorageDto.fromJson
                 return dsi
             }
 
@@ -38,11 +38,11 @@ type DirectoryDataSource(dirPath:FileDir) =
                               |> Array.map(Option.get)
             }
 
-        member this.AddNewDataStoreItem (dsi:DataStoreItem) =
+        member this.AddNewDataStoreItem (dsi:WorldStorage) =
             result {
                 let! assure = this.AssureDirectory
-                let fp = dsi |> DataStoreItem.getId |> this.GuidToFilePath
-                let cereal = dsi |> DataStoreItemDto.toDto
+                let! fp = dsi |> WorldStorage.getId |> this.GuidToFilePath
+                let cereal = dsi |> WorldStorageDto.toDto
                                  |> Json.serialize
-                return! FileUtils.writeFile fp cereal false
+                return! FileUtils.makeFile fp cereal
             }
