@@ -1,7 +1,7 @@
 ﻿namespace global
 open System
 
-module SorterShcCauseSpecGen =
+module SorterShcCauseSpecGen2 =
 
     let makeCauseSpec 
                     sorterShcSpecRndGen
@@ -117,14 +117,15 @@ module SorterShcCauseSpecGen =
                 for m in muts do
                     yield (m, t) }
 
-    let makeRunBatchSeq (outputDir:FileDir) 
-                        (seed:RandomSeed) =
+
+    let makeRunBatchSeq2 (outputDir:FileDir) 
+                         (seed:RandomSeed) =
 
         let degree = Degree.fromInt 12
-        let shcCt = ShcCount.fromInt 5
-        let sorterCt = SorterCount.fromInt 50
-        let steps = StepNumber.fromInt 100
-        let seedS = (9500480) |> RandomSeed.fromInt
+        let shcCt = ShcCount.fromInt 20
+        let sorterCt = SorterCount.fromInt 2
+        let steps = StepNumber.fromInt 1000
+        let seedS = (904877) |> RandomSeed.fromInt
 
         let refSorter = RefSorter.goodRefSorterForDegree degree |> Result.ExtractOrThrow
         let swPfx = refSorter |> Sorter.getSwitchPrefix (StageCount.fromInt 3)
@@ -145,7 +146,7 @@ module SorterShcCauseSpecGen =
         //                            (swPfxNone,
         //                            (StageCount.degreeTo999StageCount degree),
         //                             degree)
-        
+    
         //let dispSorter = SorterRndGen.createRandom 
         //                        sRndGen 
         //                        (rngD |> Rando.fromRngGen)
@@ -161,7 +162,7 @@ module SorterShcCauseSpecGen =
         //                            (swPfxNone,
         //                            (StageCount.degreeTo999StageCount degree),
         //                             degree)
-        
+    
         //let dispSorter = SorterRndGen.createRandom 
         //                        sRndGen 
         //                        (rng |> Rando.fromRngGen)
@@ -175,7 +176,7 @@ module SorterShcCauseSpecGen =
                                     (swPfx,
                                     (SwitchCount.degreeTo999SwitchCount degree),
                                      degree)
-        
+    
         let dispSorter = SorterRndGen.createRandom 
                                 sRndGen 
                                 (rng |> Rando.fromRngGen)
@@ -210,5 +211,5 @@ module SorterShcCauseSpecGen =
         sorterShcSpecRndGens |> Seq.toList |> CollectionUtils.listLoop
         |> Seq.mapi(fun dex sg -> 
                             let sng = {(sg |> fst) with  sorterShcSpecRndGen.rndGen = makeRng(randy)}
-                            makeTriple 
+                            makeTriple2 
                                dex (sg |> snd) outputDir (UseParallel.create false) sng )

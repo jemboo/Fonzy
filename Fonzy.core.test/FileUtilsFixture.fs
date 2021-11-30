@@ -19,9 +19,15 @@ type FileUtilsFixture() =
         Assert.IsTrue(res)
 
     [<TestMethod>]
-    member this.FileIo() =
-        let fp = "c:\log\JsonTest.txt"
+    member this.makeArchiver() =
+        let fDir = FileDir.fromString "c:\\folderTest\\archiver"
+        let folder = FileFolder.fromString "FileFolder"
+        let file = FileName.fromString "FileName"
+        let ext = FileExt.fromString "txt"
+        let testData = seq {"line1"; "line2"}
 
+        let archiver = FileUtils.makeArchiver fDir
+        let res = archiver folder file ext testData
         Assert.AreEqual(1, 1)
 
 

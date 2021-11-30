@@ -492,8 +492,6 @@ module SorterShcSpecRndGenDto =
 
 
 
-
-
 type sorterShcResultDto = {
         shcId:string;
         sorterShc:sorterShcSpecDto; 

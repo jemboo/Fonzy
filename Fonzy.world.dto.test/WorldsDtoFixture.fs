@@ -9,11 +9,12 @@ type WorldDtoFixture () =
     [<TestMethod>]
     member this.WorldDto () =
         let genArrayName = "genA"
+        let monitor = fun _ -> ()
         let arrayCount = 103
         let randy = RngGen.createLcg (22 |> RandomSeed.fromInt)
         let intDistType = intDistType.Uniform (UniformIntegerDistParams.zeroCentered 5)
         let csIntGen = CauseSpecRandGen.intArray intDistType arrayCount randy genArrayName
-        let cause = Causes.fromCauseSpec csIntGen |> Result.ExtractOrThrow
+        let cause = Causes.fromCauseSpec monitor csIntGen |> Result.ExtractOrThrow
         let w = World.create (WorldId.fromGuid (Guid.NewGuid())) cause enviro.Empty
         let dto = w |> WorldDto.toDto
         let dtoBack = dto |> Json.serialize |> Json.deserialize<worldDto> |> Result.ExtractOrThrow

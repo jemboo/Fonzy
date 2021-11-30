@@ -2,60 +2,9 @@
 open System
 
 
-module SorterShc =
+module SorterShcSpec2 = 
 
-    let sorterEvalPerfBin
-                   (swPk:sorterStageWeightSpec) 
-                   (srtblSetType:sortableSetType) =
-        result {
-        
-            let! sortableSet, pfxUses = SortableSetMaker.makeTNoRepo srtblSetType
-            return
-                fun (sShc:sorterShc) ->
-                    result {
-                       // Console.WriteLine(sprintf "%d" (StepNumber.value sShc.step))
-                        let stageW = ShcStageWeightSpec.getStageWeight swPk sShc       
-                        let suPlan = Sorting.SwitchUsePlan.makeIndexes
-                                        pfxUses
-                                        (sShc.sorter.switches.Length |> SwitchCount.fromInt)
-                        let swEvRecs = SortingOps.Sorter.eval sShc.sorter
-                                               sortableSet.sortableSetImpl
-                                               suPlan
-                                               Sorting.eventGrouping.BySwitch
-                        let switchUses = swEvRecs
-                                         |> SortingEval.SwitchEventRecords.getSwitchUses
-                        let usedSwitches = sShc.sorter 
-                                           |> SwitchUses.getUsedSwitches switchUses
-                        let perf = 
-                            {
-                                SortingEval.sorterPerf.successful = swEvRecs 
-                                    |> SortingEval.SwitchEventRecords.getAllSortsWereComplete
-                                    |> Some
-                                SortingEval.sorterPerf.usedStageCount = 
-                                        Stage.getStageCount 
-                                            sShc.sorter.degree 
-                                            usedSwitches
-                                SortingEval.sorterPerf.usedSwitchCount = 
-                                        SwitchCount.fromInt usedSwitches.Length
-                            }
-
-                        let energy = perf |> SorterFitness.fromSorterPerf sShc.sorter.degree stageW
-                                          |> Some
-                        return {sShc with 
-                                    bestEnergy = None;
-                                    energy = energy;
-                                    energyDelta = None
-                                    perf = Some perf;
-                                    switchUses = Some switchUses
-                               }
-                    }
-          }
-    
-
-
-module SorterShcSpec = 
-
-    let makeEvaluator (spec:sorterShcSpec) = 
+    let makeEvaluator (spec:sorterShcSpec2) = 
         match spec.evalSpec with
         | sorterEvalSpec.PerfBin -> 
                 SorterShc.sorterEvalPerfBin
@@ -64,10 +13,10 @@ module SorterShcSpec =
                   
 
 
-module SorterShcSpecRndGen =
+module SorterShcSpecRndGen2 =
 
     let swapAnnealers  rndG 
-                       (baseSpec:sorterShcSpec)
+                       (baseSpec:sorterShcSpec2)
                        (count: ShcCount)
                        (endPt:annealerSpec) = 
         let annAc randy =
@@ -100,14 +49,14 @@ module SorterShcSpecRndGen =
 
 
     let swapMut rndG 
-                (shc:sorterShcSpec)
+                (shc:sorterShcSpec2)
                 (count: ShcCount)
                 (smc:sorterMutSpec) = 
         "Not impl" |> Error
 
 
     let swapRndGen rndG 
-                   (shc:sorterShcSpec)
+                   (shc:sorterShcSpec2)
                    (count: ShcCount) = 
         let randy = rndG |> Rando.fromRngGen
         seq {0 .. ((ShcCount.value count) - 1) }
@@ -118,7 +67,7 @@ module SorterShcSpecRndGen =
 
     let swapSorters (srSrepo: (SorterSetId->sorterSet) option) 
                     rndG 
-                    (baseSpec:sorterShcSpec) 
+                    (baseSpec:sorterShcSpec2) 
                     (count: ShcCount)
                     (ssg:sorterSetGen) = 
         result {
@@ -134,7 +83,7 @@ module SorterShcSpecRndGen =
 
 
     let swapStageWeight rndG 
-                       (shc:sorterShcSpec)
+                       (shc:sorterShcSpec2)
                        (count: ShcCount)
                        (sws:sorterStageWeightSpec) = 
         "Not impl" |> Error
@@ -143,7 +92,7 @@ module SorterShcSpecRndGen =
 
     let generate (sbSrepo: (SortableSetId->sorterSet) option) 
                  (srSrepo: (SorterSetId->sorterSet) option) 
-                 (sssrg:sorterShcSpecRndGen) = 
+                 (sssrg:sorterShcSpecRndGen2) = 
         match sssrg.sssrgType with
 
         | Annealer annSpec -> swapAnnealers 
@@ -178,9 +127,9 @@ module SorterShcSpecRndGen =
 
 
 
-module SHC =
+module SHC2 =
 
-    let fromSorterShcSpec (spec:sorterShcSpec) =
+    let fromSorterShcSpec (spec:sorterShcSpec2) =
 
         let sshcInitial = {
             sorterShc.step = StepNumber.fromInt 0;
@@ -196,41 +145,37 @@ module SHC =
             energyDelta = None;
         }
         result {
-            let! evaluator = SorterShcSpec.makeEvaluator spec
+            let! evaluator = SorterShcSpec2.makeEvaluator spec
             return  {
-               sHC.id = SorterShcSpec.makeId spec;
+               sHC2.id = SorterShcSpec2.makeId spec;
                current = sshcInitial;
-               archive = [];
                mutator = SorterShcSpec.makeMutator spec.mutatorSpec;
                evaluator = evaluator;
                annealer = SorterShcSpec.makeAnnealer spec.annealerSpec;
-               logger = SorterShcSpec.makeLogger spec.loggerSpec;
                terminator = SorterShcSpec.makeTerminator spec.termSpec;
             }
         }
 
 
 
-module SorterSHCset =
+module SorterSHCset2 =
 
-    let make (specs: seq<sorterShcSpec>) =
-        SHCset.make (SorterShcSpec.makeId) (SHC.fromSorterShcSpec) specs
+    let make (specs: seq<sorterShcSpec2>) =
+        SHCset2.make (SorterShcSpec2.makeId) (SHC2.fromSorterShcSpec) specs
 
 
-    let getResults (shcs:sHCset<sorterShcSpec, sorterShc, sorterShcArch>) = 
+    let getResults (shcs:sHCset2<sorterShcSpec2, sorterShc>) = 
         let memberIds = shcs.memberMap |> Map.toArray |> Array.map(fst)
         let _rpt id = 
-            let spec = shcs.specMap.[id]
             let aR = shcs.memberMap.[id]
             let rpt = 
                 match aR with
-                | Ok m -> ("OK", m.archive |> List.toArray)
-                | Error m -> ("error", [||])
+                | Ok m -> ("OK", m.current |> SorterShcArch.toFull)
+                | Error m -> ("error", SorterShcArch.dfltPartial)
             {
-                sorterShcResult.id = id;
-                spec = spec;
+                sorterShcResult2.id = id;
                 msg = (fst rpt)
-                archives = (snd rpt)
+                archive = (snd rpt)
             }
 
-        {sorterShcResults.members =  memberIds |> Array.map(_rpt) }
+        { sorterShcResults2.members = memberIds |> Array.map(_rpt) }

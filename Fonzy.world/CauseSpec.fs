@@ -244,6 +244,29 @@ module CauseSpecSorterShc =
         }
 
 
+    let sorterShcSpecRndGen2
+        (sorterShcSpecRndGen:string*sorterShcSpecRndGen)
+        (useParallel:string*bool) 
+        (resultsName:string*string) =
+
+        let id = seq { sorterShcSpecRndGenBaseId:> obj;
+                        sorterShcSpecRndGen:> obj;
+                        useParallel:> obj;
+                        resultsName:> obj; } 
+                        |> GuidUtils.guidFromObjs
+
+        let prams = [ 
+                        (CauseSpec.tupOp sorterShcSpecRndGen SorterShcSpecRndGenDto.toJson);
+                        (CauseSpec.tupOp useParallel Json.serialize);
+                        resultsName
+                    ] 
+                    |> Map.ofList
+                    |> StringMapDto.toDto
+        {
+            causeSpec.id = CauseSpecId.fromGuid id; 
+            genus=["SorterShc"; "sorterShcSpecRndGen2"]; 
+            prams=prams;
+        }
 
 
 

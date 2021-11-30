@@ -13,13 +13,14 @@ module WorldDto =
     let toJson (w:world) =
         w |> toDto |> Json.serialize
 
-    let fromDto (wDto:worldDto) =
+    let fromDto (monitor:'a->unit)
+                (wDto:worldDto) =
            result {
              let worldId = WorldId.fromGuid wDto.id
              let parentId = WorldId.fromGuid wDto.parentId
              let! e = wDto.enviroDto |> EnviroDto.fromDto
              let! cs = wDto.causeSpecDto |> CauseSpecDto.fromDto;
-             let! c = cs |> Causes.fromCauseSpec
+             let! c = cs |> Causes.fromCauseSpec monitor
              return  {
                  world.id = worldId;
                  parentId = parentId
@@ -28,10 +29,11 @@ module WorldDto =
                 } 
             }
 
-    let fromJson (js:string) =
+    let fromJson (monitor:'a->unit)
+                 (js:string) =
         result {
             let! dto = Json.deserialize<worldDto> js
-            return! fromDto dto
+            return! fromDto monitor dto
         }
             
 type worldActionDto = {childId:Guid; parentWorldDto:worldDto; 
@@ -47,11 +49,12 @@ module WorldActionDto =
     let toJson (w:WorldAction) =
         w |> toDto |> Json.serialize
 
-    let fromDto (waDto:worldActionDto) =
+    let fromDto (monitor:'a->unit)
+                (waDto:worldActionDto) =
            result {
-             let! pw = waDto.parentWorldDto |> WorldDto.fromDto
+             let! pw = waDto.parentWorldDto |> WorldDto.fromDto monitor
              let! cs = waDto.causeSpecDto |> CauseSpecDto.fromDto;
-             let! c = cs |> Causes.fromCauseSpec
+             let! c = cs |> Causes.fromCauseSpec monitor
              return  {
                  WorldAction.childId = WorldId.fromGuid waDto.childId;
                  WorldAction.parentWorld = pw
@@ -59,10 +62,11 @@ module WorldActionDto =
                 } 
             }
 
-    let fromJson (js:string) =
+    let fromJson (monitor:'a->unit)
+                 (js:string) =
         result {
             let! dto = Json.deserialize<worldActionDto> js
-            return! fromDto dto
+            return! dto |> fromDto monitor
         }
 
 type worldMergeDto = {id:Guid; sourceNameMap: Map<string,Guid>; 

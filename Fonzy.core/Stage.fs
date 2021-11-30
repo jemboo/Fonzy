@@ -76,7 +76,7 @@ module Stage =
                           (pair:int*int) =
         let tcpM = stage |> convertToTwoCycle 
                          |> TwoCyclePerm.mutateByPair pair
-        let sA = Switch.fromIntArray tcpM.values |> Seq.toList
+        let sA = Switch.fromIntArrayAsPerm tcpM.values |> Seq.toList
         {switches=sA; degree=stage.degree}
 
 
@@ -85,7 +85,7 @@ module Stage =
 
         let tcpM = stage |> convertToTwoCycle 
                          |> TwoCyclePerm.mutateByReflPair pairs
-        let sA = Switch.fromIntArray tcpM.values |> Seq.toList
+        let sA = Switch.fromIntArrayAsPerm tcpM.values |> Seq.toList
         {switches=sA; degree=stage.degree}
 
 

@@ -6,7 +6,8 @@ type CausesFixture () =
 
     [<TestMethod>]
     member this.CauseFromCauseSpecIntArrayRandGen () =
-        let cause = Causes.fromCauseSpec TestData.CauseSpec.IntDist.rndUniform
+        let monitor = fun _ -> ()
+        let cause = Causes.fromCauseSpec monitor TestData.CauseSpec.IntDist.rndUniform
                         |> Result.ExtractOrThrow
         let env = enviro.Empty
         let newEnv = cause.op env |> Result.ExtractOrThrow
@@ -22,7 +23,8 @@ type CausesFixture () =
 
     [<TestMethod>]
     member this.CauseFromCauseSpecInt2dArrayRandGen () =
-        let cause = Causes.fromCauseSpec TestData.CauseSpec.IntDist.rnd2dUniform 
+        let monitor = fun _ -> ()
+        let cause = Causes.fromCauseSpec monitor TestData.CauseSpec.IntDist.rnd2dUniform 
                                 |> Result.ExtractOrThrow
         let env = enviro.Empty
         let newEnv = cause.op env |> Result.ExtractOrThrow
@@ -37,8 +39,10 @@ type CausesFixture () =
 
     [<TestMethod>]
     member this.CauseFromRndGenSorterSet() =
-        let cause = Causes.fromCauseSpec TestData.CauseSpec.SorterSet.rand1 
-                                |> Result.ExtractOrThrow
+        let monitor = fun _ -> ()
+        let cause = TestData.CauseSpec.SorterSet.rand1  
+                    |> Causes.fromCauseSpec monitor
+                    |> Result.ExtractOrThrow
         let env = enviro.Empty
         let newEnv = cause.op env |> Result.ExtractOrThrow
         let causedProd =  
@@ -52,14 +56,16 @@ type CausesFixture () =
 
     [<TestMethod>]
     member this.CauseEvalToSorterPerfBins() =
+        let monitor = fun _ -> ()
         let envO = enviro.Empty
-        let causeGen = Causes.fromCauseSpec TestData.CauseSpec.SorterSet.rand1 
+        let causeGen = TestData.CauseSpec.SorterSet.rand1 
+                                |> Causes.fromCauseSpec monitor
                                 |> Result.ExtractOrThrow
         let envGen = causeGen.op envO |> Result.ExtractOrThrow
 
-        let causeEval = Causes.fromCauseSpec 
-                                TestData.CauseSpec.SorterSet.evalToSorterPerfBins 
-                                |> Result.ExtractOrThrow
+        let causeEval = TestData.CauseSpec.SorterSet.evalToSorterPerfBins 
+                            |> Causes.fromCauseSpec monitor
+                            |> Result.ExtractOrThrow
 
         let envEvalRes = causeEval.op envGen |> Result.ExtractOrThrow
 
@@ -73,7 +79,8 @@ type CausesFixture () =
 
     [<TestMethod>]
     member this.CauseRndGenToPerfBins() =
-        let causeEvalR = Causes.fromCauseSpec 
+        let monitor = fun _ -> ()
+        let causeEvalR = Causes.fromCauseSpec monitor
                                 TestData.CauseSpec.SorterSet.rndGenToSorterPerfBins 
                                 
         let causeEval = causeEvalR |> Result.ExtractOrThrow

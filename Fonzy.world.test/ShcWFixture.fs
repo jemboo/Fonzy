@@ -51,7 +51,7 @@ type ShcFixture () =
                      |> Result.ExtractOrThrow
                      |> SorterSHCset.make
 
-        let batchRes = sHCset.runBatch (UseParallel.create true) shcSet
+        let batchRes = SHCset.runBatch (UseParallel.create true) shcSet
         let shcRes = SorterSHCset.getResults batchRes
         let txtOut = shcRes |> SorterShcResultsDto.toDto
         Assert.IsTrue(true)

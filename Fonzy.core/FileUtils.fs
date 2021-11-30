@@ -77,11 +77,15 @@ module FileUtils =
         with
             | ex -> ("error in writeFile: " + ex.Message ) |> Result.Error
 
-
-    //returns a cumer
-    //let logFileKeyHeader path item =
-    //    writeFile path (sprintf "%skey" item ) true
-    //    new Dictionary<int, Dictionary<Guid, string>>()
+    let makeArchiver (dir:FileDir) =
+        fun (folder:FileFolder) (file:FileName) (ext:FileExt) (data:seq<string>) ->
+            try
+                let fne = sprintf "%s.%s" (FileName.value file) (FileExt.value ext)
+                let fp = Path.Combine(FileDir.value dir, fne) |> FilePath.fromString
+                let dirInfo = System.IO.Directory.CreateDirectory (FileDir.value dir)
+                appendToFile fp data
+            with
+                | ex -> ("error in archiver: " + ex.Message ) |> Result.Error
 
 
     //let logFileKey path (cumer:Dictionary<int, Dictionary<Guid, string>>) (key:int) (group:Guid) item  =

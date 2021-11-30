@@ -15,12 +15,13 @@ type WorldStorageFixture () =
         Directory.CreateDirectory(this.testDir)
         |> ignore
 
+    member this.monitor = fun _ -> ()
 
     member this.world1 =
         World.createFromParent 
                 World.empty
                 (TestData.CauseSpec.SorterSet.rand1
-                    |> Causes.fromCauseSpec
+                    |> Causes.fromCauseSpec this.monitor
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
 
@@ -28,7 +29,7 @@ type WorldStorageFixture () =
         World.createFromParent 
                 World.empty
                 (TestData.CauseSpec.SorterSet.rand2
-                    |> Causes.fromCauseSpec
+                    |> Causes.fromCauseSpec this.monitor
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
 
@@ -36,7 +37,7 @@ type WorldStorageFixture () =
         World.createFromParent 
                 World.empty
                 (TestData.CauseSpec.SorterSet.rand3
-                    |> Causes.fromCauseSpec
+                    |> Causes.fromCauseSpec this.monitor
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
 
@@ -122,7 +123,7 @@ type WorldStorageFixture () =
                                         |> Result.ExtractOrThrow
 
         let worldActionBack = worldActionDto
-                                        |> WorldActionDto.fromDto
+                                        |> WorldActionDto.fromDto this.monitor
                                         |> Result.ExtractOrThrow
         
         Assert.AreEqual(randWorldAction.cause.causeSpec.id, 

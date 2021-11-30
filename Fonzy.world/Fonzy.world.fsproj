@@ -14,10 +14,12 @@
     <Compile Include="SortingOps.fs" />
     <Compile Include="SortableSetMaker.fs" />
     <Compile Include="ShcW.fs" />
+    <Compile Include="ShcW2.fs" />
     <Compile Include="Enviros.fs" />
     <Compile Include="CauseSpec.fs" />
     <Compile Include="SorterPbCauseSpecGen.fs" />
     <Compile Include="SorterShcCauseSpecGen.fs" />
+    <Compile Include="SorterShcCauseSpecGen2.fs" />
     <Compile Include="Cause.fs" />
     <Compile Include="CauseSorters.fs" />
     <Compile Include="CauseSorterShc.fs" />

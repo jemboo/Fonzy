@@ -52,7 +52,9 @@ module CauseRandGen =
         {Cause.causeSpec=causeSpec; op=causer} |> Ok
 
 
-    let fromCauseSpec (genus:string list) (causeSpec:causeSpec) = 
+    let fromCauseSpec (genus:string list) 
+                      (monitor:'a->unit)
+                      (causeSpec:causeSpec) = 
         match genus with
         | [] -> "No CauseRandGen genus" |> Error
         | ["IntArray"] -> intArray causeSpec

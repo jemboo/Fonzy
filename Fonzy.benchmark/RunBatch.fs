@@ -6,13 +6,17 @@ module RunBatch =
     let runBatchSeq 
             (rndCauseSpecGen : FileDir -> RandomSeed -> 
                 seq<string*FileDir*causeSpec>)
-            (outputDir:FileDir) 
+            (monitor:'a->unit)
+            (outputDir:FileDir)
             (seed:RandomSeed) 
             (firstDex:int)  =
 
         let runBatch (causeSpecDescr, outputDir, causeSpec) =
             Console.WriteLine(string causeSpecDescr)
-            let res = Runs.runCauseSpec outputDir causeSpec
+            let res = Runs.makeWorldFromCauseSpec
+                           monitor
+                           outputDir
+                           causeSpec
             match res with
             | Ok b -> b |> ignore
             | Error m -> Console.WriteLine m
@@ -23,19 +27,36 @@ module RunBatch =
 
     
     let runPerfBinBatchSeq 
+                    (monitor:'a->unit)
                     (outputDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
 
-        runBatchSeq SorterPbCauseSpecGen.makeRunBatchSeq 
-                    outputDir seed firstDex
+        runBatchSeq SorterPbCauseSpecGen.makeRunBatchSeq
+                     monitor
+                     outputDir
+                     seed 
+                     firstDex
 
-    let runShcSets
+    let runShcSets  (monitor:'a->unit)
                     (outputDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
 
-        runBatchSeq SorterShcCauseSpecGen.makeRunBatchSeq 
+        runBatchSeq SorterShcCauseSpecGen.makeRunBatchSeq
+                       monitor
+                       outputDir 
+                       seed
+                       firstDex
+
+
+    let runShcSets2 (monitor:'a->unit)
+                    (outputDir:FileDir) 
+                    (seed:RandomSeed) 
+                    (firstDex:int) =
+
+        runBatchSeq SorterShcCauseSpecGen2.makeRunBatchSeq2
+                       monitor
                        outputDir 
                        seed
                        firstDex
@@ -56,9 +77,10 @@ module RunBatch =
 
         let perfBinsFromGuid (g:Guid) =
             result {
+                let monitor = fun _ -> ()
                 let! ds = reportDataSource.GetDataSource(g)
                 let! worldDto = ds |> WorldStorage.getWorldDto
-                let! worldMerge = worldDto |> WorldDto.fromDto
+                let! worldMerge = worldDto |> WorldDto.fromDto monitor
                 let! map = worldMerge.cause.causeSpec.prams |> StringMapDto.fromDto
                 let! sorterPerfBinsDto =  
                         Enviro.getDto<sorterPerfBinDto[]> 
@@ -130,9 +152,10 @@ module RunBatch =
      let shcArchsFromGuid (archDs:IWorldStorage) 
                           (g:Guid) =
          result {
+            let monitor = fun _ -> ()
             let! ds = archDs.GetDataSource(g)
             let! worldDto = ds |> WorldStorage.getWorldDto
-            let! worldMerge = worldDto |> WorldDto.fromDto
+            let! worldMerge = worldDto |> WorldDto.fromDto monitor
             let! sShcResDto =  
                     Enviro.getDto<sorterShcResultsDto> 
                                     worldMerge.enviro

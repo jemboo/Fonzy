@@ -90,13 +90,8 @@ module SHC =
 
 
 
-//    let runBatch (shcs:sHC<'T,'A>[]) =
-//        let ree = shcs |> Array.Parallel.map(run)
-//        ree
+module SHCset = 
 
-
-
-module sHCset = 
     let make<'S,'T,'A> (idGen: 'S->ShcId)
                        (maker: 'S->Result<sHC<'T,'A>, string>) 
                        (specs: seq<'S>) =
@@ -130,16 +125,3 @@ module sHCset =
                         |> Map.ofSeq
 
         {shcs with memberMap = mms}
-
-
-
-//    let runBatch (shcs:sHCset<'S,'T,'A>) = 
-//        let _runn (id:ShcId) (shcr:Result<sHC<'T,'A>, string>) =
-//            match shcr with
-//            | Ok shc -> (id, SHC.run shc)
-//            | Error m -> (id, sprintf "error creating spec: %s" m |> Error)
-            
-//        let mms = shcs.members |> Map.toArray
-//                               |> Array.Parallel.map(fun tup -> _runn (fst tup) (snd tup))
-//                               |> Map.ofSeq
-//        {shcs with members = mms}

@@ -91,7 +91,7 @@ module TestData =
 
         let srtblSetType = sortableSetType.AllForDegree 
                                 (sortableSetRep.Bp64 degree)
-        let swLst = [|0;1;2;|] |> Switch.fromIntArray |> Seq.toList
+        let swLst = [|0;1;2;|] |> Switch.fromIntArrayAsPerm |> Seq.toList
         let srtblSetTypeR = sortableSetType.SwitchReduced 
                                 (srtblSetType, swLst)
 
@@ -256,7 +256,7 @@ module TestData =
         let rng = RngGen.createLcg (RandomSeed.fromInt 123)
         let sorter = RefSorter.goodRefSorterForDegree degree
                         |> Result.ExtractOrThrow
-        let wPfx = [|1;2;3;0;|] |> Switch.fromIntArray
+        let wPfx = [|1;2;3;0;|] |> Switch.fromIntArrayAsPerm
                    |> Seq.toArray
         let pfxSc = SwitchCount.fromInt wPfx.Length
         let mutRate = MutationRate.fromFloat 1.0

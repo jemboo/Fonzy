@@ -22,7 +22,7 @@ type ShcFixture () =
     //let srter = RefSorter.goodRefSorterForDegree degree
     //            |> Result.ExtractOrThrow
 
-    let swPfx = [| |] |> Switch.fromIntArray
+    let swPfx = [| |] |> Switch.fromIntArrayAsPerm
                       |> Seq.toArray
     let pfxCt = (SwitchCount.fromInt (swPfx.Length))
     let mutRate = (MutationRate.fromFloat 0.02)

@@ -42,6 +42,7 @@ type ArrayLength = private ArrayLength of int
 type EntityId = private EntityId of Guid
 type JsonString = private JsonString of string
 type FileDir = private FileDir of string
+type FileFolder = private FileFolder of string
 type FilePath = private FilePath of string
 type FileName = private FileName of string
 type FileExt = private FileExt of string
@@ -74,7 +75,16 @@ module JsonString =
     let createOption fieldName str = 
         ConstrainedType.createStringOption fieldName JsonString 50 str
 
-// directory name (full path to folder)
+// folder name (single name)
+module FileFolder =
+    let value (FileFolder str) = str
+    let create fieldName str = 
+        ConstrainedType.createString fieldName FileFolder 1000 str
+    let createOption fieldName str = 
+        ConstrainedType.createStringOption fieldName FileFolder 1000 str
+    let fromString v = create "" v |> Result.ExtractOrThrow
+
+// directory name (full path from root to folder)
 module FileDir =
     let value (FileDir str) = str
     let create fieldName str = 
@@ -82,9 +92,22 @@ module FileDir =
     let createOption fieldName str = 
         ConstrainedType.createStringOption fieldName FileDir 1000 str
     let fromString v = create "" v |> Result.ExtractOrThrow
+    let appendFolder (fn:FileFolder) (fd:FileDir) =
+        try
+            fromString (Path.Combine(value fd, fn |> FileFolder.value)) |> Ok
+        with
+            | ex -> ("error in addFolderName: " + ex.Message ) |> Result.Error
 
+// file extension (single name)
+module FileExt =
+    let value (FileExt str) = str
+    let create fieldName str = 
+        ConstrainedType.createString fieldName FileExt 5 str
+    let createOption fieldName str = 
+        ConstrainedType.createStringOption fieldName FileExt 5 str
+    let fromString v = create "" v |> Result.ExtractOrThrow
 
-// file name only, (no path)
+// file name only, (no path, no extension)
 module FileName =
     let value (FileName str) = str
     let create fieldName str = 
@@ -94,7 +117,7 @@ module FileName =
     let fromString v = create "" v |> Result.ExtractOrThrow
 
 
-// FileDir + FileName
+// FileDir + (FileFolder (optional)) + FileName + file extension
 module FilePath =
     let value (FilePath str) = str
     let create fieldName str = 
@@ -106,11 +129,6 @@ module FilePath =
         Path.GetDirectoryName (value fp)
     let toFileName (fp:FilePath) =
         Path.GetFileName (value fp)
-    let appendFolder (fd:FileDir) (fn:string) =
-        try
-            FileDir.fromString (Path.Combine((FileDir.value fd), fn)) |> Ok
-        with
-            | ex -> ("error in addFolderName: " + ex.Message ) |> Result.Error
     let appendFileName (fd:FileDir) (fn:FileName) =
         try
             fromString (Path.Combine((FileDir.value fd), (FileName.value fn))) |> Ok

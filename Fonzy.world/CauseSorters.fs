@@ -203,7 +203,9 @@ module CauseSorters =
         {Cause.causeSpec=causeSpec; op=causer}
    
 
-    let fromCauseSpec (genus:string list) (causeSpec:causeSpec) = 
+    let fromCauseSpec (genus:string list) 
+                      (monitor:'a->unit)
+                      (causeSpec:causeSpec) = 
         match genus with
         | [] -> "No CauseSorters genus" |> Error
         | ["rndGen"] -> rndGen causeSpec |> Ok

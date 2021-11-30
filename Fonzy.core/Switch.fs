@@ -12,6 +12,9 @@ module Switch =
             for low=0 to hi do 
                 yield {Switch.low=low; Switch.hi=hi}]
 
+    let fromIndexes (dexes:int seq) = 
+        dexes |> Seq.map(fun dex -> switchMap.[dex])
+
     let getIndex (switch:Switch) =
         (switch.hi * (switch.hi + 1)) / 2 + switch.low
     
@@ -42,17 +45,17 @@ module Switch =
         
     // produces switches from only the two cycle components of the 
     // permutation
-    let fromIntArray (pArray:int[]) =
+    let fromIntArrayAsPerm (pArray:int[]) =
             seq { for i = 0 to pArray.Length - 1 do
                     let j = pArray.[i]
                     if ((j > i ) && (i = pArray.[j]) ) then
                             yield {Switch.low=i; Switch.hi=j} }
 
     let fromPermutation (p:permutation) =
-        fromIntArray (Permutation.arrayValues p)
+        fromIntArrayAsPerm (Permutation.arrayValues p)
      
     let fromTwoCyclePerm (p:twoCyclePerm) =
-        fromIntArray (TwoCyclePerm.arrayValues p)
+        fromIntArrayAsPerm (TwoCyclePerm.arrayValues p)
     
     let switchCountForDegree (order:Degree)  =
         uint32 ((Degree.value order)*(Degree.value order + 1) / 2)
