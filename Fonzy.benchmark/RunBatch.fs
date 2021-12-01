@@ -6,58 +6,57 @@ module RunBatch =
     let runBatchSeq 
             (rndCauseSpecGen : FileDir -> RandomSeed -> 
                 seq<string*FileDir*causeSpec>)
-            (monitor:'a->unit)
-            (outputDir:FileDir)
+            (rootOutDir:FileDir)
             (seed:RandomSeed) 
             (firstDex:int)  =
 
-        let runBatch (causeSpecDescr, outputDir, causeSpec) =
+        let runBatch (causeSpecDescr, rootOutDir, causeSpec) =
+            let parentWorld = World.empty
+            let worldId = World.makeWorldId parentWorld.id causeSpec
+            let outputFolder = worldId |> WorldId.value |> string |> FileFolder.create "" |> Result.ExtractOrThrow
+            let outputDir = rootOutDir |> FileDir.appendFolder outputFolder |> Result.ExtractOrThrow
+            let monitor = SorterSHCset2.logShcData outputDir
             Console.WriteLine(string causeSpecDescr)
             let res = Runs.makeWorldFromCauseSpec
                            monitor
                            outputDir
+                           parentWorld
                            causeSpec
             match res with
             | Ok b -> b |> ignore
             | Error m -> Console.WriteLine m
 
-        rndCauseSpecGen outputDir seed 
+        rndCauseSpecGen rootOutDir seed 
             |> Seq.skip firstDex
             |> Seq.iter(runBatch)
 
     
     let runPerfBinBatchSeq 
-                    (monitor:'a->unit)
                     (outputDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
 
         runBatchSeq SorterPbCauseSpecGen.makeRunBatchSeq
-                     monitor
                      outputDir
                      seed 
                      firstDex
 
-    let runShcSets  (monitor:'a->unit)
-                    (outputDir:FileDir) 
+    let runShcSets  (outputDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
 
         runBatchSeq SorterShcCauseSpecGen.makeRunBatchSeq
-                       monitor
                        outputDir 
                        seed
                        firstDex
 
 
-    let runShcSets2 (monitor:'a->unit)
-                    (outputDir:FileDir) 
+    let runShcSets2 (rootOutDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
 
         runBatchSeq SorterShcCauseSpecGen2.makeRunBatchSeq2
-                       monitor
-                       outputDir 
+                       rootOutDir 
                        seed
                        firstDex
 
@@ -143,6 +142,7 @@ module RunBatch =
 
         let res = CsvFile.writeCsvFile csvFile |> Result.ExtractOrThrow
         sprintf "%s\\%s" (FileDir.value outputDir) fileName
+
 
 
   module ShcReports = 

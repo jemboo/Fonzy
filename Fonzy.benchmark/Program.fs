@@ -8,9 +8,7 @@ let main argv =
 
     /// ******* RunBatch.runShcSets2 ***********
     Console.WriteLine("Starting RunBatch.runShcSets2")
-    let monitor = fun _ -> ()
-    RunBatch.runShcSets2   monitor
-                           (FileDir.fromString "C:\\SimOutShc")
+    RunBatch.runShcSets2   (FileDir.fromString "C:\\SimOutShc")
                            (RandomSeed.fromNow ())
                            0
                          |> ignore

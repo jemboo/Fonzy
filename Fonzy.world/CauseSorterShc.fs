@@ -3,7 +3,7 @@ open System
 
 module CauseSorterShc =
 
-    let sorterShcSpecRndGen (monitor:'a->unit)
+    let sorterShcSpecRndGen (monitor:obj->unit)
                             (causeSpec:causeSpec) =
         let causer = fun (e:enviro) ->
             result {
@@ -37,24 +37,13 @@ module CauseSorterShc =
                                                 e 
             }
 
-        {Cause.causeSpec=causeSpec; op=causer}
+        { Cause.causeSpec=causeSpec; op=causer }
 
 
-    //let sorterShcSpecRndGen2 (logger:FileFolder->FileName->FileExt->seq<string>->Result<bool,string>)
-    //                         (causeSpec:causeSpec) =
-
-    let sorterShcSpecRndGen2 (monitor:'a->unit)
+    let sorterShcSpecRndGen2 (monitor:obj->unit)
                              (causeSpec:causeSpec) =
         let causer = fun (e:enviro) ->
             result {
-                let logShc () = 
-                    fun (state:sHCstate) shc ->
-                        match state with
-                        | sHCstate.PostMutate -> true |> ignore
-                        | sHCstate.PostEvaluate -> true |> ignore
-                        | sHCstate.PostAnnealer -> true |> ignore
-                        //let res = logger shc |> Result.ExtractOrThrow
-                        //res |> ignore
 
                 let! map = causeSpec.prams |> StringMapDto.fromDto
 
@@ -75,8 +64,8 @@ module CauseSorterShc =
 
 
                 let batchRes = SHCset2.runBatch (UseParallel.create useParallel)
-                                                (logShc ())
-                                                 shcSet
+                                                monitor
+                                                shcSet
                 let shcRes = SorterSHCset2.getResults batchRes
                 let sShcResultsDto = shcRes |> SorterShcResults2Dto.toDto
                 return! Enviro.addDto<sorterShcResults2Dto>
@@ -89,7 +78,7 @@ module CauseSorterShc =
 
 
     let fromCauseSpec  (genus:string list) 
-                       (monitor:'a->unit)
+                       (monitor:obj->unit)
                        (causeSpec:causeSpec) = 
         match genus with
         | [] -> "No CauseSorterShc genus" |> Error

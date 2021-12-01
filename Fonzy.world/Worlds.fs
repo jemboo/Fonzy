@@ -5,6 +5,12 @@ type world = {id:WorldId; parentId:WorldId; cause:Cause; enviro:enviro}
 
 module World = 
     let emptyWorldId = WorldId.fromGuid (Guid.Parse "00000000-0000-0000-0000-000000000000")
+    let makeWorldId (parentId:WorldId) 
+                    (spec:causeSpec) =
+        [parentId:>obj; spec:>obj;]
+                |> GuidUtils.guidFromObjs
+                |> WorldId.fromGuid;
+
     let empty = 
         {id=emptyWorldId; 
         parentId = WorldId.fromGuid Guid.Empty; 
@@ -15,9 +21,7 @@ module World =
     let create (parentId:WorldId) 
                (cause:Cause) 
                (enviroment:enviro) =
-          let worldId = [parentId:>obj; cause.causeSpec:>obj;]
-                          |> GuidUtils.guidFromObjs
-                          |> WorldId.fromGuid;
+          let worldId = makeWorldId parentId cause.causeSpec
           {id=worldId; parentId=parentId; cause=cause; enviro=enviroment}
 
 

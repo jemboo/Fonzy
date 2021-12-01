@@ -25,14 +25,14 @@ type sHCset2<'S,'T> =
 
 module SHC2 =
 
-    let update (logger: sHCstate->'T->unit)  (shc:sHC2<'T>) =
+    let update (monitor:obj->unit) (shc:sHC2<'T>) =
             result {
                 let! tMut = shc.current |> shc.mutator
-                logger sHCstate.PostMutate tMut
+                monitor ((sHCstate.PostMutate, tMut, shc) :> obj)
                 let! tEval = tMut |> shc.evaluator
-                logger sHCstate.PostEvaluate tEval
+                monitor ((sHCstate.PostEvaluate, tEval, shc) :> obj)
                 let! aNext = shc.annealer shc.current tEval
-                logger sHCstate.PostAnnealer aNext
+                monitor ((sHCstate.PostAnnealer, aNext, shc) :> obj)
                 return
                     {
                         sHC2.id = shc.id;
@@ -70,13 +70,14 @@ module SHC2 =
          }
     
 
-    let run (logger: sHCstate->'T->unit)  (shc:sHC2<'T>) =
+    let run (monitor:obj->unit)  
+            (shc:sHC2<'T>) =
         let goOn (s) = 
             not (s.terminator s.current)
         let firstEval = shc |> evalT |> Result.ExtractOrThrow
         let mutable shcCur = firstEval
         while (goOn shcCur) do
-            let shcNew = shcCur |> update logger |> Result.ExtractOrThrow
+            let shcNew = shcCur |> update monitor |> Result.ExtractOrThrow
             shcCur <- shcNew
         shcCur |> Ok
 
@@ -97,12 +98,12 @@ module SHCset2 =
 
 
     let runBatch (useP:UseParallel) 
-                 (logger: sHCstate->'T->unit)
+                 (monitor:obj->unit)
                  (shcs:sHCset2<'S,'T>) = 
         let _runn (id:ShcId) (shcr:Result<sHC2<'T>, string>) =
             match shcr with
             | Ok shc -> Console.WriteLine(sprintf "%A" id)
-                        (id, SHC2.run logger shc)
+                        (id, SHC2.run monitor shc)
             | Error m -> (id, sprintf "error creating spec: %s" m |> Error)
         
 

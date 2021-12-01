@@ -29,7 +29,7 @@ module WorldDto =
                 } 
             }
 
-    let fromJson (monitor:'a->unit)
+    let fromJson (monitor:obj->unit)
                  (js:string) =
         result {
             let! dto = Json.deserialize<worldDto> js
@@ -49,7 +49,7 @@ module WorldActionDto =
     let toJson (w:WorldAction) =
         w |> toDto |> Json.serialize
 
-    let fromDto (monitor:'a->unit)
+    let fromDto (monitor:obj->unit)
                 (waDto:worldActionDto) =
            result {
              let! pw = waDto.parentWorldDto |> WorldDto.fromDto monitor
@@ -62,7 +62,7 @@ module WorldActionDto =
                 } 
             }
 
-    let fromJson (monitor:'a->unit)
+    let fromJson (monitor:obj->unit)
                  (js:string) =
         result {
             let! dto = Json.deserialize<worldActionDto> js

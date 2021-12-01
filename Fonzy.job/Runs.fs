@@ -5,22 +5,21 @@ open System
 module Runs =
 
     let makeWorldFromCauseSpec
-                    (monitor:'a->unit)
-                    (rootDir:FileDir)
+                    (monitor:obj -> unit)
+                    (outputDir:FileDir)
+                    (parentWorld:world)
                     (causeSpec:causeSpec) =
         result {
     
             let! cause = causeSpec |> Causes.fromCauseSpec monitor
 
-            let! binSpecWorld = World.createFromParent World.empty
+            let! binSpecWorld = World.createFromParent parentWorld
                                                        cause
             let dataStore = binSpecWorld
                             |> WorldDto.toDto
                             |> WorldStorage.WorldDto
 
-            let! outputFolder = binSpecWorld.id |> WorldId.value |> string |> FileFolder.create ""
 
-            let! outputDir = rootDir |> FileDir.appendFolder outputFolder
             let ws = new WorldStorageDirectory(outputDir) :> IWorldStorage
 
             return! dataStore |> ws.AddNewDataStoreItem         

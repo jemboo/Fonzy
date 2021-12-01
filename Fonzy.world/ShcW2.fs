@@ -179,3 +179,13 @@ module SorterSHCset2 =
             }
 
         { sorterShcResults2.members = memberIds |> Array.map(_rpt) }
+
+
+    let logShcData (root:FileDir) = 
+        fun (shcData:obj) ->
+            let state, sshc, shcT = shcData :?> (sHCstate*sorterShc*sHC2<sorterShc>)
+            let yab = match state with
+                      | PostMutate -> ()
+                      | PostEvaluate -> ()
+                      | PostAnnealer -> ()
+            ()

@@ -43,10 +43,10 @@ module SorterShcCauseSpecGen2 =
 
 
     let makeTriple2 (dex:int)
-                   (tup:MutationRate*Temp)
-                   (outputDir:FileDir)
-                   (u:UseParallel)
-                   (sssRndGen:sorterShcSpecRndGen) = 
+                    (tup:MutationRate*Temp)
+                    (outputDir:FileDir)
+                    (u:UseParallel)
+                    (sssRndGen:sorterShcSpecRndGen) = 
         let causeSpecDescr = sprintf "%d: Time: %s  Mut: %f Temp: %f" 
                                  dex
                                  (System.DateTime.Now.ToLongTimeString())

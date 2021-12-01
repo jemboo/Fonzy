@@ -31,7 +31,7 @@ type FolderSchemeFixture () =
 
         let fsr = result {
             let! folderRoot = FileDir.create "" this.rootDir
-            let! fds = FileDtoStream.makeForSorter folderName folderRoot
+            let! fds = FileDtoStream.makeForSorterDto folderName folderRoot
             let! res = FileDtoStream.append fds sorters
             return fds
           }

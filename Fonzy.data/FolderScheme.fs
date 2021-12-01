@@ -6,12 +6,12 @@ namespace global
 type fileDtoStream<'T> = { name:Guid; root:FileDir; meta:string[]; reader:string->Result<'T, string>; writer:'T->string }
 
 module FileDtoStream =
-    let makeForSorter (name:Guid) (root:FileDir) =
+    let makeForSorterDto (name:Guid) (root:FileDir) =
         result {
             let! fpath = FilePath.appendFileName 
                                     root 
                                     (name |> string |> FileName.fromString)
-            let meta = [|nameof sorter|]
+            let meta = [|nameof sorterDto|]
             let! res = FileUtils.makeFileFromLines fpath meta
             return {
                      fileDtoStream.name = name;
@@ -19,6 +19,22 @@ module FileDtoStream =
                      meta = meta;
                      reader = SorterDto.fromJson;
                      writer = SorterDto.toJson
+                }
+        }
+
+    let makeForSorterShcArchDto (name:Guid) (root:FileDir) =
+        result {
+            let! fpath = FilePath.appendFileName 
+                                    root 
+                                    (name |> string |> FileName.fromString)
+            let meta = [|nameof sorterDto|]
+            let! res = FileUtils.makeFileFromLines fpath meta
+            return {
+                     fileDtoStream.name = name;
+                     root = root;
+                     meta = meta;
+                     reader = SorterShcArchDto.fromJson;
+                     writer = SorterShcArchDto.toJson
                 }
         }
 

@@ -5,7 +5,7 @@ module Causes =
     let noOp =
         {Cause.causeSpec=CauseSpec.noOpCauseSpec; op=fun (e:enviro) -> e|>Ok}
 
-    let fromCauseSpec (monitor:'a->unit)
+    let fromCauseSpec (monitor:obj->unit)
                       (causeSpec:causeSpec) = 
      match causeSpec.genus with
      | [] -> "No CauseSpec genus" |> Error
