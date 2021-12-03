@@ -10,8 +10,7 @@ module FileUtils =
 
     let makeDirectory (fd:FileDir) = 
         try
-            Directory.CreateDirectory(FileDir.value fd) |> ignore 
-            true |> Ok
+            Directory.CreateDirectory(FileDir.value fd) |> Ok
         with
             | ex -> ("error in makeDirectory: " + ex.Message ) |> Result.Error
 

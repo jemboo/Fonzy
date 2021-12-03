@@ -26,12 +26,12 @@ type FolderSchemeFixture () =
 
     [<TestMethod>]
     member this.fileDtoStream_RW () =
-        let folderName = Guid.NewGuid()
+        let folderId = Guid.NewGuid()
         let sorters = this.testSorters() |> Seq.take(3) |> Seq.toList
 
         let fsr = result {
             let! folderRoot = FileDir.create "" this.rootDir
-            let! fds = FileDtoStream.makeForSorterDto folderName folderRoot
+            let! fds = FileDtoStream.makeForSorterDto folderId "name" folderRoot
             let! res = FileDtoStream.append fds sorters
             return fds
           }

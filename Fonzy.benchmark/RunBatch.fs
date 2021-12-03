@@ -3,51 +3,51 @@ open System
 
 module RunBatch =
 
-    let runBatchSeq 
-            (rndCauseSpecGen : FileDir -> RandomSeed -> 
-                seq<string*FileDir*causeSpec>)
-            (rootOutDir:FileDir)
-            (seed:RandomSeed) 
+    let runCauseSeq 
+            (rndCauseSpecSeq : seq<string*FileDir*causeSpec>)
             (firstDex:int)  =
 
-        let runBatch (causeSpecDescr, rootOutDir, causeSpec) =
-            let parentWorld = World.empty
-            let worldId = World.makeWorldId parentWorld.id causeSpec
-            let outputFolder = worldId |> WorldId.value |> string |> FileFolder.create "" |> Result.ExtractOrThrow
-            let outputDir = rootOutDir |> FileDir.appendFolder outputFolder |> Result.ExtractOrThrow
-            let monitor = SorterSHCset2.logShcData outputDir
-            Console.WriteLine(string causeSpecDescr)
-            let res = Runs.makeWorldFromCauseSpec
-                           monitor
-                           outputDir
-                           parentWorld
-                           causeSpec
-            match res with
-            | Ok b -> b |> ignore
-            | Error m -> Console.WriteLine m
+        let runCause (causeSpecDescr, rootOutDir, causeSpec) =
+             let newWorld = 
+                result {
+                    let parentWorld = World.empty
+                    let worldId = World.makeWorldId parentWorld.id causeSpec
+                    let! outputFolder = worldId |> WorldId.value |> string |> FileFolder.create ""
+                    let! outputDir = rootOutDir |> FileDir.appendFolder outputFolder
+                    let! monitor = SorterSHCset2.logShcData outputDir
+                    Console.WriteLine(string causeSpecDescr)
+                    return! Runs.makeWorldFromCauseSpec
+                                   monitor
+                                   outputDir
+                                   parentWorld
+                                   causeSpec
+                }
+             match newWorld with
+              | Ok b -> b |> ignore
+              | Error m -> Console.WriteLine m
 
-        rndCauseSpecGen rootOutDir seed 
+        rndCauseSpecSeq
             |> Seq.skip firstDex
-            |> Seq.iter(runBatch)
+            |> Seq.iter(runCause)
 
-    
+
     let runPerfBinBatchSeq 
                     (outputDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
 
-        runBatchSeq SorterPbCauseSpecGen.makeRunBatchSeq
-                     outputDir
-                     seed 
+        runCauseSeq (SorterPbCauseSpecGen.makeRunBatchSeq
+                         outputDir
+                         seed)
                      firstDex
 
     let runShcSets  (outputDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
 
-        runBatchSeq SorterShcCauseSpecGen.makeRunBatchSeq
-                       outputDir 
-                       seed
+        runCauseSeq (SorterShcCauseSpecGen.makeRunBatchSeq
+                           outputDir 
+                           seed)
                        firstDex
 
 
@@ -55,11 +55,10 @@ module RunBatch =
                     (seed:RandomSeed) 
                     (firstDex:int) =
 
-        runBatchSeq SorterShcCauseSpecGen2.makeRunBatchSeq2
-                       rootOutDir 
-                       seed
+        runCauseSeq (SorterShcCauseSpecGen2.makeRunBatchSeq2
+                           rootOutDir 
+                           seed)
                        firstDex
-
 
 
   module PerfBinReports =

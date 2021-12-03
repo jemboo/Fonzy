@@ -129,9 +129,10 @@ module FilePath =
         Path.GetDirectoryName (value fp)
     let toFileName (fp:FilePath) =
         Path.GetFileName (value fp)
-    let appendFileName (fd:FileDir) (fn:FileName) =
+    let appendFileName (fd:FileDir) (fn:FileName) (fe:FileExt) =
         try
-            fromString (Path.Combine((FileDir.value fd), (FileName.value fn))) |> Ok
+            let fne = sprintf "%s%s" (FileName.value fn) (FileExt.value fe)
+            fromString (Path.Combine(FileDir.value fd, fne)) |> Ok
         with
             | ex -> ("error in addFolderName: " + ex.Message ) |> Result.Error
 
@@ -153,6 +154,7 @@ module String50 =
         ConstrainedType.createString fieldName String50 50 str
     let createOption fieldName str = 
         ConstrainedType.createStringOption fieldName String50 50 str
+
 
 module UseEagerProc = 
     let create (useEagerProc:bool) =

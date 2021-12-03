@@ -182,10 +182,25 @@ module SorterSHCset2 =
 
 
     let logShcData (root:FileDir) = 
-        fun (shcData:obj) ->
-            let state, sshc, shcT = shcData :?> (sHCstate*sorterShc*sHC2<sorterShc>)
-            let yab = match state with
-                      | PostMutate -> ()
-                      | PostEvaluate -> ()
-                      | PostAnnealer -> ()
-            ()
+        result {
+            let mutable trialSorterPerfs = []
+            let sorterShcArchId = Guid.NewGuid()
+            let sorterShcArchName = "sorterShcArch"
+            let! shcArchFd = FileDtoStream.makeForSorterShcArchDto sorterShcArchId sorterShcArchName root
+            let! bk = FileDtoStream.addToCatalog shcArchFd
+            return
+                fun (shcData:obj) ->
+                    let srtrPrf = 
+                       {
+                            SortingEval.sorterPerf.usedStageCount = (StageCount.fromInt 5);
+                            SortingEval.sorterPerf.usedSwitchCount = (SwitchCount.fromInt 10)
+                            SortingEval.sorterPerf.successful = Some true
+                        }
+                    trialSorterPerfs <- srtrPrf::trialSorterPerfs
+                    let state, sshc, shcT = shcData :?> (sHCstate*sorterShc*sHC2<sorterShc>)
+                    let yab = match state with
+                                | PostMutate -> ()
+                                | PostEvaluate -> ()
+                                | PostAnnealer -> ()
+                    ()
+        }

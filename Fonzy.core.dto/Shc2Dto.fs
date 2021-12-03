@@ -179,3 +179,14 @@ module SorterShcResults2Dto =
     let toJson (ssR:sorterShcResults2) =
         ssR |> toDto |> Json.serialize
 
+
+
+
+
+
+type sorterShcResult25Dto = {
+        shcId:string;
+        generation:int; 
+        generationSpan:int; 
+        perfDto:sorterPerfDto;
+    }

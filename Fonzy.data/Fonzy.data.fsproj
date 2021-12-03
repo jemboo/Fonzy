@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="FolderScheme.fs" />
     <Compile Include="WorldStorage.fs" />
     <Compile Include="WorldStorageDirectory.fs" />
     <Compile Include="Program.fs" />

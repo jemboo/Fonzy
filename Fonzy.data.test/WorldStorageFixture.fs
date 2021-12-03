@@ -75,8 +75,8 @@ type WorldStorageFixture () =
         let res = dirDs.AssureDirectory |> Result.ExtractOrThrow
         let res2 = dirDs.AssureDirectory |> Result.ExtractOrThrow
         this.tearDownDataSource() 
-        Assert.IsTrue(res);
-        Assert.IsTrue(res2);
+        Assert.IsTrue(res <> null);
+        Assert.IsTrue(res2 <> null);
 
     [<TestMethod>]
     member this.DirectoryDataSource_GetDsIds() =

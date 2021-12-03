@@ -40,6 +40,7 @@ module CauseSorterShc =
         { Cause.causeSpec=causeSpec; op=causer }
 
 
+
     let sorterShcSpecRndGen2 (monitor:obj->unit)
                              (causeSpec:causeSpec) =
         let causer = fun (e:enviro) ->
@@ -75,6 +76,7 @@ module CauseSorterShc =
             }
 
         {Cause.causeSpec=causeSpec; op=causer}
+
 
 
     let fromCauseSpec  (genus:string list) 
