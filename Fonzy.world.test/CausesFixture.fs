@@ -1,5 +1,10 @@
 namespace Fonzy.world.test
 open Microsoft.VisualStudio.TestTools.UnitTesting
+open System;
+
+
+type qq = {a:(obj->unit)->int->int}
+
 
 [<TestClass>]
 type CausesFixture () =
@@ -7,10 +12,10 @@ type CausesFixture () =
     [<TestMethod>]
     member this.CauseFromCauseSpecIntArrayRandGen () =
         let monitor = fun _ -> ()
-        let cause = Causes.fromCauseSpec monitor TestData.CauseSpec.IntDist.rndUniform
+        let cause = Causes.fromCauseSpec TestData.CauseSpec.IntDist.rndUniform
                         |> Result.ExtractOrThrow
         let env = enviro.Empty
-        let newEnv = cause.op env |> Result.ExtractOrThrow
+        let newEnv = cause.op monitor env |> Result.ExtractOrThrow
         let causedProd =  
             Enviro.getDto<intDistDto> 
                                 newEnv 
@@ -24,10 +29,10 @@ type CausesFixture () =
     [<TestMethod>]
     member this.CauseFromCauseSpecInt2dArrayRandGen () =
         let monitor = fun _ -> ()
-        let cause = Causes.fromCauseSpec monitor TestData.CauseSpec.IntDist.rnd2dUniform 
+        let cause = Causes.fromCauseSpec TestData.CauseSpec.IntDist.rnd2dUniform 
                                 |> Result.ExtractOrThrow
         let env = enviro.Empty
-        let newEnv = cause.op env |> Result.ExtractOrThrow
+        let newEnv = cause.op monitor env |> Result.ExtractOrThrow
         let causedProd =  
             Enviro.getDto<int2dDistDto> 
                                 newEnv 
@@ -41,10 +46,10 @@ type CausesFixture () =
     member this.CauseFromRndGenSorterSet() =
         let monitor = fun _ -> ()
         let cause = TestData.CauseSpec.SorterSet.rand1  
-                    |> Causes.fromCauseSpec monitor
+                    |> Causes.fromCauseSpec
                     |> Result.ExtractOrThrow
         let env = enviro.Empty
-        let newEnv = cause.op env |> Result.ExtractOrThrow
+        let newEnv = cause.op monitor env |> Result.ExtractOrThrow
         let causedProd =  
             Enviro.getDto<sorterSetDto> 
                                 newEnv 
@@ -59,15 +64,15 @@ type CausesFixture () =
         let monitor = fun _ -> ()
         let envO = enviro.Empty
         let causeGen = TestData.CauseSpec.SorterSet.rand1 
-                                |> Causes.fromCauseSpec monitor
+                                |> Causes.fromCauseSpec
                                 |> Result.ExtractOrThrow
-        let envGen = causeGen.op envO |> Result.ExtractOrThrow
+        let envGen = causeGen.op monitor envO |> Result.ExtractOrThrow
 
         let causeEval = TestData.CauseSpec.SorterSet.evalToSorterPerfBins 
-                            |> Causes.fromCauseSpec monitor
+                            |> Causes.fromCauseSpec
                             |> Result.ExtractOrThrow
 
-        let envEvalRes = causeEval.op envGen |> Result.ExtractOrThrow
+        let envEvalRes = causeEval.op monitor envGen |> Result.ExtractOrThrow
 
         let sorterEvalResults =  
              Enviro.getDto<sorterPerfBinDto[]> 
@@ -80,11 +85,12 @@ type CausesFixture () =
     [<TestMethod>]
     member this.CauseRndGenToPerfBins() =
         let monitor = fun _ -> ()
-        let causeEvalR = Causes.fromCauseSpec monitor
+        let causeEvalR = Causes.fromCauseSpec
                                 TestData.CauseSpec.SorterSet.rndGenToSorterPerfBins 
                                 
         let causeEval = causeEvalR |> Result.ExtractOrThrow
-        let resWrldR = World.createFromParent 
+        let resWrldR = World.createFromParent
+                                  monitor
                                   World.empty
                                   causeEval
 
@@ -101,4 +107,15 @@ type CausesFixture () =
         Assert.IsTrue(true)
 
        
+    [<TestMethod>]
+    member this.tm() =
+        let monitor = fun (x:obj) ->
+                        Console.WriteLine(sprintf "%A" x)
 
+        let qqf = fun (mf:obj->unit) (dex:int) -> 
+                    mf (dex:> obj)
+                    dex * 2
+
+        let qqv = {qq.a = qqf}
+        let res = qqv.a monitor 55
+        Assert.IsTrue(true)

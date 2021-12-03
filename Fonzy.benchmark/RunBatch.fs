@@ -75,10 +75,9 @@ module RunBatch =
 
         let perfBinsFromGuid (g:Guid) =
             result {
-                let monitor = fun _ -> ()
                 let! ds = reportDataSource.GetDataSource(g)
                 let! worldDto = ds |> WorldStorage.getWorldDto
-                let! worldMerge = worldDto |> WorldDto.fromDto monitor
+                let! worldMerge = worldDto |> WorldDto.fromDto
                 let! map = worldMerge.cause.causeSpec.prams |> StringMapDto.fromDto
                 let! sorterPerfBinsDto =  
                         Enviro.getDto<sorterPerfBinDto[]> 
@@ -154,7 +153,7 @@ module RunBatch =
             let monitor = fun _ -> ()
             let! ds = archDs.GetDataSource(g)
             let! worldDto = ds |> WorldStorage.getWorldDto
-            let! worldMerge = worldDto |> WorldDto.fromDto monitor
+            let! worldMerge = worldDto |> WorldDto.fromDto
             let! sShcResDto =  
                     Enviro.getDto<sorterShcResultsDto> 
                                     worldMerge.enviro

@@ -3,9 +3,9 @@ open System
 
 module CauseSorterShc =
 
-    let sorterShcSpecRndGen (monitor:obj->unit)
-                            (causeSpec:causeSpec) =
-        let causer = fun (e:enviro) ->
+    let sorterShcSpecRndGen (causeSpec:causeSpec) =
+
+        let causer = fun (monitor:obj->unit) (e:enviro) ->
             result {
 
                 let! map = causeSpec.prams |> StringMapDto.fromDto
@@ -41,9 +41,8 @@ module CauseSorterShc =
 
 
 
-    let sorterShcSpecRndGen2 (monitor:obj->unit)
-                             (causeSpec:causeSpec) =
-        let causer = fun (e:enviro) ->
+    let sorterShcSpecRndGen2 (causeSpec:causeSpec) =
+        let causer = fun (monitor:obj->unit) (e:enviro) ->
             result {
 
                 let! map = causeSpec.prams |> StringMapDto.fromDto
@@ -80,12 +79,11 @@ module CauseSorterShc =
 
 
     let fromCauseSpec  (genus:string list) 
-                       (monitor:obj->unit)
                        (causeSpec:causeSpec) = 
         match genus with
         | [] -> "No CauseSorterShc genus" |> Error
-        | [nameof sorterShcSpecRndGen] -> sorterShcSpecRndGen monitor causeSpec |> Ok
-        | ["sorterShcSpecRndGen2"] -> sorterShcSpecRndGen2 monitor causeSpec |> Ok
+        | [nameof sorterShcSpecRndGen] -> sorterShcSpecRndGen causeSpec |> Ok
+        | ["sorterShcSpecRndGen2"] -> sorterShcSpecRndGen2 causeSpec |> Ok
         | a::b -> sprintf "CauseSpec: %s not handled" a |> Error
 
 

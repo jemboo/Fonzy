@@ -26,7 +26,7 @@ type WorldsFixture () =
     [<TestMethod>]
     member this.worldActionGenIntDist() =
         let worldAction = TestData.WorldAction.IntDist.randomUniform
-        let newWorld = WorldAction.createWorld worldAction 
+        let newWorld = WorldAction.createWorld (fun _ -> ()) worldAction 
                     |> Result.ExtractOrThrow
         Assert.AreEqual(WorldId.value newWorld.id, 
                         CauseSpecId.value TestData.CauseSpec.IntDist.rndUniform.id);

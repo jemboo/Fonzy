@@ -11,10 +11,12 @@ module Runs =
                     (causeSpec:causeSpec) =
         result {
     
-            let! cause = causeSpec |> Causes.fromCauseSpec monitor
+            let! cause = causeSpec |> Causes.fromCauseSpec
 
-            let! newWorld = World.createFromParent parentWorld
-                                                       cause
+            let! newWorld = World.createFromParent 
+                                        monitor 
+                                        parentWorld
+                                        cause
             let dataStore = newWorld
                             |> WorldDto.toDto
                             |> WorldStorage.WorldDto

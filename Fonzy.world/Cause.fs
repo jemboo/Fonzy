@@ -2,11 +2,11 @@
 open System
 
 
-type Cause = {causeSpec:causeSpec; op:enviro -> Result<enviro, string>}
+type Cause = {causeSpec:causeSpec; op:(obj->unit) -> enviro -> Result<enviro, string>}
 
 module CauseRandGen = 
     let intArray (causeSpec:causeSpec) = 
-        let causer = fun (e:enviro) ->
+        let causer = fun (monitor:obj->unit) (e:enviro) ->
             result {
                 let! map = causeSpec.prams |> StringMapDto.fromDto; 
                 let! count = map |> ResultMap.lookupKeyedInt "count"
@@ -31,7 +31,7 @@ module CauseRandGen =
         
 
     let lattice2dArray (causeSpec:causeSpec) = 
-        let causer = fun (e:enviro) ->
+        let causer = fun (monitor:obj->unit) (e:enviro) ->
             result {
                 let! map = causeSpec.prams |> StringMapDto.fromDto; 
                 let count = map.["count"] |> int
@@ -52,8 +52,7 @@ module CauseRandGen =
         {Cause.causeSpec=causeSpec; op=causer} |> Ok
 
 
-    let fromCauseSpec (genus:string list) 
-                      (monitor:'a->unit)
+    let fromCauseSpec (genus:string list)
                       (causeSpec:causeSpec) = 
         match genus with
         | [] -> "No CauseRandGen genus" |> Error

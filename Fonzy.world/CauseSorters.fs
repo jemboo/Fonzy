@@ -4,7 +4,8 @@ open System
 module CauseSorters =
 
     let rndGen (causeSpec:causeSpec) =
-        let causer = fun (e:enviro) ->
+        let causer = fun (monitor:obj->unit) 
+                         (e:enviro) ->
             result {
                 let! map = causeSpec.prams |> StringMapDto.fromDto
                 let! sorterSetId = 
@@ -47,8 +48,9 @@ module CauseSorters =
         {Cause.causeSpec=causeSpec; op=causer}
 
 
+
     let evalToSorterPerfBins (causeSpec:causeSpec) =
-        let causer = fun (e:enviro) ->
+        let causer = fun (monitor:obj->unit) (e:enviro) ->
           result {
                 let! map = causeSpec.prams |> StringMapDto.fromDto
                 let! sorterSetName = 
@@ -118,7 +120,8 @@ module CauseSorters =
 
 
     let rndGenToPerfBins (causeSpec:causeSpec) =
-        let causer = fun (e:enviro) ->
+        let causer = fun (monitor:obj->unit) 
+                         (e:enviro) ->
             result {
                 let! map = causeSpec.prams |> StringMapDto.fromDto
 
@@ -203,8 +206,7 @@ module CauseSorters =
         {Cause.causeSpec=causeSpec; op=causer}
    
 
-    let fromCauseSpec (genus:string list) 
-                      (monitor:'a->unit)
+    let fromCauseSpec (genus:string list)
                       (causeSpec:causeSpec) = 
         match genus with
         | [] -> "No CauseSorters genus" |> Error

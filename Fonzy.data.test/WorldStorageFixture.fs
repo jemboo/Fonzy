@@ -18,26 +18,29 @@ type WorldStorageFixture () =
     member this.monitor = fun _ -> ()
 
     member this.world1 =
-        World.createFromParent 
+        World.createFromParent
+                this.monitor
                 World.empty
                 (TestData.CauseSpec.SorterSet.rand1
-                    |> Causes.fromCauseSpec this.monitor
+                    |> Causes.fromCauseSpec
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
 
     member this.world2 =
         World.createFromParent 
+                this.monitor
                 World.empty
                 (TestData.CauseSpec.SorterSet.rand2
-                    |> Causes.fromCauseSpec this.monitor
+                    |> Causes.fromCauseSpec
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
 
     member this.world3 =
         World.createFromParent 
+                this.monitor
                 World.empty
                 (TestData.CauseSpec.SorterSet.rand3
-                    |> Causes.fromCauseSpec this.monitor
+                    |> Causes.fromCauseSpec
                     |> Result.ExtractOrThrow)
         |> Result.ExtractOrThrow
 
@@ -123,12 +126,14 @@ type WorldStorageFixture () =
                                         |> Result.ExtractOrThrow
 
         let worldActionBack = worldActionDto
-                                        |> WorldActionDto.fromDto this.monitor
+                                        |> WorldActionDto.fromDto
                                         |> Result.ExtractOrThrow
         
         Assert.AreEqual(randWorldAction.cause.causeSpec.id, 
                         worldActionBack.cause.causeSpec.id)
-        let dataStoreWorldDto = WorldAction.createWorld worldActionBack 
+        let dataStoreWorldDto = WorldAction.createWorld 
+                                        this.monitor
+                                        worldActionBack 
                                     |> Result.ExtractOrThrow
                                     |> WorldDto.toDto
                                     |> WorldStorage.WorldDto

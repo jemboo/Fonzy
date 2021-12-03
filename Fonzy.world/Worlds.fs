@@ -25,9 +25,11 @@ module World =
           {id=worldId; parentId=parentId; cause=cause; enviro=enviroment}
 
 
-    let createFromParent (parentWorld:world) (cause:Cause) =
+    let createFromParent (monitor:obj->unit) 
+                         (parentWorld:world) 
+                         (cause:Cause) =
         result {
-            let! newEnv = cause.op parentWorld.enviro
+            let! newEnv = cause.op monitor parentWorld.enviro
             return create (parentWorld.id) cause newEnv
         }
      
@@ -36,7 +38,8 @@ type WorldAction = {childId:WorldId; parentWorld:world; cause:Cause;}
 
 module WorldAction =
 
-    let create (parentWorld:world) (cause:Cause) =
+    let create (parentWorld:world) 
+               (cause:Cause) =
             {
                 parentWorld = parentWorld; 
                 childId = GuidUtils.addGuids 
@@ -46,8 +49,10 @@ module WorldAction =
                 cause=cause;
             }
 
-    let createWorld (worldAction:WorldAction) =
+    let createWorld (monitor:obj->unit)  
+                    (worldAction:WorldAction) =
         World.createFromParent 
+            monitor
             worldAction.parentWorld 
             worldAction.cause
 

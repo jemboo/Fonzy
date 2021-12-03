@@ -6,28 +6,28 @@ open BenchmarkDotNet.Running
 [<EntryPoint>]
 let main argv =
     /// ******* RunBatch.runShcSets2 ***********
-    Console.WriteLine("Starting MakeCauseSpecs")
-    MakeCauseSpecs.sorterPerfBins   
-                           (FileDir.fromString "C:\\SimOutShc")
-                           (RandomSeed.fromNow ())
-                         |> ignore
-
-    Console.WriteLine(sprintf "Finished: %s " 
-                                 (System.DateTime.Now.ToLongTimeString()))
-    Console.Read() |> ignore
-    0
-
-    ///// ******* RunBatch.runShcSets2 ***********
-    //Console.WriteLine("Starting RunBatch.runShcSets2")
-    //RunBatch.runShcSets2   (FileDir.fromString "C:\\SimOutShc")
+    //Console.WriteLine("Starting MakeCauseSpecs")
+    //MakeCauseSpecs.sorterPerfBins   
+    //                       (FileDir.fromString "C:\\SimOutShc")
     //                       (RandomSeed.fromNow ())
-    //                       0
     //                     |> ignore
 
     //Console.WriteLine(sprintf "Finished: %s " 
     //                             (System.DateTime.Now.ToLongTimeString()))
     //Console.Read() |> ignore
     //0
+
+    ///// ******* RunBatch.runShcSets2 ***********
+    Console.WriteLine("Starting RunBatch.runShcSets2")
+    RunBatch.runShcSets2   (FileDir.fromString "C:\\SimOutShc")
+                           (RandomSeed.fromNow ())
+                           0
+                         |> ignore
+
+    Console.WriteLine(sprintf "Finished: %s " 
+                                 (System.DateTime.Now.ToLongTimeString()))
+    Console.Read() |> ignore
+    0
 
     // ******* RunBatch.runShcSets ***********
     //Console.WriteLine("Starting RunBatch.runShcSets")

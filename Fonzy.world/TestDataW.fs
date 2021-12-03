@@ -125,13 +125,13 @@ module TestData =
     module WorldAction =
         module IntDist =
             let causeRndUniform = CauseSpec.IntDist.rndUniform 
-                                  |> Causes.fromCauseSpec (fun _ -> ())
+                                  |> Causes.fromCauseSpec
                                   |> Result.ExtractOrThrow
             let randomUniform = WorldAction.create World.empty causeRndUniform
 
         module SorterGen = 
             let randCause = CauseSpec.SorterSet.rand1 
-                            |> Causes.fromCauseSpec (fun _ -> ())
+                            |> Causes.fromCauseSpec
                             |> Result.ExtractOrThrow
             let randWorldAction = WorldAction.create World.empty randCause
 
