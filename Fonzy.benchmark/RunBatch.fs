@@ -5,6 +5,7 @@ module RunBatch =
 
     let runCauseSeq 
             (rndCauseSpecSeq : seq<string*FileDir*causeSpec>)
+            (monitor:obj->unit)
             (firstDex:int)  =
 
         let runCause (causeSpecDescr, rootOutDir, causeSpec) =
@@ -14,7 +15,6 @@ module RunBatch =
                     let worldId = World.makeWorldId parentWorld.id causeSpec
                     let! outputFolder = worldId |> WorldId.value |> string |> FileFolder.create ""
                     let! outputDir = rootOutDir |> FileDir.appendFolder outputFolder
-                    let! monitor = SorterSHCset2.logShcData outputDir
                     Console.WriteLine(string causeSpecDescr)
                     return! Runs.makeWorldFromCauseSpec
                                    monitor
@@ -31,34 +31,37 @@ module RunBatch =
             |> Seq.iter(runCause)
 
 
+     
+
     let runPerfBinBatchSeq 
                     (outputDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
-
-        runCauseSeq (SorterPbCauseSpecGen.makeRunBatchSeq
-                         outputDir
-                         seed)
+        let monitor = fun _ -> ()
+        runCauseSeq (SorterPbCauseSpecGen.makeRunBatchSeq outputDir seed)
+                     monitor
                      firstDex
 
     let runShcSets  (outputDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
-
-        runCauseSeq (SorterShcCauseSpecGen.makeRunBatchSeq
-                           outputDir 
-                           seed)
+        let monitor = fun _ -> ()
+        runCauseSeq (SorterShcCauseSpecGen.makeRunBatchSeq outputDir seed)
+                       monitor
                        firstDex
 
 
     let runShcSets2 (rootOutDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
-
-        runCauseSeq (SorterShcCauseSpecGen2.makeRunBatchSeq2
-                           rootOutDir 
-                           seed)
-                       firstDex
+        let resMonitor = SorterSHCset2.makeSorterShcLoggerMaker rootOutDir (StepNumber.fromInt 20)
+        match resMonitor with
+        | Result.Ok monitor ->
+            runCauseSeq (SorterShcCauseSpecGen2.makeRunBatchSeq2 rootOutDir seed)
+                           monitor
+                           firstDex
+            Console.WriteLine("finished")
+        | Result.Error msg -> Console.WriteLine(msg)
 
 
   module PerfBinReports =

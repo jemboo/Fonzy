@@ -28,7 +28,7 @@ module SHC2 =
     let update (monitor:obj->unit) (shc:sHC2<'T>) =
             result {
                 let! tMut = shc.current |> shc.mutator
-                monitor ((sHCstate.PostMutate, tMut, shc) :> obj)
+                //monitor ((sHCstate.PostMutate, tMut, shc) :> obj)
                 let! tEval = tMut |> shc.evaluator
                 monitor ((sHCstate.PostEvaluate, tEval, shc) :> obj)
                 let! aNext = shc.annealer shc.current tEval
@@ -104,7 +104,7 @@ module SHCset2 =
             match shcr with
             | Ok shc -> Console.WriteLine(sprintf "%A" id)
                         (id, SHC2.run monitor shc)
-            | Error m -> (id, sprintf "error creating spec: %s" m |> Error)
+            | Error m -> (id, sprintf "error creating shc from spec: %s" m |> Error)
         
 
         let mms = 

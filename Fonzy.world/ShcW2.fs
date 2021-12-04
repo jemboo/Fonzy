@@ -181,21 +181,34 @@ module SorterSHCset2 =
         { sorterShcResults2.members = memberIds |> Array.map(_rpt) }
 
 
-    let logShcData (root:FileDir) = 
+    
+    let reportShcDetails (repCurrentPerf:StepNumber->bool) 
+                         (perfReporter:SortingEval.sorterPerf->unit)
+                         (repCurrentBins:StepNumber->bool) 
+                         (evalBinReporter:SortingEval.sorterPerfBin->unit)
+                         (annealBinReporter:SortingEval.sorterPerfBin->unit) =
+        None
+    
+
+    let makeSorterShcLoggerMaker (root:FileDir) (reportingFreq:StepNumber) = 
+       // let doReport ()
         result {
             let mutable trialSorterPerfs = []
+            let mutable curRepStep = -1
             let sorterShcArchId = Guid.NewGuid()
             let sorterShcArchName = "sorterShcArch"
             let! shcArchFd = FileDtoStream.makeForSorterShcArchDto sorterShcArchId sorterShcArchName root
             let! bk = FileDtoStream.addToCatalog shcArchFd
             return
                 fun (shcData:obj) ->
+                    let (shcSt, srtrShc, shc2) = shcData :?> sHCstate*sorterShc*sHC2<sorterShc>
                     let srtrPrf = 
                        {
                             SortingEval.sorterPerf.usedStageCount = (StageCount.fromInt 5);
                             SortingEval.sorterPerf.usedSwitchCount = (SwitchCount.fromInt 10)
                             SortingEval.sorterPerf.successful = Some true
                         }
+                    Console.WriteLine(string srtrShc.step)
                     trialSorterPerfs <- srtrPrf::trialSorterPerfs
                     let state, sshc, shcT = shcData :?> (sHCstate*sorterShc*sHC2<sorterShc>)
                     let yab = match state with
