@@ -5,7 +5,7 @@ module RunBatch =
 
     let runCauseSeq 
             (rndCauseSpecSeq : seq<string*FileDir*causeSpec>)
-            (monitor:obj->unit)
+            (monitor:causeSpec->obj->unit)
             (firstDex:int)  =
 
         let runCause (causeSpecDescr, rootOutDir, causeSpec) =
@@ -17,7 +17,7 @@ module RunBatch =
                     let! outputDir = rootOutDir |> FileDir.appendFolder outputFolder
                     Console.WriteLine(string causeSpecDescr)
                     return! Runs.makeWorldFromCauseSpec
-                                   monitor
+                                   (fun _ -> (fun _ -> ()) |> Ok)
                                    outputDir
                                    parentWorld
                                    causeSpec
@@ -31,13 +31,39 @@ module RunBatch =
             |> Seq.iter(runCause)
 
 
+    let runCauseSeq2
+            (rndCauseSpecSeq : seq<string*FileDir*causeSpec>)
+            (firstDex:int)  =
+
+        let runCause (causeSpecDescr, rootOutDir, causeSpec) =
+             let newWorld = 
+                result {
+                    let parentWorld = World.empty
+                    let worldId = World.makeWorldId parentWorld.id causeSpec
+                    let monitorMaker = fun cntxt -> SorterSHCset2.sorterShcLoggerMaker rootOutDir cntxt
+                    let! outputFolder = worldId |> WorldId.value |> string |> FileFolder.create ""
+                    let! outputDir = rootOutDir |> FileDir.appendFolder outputFolder
+                    Console.WriteLine(string causeSpecDescr)
+                    return! Runs.makeWorldFromCauseSpec
+                                   monitorMaker
+                                   outputDir
+                                   parentWorld
+                                   causeSpec
+                }
+             match newWorld with
+              | Ok b -> b |> ignore
+              | Error m -> Console.WriteLine m
+
+        rndCauseSpecSeq
+            |> Seq.skip firstDex
+            |> Seq.iter(runCause)
      
 
     let runPerfBinBatchSeq 
                     (outputDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
-        let monitor = fun _ -> ()
+        let monitor = fun _ _ -> ()
         runCauseSeq (SorterPbCauseSpecGen.makeRunBatchSeq outputDir seed)
                      monitor
                      firstDex
@@ -45,23 +71,17 @@ module RunBatch =
     let runShcSets  (outputDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
-        let monitor = fun _ -> ()
+        let monitor = fun _ _ -> ()
         runCauseSeq (SorterShcCauseSpecGen.makeRunBatchSeq outputDir seed)
                        monitor
                        firstDex
 
-
     let runShcSets2 (rootOutDir:FileDir) 
                     (seed:RandomSeed) 
                     (firstDex:int) =
-        let resMonitor = SorterSHCset2.makeSorterShcLoggerMaker rootOutDir (StepNumber.fromInt 20)
-        match resMonitor with
-        | Result.Ok monitor ->
-            runCauseSeq (SorterShcCauseSpecGen2.makeRunBatchSeq2 rootOutDir seed)
-                           monitor
-                           firstDex
-            Console.WriteLine("finished")
-        | Result.Error msg -> Console.WriteLine(msg)
+        runCauseSeq2 (SorterShcCauseSpecGen2.makeRunBatchSeq2 rootOutDir seed)
+                     firstDex
+
 
 
   module PerfBinReports =
@@ -276,7 +296,7 @@ module RunBatch =
 
      let shcRunSeries (haTup: Guid*sorterShcResult) =
          let (gu, shcRes) = haTup
-         let totReptSteps = shcRes.spec.termSpec |> ShcTermSpec.getSteps
+         let totReptSteps = shcRes.spec.termSpec |> ShcTermSpec.getMaxSteps
          let ticsPerLog = 20.0
          let tics = StepNumber.logReporting totReptSteps ticsPerLog |> Array.map(StepNumber.value)
          let dexer (arch:sorterShcArch) =

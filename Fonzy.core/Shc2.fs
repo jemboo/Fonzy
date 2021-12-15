@@ -25,14 +25,16 @@ type sHCset2<'S,'T> =
 
 module SHC2 =
 
-    let update (monitor:obj->unit) (shc:sHC2<'T>) =
+    let update (monitor:obj->unit)  //(monitor:obj->unit) 
+               (shc:sHC2<'T>) 
+               (spec:'S) =
             result {
                 let! tMut = shc.current |> shc.mutator
-                //monitor ((sHCstate.PostMutate, tMut, shc) :> obj)
+                monitor ((sHCstate.PostMutate, tMut, shc, spec) :> obj)
                 let! tEval = tMut |> shc.evaluator
-                monitor ((sHCstate.PostEvaluate, tEval, shc) :> obj)
+                monitor ((sHCstate.PostEvaluate, tEval, shc, spec) :> obj)
                 let! aNext = shc.annealer shc.current tEval
-                monitor ((sHCstate.PostAnnealer, aNext, shc) :> obj)
+                monitor ((sHCstate.PostAnnealer, aNext, shc, spec) :> obj)
                 return
                     {
                         sHC2.id = shc.id;
@@ -71,13 +73,14 @@ module SHC2 =
     
 
     let run (monitor:obj->unit)  
-            (shc:sHC2<'T>) =
+            (shc:sHC2<'T>) 
+            (spec:'S) =
         let goOn (s) = 
             not (s.terminator s.current)
         let firstEval = shc |> evalT |> Result.ExtractOrThrow
         let mutable shcCur = firstEval
         while (goOn shcCur) do
-            let shcNew = shcCur |> update monitor |> Result.ExtractOrThrow
+            let shcNew = update monitor shcCur spec |> Result.ExtractOrThrow
             shcCur <- shcNew
         shcCur |> Ok
 
@@ -98,14 +101,20 @@ module SHCset2 =
 
 
     let runBatch (useP:UseParallel) 
-                 (monitor:obj->unit)
+                 (context:obj*(obj->Result<obj->unit, string>))
                  (shcs:sHCset2<'S,'T>) = 
+
         let _runn (id:ShcId) (shcr:Result<sHC2<'T>, string>) =
-            match shcr with
-            | Ok shc -> Console.WriteLine(sprintf "%A" id)
-                        (id, SHC2.run monitor shc)
-            | Error m -> (id, sprintf "error creating shc from spec: %s" m |> Error)
-        
+                result 
+                    {
+                        let batchSpec, mm = context
+                        let! shc = shcr
+                        let shcsArg = (shcs.specMap.[id], shcs.memberMap.[id])
+                        let! monitor = mm shcsArg
+                        Console.WriteLine(sprintf "%A" id)
+                        let shcNew = SHC2.run monitor shc (shcs.specMap.Item id)
+                        return (id, shcNew)
+                    } |> Result.ExtractOrThrow
 
         let mms = 
             match UseParallel.value(useP) with

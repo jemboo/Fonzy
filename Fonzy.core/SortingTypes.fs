@@ -47,13 +47,15 @@ module SorterSetId =
 module SorterCount =
     let value (SorterCount v) = v
     let create fieldName v = 
-        ConstrainedType.createInt fieldName SorterCount 1 5000000 v
+        ConstrainedType.createInt fieldName SorterCount 0 5000000 v
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {
             let! gv = ResultMap.read key m
             return! create "" (gv:?>int)
         }
+    let add (a:SorterCount) (b:SorterCount) =
+        fromInt ((value a) + (value b))
 
 module SortableSetId =
     let value (SortableSetId v) = v

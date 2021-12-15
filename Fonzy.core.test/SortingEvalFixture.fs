@@ -53,6 +53,43 @@ type SortingEvalFixture () =
 
 
     [<TestMethod>]
-    member this.test() =
+    member this.SorterPerfBin_merge() =
+        let binA1 = 
+          { 
+              SortingEval.sorterPerfBin.usedSwitchCount = (SwitchCount.fromInt 1);
+              SortingEval.sorterPerfBin.usedStageCount = (StageCount.fromInt 1);
+              SortingEval.sorterPerfBin.sorterCount = (SorterCount.fromInt 1);
+              SortingEval.sorterPerfBin.successCount = 1;
+              SortingEval.sorterPerfBin.failCount = 0;
+          }
+        let binA2 = 
+          { 
+              SortingEval.sorterPerfBin.usedSwitchCount = (SwitchCount.fromInt 1);
+              SortingEval.sorterPerfBin.usedStageCount = (StageCount.fromInt 1);
+              SortingEval.sorterPerfBin.sorterCount = (SorterCount.fromInt 1);
+              SortingEval.sorterPerfBin.successCount = 1;
+              SortingEval.sorterPerfBin.failCount = 0;
+          }
+        let binB = 
+          { 
+              SortingEval.sorterPerfBin.usedSwitchCount = (SwitchCount.fromInt 2);
+              SortingEval.sorterPerfBin.usedStageCount = (StageCount.fromInt 1);
+              SortingEval.sorterPerfBin.sorterCount = (SorterCount.fromInt 1);
+              SortingEval.sorterPerfBin.successCount = 1;
+              SortingEval.sorterPerfBin.failCount = 0;
+          }
+        let binC = 
+          { 
+              SortingEval.sorterPerfBin.usedSwitchCount = (SwitchCount.fromInt 1);
+              SortingEval.sorterPerfBin.usedStageCount = (StageCount.fromInt 2);
+              SortingEval.sorterPerfBin.sorterCount = (SorterCount.fromInt 1);
+              SortingEval.sorterPerfBin.successCount = 1;
+              SortingEval.sorterPerfBin.failCount = 0;
+          }
 
-      Assert.IsTrue(true)
+        let testBins = seq { binA1; binA2; binB; binC }
+
+        let merged = SortingEval.SorterPerfBin.merge testBins
+                     |> Seq.toArray
+
+        Assert.AreEqual(merged.Length, 2)

@@ -46,13 +46,12 @@ module SorterShcCauseSpecGen2 =
                     (tup:MutationRate*Temp)
                     (outputDir:FileDir)
                     (u:UseParallel)
-                    (sssRndGen:sorterShcSpecRndGen) = 
+                    (sssRndGen:sorterShcSpecRndGen2) = 
         let causeSpecDescr = sprintf "%d: Time: %s  Mut: %f Temp: %f" 
                                  dex
                                  (System.DateTime.Now.ToLongTimeString())
                                  (tup|>fst|>MutationRate.value)
                                  (tup|>snd|>Temp.value)
-                             
 
         let resultsName = "sorterShcSet"
         let causeSpec = makeCauseSpec2 sssRndGen u resultsName
@@ -85,18 +84,17 @@ module SorterShcCauseSpecGen2 =
         let swS = sorterStageWeightSpec.Constant stageW
         let evl = sorterEvalSpec.PerfBin
         let ann = annealerSpec.Constant startingTemp
-        let ticsPerLog = 20.0
+        let ticsPerLog = 40.0
         let updt = shcSaveDetails.ForSteps (StepNumber.logReporting totSteps ticsPerLog)
         let term = shcTermSpec.FixedLength totSteps
         {
-            sorterShcSpec.rngGen = dispRngGen;
-            sorterShcSpec.sorter = dispSorter;
-            sorterShcSpec.mutatorSpec = mutSpec;
-            sorterShcSpec.srtblSetType = srtbleSetType;
-            sorterShcSpec.sorterStageWeightSpec = swS;
+            sorterShcSpec2.rngGen = dispRngGen;
+            sorter = dispSorter;
+            mutatorSpec = mutSpec;
+            srtblSetType = srtbleSetType;
+            sorterStageWeightSpec = swS;
             evalSpec = evl;
             annealerSpec = ann;
-            loggerSpec = updt;
             termSpec = term;
         }
 
@@ -108,8 +106,8 @@ module SorterShcCauseSpecGen2 =
         randy.NextPositiveInt |> RandomSeed.fromInt |> RngGen.createLcg
 
     let seqConfigs () = // [0.09; 0.07; 0.05; 0.04; 0.035; 0.03; 0.0275; 0.025; 0.0225; 0.02; 0.0175; 0.015; 0.013; 0.012; 0.011; 0.01; 0.008; 0.006; 0.004; 0.002; 0.0]
-        let temps = [0.01; 0.008;]
-                   |> List.map(Temp.fromFloat)
+        let temps = [0.09; 0.07; 0.05; 0.04; 0.035; 0.03; 0.0275; 0.025; 0.0225; 0.02; 0.0175; 0.015; 0.013; 0.012; 0.011; 0.01; 0.008; 0.006; 0.004; 0.002; 0.0]
+                    |> List.map(Temp.fromFloat)
         let muts = [0.0175; 0.02;] |> List.map(MutationRate.fromFloat)
        // let muts = [0.015; 0.0175; 0.02; 0.0225; 0.025; ] |> List.map(MutationRate.fromFloat)
 
@@ -121,10 +119,10 @@ module SorterShcCauseSpecGen2 =
     let makeRunBatchSeq2 (outputDir:FileDir) 
                          (seed:RandomSeed) =
 
-        let degree = Degree.fromInt 12
-        let shcCt = ShcCount.fromInt 20
-        let sorterCt = SorterCount.fromInt 2
-        let steps = StepNumber.fromInt 1000
+        let degree = Degree.fromInt 16
+        let shcCt = ShcCount.fromInt 25
+        let sorterCt = SorterCount.fromInt 25
+        let steps = StepNumber.fromInt 200000
         let seedS = (904877) |> RandomSeed.fromInt
 
         let refSorter = RefSorter.goodRefSorterForDegree degree |> Result.ExtractOrThrow
@@ -193,15 +191,15 @@ module SorterShcCauseSpecGen2 =
                 |> Seq.map(
                   fun tup ->
                     (
-                        { sorterShcSpecRndGen.baseSpec = 
+                        { sorterShcSpecRndGen2.baseSpec = 
                             makeBaseSpecVar
                                 (snd tup)
                                 (fst tup)
                                 steps
                                 degree dispSorter rng swPfx; 
-                          sorterShcSpecRndGen.sssrgType = sssrgT;
-                          sorterShcSpecRndGen.count = shcCt;
-                          sorterShcSpecRndGen.rndGen = makeRng(randy) 
+                          sssrgType = sssrgT;
+                          count = shcCt;
+                          rndGen = makeRng(randy) 
                           },
                         tup
                     )
@@ -210,6 +208,6 @@ module SorterShcCauseSpecGen2 =
         Console.WriteLine(sprintf "seed: %d" (RandomSeed.value seed))            
         sorterShcSpecRndGens |> Seq.toList |> CollectionUtils.listLoop
         |> Seq.mapi(fun dex sg -> 
-                            let sng = {(sg |> fst) with  sorterShcSpecRndGen.rndGen = makeRng(randy)}
+                            let sng = {(sg |> fst) with  sorterShcSpecRndGen2.rndGen = makeRng(randy)}
                             makeTriple2 
                                dex (sg |> snd) outputDir (UseParallel.create false) sng )

@@ -5,7 +5,51 @@ open BenchmarkDotNet.Running
 
 [<EntryPoint>]
 let main argv =
-    /// ******* RunBatch.runShcSets2 ***********
+
+    /// ******* ShcReport2_sortPerfBins***********
+    //Console.WriteLine("Starting ShcReport2_sortPerfBins")
+    //Console.WriteLine(sprintf "Started: %s "
+    //                          (System.DateTime.Now.ToLongTimeString()))
+    //let res2 =  Reports.sortPerfBins 
+    //                    (FileDir.fromString "C:\\SimOutShc\\waky")
+    //Console.WriteLine(res2)
+    //Console.WriteLine(sprintf "Finished: %s "
+    //                          (System.DateTime.Now.ToLongTimeString()))
+    //Console.Read() |> ignore
+ 
+    //0
+
+    ///// ******* ShcReport2_mergePerfBins***********
+    Console.WriteLine("Starting ShcReport2_mergePerfBins")
+    Console.WriteLine(sprintf "Started: %s "
+                              (System.DateTime.Now.ToLongTimeString()))
+    let res2 =  Reports.mergePerfBins 
+                        (FileDir.fromString "C:\\SimOutShc\\waky2")
+    Console.WriteLine(res2)
+    Console.WriteLine(sprintf "Finished: %s "
+                              (System.DateTime.Now.ToLongTimeString()))
+    Console.Read() |> ignore
+ 
+    0
+
+
+
+    /// ******* ShcReport2_reportSwitchWeights ***********
+    //Console.WriteLine("Starting ShcReport2_reportSwitchWeights")
+    //Console.WriteLine(sprintf "Started: %s "
+    //                          (System.DateTime.Now.ToLongTimeString()))
+    //let res2 =  Reports.reportSwitchWeights 
+    //                    (FileDir.fromString "C:\\SimOutShc\\waky")
+    //Console.WriteLine(res2)
+    //Console.WriteLine(sprintf "Finished: %s "
+    //                          (System.DateTime.Now.ToLongTimeString()))
+    //Console.Read() |> ignore
+ 
+    //0
+
+
+
+    /// ******* RunBatch.sorterPerfBins ***********
     //Console.WriteLine("Starting MakeCauseSpecs")
     //MakeCauseSpecs.sorterPerfBins   
     //                       (FileDir.fromString "C:\\SimOutShc")
@@ -17,17 +61,22 @@ let main argv =
     //Console.Read() |> ignore
     //0
 
-    ///// ******* RunBatch.runShcSets2 ***********
-    Console.WriteLine("Starting RunBatch.runShcSets2")
-    RunBatch.runShcSets2   (FileDir.fromString "C:\\SimOutShc")
-                           (RandomSeed.fromNow ())
-                           0
-                         |> ignore
 
-    Console.WriteLine(sprintf "Finished: %s " 
-                                 (System.DateTime.Now.ToLongTimeString()))
-    Console.Read() |> ignore
-    0
+
+
+    ///// ******* RunBatch.runShcSets2 ***********
+    //Console.WriteLine("Starting RunBatch.runShcSets2")
+    //RunBatch.runShcSets2   (FileDir.fromString "C:\\SimOutShc\\waky2")
+    //                       (RandomSeed.fromNow ())
+    //                       0
+    //                     |> ignore
+
+    //Console.WriteLine(sprintf "Finished: %s " 
+    //                             (System.DateTime.Now.ToLongTimeString()))
+    //Console.Read() |> ignore
+    //0
+
+
 
     // ******* RunBatch.runShcSets ***********
     //Console.WriteLine("Starting RunBatch.runShcSets")
@@ -41,6 +90,8 @@ let main argv =
     //                             (System.DateTime.Now.ToLongTimeString()))
     //Console.Read() |> ignore
     //0
+
+
 
 ///// ******* ShcReport ***********
     //Console.WriteLine("Starting ShcReport")
@@ -69,6 +120,8 @@ let main argv =
     //0
 
 
+
+
      /// ******* PerfBinsReport ***********
     //Console.WriteLine("Starting PerfBinsReport.main")
     //let res2 =  PerfBinReports.dirPerfBinBySorterGenReport 
@@ -79,12 +132,16 @@ let main argv =
     //0
 
 
+
+
 ///// ******* Benchmark ***********
 //    Console.WriteLine("Starting Benchmark.main")
 //    let summary = BenchmarkRunner.Run<BenchmarkSorterSetOnBp64>()
 //    printfn "%A" summary
 //    Console.Read() |> ignore
 //    0
+
+
 
 
 /// ******* Migrate Data ***********

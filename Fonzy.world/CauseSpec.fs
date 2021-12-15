@@ -245,7 +245,7 @@ module CauseSpecSorterShc =
 
 
     let sorterShcSpecRndGen2
-        (sorterShcSpecRndGen:string*sorterShcSpecRndGen)
+        (sorterShcSpecRndGen:string*sorterShcSpecRndGen2)
         (useParallel:string*bool) 
         (resultsName:string*string) =
 
@@ -256,7 +256,7 @@ module CauseSpecSorterShc =
                         |> GuidUtils.guidFromObjs
 
         let prams = [ 
-                        (CauseSpec.tupOp sorterShcSpecRndGen SorterShcSpecRndGenDto.toJson);
+                        (CauseSpec.tupOp sorterShcSpecRndGen SorterShcSpecRndGen2Dto.toJson);
                         (CauseSpec.tupOp useParallel Json.serialize);
                         resultsName
                     ] 

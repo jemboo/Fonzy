@@ -3,13 +3,21 @@ open System
 
 namespace global
 
-type fileDtoStream<'T> = { id:Guid; name:string; root:FileDir; meta:string array; reader:string->Result<'T, string>; writer:'T->string }
+type fileDtoStream<'T> = 
+    { 
+        id:string; 
+        descr:string; 
+        root:FileDir; 
+        meta:string array; 
+        reader:string->Result<'T, string>; 
+        writer:'T->string
+    }
 
 module FileDtoStream =
     
     let getFilePath (fdtos:fileDtoStream<'T>) =
         result {
-            let! fpath = FilePath.appendFileName 
+            let! fpath = FilePath.fromParts 
                                     fdtos.root 
                                     (fdtos.id |> string |> FileName.fromString)
                                     (".txt" |> FileExt.fromString)
@@ -18,7 +26,7 @@ module FileDtoStream =
 
     let getCatalogFilePath (fdtos:fileDtoStream<'T>) =
         result {
-            let! fpath = FilePath.appendFileName 
+            let! fpath = FilePath.fromParts 
                                     fdtos.root 
                                     ("catalog"|> FileName.fromString)
                                     (".txt" |> FileExt.fromString)
@@ -34,7 +42,7 @@ module FileDtoStream =
             return fdtos
         }
 
-    let initFile (fdtos:fileDtoStream<'T>) =
+    let makeFileHeader (fdtos:fileDtoStream<'T>) =
         result {
             let! di = FileUtils.makeDirectory fdtos.root
             let! fpath = getFilePath fdtos
@@ -43,7 +51,7 @@ module FileDtoStream =
             return fdtos
         }
 
-    let append<'T> (fdtos:fileDtoStream<'T>) (items:seq<'T>) =
+    let append<'T> (items:seq<'T>) (fdtos:fileDtoStream<'T>) =
         result {
             let! fpath = getFilePath fdtos
             let lines = items |> Seq.map(fdtos.writer)
@@ -52,39 +60,79 @@ module FileDtoStream =
         }
 
 
-    let makeForSorterDto (id:Guid) (name:string) (root:FileDir) =
+    let forSorterDto (id:string) (descr:string) (root:FileDir) =
         result {
             let fdtos = 
                {
                      fileDtoStream.id = id;
-                     name = name;
+                     descr = descr;
                      root = root;
-                     meta = [|nameof sorterDto; name; id |> string|];
+                     meta = [|nameof sorterDto; descr; id |> string|];
                      reader = SorterDto.fromJson;
                      writer = SorterDto.toJson
                 }
-            let! res = initFile fdtos
+            let! res = makeFileHeader fdtos
             return fdtos
         }
 
-    let makeForSorterShcArchDto (id:Guid) (name:string) (root:FileDir) =
+
+    let forSorterShcArchDto (id:string) (descr:string) (root:FileDir) =
         result {
             let fdtos = 
                {
                      fileDtoStream.id = id;
-                     name = name;
+                     descr = descr;
                      root = root;
-                     meta = [|nameof sorterShcArchDto; name; id |> string|];
+                     meta = [|nameof sorterShcArchDto; descr; id |> string|];
                      reader = SorterShcArchDto.fromJson;
                      writer = SorterShcArchDto.toJson
                 }
-            let! res = initFile fdtos
+            let! res = makeFileHeader fdtos
             return fdtos
         }
 
+
+    let forSorterShc2Dto (id:string) (descr:string) (root:FileDir) =
+        result {
+            let fdtos = 
+               {
+                     fileDtoStream.id = id;
+                     descr = descr;
+                     root = root;
+                     meta = [|nameof sorterShc2Dto; descr; id |> string|];
+                     reader = Json.deserialize<sorterShc2Dto>  //fun _ -> "not implemented" |> Error;
+                     writer = Json.serialize
+                }
+            let! res = makeFileHeader fdtos
+            return fdtos
+        }
+
+
+    let openSorterShc2Dto (descr:string) (fpath:FilePath) =
+
+        if (FilePath.exists fpath) then
+            result {
+                let! lines = FileUtils.readLines fpath
+                let! meta = lines |> Seq.head |> Json.deserialize<string[]>
+                return {
+                          fileDtoStream.id =  meta.[2];
+                          descr = meta.[1];
+                          root = fpath |> FilePath.toFileDir
+                          meta = meta;
+                          reader = Json.deserialize<sorterShc2Dto>
+                          writer = Json.serialize
+                        }
+                 }
+            else
+              let fileName = fpath |> FilePath.toFileName
+              let fileDir = fpath |> FilePath.toFileDir
+              forSorterShc2Dto (FileName.value fileName) descr fileDir
+
+
+
     let read (fdtos:fileDtoStream<'T>) =
         result {
-            let! fpath = FilePath.appendFileName fdtos.root 
+            let! fpath = FilePath.fromParts fdtos.root 
                                     (fdtos.id |> string |> FileName.fromString)
                                     (".txt" |> FileExt.fromString)
             let! lines = FileUtils.readLines fpath

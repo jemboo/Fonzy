@@ -46,7 +46,7 @@ module SorterShcCauseSpecGen =
                    (tup:MutationRate*Temp)
                    (outputDir:FileDir)
                    (u:UseParallel)
-                   (sssRndGen:sorterShcSpecRndGen) = 
+                   (sssRndGen:sorterShcSpecRndGen2) = 
         let causeSpecDescr = sprintf "%d: Time: %s  Mut: %f Temp: %f" 
                                  dex
                                  (System.DateTime.Now.ToLongTimeString())

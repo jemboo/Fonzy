@@ -31,20 +31,14 @@ type FolderSchemeFixture () =
 
         let fsr = result {
             let! folderRoot = FileDir.create "" this.rootDir
-            let! fds = FileDtoStream.makeForSorterDto folderId "name" folderRoot
-            let! res = FileDtoStream.append fds sorters
+            let! fds = FileDtoStream.forSorterDto (folderId |> string) "descr" folderRoot
+            let! res = FileDtoStream.append sorters fds 
             return fds
           }
         let fDtoS = fsr |> Result.ExtractOrThrow
         let sortersBack = FileDtoStream.read fDtoS |> Result.ExtractOrThrow
 
         Assert.AreEqual(sorters, sortersBack);
-
-
-
-
-
-
 
 
 

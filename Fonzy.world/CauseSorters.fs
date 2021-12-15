@@ -4,7 +4,7 @@ open System
 module CauseSorters =
 
     let rndGen (causeSpec:causeSpec) =
-        let causer = fun (monitor:obj->unit) 
+        let causer = fun (context:obj) 
                          (e:enviro) ->
             result {
                 let! map = causeSpec.prams |> StringMapDto.fromDto
@@ -45,12 +45,12 @@ module CauseSorters =
                                                 sorterSetDto 
                                                 e 
             }
-        {Cause.causeSpec=causeSpec; op=causer}
+        {cause.causeSpec=causeSpec; op=causer}
 
 
 
     let evalToSorterPerfBins (causeSpec:causeSpec) =
-        let causer = fun (monitor:obj->unit) (e:enviro) ->
+        let causer = fun context (e:enviro) ->
           result {
                 let! map = causeSpec.prams |> StringMapDto.fromDto
                 let! sorterSetName = 
@@ -116,11 +116,11 @@ module CauseSorters =
                                     selectedCovs
                                     e2 
           } 
-        {Cause.causeSpec=causeSpec; op=causer}
+        {cause.causeSpec=causeSpec; op=causer}
 
 
     let rndGenToPerfBins (causeSpec:causeSpec) =
-        let causer = fun (monitor:obj->unit) 
+        let causer = fun (context:obj) 
                          (e:enviro) ->
             result {
                 let! map = causeSpec.prams |> StringMapDto.fromDto
@@ -203,7 +203,7 @@ module CauseSorters =
                                     e2 
             }
 
-        {Cause.causeSpec=causeSpec; op=causer}
+        {cause.causeSpec=causeSpec; op=causer}
    
 
     let fromCauseSpec (genus:string list)

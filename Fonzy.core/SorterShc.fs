@@ -29,7 +29,7 @@ type shcTermSpec =
     | EnergyBased of Energy*StepNumber*StepNumber
 
 module ShcTermSpec =
-    let getSteps (termSpec:shcTermSpec) = 
+    let getMaxSteps (termSpec:shcTermSpec) = 
         match termSpec with
         | shcTermSpec.EnergyBased (e,sa,sb) -> sb
         | shcTermSpec.FixedLength st -> st
@@ -176,10 +176,28 @@ module SorterShc =
         | Some r -> r |> Ok
         | None -> Error "Perf missing"
 
-    let getEnergy (shc:sorterShc) = 
-        match shc.energy with
+    let successFul (perf:SortingEval.sorterPerf) = 
+        match perf.successful with
         | Some r -> r |> Ok
-        | None -> Error "Energy missing"
+        | None -> Error "successful missing"
+
+    let getEnergy (shc:sorterShc) = 
+        result {
+            let! perf = getPerf shc
+            let! sFul = successFul perf
+            if sFul then
+                return!
+                    match shc.energy with
+                    | Some r -> r |> Ok
+                    | None -> Error "Energy missing"
+            else
+                return Energy.failure
+        }
+
+    //let getEnergy (shc:sorterShc) = 
+    //    match shc.energy with
+    //    | Some r -> r |> Ok
+    //    | None -> Error "Energy missing"
 
     
     let isCurrentBest (shc:sorterShc) =

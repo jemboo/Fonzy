@@ -3,7 +3,7 @@ open System
 
 module Causes =
     let noOp =
-        {Cause.causeSpec=CauseSpec.noOpCauseSpec; op=fun monitor (e:enviro) -> e |> Ok}
+        {cause.causeSpec=CauseSpec.noOpCauseSpec; op=fun monitor (e:enviro) -> e |> Ok}
 
     let fromCauseSpec (causeSpec:causeSpec) = 
      match causeSpec.genus with

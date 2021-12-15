@@ -2,11 +2,13 @@
 open System
 
 
-type Cause = {causeSpec:causeSpec; op:(obj->unit) -> enviro -> Result<enviro, string>}
+type cause = { causeSpec:causeSpec; 
+               op:(obj->Result<obj->unit, string>) -> enviro-> Result<enviro, string>
+             }
 
 module CauseRandGen = 
     let intArray (causeSpec:causeSpec) = 
-        let causer = fun (monitor:obj->unit) (e:enviro) ->
+        let causer = fun (context:obj) (e:enviro) ->
             result {
                 let! map = causeSpec.prams |> StringMapDto.fromDto; 
                 let! count = map |> ResultMap.lookupKeyedInt "count"
@@ -27,11 +29,11 @@ module CauseRandGen =
                                             intDistDto
                                             e
             }
-        {Cause.causeSpec=causeSpec; op=causer} |> Ok
+        {cause.causeSpec=causeSpec; op=causer} |> Ok
         
 
     let lattice2dArray (causeSpec:causeSpec) = 
-        let causer = fun (monitor:obj->unit) (e:enviro) ->
+        let causer = fun (context:obj) (e:enviro) ->
             result {
                 let! map = causeSpec.prams |> StringMapDto.fromDto; 
                 let count = map.["count"] |> int
@@ -49,7 +51,7 @@ module CauseRandGen =
                                     int2dDistDto
                                     e 
             }
-        {Cause.causeSpec=causeSpec; op=causer} |> Ok
+        {cause.causeSpec=causeSpec; op=causer} |> Ok
 
 
     let fromCauseSpec (genus:string list)

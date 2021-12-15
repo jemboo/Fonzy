@@ -32,6 +32,10 @@ module SorterPerfDto =
 
 type sorterPerfBinDto = int[]
 module SorterPerfBinDto =
+    
+    
+    let intVals (vv:sorterPerfBinDto)  = [|vv.[0];vv.[1];vv.[2];vv.[3];vv.[4];|]
+
     let toDto (spb:SortingEval.sorterPerfBin) =
         [|
             (SwitchCount.value spb.usedSwitchCount)
@@ -41,20 +45,26 @@ module SorterPerfBinDto =
             spb.failCount
         |]
 
-    let toTup (dto:sorterPerfBinDto) =
+    
+    let fromInts (ia:int array) =
         result {
-            let! uwc = SwitchCount.create "" dto.[0]
-            let! utc = StageCount.create "" dto.[1]
-            let! stc = SorterCount.create "" dto.[2]
+            let! uwc = SwitchCount.create "" ia.[0]
+            let! utc = StageCount.create "" ia.[1]
+            let! stc = SorterCount.create "" ia.[2]
             return
                 { 
                     SortingEval.sorterPerfBin.usedSwitchCount = uwc;
                     SortingEval.sorterPerfBin.usedStageCount = utc;
                     SortingEval.sorterPerfBin.sorterCount = stc;
-                    SortingEval.sorterPerfBin.successCount = dto.[3]
-                    SortingEval.sorterPerfBin.failCount = dto.[4]
+                    SortingEval.sorterPerfBin.successCount = ia.[3]
+                    SortingEval.sorterPerfBin.failCount = ia.[4]
                 }
         }
+
+
+    let toTup (dto:sorterPerfBinDto) =
+        dto |> intVals |> fromInts
+        
 
     let fromDtos (dtos:sorterPerfBinDto[]) =
         result {
@@ -107,7 +117,6 @@ module SorterCoverageDto =
 
     let toDto (cov:SortingEval.sorterCoverage) =
         {sorterId = (SorterId.value cov.sorterId); 
-        // sortableSetId = (SortableSetId.value cov.sortableSetId);
          perfDto = cov.perf |> SorterPerfDto.toDto;
          usedSwitches = cov.usedSwitches |> Array.map(SwitchDto.toDto)}
 

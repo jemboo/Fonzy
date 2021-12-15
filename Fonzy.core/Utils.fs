@@ -275,6 +275,24 @@ module CollectionUtils =
              |> Seq.toArray
              |> Array.reduce addArrays
 
+
+    let merge2DArray<'T,'M> (emptyV:'M) 
+                            (merger:'M[]->'T[]->'M[])  
+                            (raw:'T[][]) = 
+        let mergeSeed = Array.create raw.[0].Length emptyV
+        raw |> Array.fold merger mergeSeed
+
+
+    let merge3DintsToFloats (raws:int[][][]) = 
+        let _mrg = ()
+        let sl = raws.[0].[0] |> Array.length
+        let emptyM = Array.zeroCreate<float> sl
+        let merger (fm:float[][]) (im:int[][]) =
+            fm |> Array.mapi(fun dexA vv -> 
+                    vv |> Array.mapi(fun dexB v -> v + (float im.[dexA].[dexB]) ))
+        merge2DArray emptyM merger raws
+
+
 // Splits the sourceArray into segments using segBounds
     let breakArrayIntoSegments (sourceArray : array<'a>) 
                                (segBounds : array<int>) =

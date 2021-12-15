@@ -30,7 +30,7 @@ module Combinatorics =
         if values |> Seq.isEmpty then
             true
         else
-            let yak = values.GetEnumerator()
+            use yak = values.GetEnumerator()
             yak.MoveNext() |> ignore
             let mutable lastVal = yak.Current
             let mutable cont = true

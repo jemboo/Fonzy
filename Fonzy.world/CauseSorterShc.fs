@@ -5,7 +5,7 @@ module CauseSorterShc =
 
     let sorterShcSpecRndGen (causeSpec:causeSpec) =
 
-        let causer = fun (monitor:obj->unit) (e:enviro) ->
+        let causer = fun (context:obj) (e:enviro) ->
             result {
 
                 let! map = causeSpec.prams |> StringMapDto.fromDto
@@ -37,12 +37,13 @@ module CauseSorterShc =
                                                 e 
             }
 
-        { Cause.causeSpec=causeSpec; op=causer }
+        { cause.causeSpec=causeSpec; op=causer }
 
 
 
     let sorterShcSpecRndGen2 (causeSpec:causeSpec) =
-        let causer = fun (monitor:obj->unit) (e:enviro) ->
+        let causer = fun (context:(obj->Result<obj->unit, string>))
+                         (e:enviro) ->
             result {
 
                 let! map = causeSpec.prams |> StringMapDto.fromDto
@@ -62,9 +63,16 @@ module CauseSorterShc =
                 let! shcSpecs = SorterShcSpecRndGen2.generate None None sorterShcSpecRndGen
                 let shcSet = shcSpecs  |> SorterSHCset2.make
 
+                //let monitorCtx, monitorMaker = context :?> (FileDir*causeSpec)*(obj -> Result<(causeSpec->(obj->unit)), string>)
+
+                let yaba = causeSpec :> obj
+
+               // let monitorCtx, monitorMaker = context :?> obj*(obj -> Result<(obj->(obj->unit)), string>)
+
+
 
                 let batchRes = SHCset2.runBatch (UseParallel.create useParallel)
-                                                monitor
+                                                (yaba, context)
                                                 shcSet
                 let shcRes = SorterSHCset2.getResults batchRes
                 let sShcResultsDto = shcRes |> SorterShcResults2Dto.toDto
@@ -74,7 +82,7 @@ module CauseSorterShc =
                                                 e
             }
 
-        {Cause.causeSpec=causeSpec; op=causer}
+        {cause.causeSpec=causeSpec; op=causer}
 
 
 

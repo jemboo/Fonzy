@@ -190,7 +190,6 @@ module SortingInts =
         let eval<'T> 
                 (sorterSet:sorterSet)
                 (intSetsRollout:intSetsRollout)
-           //     (sortableSetId:SortableSetId)
                 (switchusePlan:Sorting.switchUsePlan) 
                 (switchEventAgg:Sorting.eventGrouping) 
                 (_parallel:UseParallel) 
@@ -204,7 +203,6 @@ module SortingInts =
                     sortingResult.sorter = sorter;
                     sortingResult.switchEventRecords = swEvRecs;
                     sortingResult.sorterId = sorterId;
-              //      sortingResult.sortableSetId = sortableSetId
                 }
                 proc resSoSS
 
@@ -219,6 +217,7 @@ module SortingInts =
                                                  |> List.map(rewrap intSetsRollout)
                                                  |> Result.sequence
             }
+
 
 
     module History =

@@ -122,14 +122,16 @@ module FilePath =
     let value (FilePath str) = str
     let create fieldName str = 
         ConstrainedType.createString fieldName FilePath 1000 str
+    let exists (FilePath str) =
+         System.IO.File.Exists str
     let createOption fieldName str = 
         ConstrainedType.createStringOption fieldName FilePath 1000 str
     let fromString v = create "" v |> Result.ExtractOrThrow
     let toFileDir (fp:FilePath) =
-        Path.GetDirectoryName (value fp)
+        Path.GetDirectoryName (value fp) |> FileDir.fromString
     let toFileName (fp:FilePath) =
-        Path.GetFileName (value fp)
-    let appendFileName (fd:FileDir) (fn:FileName) (fe:FileExt) =
+        Path.GetFileNameWithoutExtension (value fp) |> FileName.fromString
+    let fromParts (fd:FileDir) (fn:FileName) (fe:FileExt) =
         try
             let fne = sprintf "%s%s" (FileName.value fn) (FileExt.value fe)
             fromString (Path.Combine(FileDir.value fd, fne)) |> Ok

@@ -5,7 +5,7 @@ open System
 module Runs =
 
     let makeWorldFromCauseSpec
-                    (monitor:obj -> unit)
+                    (context:obj->Result<obj->unit,string>)
                     (outputDir:FileDir)
                     (parentWorld:world)
                     (causeSpec:causeSpec) =
@@ -14,7 +14,7 @@ module Runs =
             let! cause = causeSpec |> Causes.fromCauseSpec
 
             let! newWorld = World.createFromParent 
-                                        monitor 
+                                        context 
                                         parentWorld
                                         cause
             let dataStore = newWorld

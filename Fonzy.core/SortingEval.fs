@@ -1,5 +1,6 @@
 ﻿namespace global
 open System
+open FSharp.Stats
 
 module SortingEval =
 
@@ -136,28 +137,182 @@ module SortingEval =
                }
 
 
-    module SorterPerfBin = 
-    
-        let fromSorterCoverages (coverage:sorterCoverage seq) =
-            let extractSorterPerfBin ((stc, swc), (scs:sorterCoverage[])) =
-                let sct = scs |> Array.filter(fun sc -> 
-                                        sc.perf.successful = (Some true))
-                              |> Array.length
-                let fct = scs |> Array.filter(fun sc -> 
-                                        sc.perf.successful = (Some false))
-                              |> Array.length
+    module SorterPerfBin =
+        
+        let merge (bins:sorterPerfBin seq) =
+            let _makeKey (bin:sorterPerfBin) =
+                (bin.usedSwitchCount, bin.usedStageCount)
+            let _add (taggedBins:(SwitchCount*StageCount)*sorterPerfBin array) =
+                let (wc, tc), bins = taggedBins
+                let totSorterCt = 
+                        bins 
+                          |> Seq.map(fun bin -> bin.sorterCount)
+                          |> Seq.fold SorterCount.add (SorterCount.fromInt 0)
+                let totSuccessCt = 
+                        bins 
+                          |> Seq.map(fun bin -> bin.successCount)
+                          |> Seq.fold (+) 0
+                let totFailCt = 
+                        bins 
+                          |> Seq.map(fun bin -> bin.failCount)
+                          |> Seq.fold (+) 0
                 {
-                    sorterPerfBin.sorterCount = SorterCount.fromInt scs.Length
+                    sorterPerfBin.usedSwitchCount = wc;
+                    sorterPerfBin.usedStageCount = tc;
+                    sorterPerfBin.sorterCount = totSorterCt
+                    sorterPerfBin.successCount = totSuccessCt;
+                    sorterPerfBin.failCount = totFailCt;
+                }
+
+            bins 
+               |> Seq.toArray
+               |> Array.groupBy(_makeKey)
+               |> Seq.map(_add)
+
+
+    
+        let fromSorterPerfs (perfs:sorterPerf seq) =
+            let extractSorterPerfBin ((stc, swc), (perfs:sorterPerf[])) =
+                let sct = perfs |> Array.filter(fun sc -> 
+                                        sc.successful = (Some true))
+                                |> Array.length
+                let fct = perfs |> Array.filter(fun sc -> 
+                                        sc.successful = (Some false))
+                                |> Array.length
+                {
+                    sorterPerfBin.sorterCount = SorterCount.fromInt perfs.Length
                     usedStageCount = stc;
                     usedSwitchCount = swc;
                     successCount = sct;
                     failCount = fct;
                 }
-            coverage
+            perfs
                 |> Seq.toArray
-                |> Array.groupBy(fun c-> (c.perf.usedStageCount, 
-                                          c.perf.usedSwitchCount))
+                |> Array.groupBy(fun c -> (c.usedStageCount, 
+                                           c.usedSwitchCount))
                 |> Array.map(extractSorterPerfBin)
+
+
+        let fromSorterCoverages (coverages:sorterCoverage seq) =
+             coverages |> Seq.map(fun cov -> cov.perf)
+                       |> fromSorterPerfs
+
+
+        let toSorterPerfs (bins:sorterPerfBin seq) =
+            let _sp (spBin:sorterPerfBin) =
+                let ssfls =
+                    {
+                        sorterPerf.successful = Some true;
+                        sorterPerf.usedStageCount = spBin.usedStageCount;
+                        sorterPerf.usedSwitchCount = spBin.usedSwitchCount;
+                    } |> Seq.replicate spBin.successCount
+                let unSsfls =
+                    {
+                        sorterPerf.successful = Some false;
+                        sorterPerf.usedStageCount = spBin.usedStageCount;
+                        sorterPerf.usedSwitchCount = spBin.usedSwitchCount;
+                    } |> Seq.replicate spBin.failCount
+                ssfls |> Seq.append unSsfls
+
+            bins |> Seq.map(_sp) |> Seq.concat
+
+
+
+        let getMinMaxMeanOfSuccessful (bins:sorterPerfBin seq) 
+                                      (perfM:sorterPerfBin -> double) =
+            use yak = bins.GetEnumerator()
+            let mutable min = Double.MaxValue
+            let mutable max = Double.MinValue
+            let mutable total = 0.0
+            let mutable count = 0.0
+            while yak.MoveNext() do
+                if yak.Current.successCount > 0 then
+                    let fct = (float yak.Current.successCount)
+                    let curM = perfM yak.Current
+                    if curM < min then 
+                        min <- curM
+                    if curM > max then
+                        max <- curM
+                    count <- count + fct
+                    total <- total + (curM * fct)
+
+            (min, max, total / count)
+
+
+        let getMinMaxMeanOfFails (bins:sorterPerfBin seq) 
+                                 (perfM:sorterPerfBin -> double) =
+            use yak = bins.GetEnumerator()
+            let mutable min = Double.MaxValue
+            let mutable max = Double.MinValue
+            let mutable total = 0.0
+            let mutable count = 0.0
+            while yak.MoveNext() do
+                if yak.Current.failCount > 0 then
+                    let fct = (float yak.Current.failCount)
+                    let curM = perfM yak.Current
+                    if curM < min then 
+                        min <- curM
+                    if curM > max then
+                        max <- curM
+                    count <- count + fct
+                    total <- total + (curM * fct)
+
+            (min, max, total / count)
+
+
+        let getRdsBetterWorseOfSuccessful (bins:sorterPerfBin seq) 
+                                          (perfM:sorterPerfBin -> double) 
+                                          (centroid:float) =
+            use yak = bins.GetEnumerator()
+            let mutable totalBetter = 0.0
+            let mutable countBetter = 0.0
+            let mutable totalWorse = 0.0
+            let mutable countWorse = 0.0
+            while yak.MoveNext() do
+                if yak.Current.successCount > 0 then
+                    let fct = (float yak.Current.successCount)
+                    let curM = perfM yak.Current
+                    if curM < centroid then 
+                        countBetter <- countBetter + fct
+                        totalBetter <- totalBetter + (curM - centroid) * (curM - centroid) * fct
+                    else
+                        countWorse <- countWorse + fct
+                        totalWorse <- totalWorse + (curM - centroid) * (curM - centroid) * fct
+
+            (countBetter / totalBetter, countBetter / totalWorse)
+
+
+
+        let getRdsBetterWorseOfFails (bins:sorterPerfBin seq) 
+                                     (perfM:sorterPerfBin -> double) 
+                                     (centroid:float) =
+            use yak = bins.GetEnumerator()
+            let mutable totalBetter = 0.0
+            let mutable countBetter = 0.0
+            let mutable totalWorse = 0.0
+            let mutable countWorse = 0.0
+            while yak.MoveNext() do
+                if yak.Current.failCount > 0 then
+                    let fct = (float yak.Current.failCount)
+                    let curM = perfM yak.Current
+                    if curM < centroid then 
+                        countBetter <- countBetter + fct
+                        totalBetter <- totalBetter + (curM - centroid) * (curM - centroid) * fct
+                    else
+                        countWorse <- countWorse + fct
+                        totalWorse <- totalWorse + (curM - centroid) * (curM - centroid) * fct
+
+            (countBetter / totalBetter, countBetter / totalWorse)
+
+
+
+        let getStDev (bins:sorterPerfBin seq) (perfM:sorterPerf -> double) =
+            bins |> toSorterPerfs |> Seq.map(perfM) |> Seq.stDev
+
+        
+        let getMean (bins:sorterPerfBin seq) (perfM:sorterPerf -> double) =
+            bins |> toSorterPerfs |> Seq.map(perfM) |> Seq.mean
+
 
 
             
@@ -175,29 +330,6 @@ type sorterSaving =
         | Successful
         | Perf of StageWeight*SorterCount
 
-
-//type Fitness = private Fitness of float
-//module Fitness =
-//    let value (Fitness v) = v
-//    let create fieldName v = 
-//        ConstrainedType.createFloat fieldName Fitness 0.0 10.0 v
-//    let fromFloat v = create "" v |> Result.ExtractOrThrow
-//    let repStr v = match v with
-//                            |Some r -> sprintf "%.4f" (value r)
-//                            |None -> ""
-//    let fromKey (m:Map<'a, obj>) (key:'a) =
-//        result {
-//            let! gv = ResultMap.read key m
-//            return! create "" (gv:?>float)
-//        }
-
-//    let failure = 
-//        Double.MaxValue |> fromFloat
-
-
-// Positive valued - zero is the best value
-type sorterFitness =
-        | PerfBin of StageWeight
 
 module SorterFitness =
 
@@ -231,6 +363,7 @@ module SorterFitness =
         match perf.successful with
         | Some v -> if v then pv else Energy.failure
         | None -> pv
+
 
 
 module SorterSaving = 

@@ -182,38 +182,93 @@ module SorterSHCset2 =
 
 
     
-    let reportShcDetails (repCurrentPerf:StepNumber->bool) 
-                         (perfReporter:SortingEval.sorterPerf->unit)
-                         (repCurrentBins:StepNumber->bool) 
-                         (evalBinReporter:SortingEval.sorterPerfBin->unit)
-                         (annealBinReporter:SortingEval.sorterPerfBin->unit) =
-        None
-    
+    let reportShcDetails (shouldRepPerf:StepNumber->bool) 
+                         (shouldRepBins:StepNumber->bool) 
+                         (reportPerf:SortingEval.sorterPerf option -> unit)
+                         (reportBins:unit->unit)
+                         (addEvalToBins:SortingEval.sorterPerf option -> unit)
+                         (addAnnealBins:SortingEval.sorterPerf option -> unit) 
+                         (state:sHCstate) 
+                         (srtrShc:sorterShc) 
+                         (shc:sHC2<sorterShc>) =
 
-    let makeSorterShcLoggerMaker (root:FileDir) (reportingFreq:StepNumber) = 
-       // let doReport ()
+        match state with
+        | PostMutate -> 
+            ()
+        | PostEvaluate -> 
+            addEvalToBins srtrShc.perf
+        | PostAnnealer -> 
+            addAnnealBins srtrShc.perf
+            if (shouldRepPerf srtrShc.step) then
+                reportPerf srtrShc.perf
+            if (shouldRepBins srtrShc.step) then
+                reportBins ()
+ 
+
+    let sorterShcLoggerMaker (rootOutDir:FileDir) (context:obj) = 
+        let srtrShcSpec2, sorterShc = context :?> sorterShcSpec2*Result<sHC2<sorterShc>, string>
+        //let logFldr = match sorterShc with
+        //             | Result.Ok shc -> (ShcId.value shc.id) |> string |> FileFolder.fromString
+        //             | Error msg -> "error" |> FileFolder.fromString
+        // let shcFolder = rootOutDir |> FileDir.appendFolder logFldr |> Result.ExtractOrThrow
+
+        let id = match sorterShc with
+                     | Result.Ok shc -> (ShcId.value shc.id)
+                     | Error msg -> Guid.Empty
+
+        let sorterShcArchName = "sorterShcArch"
+        
+        let sorterShc2Fdtos = FileDtoStream.forSorterShc2Dto (id |> string) sorterShcArchName rootOutDir
+                           |> Result.ExtractOrThrow
+        let sorterShc2Fdtos = sorterShc2Fdtos |> FileDtoStream.makeFileHeader
+                           |> Result.ExtractOrThrow
+
+        let bk = FileDtoStream.addToCatalog sorterShc2Fdtos
+
+        let totReptSteps = srtrShcSpec2.termSpec |> ShcTermSpec.getMaxSteps
+        let ticsPerLog = 20.0
+        let reportSteps = StepNumber.logReporting totReptSteps ticsPerLog |> Array.map(StepNumber.value)
+        let mutable trialSorterPerfs = []
+        let mutable acceptedSorterPerfs = []
+        let mutable genSpan = 0
+
+        let yab = 0
         result {
-            let mutable trialSorterPerfs = []
-            let mutable curRepStep = -1
-            let sorterShcArchId = Guid.NewGuid()
-            let sorterShcArchName = "sorterShcArch"
-            let! shcArchFd = FileDtoStream.makeForSorterShcArchDto sorterShcArchId sorterShcArchName root
-            let! bk = FileDtoStream.addToCatalog shcArchFd
             return
-                fun (shcData:obj) ->
-                    let (shcSt, srtrShc, shc2) = shcData :?> sHCstate*sorterShc*sHC2<sorterShc>
-                    let srtrPrf = 
-                       {
-                            SortingEval.sorterPerf.usedStageCount = (StageCount.fromInt 5);
-                            SortingEval.sorterPerf.usedSwitchCount = (SwitchCount.fromInt 10)
-                            SortingEval.sorterPerf.successful = Some true
-                        }
-                    Console.WriteLine(string srtrShc.step)
-                    trialSorterPerfs <- srtrPrf::trialSorterPerfs
-                    let state, sshc, shcT = shcData :?> (sHCstate*sorterShc*sHC2<sorterShc>)
-                    let yab = match state with
-                                | PostMutate -> ()
-                                | PostEvaluate -> ()
-                                | PostAnnealer -> ()
-                    ()
+                fun (context:obj) ->
+                    let state, srtrShc, shc, spec = context :?> sHCstate*sorterShc*sHC2<sorterShc>*sorterShcSpec2
+
+                    match state with
+                    | PostMutate -> 
+                        genSpan <- genSpan + 1
+                    | PostEvaluate -> 
+                        trialSorterPerfs <- (srtrShc.perf |> Option.get ) :: trialSorterPerfs
+                        ()
+                    | PostAnnealer -> 
+                        acceptedSorterPerfs <- (srtrShc.perf |> Option.get ) :: acceptedSorterPerfs
+                        if(reportSteps |> Array.contains (StepNumber.value srtrShc.step)) then
+
+                            let trialPerfBins = 
+                                trialSorterPerfs 
+                                        |> SortingEval.SorterPerfBin.fromSorterPerfs
+
+                            let acceptedPerfBins = 
+                                acceptedSorterPerfs 
+                                        |> SortingEval.SorterPerfBin.fromSorterPerfs
+                            let dto = SorterShc2Dto.toDto 
+                                            srtrShc 
+                                            shc.id 
+                                            (spec |> SorterShcSpec2.sorterReport)
+                                            (spec |> SorterShcSpec2.seedReport)
+                                            (spec |> SorterShcSpec2.mutReport)
+                                            (spec |> SorterShcSpec2.tempReport)
+                                            genSpan 
+                                            trialPerfBins 
+                                            acceptedPerfBins
+                            let res = sorterShc2Fdtos |> FileDtoStream.append (seq { dto })
+                                      |> Result.ExtractOrThrow
+                            trialSorterPerfs <- []
+                            acceptedSorterPerfs <- []
+                            genSpan <- 0
+                        ()
         }

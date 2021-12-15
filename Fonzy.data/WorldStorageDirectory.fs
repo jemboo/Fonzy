@@ -12,7 +12,7 @@ type WorldStorageDirectory(dirPath:FileDir) =
     member this.DirectoryPath = dirPath
     member this.GuidToFilePath (id:Guid) =
         let fn =  FileName.fromString ((string id))
-        FilePath.appendFileName this.DirectoryPath fn (FileExt.fromString ".txt")
+        FilePath.fromParts this.DirectoryPath fn (FileExt.fromString ".txt")
            
     member this.AssureDirectory = 
             FileUtils.makeDirectory this.DirectoryPath

@@ -15,7 +15,7 @@ type WorldStorageFixture () =
         Directory.CreateDirectory(this.testDir)
         |> ignore
 
-    member this.monitor = fun _ -> ()
+    member this.monitor = fun _ -> (fun _ -> ()) |> Ok
 
     member this.world1 =
         World.createFromParent

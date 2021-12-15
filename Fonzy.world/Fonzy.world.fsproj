@@ -14,10 +14,10 @@
     <Compile Include="SortingBp64.fs" />
     <Compile Include="SortingOps.fs" />
     <Compile Include="SortableSetMaker.fs" />
+    <Compile Include="CauseSpec.fs" />
     <Compile Include="ShcW.fs" />
     <Compile Include="ShcW2.fs" />
     <Compile Include="Enviros.fs" />
-    <Compile Include="CauseSpec.fs" />
     <Compile Include="SorterPbCauseSpecGen.fs" />
     <Compile Include="SorterShcCauseSpecGen.fs" />
     <Compile Include="SorterShcCauseSpecGen2.fs" />
@@ -41,7 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="6.0.0" />
+    <PackageReference Update="FSharp.Core" Version="6.0.1" />
   </ItemGroup>
 
 </Project>

@@ -122,7 +122,42 @@ type UtilsFixture () =
 
 
     [<TestMethod>]
-    member this.TestBreakIntoSegments() =
+    member this.merge2DArray() =
+        let sorterLen = 10
+        let genCount = 5
+        let mergeCount = 3
+        let gen0 = [|1 .. sorterLen|] 
+        let genN (gnN:int) = 
+            gen0 |> Array.map(fun v -> gnN*10 + v)
+        let shc0 = Array.init genCount (fun dex -> genN dex)
+        let mergeF = fun fm (im:int[]) -> fm |> Array.mapi(fun dex v -> v + (float im.[dex]))
+        let merged = CollectionUtils.merge2DArray<int,float> 0.0 mergeF shc0
+        Assert.AreEqual (merged.Length, sorterLen)
+        
+
+
+
+    [<TestMethod>]
+    member this.merge3DintsToFloats() =
+        let sorterLen = 10
+        let genCount = 5
+        let mergeCount = 3
+        let gen0 = [|1 .. sorterLen|] 
+        let genN (gnN:int) = 
+            gen0 |> Array.map(fun v -> gnN*10 + v)
+        let shc0 = Array.init genCount (fun dex -> genN dex)
+        let repN (rpN:int) = 
+            shc0 |> Array.map(fun v -> v |> Array.map((+) (100*rpN)))
+        let shcS = Array.init mergeCount (fun dex -> repN dex)
+        let merged = CollectionUtils.merge3DintsToFloats shcS
+        //let yab = CollectionUtils.merge2DArray<int,float> 0.0 (fun a b -> (float a) + b) shc0
+        Assert.AreEqual (3, 3)
+
+
+
+
+    [<TestMethod>]
+    member this.breakIntoSegments() =
         let testArray = [|1; 2; 3; 4; 5; 6; 7; 8; 9|] 
         let testBreaks = [|0; 2; 5; 9|] 
         let yak = CollectionUtils.breakArrayIntoSegments testArray testBreaks
