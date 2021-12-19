@@ -218,91 +218,109 @@ module SortingEval =
 
 
 
-        let getMinMaxMeanOfSuccessful (bins:sorterPerfBin seq) 
-                                      (perfM:sorterPerfBin -> double) =
-            use yak = bins.GetEnumerator()
+        let getMinMaxMeanOfSuccessful (perfM:sorterPerfBin -> double)  
+                                      (bins:sorterPerfBin seq)  =
+            use enumer = bins.GetEnumerator()
             let mutable min = Double.MaxValue
             let mutable max = Double.MinValue
             let mutable total = 0.0
             let mutable count = 0.0
-            while yak.MoveNext() do
-                if yak.Current.successCount > 0 then
-                    let fct = (float yak.Current.successCount)
-                    let curM = perfM yak.Current
+            while enumer.MoveNext() do
+                if enumer.Current.successCount > 0 then
+                    let fct = (float enumer.Current.successCount)
+                    let curM = perfM enumer.Current
                     if curM < min then 
                         min <- curM
                     if curM > max then
                         max <- curM
                     count <- count + fct
                     total <- total + (curM * fct)
+            let mean = if count = 0.0 then 0.0 else total / count
+            (min, max, mean)
 
-            (min, max, total / count)
 
-
-        let getMinMaxMeanOfFails (bins:sorterPerfBin seq) 
-                                 (perfM:sorterPerfBin -> double) =
-            use yak = bins.GetEnumerator()
+        let getMinMaxMeanOfFails (perfM:sorterPerfBin -> double) 
+                                 (bins:sorterPerfBin seq)  =
+            use enumer = bins.GetEnumerator()
             let mutable min = Double.MaxValue
             let mutable max = Double.MinValue
             let mutable total = 0.0
             let mutable count = 0.0
-            while yak.MoveNext() do
-                if yak.Current.failCount > 0 then
-                    let fct = (float yak.Current.failCount)
-                    let curM = perfM yak.Current
+            while enumer.MoveNext() do
+                if enumer.Current.failCount > 0 then
+                    let fct = (float enumer.Current.failCount)
+                    let curM = perfM enumer.Current
                     if curM < min then 
                         min <- curM
                     if curM > max then
                         max <- curM
                     count <- count + fct
                     total <- total + (curM * fct)
+            let mean = if count = 0.0 then 0.0 else total / count
+            (min, max, mean)
 
-            (min, max, total / count)
+
+        let getStdevOfSuccessful (perfM:sorterPerfBin -> double) 
+                                 (centroid:float) 
+                                 (bins:sorterPerfBin seq) =
+            use enumer = bins.GetEnumerator()
+            let mutable totalCt = 0.0
+            let mutable totalRds = 0.0
+            while enumer.MoveNext() do
+                if enumer.Current.successCount > 0 then
+                    let binCt = (float enumer.Current.successCount)
+                    let curM = perfM enumer.Current
+                    totalCt <- totalCt + binCt
+                    totalRds <- totalRds + (Math.Sqrt ((curM - centroid) * (curM - centroid))) * binCt
+
+            if (totalCt = 0.0) then 0.0 else (totalRds / totalCt)
 
 
-        let getRdsBetterWorseOfSuccessful (bins:sorterPerfBin seq) 
-                                          (perfM:sorterPerfBin -> double) 
-                                          (centroid:float) =
-            use yak = bins.GetEnumerator()
-            let mutable totalBetter = 0.0
-            let mutable countBetter = 0.0
-            let mutable totalWorse = 0.0
-            let mutable countWorse = 0.0
-            while yak.MoveNext() do
-                if yak.Current.successCount > 0 then
-                    let fct = (float yak.Current.successCount)
-                    let curM = perfM yak.Current
+
+        let getRdsBetterWorseOfSuccessful (perfM:sorterPerfBin -> double) 
+                                          (centroid:float)
+                                          (bins:sorterPerfBin seq) =
+            use enumer = bins.GetEnumerator()
+            let mutable totalCtBetter = 0.0
+            let mutable totalRdsBetter = 0.0
+            let mutable totalCtWorse = 0.0
+            let mutable totalRdsWorse = 0.0
+            while enumer.MoveNext() do
+                if enumer.Current.successCount > 0 then
+                    let fct = (float enumer.Current.successCount)
+                    let curM = perfM enumer.Current
                     if curM < centroid then 
-                        countBetter <- countBetter + fct
-                        totalBetter <- totalBetter + (curM - centroid) * (curM - centroid) * fct
+                        totalCtBetter <- totalCtBetter + fct
+                        totalRdsBetter <- totalRdsBetter + (curM - centroid) * (curM - centroid) * fct
                     else
-                        countWorse <- countWorse + fct
-                        totalWorse <- totalWorse + (curM - centroid) * (curM - centroid) * fct
+                        totalCtWorse <- totalCtWorse + fct
+                        totalRdsWorse <- totalRdsWorse + (curM - centroid) * (curM - centroid) * fct
+            let bR = if (totalCtBetter = 0.0) then 0.0 else totalRdsBetter / totalCtBetter
+            let wR = if (totalCtWorse = 0.0) then 0.0 else totalRdsWorse / totalCtWorse
+            (bR, wR)
 
-            (countBetter / totalBetter, countBetter / totalWorse)
 
-
-
-        let getRdsBetterWorseOfFails (bins:sorterPerfBin seq) 
-                                     (perfM:sorterPerfBin -> double) 
-                                     (centroid:float) =
-            use yak = bins.GetEnumerator()
-            let mutable totalBetter = 0.0
-            let mutable countBetter = 0.0
-            let mutable totalWorse = 0.0
-            let mutable countWorse = 0.0
-            while yak.MoveNext() do
-                if yak.Current.failCount > 0 then
-                    let fct = (float yak.Current.failCount)
-                    let curM = perfM yak.Current
+        let getRdsBetterWorseOfFails (perfM:sorterPerfBin -> double)  
+                                     (centroid:float)
+                                     (bins:sorterPerfBin seq)  =
+            use enumer = bins.GetEnumerator()
+            let mutable totalCtBetter = 0.0
+            let mutable totalRdsBetter = 0.0
+            let mutable totalCtWorse = 0.0
+            let mutable totalRdsWorse = 0.0
+            while enumer.MoveNext() do
+                if enumer.Current.failCount > 0 then
+                    let fct = (float enumer.Current.failCount)
+                    let curM = perfM enumer.Current
                     if curM < centroid then 
-                        countBetter <- countBetter + fct
-                        totalBetter <- totalBetter + (curM - centroid) * (curM - centroid) * fct
+                        totalCtBetter <- totalCtBetter + fct
+                        totalRdsBetter <- totalRdsBetter + (curM - centroid) * (curM - centroid) * fct
                     else
-                        countWorse <- countWorse + fct
-                        totalWorse <- totalWorse + (curM - centroid) * (curM - centroid) * fct
-
-            (countBetter / totalBetter, countBetter / totalWorse)
+                        totalCtWorse <- totalCtWorse + fct
+                        totalRdsWorse <- totalRdsWorse + (curM - centroid) * (curM - centroid) * fct
+            let bR = if (totalCtBetter = 0.0) then 0.0 else totalRdsBetter / totalCtBetter
+            let wR = if (totalCtWorse = 0.0) then 0.0 else totalRdsWorse / totalCtWorse
+            (bR, wR)
 
 
 
@@ -348,17 +366,24 @@ module SorterFitness =
         let scv = stageCount |> StageCount.value |> float
         (scv) / (bestStage) |> Energy.fromFloat
 
+    let weighted (degree:Degree) 
+                 (stageWeight:StageWeight) 
+                 (wCt:SwitchCount)
+                 (tCt:StageCount) =
+        let wV = switchBased degree wCt
+                    |> Energy.value
+        let tV = stageBased degree tCt
+                    |> Energy.value
+        let tw = StageWeight.value stageWeight
+        ((wV + tV * tw) / (tw + 1.0)) |> Energy.fromFloat
+
 
     let fromSorterPerf (degree:Degree)  
                        (stageWeight:StageWeight) 
                        (perf:SortingEval.sorterPerf) =
         let pv =
-            let wV = switchBased degree perf.usedSwitchCount
-                        |> Energy.value
-            let tV = stageBased degree perf.usedStageCount
-                        |> Energy.value
-            let tw = StageWeight.value stageWeight
-            ((wV + tV * tw) / (tw + 1.0)) |> Energy.fromFloat
+            weighted degree stageWeight 
+                     perf.usedSwitchCount perf.usedStageCount
 
         match perf.successful with
         | Some v -> if v then pv else Energy.failure

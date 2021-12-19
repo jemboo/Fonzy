@@ -1,7 +1,5 @@
 ﻿namespace global
-open System.Collections.Generic
 open Microsoft.FSharp.Core
-open System
 open System.IO
 open Newtonsoft.Json
 
@@ -24,10 +22,26 @@ module FileUtils =
             | ex -> ("error in clearDirectory: " + ex.Message ) |> Result.Error
 
 
-    let getFilesInDirectory (fd:FileDir) ext =
+    let getFileNamesInDirectory (fd:FileDir) ext =
         try
             Directory.GetFiles((FileDir.value fd), ext) 
-            |> Array.map Path.GetFileName  |> Ok
+            |> Array.map (Path.GetFileNameWithoutExtension >> FileName.fromString)  |> Ok
+        with
+            | ex -> ("error in getFilesInDirectory: " + ex.Message ) |> Result.Error
+
+
+    let getFileNameWithExtInDirectory (fd:FileDir) ext =
+        try
+            Directory.GetFiles((FileDir.value fd), ext) 
+            |> Array.map (Path.GetFileName) |> Ok
+        with
+            | ex -> ("error in getFilesInDirectory: " + ex.Message ) |> Result.Error
+
+
+    let getFilePathsInDirectory (fd:FileDir) ext =
+        try
+            Directory.GetFiles((FileDir.value fd), ext) 
+            |> Array.map FilePath.fromString  |> Ok
         with
             | ex -> ("error in getFilesInDirectory: " + ex.Message ) |> Result.Error
 
@@ -44,8 +58,10 @@ module FileUtils =
 
     let readLines<'T> (fp:FilePath) = 
         try
-            System.IO.File.ReadAllLines (FilePath.value fp)
-                            |> Ok
+            System.IO.File.ReadLines (FilePath.value fp)
+            |> Ok
+            //System.IO.File.ReadAllLines (FilePath.value fp)
+            //                |> Ok
         with
             | ex -> ("error in readFile: " + ex.Message ) |> Result.Error
 

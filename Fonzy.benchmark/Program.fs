@@ -5,7 +5,7 @@ open BenchmarkDotNet.Running
 
 [<EntryPoint>]
 let main argv =
-
+    let textExt = FileExt.fromString ".txt"
     /// ******* ShcReport2_sortPerfBins***********
     //Console.WriteLine("Starting ShcReport2_sortPerfBins")
     //Console.WriteLine(sprintf "Started: %s "
@@ -19,12 +19,35 @@ let main argv =
  
     //0
 
-    ///// ******* ShcReport2_mergePerfBins***********
-    Console.WriteLine("Starting ShcReport2_mergePerfBins")
+    /////// ******* ShcReport2_mergePerfBins***********
+    //Console.WriteLine("Starting ShcReport2_mergePerfBins")
+    //Console.WriteLine(sprintf "Started: %s "
+    //                          (System.DateTime.Now.ToLongTimeString()))
+    //let res2 =  Reports.mergePerfBins 
+    //                    (FileDir.fromString "C:\\SimOutShc\\mergeTest")
+    //Console.WriteLine(res2)
+    //Console.WriteLine(sprintf "Finished: %s "
+    //                          (System.DateTime.Now.ToLongTimeString()))
+    //Console.Read() |> ignore
+ 
+    //0
+
+
+
+    ///// ******* ShcReport2_reportMergedBins ***********
+    Console.WriteLine("Starting ShcReport2_reportMergedBins")
     Console.WriteLine(sprintf "Started: %s "
                               (System.DateTime.Now.ToLongTimeString()))
-    let res2 =  Reports.mergePerfBins 
-                        (FileDir.fromString "C:\\SimOutShc\\waky2")
+    let reportDir = FileDir.fromString "C:\\SimOutShc\\mergeTest\\reports"
+    let reportFileName = FileName.fromString "0941168f-9dde-49de-b77c-ae08a6f3380d"
+    let pivotFileName = FileName.fromString "pivotFile2"
+    let reportPath = FilePath.fromParts reportDir reportFileName textExt
+                       |> Result.ExtractOrThrow
+    let pivotPath = FilePath.fromParts reportDir pivotFileName textExt
+                       |> Result.ExtractOrThrow
+    let res2 = Reports.reportMergedBins reportPath pivotPath
+                
+                        
     Console.WriteLine(res2)
     Console.WriteLine(sprintf "Finished: %s "
                               (System.DateTime.Now.ToLongTimeString()))

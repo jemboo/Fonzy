@@ -269,22 +269,11 @@ module SorterShc2Dto =
 
 
     let getPerfBinsTrial (dto:sorterShc2Dto) = 
-        result {
-            return! dto.perfBinsTrial 
-                       |> Array.map(SorterPerfBinDto.fromInts)
-                       |> Array.toList
-                       |> Result.sequence
-        }
+        dto.perfBinsTrial |> SorterPerfBinDto.fromIntArrays
 
 
     let getPerfBinsAccepted (dto:sorterShc2Dto) = 
-        result {
-            return! dto.perfBinsAccepted 
-                       |> Array.map(SorterPerfBinDto.fromInts)
-                       |> Array.toList
-                       |> Result.sequence
-        }
-
+        dto.perfBinsAccepted |> SorterPerfBinDto.fromIntArrays
 
 
 
@@ -305,6 +294,7 @@ type sorterShcMergedDto =
 
 
 module SorterShcMergedDto =
+
     let makeEmpty (sorterId:string) 
                   (generation:int)
                   (mut:string)
@@ -324,6 +314,103 @@ module SorterShcMergedDto =
             perfBinsCurrent = Array.empty
         }
 
+
+
+    let getPerfBinsTrial (dto:sorterShcMergedDto) = 
+        dto.perfBinsTrial |> SorterPerfBinDto.fromIntArrays
+
+
+    let getPerfBinsAccepted (dto:sorterShcMergedDto) = 
+        dto.perfBinsAccepted |> SorterPerfBinDto.fromIntArrays
+
+
+    let getPerfBinsCurrent (dto:sorterShcMergedDto) = 
+        dto.perfBinsCurrent |> SorterPerfBinDto.fromIntArrays
+
+
+    let pivotTableHdrs = "mergeCt\t srtrId\t gen\t mut\t temp\t degree\t genSpan\t" +
+                         "trlMinE\t trlMeanE\t trlMaxE\t trlStdE\t" +
+                         "accptMinE\t accptMeanE\t accptMaxE\t accptStdE\t" +
+                         "curMinE\t curMeanE\t curMaxE\t curStdE\t" +
+                         "trlMinW\t trlMeanW\t trlMaxW\t trlStdW\t" +
+                         "accptMinW\t accptMeanW\t accptMaxW\t accptStdW\t" +
+                         "curMinW\t curMeanW\t curMaxW\t curStdW\t" +
+                         "trlMinT\t trlMeanT\t trlMaxT\t trlStdT\t" +
+                         "accptMinT\t accptMeanT\t accptMaxT\t accptStdT\t" +
+                         "curMinT\t curMeanT\t curMaxT\t curStdT\t"
+
+
+    let toReport (energyF:SortingEval.sorterPerfBin->double) 
+                 (mDto:sorterShcMergedDto)  =
+
+        let _getSwitches (bin:SortingEval.sorterPerfBin) = 
+                bin.usedSwitchCount |> SwitchCount.value |> float
+        let _getStages (bin:SortingEval.sorterPerfBin) = 
+                bin.usedStageCount |> StageCount.value |> float
+
+        result {
+            let mergeCt = mDto.mergeCt |> string
+            let srtrId = mDto.sorterId
+            let gen = mDto.generation |> string
+            let mut = mDto.mut
+            let temp = mDto.temp
+            let degree = mDto.degree |> string
+            let genSpan = mDto.generationSpan |> string
+            let chunk1 = sprintf "%s\t%s\t%s\t%s\t%s\t%s\t%s" mergeCt srtrId gen mut temp degree genSpan
+
+            let! trialBins =  mDto |> getPerfBinsTrial
+            let! acceptedBins =  mDto |> getPerfBinsAccepted
+            let! currentBins =  mDto |> getPerfBinsCurrent
+
+
+            let trlMinE, trlMaxE, trlMeanE =  trialBins |> SortingEval.SorterPerfBin.getMinMaxMeanOfSuccessful energyF
+            let trlStdE = trialBins |> SortingEval.SorterPerfBin.getStdevOfSuccessful energyF trlMeanE
+            let chunk2 = sprintf "%s\t%s\t%s\t%s" (string trlMinE) (string trlMeanE) (string trlMaxE) (string trlStdE) 
+
+
+            let accptMinE, accptMaxE, accptMeanE =  acceptedBins |> SortingEval.SorterPerfBin.getMinMaxMeanOfSuccessful energyF
+            let accptStdE = acceptedBins |> SortingEval.SorterPerfBin.getStdevOfSuccessful energyF accptMeanE
+            let chunk3 = sprintf "%s\t%s\t%s\t%s" (string accptMinE) (string accptMeanE) (string accptMaxE) (string accptStdE)
+        
+
+            let curMinE, curMaxE, curMeanE =  currentBins |> SortingEval.SorterPerfBin.getMinMaxMeanOfSuccessful energyF
+            let curStdE = currentBins |> SortingEval.SorterPerfBin.getStdevOfSuccessful energyF curMeanE
+            let chunk4 = sprintf "%s\t%s\t%s\t%s" (string curMinE) (string curMeanE) (string curMaxE) (string curStdE)
+ 
+
+            let trlMinW, trlMaxW, trlMeanW =  trialBins |> SortingEval.SorterPerfBin.getMinMaxMeanOfSuccessful _getSwitches
+            let trlStdW = trialBins |> SortingEval.SorterPerfBin.getStdevOfSuccessful _getSwitches trlMeanW
+            let chunk5 = sprintf "%s\t%s\t%s\t%s" (string trlMinW) (string trlMeanW) (string trlMaxW) (string trlStdW)
+        
+
+            let accptMinW, accptMaxW, accptMeanW =  acceptedBins |> SortingEval.SorterPerfBin.getMinMaxMeanOfSuccessful _getSwitches
+            let accptStdW = acceptedBins |> SortingEval.SorterPerfBin.getStdevOfSuccessful _getSwitches accptMeanW
+            let chunk6 = sprintf "%s\t%s\t%s\t%s" (string accptMinW) (string accptMeanW) (string accptMaxW) (string accptStdW)
+        
+
+            let curMinW, curMaxW, curMeanW =  currentBins |> SortingEval.SorterPerfBin.getMinMaxMeanOfSuccessful _getSwitches
+            let curStdW = currentBins |> SortingEval.SorterPerfBin.getStdevOfSuccessful _getSwitches curMeanW
+            let chunk7 = sprintf "%s\t%s\t%s\t%s" (string curMinW) (string curMeanW) (string curMaxW) (string curStdW)
+        
+
+            let trlMinT, trlMaxT, trlMeanT =  trialBins |> SortingEval.SorterPerfBin.getMinMaxMeanOfSuccessful _getStages
+            let trlStdT = trialBins |> SortingEval.SorterPerfBin.getStdevOfSuccessful _getStages trlMeanT
+            let chunk8 = sprintf "%s\t%s\t%s\t%s" (string trlMinT) (string trlMeanT) (string trlMaxT) (string trlStdT)
+        
+
+            let accptMinT, accptMaxT, accptMeanT =  acceptedBins |> SortingEval.SorterPerfBin.getMinMaxMeanOfSuccessful _getStages
+            let accptStdT = acceptedBins |> SortingEval.SorterPerfBin.getStdevOfSuccessful _getStages accptMeanT
+            let chunk9 = sprintf "%s\t%s\t%s\t%s" (string accptMinT) (string accptMeanT) (string accptMaxT) (string accptStdT)
+        
+
+            let curMinT, curMaxT, curMeanT =  currentBins |> SortingEval.SorterPerfBin.getMinMaxMeanOfSuccessful _getStages
+            let curStdT = currentBins |> SortingEval.SorterPerfBin.getStdevOfSuccessful _getStages curMeanT
+            let chunk10 = sprintf "%s\t%s\t%s\t%s" (string curMinT) (string curMeanT) (string curMaxT) (string curStdT)
+
+
+            return sprintf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" 
+                            chunk1 chunk2 chunk3 chunk4 chunk5 chunk6 chunk7 chunk8 chunk9 chunk10
+        }
 
     let merge (a:sorterShc2Dto seq) =
         let allin = a |> Seq.toArray

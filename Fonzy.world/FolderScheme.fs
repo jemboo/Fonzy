@@ -100,7 +100,23 @@ module FileDtoStream =
                      descr = descr;
                      root = root;
                      meta = [|nameof sorterShc2Dto; descr; id |> string|];
-                     reader = Json.deserialize<sorterShc2Dto>  //fun _ -> "not implemented" |> Error;
+                     reader = Json.deserialize<sorterShc2Dto>
+                     writer = Json.serialize
+                }
+            let! res = makeFileHeader fdtos
+            return fdtos
+        }
+
+
+    let forSorterShcMergedDto (id:string) (descr:string) (root:FileDir) =
+        result {
+            let fdtos = 
+               {
+                     fileDtoStream.id = id;
+                     descr = descr;
+                     root = root;
+                     meta = [|nameof sorterShcMergedDto; descr; id |> string|];
+                     reader = Json.deserialize<sorterShcMergedDto>
                      writer = Json.serialize
                 }
             let! res = makeFileHeader fdtos
@@ -130,6 +146,27 @@ module FileDtoStream =
 
 
 
+    let openSorterShcMergedDto (descr:string) (fpath:FilePath) =
+
+        if (FilePath.exists fpath) then
+            result {
+                let! lines = FileUtils.readLines fpath
+                let! meta = lines |> Seq.head |> Json.deserialize<string[]>
+                return {
+                          fileDtoStream.id =  meta.[2];
+                          descr = meta.[1];
+                          root = fpath |> FilePath.toFileDir
+                          meta = meta;
+                          reader = Json.deserialize<sorterShcMergedDto>
+                          writer = Json.serialize
+                        }
+                 }
+            else
+              let fileName = fpath |> FilePath.toFileName
+              let fileDir = fpath |> FilePath.toFileDir
+              forSorterShcMergedDto (FileName.value fileName) descr fileDir
+
+
     let read (fdtos:fileDtoStream<'T>) =
         result {
             let! fpath = FilePath.fromParts fdtos.root 
@@ -144,26 +181,21 @@ module FileDtoStream =
         }
 
 
+    let read2 (resProc:'T->Result<string, string>) (fdtos:fileDtoStream<'T>) =
+        let _unPackRead res =
+            match res with
+            | Result.Ok t -> 
+                let procRes = resProc t
+                match procRes with
+                | Result.Ok gdRes -> gdRes
+                | Result.Error msg -> msg
+            | Result.Error msg -> msg
 
-//type folderScheme = { dir:FileDir; meta:string array; fileRecords: Map<string, Guid> }
-
-//module FolderScheme =
-
-//    let create (dir:FileDir) 
-//               (name:Guid) 
-//               (meta:string array) 
-//               (fileRecords:Map<string, Guid>) =
-//        result {
-//         let! folder = name |> string |> FileFolder.create ""
-//         let! fdir = dir |> FileDir.appendFolder folder
-//         let! metaFile = FileName.create "" "meta"
-//         let fext = (".txt" |> FileExt.fromString)
-//         let! metaPath = FilePath.appendFileName fdir metaFile fext
-//         let! res = FileUtils.makeFile metaPath (meta |> Json.serialize)
-//         return {
-//                folderScheme.dir = fdir;
-//                folderScheme.meta = [||];
-//                fileRecords = Map.empty;
-//            }
-//        }
-
+        result {
+            let! fpath = FilePath.fromParts fdtos.root 
+                                    (fdtos.id |> string |> FileName.fromString)
+                                    (".txt" |> FileExt.fromString)
+            let! lines = FileUtils.readLines fpath
+            return lines |> Seq.skip(1)
+                         |> Seq.map(fdtos.reader >> _unPackRead)
+        }

@@ -2,6 +2,7 @@
 open Microsoft.VisualStudio.TestTools.UnitTesting
 open Newtonsoft.Json
 open Microsoft.FSharpLu.Json
+open System
 
 [<TestClass>]
 type ShcDtoFixture () =
@@ -127,6 +128,34 @@ type ShcDtoFixture () =
 
 
 
+
+    [<TestMethod>]
+    member this.shcPivot () =
+        let degree = Degree.fromInt 12
+        let stageWeight = StageWeight.fromFloat 1.0
+        //[SwitchCount, StageCount, SorterCount, SuccessCount, FailCount]
+        let yab = 
+            {
+                sorterShcMergedDto.mergeCt = 1;
+                sorterShcMergedDto.sorterId = "sorterId";
+                sorterShcMergedDto.generation = 11;
+                sorterShcMergedDto.mut = "mut"
+                sorterShcMergedDto.temp = "temp"
+                sorterShcMergedDto.degree = 111;
+                sorterShcMergedDto.generationSpan = 1111;
+                sorterShcMergedDto.perfBinsTrial = [|[|0;0;10;10;0|]; [|100;50;1;1;0|]; |]
+                sorterShcMergedDto.perfBinsAccepted = [| [|0;0;10;10;0|]; [|100;50;1;1;0|]; |]
+                sorterShcMergedDto.perfBinsCurrent = [|[|0;0;10;10;0|]; [|100;50;1;1;0|]; |]
+            }
+
+        let energyF = fun (pb:SortingEval.sorterPerfBin) ->  
+            SorterFitness.weighted degree stageWeight pb.usedSwitchCount pb.usedStageCount
+            |> Energy.value
+
+        Console.WriteLine SorterShcMergedDto.pivotTableHdrs
+        Console.WriteLine (SorterShcMergedDto.toReport energyF yab |> Result.ExtractOrThrow)
+
+        Assert.AreEqual(1, 1);
 
 
 

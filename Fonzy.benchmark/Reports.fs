@@ -1,5 +1,6 @@
 ﻿namespace global
 open System
+open System.IO
 
 module Reports =
 
@@ -42,20 +43,23 @@ module Reports =
 
 
 
-
     let mergePerfBins (inputDir:FileDir) = 
 
-        let _getShcDtos (id:Guid) = 
-            let fpath = FilePath.fromParts 
-                                inputDir 
-                                (id |> string |> FileName.fromString) 
-                                (".txt" |> FileExt.fromString)
-                        |> Result.ExtractOrThrow
+        let _getShcDtos (fpath:FilePath) =
             let fileDtoStream = FileDtoStream.openSorterShc2Dto "" fpath
                                 |> Result.ExtractOrThrow
             let items = FileDtoStream.read fileDtoStream
                                 |> Result.ExtractOrThrow
             items |> List.toSeq
+
+
+        let _mergeShcDtos (shcDtos:sorterShc2Dto seq) =
+            let gps = shcDtos |> Seq.groupBy(fun dto ->  (dto.mut, dto.temp, dto.sorterId))
+            let merged = gps |> Seq.map(fun tup -> (snd tup) |> SorterShcMergedDto.merge)
+                             |> Seq.toList
+                             |> Result.sequence
+                             |> Result.ExtractOrThrow
+            merged
 
 
         let reportFolder = FileFolder.fromString "reports"
@@ -65,29 +69,55 @@ module Reports =
 
         let outPath = FilePath.fromParts 
                                 reportDir 
-                                (Guid.NewGuid() |> string |> FileName.fromString) 
+                                ("0941168f-9dde-49de-b77c-ae08a6f3380d"|> FileName.fromString) 
                                 (".txt" |> FileExt.fromString)
                       |> Result.ExtractOrThrow
 
 
-        let reportDataSource = new WorldStorageDirectory(inputDir) 
-                                    :> IWorldStorage
-        let repNames = reportDataSource.GetDataSourceIds()
-                      |> Result.ExtractOrThrow
+        let genFiles = FileUtils.getFilePathsInDirectory inputDir "*.txt"
+                       |> Result.ExtractOrThrow
+
+        
+        let mergedDtos = genFiles |> Seq.map(_getShcDtos >> _mergeShcDtos)
+
+        let fileDtoStream = FileDtoStream.openSorterShcMergedDto "" outPath
+                            |> Result.ExtractOrThrow
+
+        let res = mergedDtos |> Seq.map(fun dtos -> FileDtoStream.append dtos fileDtoStream)
+                             |> Seq.toList
+                             |> Result.sequence
+                             |> Result.ExtractOrThrow
+
+        "finished"
 
 
-        let wab = repNames |> Seq.map(_getShcDtos) |> Seq.concat |> Seq.map(string)
 
-        let merged = repNames |> Seq.map(_getShcDtos) |> Seq.concat |> Seq.groupBy(fun dto ->  (dto.sorterId, dto.generation))// (dto.mut, dto.temp, dto.sorterId, dto.generation))
-        let mfs = merged |> Seq.map(fun tup -> (snd tup) |> SorterShcMergedDto.merge)
-                         |> Seq.toList
-                         |> Result.sequence
-                         |> Result.ExtractOrThrow
-        let fms = mfs |> List.filter(fun m -> m.mergeCt > 1)
-        let ct = merged |> Seq.length
-        FileUtils.makeDirectory reportDir |> Result.ExtractOrThrow |> ignore
-        FileUtils.makeFileFromLines outPath wab
 
+    let reportMergedBins (reportPath:FilePath) 
+                         (pivotPath:FilePath) = 
+
+        let degree = Degree.fromInt 12
+        let stageWeight = StageWeight.fromFloat 1.0
+
+        let energyF = fun (pb:SortingEval.sorterPerfBin) ->  
+            SorterFitness.weighted degree stageWeight pb.usedSwitchCount pb.usedStageCount
+            |> Energy.value
+
+        let sorterShcRep (dto:sorterShcMergedDto) =
+            SorterShcMergedDto.toReport energyF dto
+
+        let reportDtoStream = FileDtoStream.openSorterShcMergedDto "" reportPath
+                            |> Result.ExtractOrThrow
+
+        let repSq = FileDtoStream.read2 sorterShcRep reportDtoStream
+                    |> Result.ExtractOrThrow
+
+        use sw = new StreamWriter(pivotPath |> FilePath.value , false)
+        fprintfn sw "%s" SorterShcMergedDto.pivotTableHdrs
+        repSq |> Seq.iter(fprintfn sw "%s")
+        sw.Dispose()
+
+        "finished"
 
 
     

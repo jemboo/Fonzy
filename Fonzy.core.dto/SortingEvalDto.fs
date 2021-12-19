@@ -61,6 +61,14 @@ module SorterPerfBinDto =
                 }
         }
 
+    let fromIntArrays (ias: int array array) =
+        result {
+            let! lst = ias |> Array.map(fromInts)
+                           |> Array.toList
+                           |> Result.sequence
+            return lst |> List.toSeq
+        }
+
 
     let toTup (dto:sorterPerfBinDto) =
         dto |> intVals |> fromInts

@@ -415,19 +415,6 @@ module IntSet =
     let isSorted (intSet:intSet) =
         Combinatorics.isSorted intSet.values
 
-    let sorted_O_1_Sequence (degree:Degree) 
-                            (onesCount:int) =
-        let totalSize = (Degree.value degree)
-        let numZeroes = totalSize - onesCount
-        { intSet.values = Array.init totalSize 
-                    (fun i -> if i< numZeroes then 0 else 1)}
-
-    //Returns a bloclLen + 1 length array of IntBits
-    // of all possible sorted 0-1 sequences of length degree
-    let sorted_0_1_Sequences (degree:Degree)  =
-        seq { for i = 0 to (Degree.value degree) do 
-                yield (sorted_O_1_Sequence degree i) }
-
 
     let fromInteger (len:int) (intVers:int) =
         let bitLoc (loc:int) (intBits:int) =

@@ -26,6 +26,7 @@ module Combinatorics =
                            (conj:array<int>) =
         composeMapIntArrays conj (composeMapIntArrays a (inverseMapArray conj) )
 
+
     let isSorted (values:int seq) =
         if values |> Seq.isEmpty then
             true

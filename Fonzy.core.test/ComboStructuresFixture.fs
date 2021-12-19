@@ -22,7 +22,7 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
-    member this.TestIdentityPermutation() =
+    member this.Permutation_Identity() =
       let expectedLen = (Degree.value TestData.degree)
       let expectedSum = ( expectedLen * (expectedLen - 1)) / 2
       let permutes = Permutation.identity  TestData.degree
@@ -31,7 +31,7 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
-    member this.powers() =
+    member this.Permutation_powers() =
         let maxPower = 20
         let arA = TestData.ComboStructures.permutation |> Permutation.powers maxPower
                     |> Seq.toArray
@@ -43,7 +43,7 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
-    member this.permPowerDist() =
+    member this.Permutation_PowerDist() =
         let maxPower = 2000
         let degree = Degree.fromInt 16
         let permCount = 100000
@@ -63,7 +63,7 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
-    member this.TestInversePermutation() =
+    member this.Permutation_Inverse() =
 
        let inv = Permutation.inverse TestData.ComboStructures.permutation
        let prod = Permutation.productR TestData.ComboStructures.permutation inv 
@@ -73,7 +73,7 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
-    member this.TestMakeMonoCycle() =
+    member this.TwoCyclePerm_makeMonoCycle() =
        let degree = Degree.create "" 6 |> Result.ExtractOrThrow
        let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
        let tcp = TwoCyclePerm.makeMonoCycle degree 2 3 |> Result.ExtractOrThrow
@@ -81,7 +81,7 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
-    member this.TestMakeAllMonoCycles() =
+    member this.TwoCyclePerm_MakeAllMonoCycles() =
        let degree = Degree.create "" 6 |> Result.ExtractOrThrow
        let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
        let tcA = TwoCyclePerm.makeAllMonoCycles degree |> Seq.toArray
@@ -92,22 +92,12 @@ type ComboStructuresFixture () =
           Assert.IsTrue(tcASq.[i])
 
 
-    [<TestMethod>]
-    member this.TestMakeMakeRandomFullPolyCycle() =
-       let degree = Degree.create "" 9 |> Result.ExtractOrThrow
-       let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
-       let id = TwoCyclePerm.identity degree
-       for i in {0 .. 20} do
-                let tcp = TwoCyclePerm.rndFullTwoCycle degree rnd
-                Assert.IsTrue(tcp |> TwoCyclePerm.toPermutation |> Permutation.isTwoCycle)
-
 
     [<TestMethod>]
-    member this.TestMakeMakeRandomPolyCycle() =
+    member this.TwoCyclePerm_rndTwoCycle() =
        let degree = Degree.create "" 9 |> Result.ExtractOrThrow
        let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424)
        let switchFreq = 0.5
-       let id = TwoCyclePerm.identity degree
        for i in {0 .. 20} do
                 let tcp = TwoCyclePerm.rndTwoCycle degree switchFreq rnd 
                 Assert.IsTrue(tcp |> TwoCyclePerm.toPermutation |> Permutation.isTwoCycle)
@@ -181,7 +171,7 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
-    member this.makeFromTupleSeq() =        
+    member this.TwoCyclePerm_makeFromTupleSeq() =        
         let rndy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let switchFreq = SwitchFrequency.fromFloat 0.5
         let degree = Degree.fromInt 16
@@ -192,7 +182,7 @@ type ComboStructuresFixture () =
 
 
     [<TestMethod>]
-    member this.IntBits_FromInteger() =
+    member this.BitSet_FromInteger() =
      let len = 6
      let expectedArray = [|1; 1; 1; 0; 1; 0|]
      let converted = BitSet.fromInteger 6 23
@@ -200,26 +190,20 @@ type ComboStructuresFixture () =
      
 
     [<TestMethod>]
-    member this.IntBits_FromAndToInteger() =
+    member this.BitSet_FromAndToInteger() =
      let testInt = 123456
      let converted = BitSet.fromInteger 32 testInt
      let intBack = BitSet.toInteger converted
      Assert.AreEqual (testInt, intBack)
 
     [<TestMethod>]
-    member this.trueBitCount64() =
+    member this.BitSet_trueBitCount64() =
         let gA = BitSet.create [|1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1|]
         let gB = BitSet.toUint64 gA
         let tc = ByteUtils.trueBitCount64 gB
         Assert.AreEqual(tc, 25)
 
 
-    [<TestMethod>]
-    member this.recordOn64() =
-        let degree = Degree.fromInt 7
-        let records = Record64Array.make degree
-        let ress = Record64Array.recordPosition records
-        Assert.AreEqual(1, 1)
 
 
     [<TestMethod>]
@@ -295,6 +279,15 @@ type ComboStructuresFixture () =
       let intBitsBack = Record64Array.toBitSets degree rec64Array
                         |> Seq.head
       Assert.AreEqual (intBits, intBitsBack)
+
+
+    [<TestMethod>]
+    member this.recordOn64() =
+        let degree = Degree.fromInt 7
+        let records = Record64Array.make degree
+        let ress = Record64Array.recordPosition records
+        Assert.AreEqual(1, 1)
+
 
 
     [<TestMethod>]

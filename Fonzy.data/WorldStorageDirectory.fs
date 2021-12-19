@@ -31,8 +31,8 @@ type WorldStorageDirectory(dirPath:FileDir) =
         member this.GetDataSourceIds() =
             result {
                 let! assure = this.AssureDirectory
-                let! files = FileUtils.getFilesInDirectory this.DirectoryPath "*.txt"
-                return  files |> Array.map(Path.GetFileNameWithoutExtension)
+                let! files = FileUtils.getFileNamesInDirectory this.DirectoryPath "*.txt"
+                return  files |> Array.map(FileName.value)
                               |> Array.map(GuidUtils.guidFromStringO)
                               |> Array.filter(Option.isSome)
                               |> Array.map(Option.get)

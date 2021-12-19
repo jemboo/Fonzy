@@ -194,11 +194,6 @@ module SorterShc =
                 return Energy.failure
         }
 
-    //let getEnergy (shc:sorterShc) = 
-    //    match shc.energy with
-    //    | Some r -> r |> Ok
-    //    | None -> Error "Energy missing"
-
     
     let isCurrentBest (shc:sorterShc) =
         match shc.energy, shc.bestEnergy  with
@@ -215,10 +210,3 @@ module SorterShc =
         | Some (Energy e) -> (shc |> isCurrentBest) && (shc.isNew) && (e < 0)
         | None -> true
 
-//let logPolicy0 (shc:sorterShc) =
-//    if shc.step |> StepNumber.value = 0 then
-//        true
-//    else
-//        match shc.energyDelta with
-//        | Some (Energy e) -> (shc |> isCurrentBest) && (shc.isNew) && (e < 0)
-//        | None -> true
