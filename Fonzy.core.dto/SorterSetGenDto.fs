@@ -1,6 +1,7 @@
 ﻿namespace global
 open System
 
+
 type sorterSetGenDto = {cat:string; value:string}
 
 module SorterSetGenDto =

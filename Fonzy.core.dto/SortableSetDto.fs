@@ -52,6 +52,11 @@ module SortableSetTypeDto =
     
     let rec toDto (sst:sortableSetType) =
          match sst with
+         | sortableSetType.BinaryMerge (degs, ssr) ->
+            let cereal = [| degs |> Seq.map(Degree.value) |> Seq.toArray |> Json.serialize;
+                            ssr |> SortableSetRepDto.toJson;|]
+            { cat = nameof sortableSetType.AllForDegree; 
+              value = cereal |> Json.serialize }
          | sortableSetType.AllForDegree ssr ->
             { cat = nameof sortableSetType.AllForDegree; 
               value = ssr |> SortableSetRepDto.toJson }
@@ -72,7 +77,16 @@ module SortableSetTypeDto =
 
 
     let rec fromDto (eDto:sortableSetTypeDto) =
-        if eDto.cat = nameof sortableSetType.AllForDegree then
+        if eDto.cat = nameof sortableSetType.BinaryMerge then
+            result {
+                let! pcs = eDto.value |> Json.deserialize<string[]>
+                let! degVs = pcs.[0] |> Json.deserialize<int[]>
+                let degs = degVs |> Array.map(Degree.fromInt)
+                                 |> Array.toList
+                let! ssr = pcs.[1] |> SortableSetRepDto.fromJson
+                return (degs, ssr) |> sortableSetType.BinaryMerge
+            }
+        else if eDto.cat = nameof sortableSetType.AllForDegree then
             result {
                 let! ssr = eDto.value |> SortableSetRepDto.fromJson
                 return ssr |> sortableSetType.AllForDegree
@@ -115,6 +129,7 @@ module SortableSetTypeDto =
             let! dto = cereal |> Json.deserialize<sortableSetTypeDto>
             return! dto |> fromDto
         }
+
 
 
 type sortableSetImplDto = {cat:string; value:string; degree:int}

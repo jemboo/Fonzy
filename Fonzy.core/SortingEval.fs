@@ -413,3 +413,15 @@ module SorterSaving =
         | Successful -> scs |> Array.filter(fun s -> 
                                s.perf |> SortingEval.SorterPerf.isSucessful)
         | Perf (sw, sc) -> getBest degree sw sc scs
+
+
+
+type sorterSetPerf = 
+        {
+            id:SorterSetId;
+            sorterRndGen: sorterRndGen;
+            rngGen: RngGen;
+            sorterCount:SorterCount;
+            sortableSetType:sortableSetType;
+            perfBins:SortingEval.sorterPerfBin array;
+        }

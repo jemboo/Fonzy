@@ -196,6 +196,7 @@ type ComboStructuresFixture () =
      let intBack = BitSet.toInteger converted
      Assert.AreEqual (testInt, intBack)
 
+    
     [<TestMethod>]
     member this.BitSet_trueBitCount64() =
         let gA = BitSet.create [|1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1;0;1;1;0;1|]
@@ -204,6 +205,43 @@ type ComboStructuresFixture () =
         Assert.AreEqual(tc, 25)
 
 
+
+    [<TestMethod>]
+    member this.BitSet_sorted_O_1_Sequence() =
+        let degree = Degree.fromInt 10
+        let block = BitSet.sorted_O_1_Sequence degree 7
+        let blockItems = block.values |> Array.toList
+        Assert.IsTrue(Combinatorics.isSorted blockItems)
+        Assert.IsTrue (blockItems.Length = (Degree.value degree))
+        
+
+    [<TestMethod>]
+    member this.BitSet_sorted_0_1_Sequences() =
+        let degree = Degree.fromInt 10
+        let block = BitSet.sorted_0_1_Sequences degree
+                    |> Seq.toArray
+        Assert.IsTrue (block.Length = (Degree.value degree) + 1)
+
+
+    [<TestMethod>]
+    member this.BitSet_comboStack() =
+        let blocksA = [| [|0;0;1|]; [|0;1;1|] |]
+                        |> Array.map(BitSet.create)
+        let blocksB = [| [|0;1|]; [|1;1|]; |]
+                        |> Array.map(BitSet.create)
+
+        let res = BitSet.comboStack (seq { blocksA; blocksB; } )
+                  |> Seq.toArray
+        Assert.AreEqual (res.Length, 4)
+
+
+    [<TestMethod>]
+    member this.BitSet_stackSortedBlocks() =
+        let degreeU = Degree.fromInt 4
+        let degreeL = Degree.fromInt 2
+        let res = BitSet.stackSortedBlocks [degreeU; degreeL]
+                  |> Seq.toArray
+        Assert.IsTrue (true)
 
 
     [<TestMethod>]

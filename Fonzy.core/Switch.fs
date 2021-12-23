@@ -8,7 +8,7 @@ module Switch =
         sprintf "(%d, %d)" sw.low sw.hi
 
     let switchMap = 
-        [for hi=0 to 64 do 
+        [for hi=0 to 128 do 
             for low=0 to hi do 
                 yield {Switch.low=low; Switch.hi=hi}]
 

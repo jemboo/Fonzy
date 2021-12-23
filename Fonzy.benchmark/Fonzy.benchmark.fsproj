@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Reports.fs" />
+    <Compile Include="PerfBinReports.fs" />
+    <Compile Include="ShcReports.fs" />
     <Compile Include="MakeCauseSpecs.fs" />
     <Compile Include="VecBench.fs" />
     <Compile Include="RunBatch.fs" />

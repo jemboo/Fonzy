@@ -134,22 +134,6 @@ type CombinatoricsFixture () =
             Assert.IsTrue(Combinatorics.isTwoCycle conj)
             i <- i+1
 
-
-    [<TestMethod>]
-    member this.sorted_O_1_Sequence() =
-        let degree = Degree.fromInt 10
-        let block = BitSet.sorted_O_1_Sequence degree 7
-        let blockItems = block.values |> Array.toList
-        Assert.IsTrue(Combinatorics.isSorted blockItems)
-        Assert.IsTrue (blockItems.Length = (Degree.value degree))
-        
-
-    [<TestMethod>]
-    member this.sorted_0_1_Sequences() =
-        let degree = Degree.fromInt 10
-        let block = BitSet.sorted_0_1_Sequences degree
-                    |> Seq.toArray
-        Assert.IsTrue (block.Length = (Degree.value degree) + 1)
         
 
     [<TestMethod>]

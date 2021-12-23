@@ -18,7 +18,7 @@ module RunBatch =
                     Console.WriteLine(string causeSpecDescr)
                     return! Runs.makeWorldFromCauseSpec
                                    (fun _ -> (fun _ -> ()) |> Ok)
-                                   outputDir
+                                   rootOutDir
                                    parentWorld
                                    causeSpec
                 }
@@ -111,7 +111,8 @@ module RunBatch =
                         |> ResultMap.procKeyedString "sorterRndGen" 
                                                      (SorterRndGenDto.fromJson)
 
-                let sorterRndGenRep = sorterRndGen |> SorterRndGen.reportString g
+                let sorterRndGenRep = sprintf "%s\t%s\t switch\t stage\t count" 
+                                        (sorterRndGen |> SorterRndGen.reportString) (g |> string)
                 return (sorterRndGenRep, sorterPerfBinsDto)
             }
 
@@ -129,7 +130,6 @@ module RunBatch =
         let formatPerfBinTotal (bt:(string*SortingEval.sorterPerfBin)*int) = 
             let sorterGenInfo, perfBin = fst bt
             let binCount = snd bt
-            //let perfBin = (fst >> snd) bt
             sprintf "%s\t%d\t%d\t%d" 
                         sorterGenInfo
                         (SwitchCount.value perfBin.usedSwitchCount) 
@@ -154,7 +154,7 @@ module RunBatch =
                                             (fst k, (snd k) |> Array.sumBy(snd)))
 
         let rep = perfBinTotals |> Array.map(formatPerfBinTotal)
-        let header = "Id Gen pfx len win degree switch stage count"
+        let header = sprintf "Id\t %s" SorterRndGen.reportHeaders
         let fileName = sprintf "%s.txt"  (System.DateTime.Now.Ticks |> string)
         let csvFile = { csvFile.header = header; 
                         csvFile.directory = reportDir;

@@ -26,22 +26,22 @@ module SorterPbCauseSpecGen =
 
     let sorterCountForDegree (degree:Degree) = 
         if (Degree.value degree) = 8 then
-             (SorterCount.fromInt 40000)
+             (SorterCount.fromInt 4000)
         elif (Degree.value degree) = 10 then
-             (SorterCount.fromInt 40000)
+             (SorterCount.fromInt 4000)
         elif (Degree.value degree) = 12 then
-             (SorterCount.fromInt 40000)
+             (SorterCount.fromInt 4000)
         elif (Degree.value degree) = 14 then
-             (SorterCount.fromInt 20000)
+             (SorterCount.fromInt 2000)
         elif (Degree.value degree) = 16 then
-             (SorterCount.fromInt 10000)
+             (SorterCount.fromInt 1000)
         elif (Degree.value degree) = 18 then
-             (SorterCount.fromInt 50000)
+             (SorterCount.fromInt 5000)
         elif (Degree.value degree) = 20 then
-             (SorterCount.fromInt 40000)
+             (SorterCount.fromInt 4000)
         elif (Degree.value degree) = 22 then
-             (SorterCount.fromInt 30000)
-        else (SorterCount.fromInt 20000)
+             (SorterCount.fromInt 3000)
+        else (SorterCount.fromInt 2000)
 
     let makeTriple (dex:int) 
                    (sorterRndGen:sorterRndGen)
@@ -82,10 +82,13 @@ module SorterPbCauseSpecGen =
                             resultsName
 
         let csGu = causeSpec.id |> CauseSpecId.value
+        let sorterGenInfo = sprintf "%s\t%s\t switch\t stage\t count" 
+                                (sorterRndGen |> SorterRndGen.reportString) (csGu |> string)
+
         let causeSpecDescr = sprintf "%d: Time: %s SorterGen: %s SorterCount: %d" 
                                 dex
                                 (System.DateTime.Now.ToLongTimeString())
-                                (sorterRndGen |> SorterRndGen.reportString csGu) 
+                                sorterGenInfo
                                 (SorterCount.value sorterCount)
 
         (causeSpecDescr, outputDir, causeSpec)
@@ -180,7 +183,7 @@ module SorterPbCauseSpecGen =
         degreesToTest |> Seq.map(
                     fun d -> tup900Stages (makeRandomStageSymSwitches d stageCount) 
                                           d
-                              |>  sorterRndGen.RandSymmetric)
+                              |>  sorterRndGen.RandRfl)
 
 
     let makeRandBuddies900 degreesToTest =

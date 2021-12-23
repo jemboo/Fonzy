@@ -166,7 +166,7 @@ type sorterRndGen =
     | RandSwitches of Switch list * SwitchCount * Degree
     | RandStages of Switch list  * StageCount * Degree
     | RandBuddies of Switch list  * StageCount * StageWindowSize * Degree 
-    | RandSymmetric of Switch list  * StageCount * Degree
+    | RandRfl of Switch list  * StageCount * Degree
     | RandRflBuddies of Switch list  * StageCount * StageWindowSize * Degree
 
 
@@ -177,7 +177,7 @@ module SorterRndGen =
         | RandSwitches (_, _, d) -> d
         | RandStages   (_, _, d) -> d
         | RandBuddies  (_, _, _, d) -> d
-        | RandSymmetric   (_, _, d) -> d
+        | RandRfl   (_, _, d) -> d
         | RandRflBuddies  (_, _, _, d) -> d
 
 
@@ -186,7 +186,7 @@ module SorterRndGen =
         | RandSwitches (swl, _, _) -> swl
         | RandStages   (swl, _, _) -> swl
         | RandBuddies  (swl, _, _, _) -> swl
-        | RandSymmetric   (swl, _, _) -> swl
+        | RandRfl   (swl, _, _) -> swl
         | RandRflBuddies  (swl, _, _, _) -> swl
 
 
@@ -195,46 +195,40 @@ module SorterRndGen =
         | RandSwitches (_, w, _) -> w
         | RandStages   (_, t, d) -> t |> StageCount.toSwitchCount d
         | RandBuddies  (_, t, _, d) -> t |> StageCount.toSwitchCount d
-        | RandSymmetric   (_, t, d) -> t |> StageCount.toSwitchCount d
+        | RandRfl   (_, t, d) -> t |> StageCount.toSwitchCount d
         | RandRflBuddies  (_, t, _, d) -> t |> StageCount.toSwitchCount d
 
-
-    let reportString (id:Guid)
-                     (sorterRndGen:sorterRndGen) =
+    let reportHeaders = "GenType\t pfxLen\t len\t win\t degree"
+    let reportString (sorterRndGen:sorterRndGen) =
 
         match sorterRndGen with
         | RandSwitches (pfxc, wc, d) ->   
-                sprintf "%s\tRandSwitches\t%s\t%d\t@\t%d"
-                            (id.ToString())
+                sprintf "RandSwitches\t %s\t %d\t @\t %d"
                             (pfxc.Length |> string)
                             (SwitchCount.value wc) 
                             (Degree.value d)
 
         | RandStages (pfxc, tc, d) -> 
-                sprintf "%s\tRandStages\t%s\t%d\t@\t%d"
-                            (id.ToString())
+                sprintf "RandStages\t %s\t %d\t @\t %d"
                             (pfxc.Length |> string)
                             (StageCount.value tc) 
                             (Degree.value d)
   
         | RandBuddies (pfxc, tc, wc, d) ->
-                sprintf "%s\tRandBuddies\t%s\t%d\t%d\t%d"
-                            (id.ToString())
+                sprintf "RandBuddies\t %s\t %d\t %d\t %d"
                             (pfxc.Length |> string)
                             (StageCount.value tc) 
                             (StageWindowSize.value wc)
                             (Degree.value d)
 
-        | RandSymmetric (pfxc, tc, d) ->
-                sprintf "%s\tRandSymmetric\t%s\t%d\t@\t%d"
-                            (id.ToString())
+        | RandRfl (pfxc, tc, d) ->
+                sprintf "RandRfl\t %s\t %d\t @\t %d"
                             (pfxc.Length |> string)
                             (StageCount.value tc) 
                             (Degree.value d)
 
         | RandRflBuddies (pfxc, tc, wc, d) ->
-                sprintf "%s\tRandSymmetricBuddies\t%s\t%d\t%d\t%d"
-                            (id.ToString())
+                sprintf "RandRflBuddies\t %s\t %d\t %d\t %d"
                             (pfxc.Length |> string)
                             (StageCount.value tc) 
                             (StageWindowSize.value wc)
@@ -399,7 +393,7 @@ module SorterRndGen =
                            windowSize
                            randy
 
-        | sorterRndGen.RandSymmetric (wPfx, stageCount, degree) ->
+        | sorterRndGen.RandRfl (wPfx, stageCount, degree) ->
             randomSymmetric 
                            degree
                            wPfx

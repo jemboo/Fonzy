@@ -66,7 +66,7 @@ module SortableSetId =
 module SwitchCount =
     let value (SwitchCount v) = v
     let create fieldName v = 
-        ConstrainedType.createInt fieldName SwitchCount 0 10000 v
+        ConstrainedType.createInt fieldName SwitchCount 0 100000 v
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let fromKey (m:Map<'a, obj>) (key:'a) =
         result {

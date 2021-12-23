@@ -33,7 +33,6 @@ module SorterPerfDto =
 type sorterPerfBinDto = int[]
 module SorterPerfBinDto =
     
-    
     let intVals (vv:sorterPerfBinDto)  = [|vv.[0];vv.[1];vv.[2];vv.[3];vv.[4];|]
 
     let toDto (spb:SortingEval.sorterPerfBin) =
@@ -94,7 +93,6 @@ module SorterPerfBinDto =
             let! dto = Json.deserialize<sorterPerfBinDto[]> json
             return! dto |> fromDtos
         }
-
 
 
 type sorterCoverageDto = {sorterId:Guid; 

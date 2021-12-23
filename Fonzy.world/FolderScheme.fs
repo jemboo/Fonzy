@@ -124,6 +124,22 @@ module FileDtoStream =
         }
 
 
+    let forSorterSetPerfDto (id:string) (descr:string) (root:FileDir) =
+        result {
+            let fdtos = 
+               {
+                     fileDtoStream.id = id;
+                     descr = descr;
+                     root = root;
+                     meta = [|nameof sorterSetPerfDto; descr; id |> string|];
+                     reader = Json.deserialize<sorterSetPerfDto>
+                     writer = Json.serialize
+                }
+            let! res = makeFileHeader fdtos
+            return fdtos
+        }
+
+
     let openSorterShc2Dto (descr:string) (fpath:FilePath) =
 
         if (FilePath.exists fpath) then
@@ -165,6 +181,29 @@ module FileDtoStream =
               let fileName = fpath |> FilePath.toFileName
               let fileDir = fpath |> FilePath.toFileDir
               forSorterShcMergedDto (FileName.value fileName) descr fileDir
+
+
+
+    let openSorterSetPerfDto (descr:string) (fpath:FilePath) =
+
+        if (FilePath.exists fpath) then
+            result {
+                let! lines = FileUtils.readLines fpath
+                let! meta = lines |> Seq.head |> Json.deserialize<string[]>
+                return {
+                          fileDtoStream.id =  meta.[2];
+                          descr = meta.[1];
+                          root = fpath |> FilePath.toFileDir
+                          meta = meta;
+                          reader = Json.deserialize<sorterSetPerfDto>
+                          writer = Json.serialize
+                        }
+                 }
+            else
+              let fileName = fpath |> FilePath.toFileName
+              let fileDir = fpath |> FilePath.toFileDir
+              forSorterSetPerfDto (FileName.value fileName) descr fileDir
+
 
 
     let read (fdtos:fileDtoStream<'T>) =

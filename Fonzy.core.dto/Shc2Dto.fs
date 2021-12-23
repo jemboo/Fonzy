@@ -328,6 +328,66 @@ module SorterShcMergedDto =
         dto.perfBinsCurrent |> SorterPerfBinDto.fromIntArrays
 
 
+    let merge (a:sorterShc2Dto seq) =
+        let allin = a |> Seq.toArray
+        let _toSorterPerf (dto:sorterShc2Dto) =
+            {
+                SortingEval.sorterPerf.usedSwitchCount = (SwitchCount.fromInt dto.switchesUsed)
+                SortingEval.sorterPerf.usedStageCount = (StageCount.fromInt dto.stagesUsed)
+                SortingEval.sorterPerf.successful = Some (dto.successful |> bool.Parse)
+
+            }
+
+        let _trialSorterPerfBins (dtos:sorterShc2Dto seq) =
+            result {
+                let! lols = dtos |> Seq.map(SorterShc2Dto.getPerfBinsTrial)
+                                |> Seq.toList
+                                |> Result.sequence
+
+                let mergedBins = lols |> Seq.concat
+                                      |> SortingEval.SorterPerfBin.merge
+                return mergedBins |> Seq.map(SorterPerfBinDto.toDto)
+                                  |> Seq.toArray
+            }
+   
+   
+        let _acceptedSorterPerfBins (dtos:sorterShc2Dto seq) =
+            result {
+                   let! lols = dtos |> Seq.map(SorterShc2Dto.getPerfBinsAccepted)
+                                   |> Seq.toList
+                                   |> Result.sequence
+
+                   let mergedBins = lols |> Seq.concat
+                                         |> SortingEval.SorterPerfBin.merge
+                   return mergedBins |> Seq.map(SorterPerfBinDto.toDto)
+                                     |> Seq.toArray
+               }
+
+
+        let perfBinsCurrent = allin |> Array.map (_toSorterPerf)
+                              |> SortingEval.SorterPerfBin.fromSorterPerfs
+
+        result {
+
+            let! acceptedBins =  _acceptedSorterPerfBins allin
+            let! trialBins = _trialSorterPerfBins allin
+        
+            return {
+                sorterShcMergedDto.mergeCt = allin.Length;
+                sorterId = allin.[0].sorterId;
+                generation = allin.[0].generation;
+                mut = allin.[0].mut;
+                temp = allin.[0].temp;
+                degree = allin.[0].degree;
+                generationSpan = allin.[0].generationSpan;
+                perfBinsTrial =  trialBins;
+                perfBinsAccepted = acceptedBins;
+                perfBinsCurrent = perfBinsCurrent |> SorterPerfBinDto.toDtos;
+            }
+         }
+
+
+
     let pivotTableHdrs = "mergeCt\t srtrId\t gen\t mut\t temp\t degree\t genSpan\t" +
                          "trlMinE\t trlMeanE\t trlMaxE\t trlStdE\t" +
                          "accptMinE\t accptMeanE\t accptMaxE\t accptStdE\t" +
@@ -412,61 +472,4 @@ module SorterShcMergedDto =
                             chunk1 chunk2 chunk3 chunk4 chunk5 chunk6 chunk7 chunk8 chunk9 chunk10
         }
 
-    let merge (a:sorterShc2Dto seq) =
-        let allin = a |> Seq.toArray
-        let _toSorterPerf (dto:sorterShc2Dto) =
-            {
-                SortingEval.sorterPerf.usedSwitchCount = (SwitchCount.fromInt dto.switchesUsed)
-                SortingEval.sorterPerf.usedStageCount = (StageCount.fromInt dto.stagesUsed)
-                SortingEval.sorterPerf.successful = Some (dto.successful |> bool.Parse)
-
-            }
-
-        let _trialSorterPerfBins (dtos:sorterShc2Dto seq) =
-            result {
-                let! lols = dtos |> Seq.map(SorterShc2Dto.getPerfBinsTrial)
-                                |> Seq.toList
-                                |> Result.sequence
-
-                let mergedBins = lols |> Seq.concat
-                                      |> SortingEval.SorterPerfBin.merge
-                return mergedBins |> Seq.map(SorterPerfBinDto.toDto)
-                                  |> Seq.toArray
-            }
-   
-   
-        let _acceptedSorterPerfBins (dtos:sorterShc2Dto seq) =
-            result {
-                   let! lols = dtos |> Seq.map(SorterShc2Dto.getPerfBinsAccepted)
-                                   |> Seq.toList
-                                   |> Result.sequence
-
-                   let mergedBins = lols |> Seq.concat
-                                         |> SortingEval.SorterPerfBin.merge
-                   return mergedBins |> Seq.map(SorterPerfBinDto.toDto)
-                                     |> Seq.toArray
-               }
-
-
-        let perfBinsCurrent = allin |> Array.map (_toSorterPerf)
-                              |> SortingEval.SorterPerfBin.fromSorterPerfs
-
-        result {
-
-            let! acceptedBins =  _acceptedSorterPerfBins allin
-            let! trialBins = _trialSorterPerfBins allin
-        
-            return {
-                sorterShcMergedDto.mergeCt = allin.Length;
-                sorterId = allin.[0].sorterId;
-                generation = allin.[0].generation;
-                mut = allin.[0].mut;
-                temp = allin.[0].temp;
-                degree = allin.[0].degree;
-                generationSpan = allin.[0].generationSpan;
-                perfBinsTrial =  trialBins;
-                perfBinsAccepted = acceptedBins;
-                perfBinsCurrent = perfBinsCurrent |> SorterPerfBinDto.toDtos;
-            }
-         }
 

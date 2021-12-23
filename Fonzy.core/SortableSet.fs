@@ -36,6 +36,7 @@ module SortableSetImpl =
 
 
 type sortableSetType = 
+    | BinaryMerge of (Degree list)*sortableSetRep
     | AllForDegree of sortableSetRep
     | Explicit of SortableSetId
     | Random of RngGen*SortableCount*sortableSetRep
@@ -44,6 +45,7 @@ type sortableSetType =
 module SortableSetType = 
     let getPrefix sst =
         match sst with
+        | sortableSetType.BinaryMerge (dlst, ssr) -> []
         | sortableSetType.AllForDegree ssr -> []
         | sortableSetType.Explicit  ssid -> []
         | sortableSetType.Random (r, sc, ssr) -> []

@@ -56,6 +56,20 @@ module SortableSetMaker =
         | sortableSetRep.Bp64 d -> 
             (bitsP64Set(), d) |> sortableSetImpl.Bp64
 
+    let binaryMerges (degs:Degree list) (ssr:sortableSetRep) = 
+        
+        let bitSet() = 
+            (BitSet.stackSortedBlocks degs)
+            |> Seq.toArray
+
+        match ssr with
+        | sortableSetRep.Binary d -> 
+            (bitSet(), d) |> sortableSetImpl.Binary
+        | sortableSetRep.Integer d -> 
+            (bitSet() |> Array.map(BitSet.toIntSet), d) |> sortableSetImpl.Integer
+        | sortableSetRep.Bp64 d -> 
+            (bitSet() |> BitsP64.fromBitSet |> Seq.toArray, d)  |> sortableSetImpl.Bp64
+
 
 
     let rec makeT (repo: (SortableSetId->sortableSetImpl) option) 
@@ -67,6 +81,9 @@ module SortableSetMaker =
             | None -> "repo missing" |> Error
 
         match ssType with
+        | sortableSetType.BinaryMerge (degs, ssr) ->
+            (binaryMerges degs ssr, {switchUses.weights = [||] })  |> Ok
+
         | sortableSetType.AllForDegree ssr -> 
                 (allZeroOnes ssr, {switchUses.weights = [||] }) |> Ok
         | sortableSetType.Explicit ssid ->
@@ -94,6 +111,8 @@ module SortableSetMaker =
             | Some f -> f ssid |> Ok
             | None -> "repo missing" |> Error
         match ssType with
+        | sortableSetType.BinaryMerge (degs, ssr) ->
+            binaryMerges degs ssr  |> Ok
         | sortableSetType.AllForDegree ssr -> 
                 allZeroOnes ssr |> Ok
         | sortableSetType.Explicit ssid ->
@@ -111,7 +130,6 @@ module SortableSetMaker =
             }
 
     let makeNoRepo (sortableSetType:sortableSetType) =
-        let yab = make None
         SortableSet.make (make None) sortableSetType
 
     let makeTNoRepo (sortableSetType:sortableSetType) =

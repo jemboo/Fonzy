@@ -2,7 +2,7 @@
 open System
 open System.IO
 
-module Reports =
+module ShcRep =
 
     let reportSwitchWeights (inputDir:FileDir) = 
         let _getSwitchWeights (id:Guid) = 
@@ -43,7 +43,7 @@ module Reports =
 
 
 
-    let mergePerfBins (inputDir:FileDir) = 
+    let mergePerfBinsForSorterShc2Dto (inputDir:FileDir) = 
 
         let _getShcDtos (fpath:FilePath) =
             let fileDtoStream = FileDtoStream.openSorterShc2Dto "" fpath
@@ -93,7 +93,8 @@ module Reports =
 
 
 
-    let reportMergedBins (reportPath:FilePath) 
+    let sorterShcMergedDtoToPivotTable 
+                         (reportPath:FilePath) 
                          (pivotPath:FilePath) = 
 
         let degree = Degree.fromInt 12
@@ -121,8 +122,7 @@ module Reports =
 
 
     
-    
-    let sortPerfBins (inputDir:FileDir) = 
+    let mergeShc2sByGeneration (inputDir:FileDir) = 
 
         let sortedFolder = FileFolder.fromString "sorted"
         let sortedDir = inputDir |> FileDir.appendFolder sortedFolder

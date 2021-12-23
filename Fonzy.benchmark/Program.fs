@@ -5,55 +5,84 @@ open BenchmarkDotNet.Running
 
 [<EntryPoint>]
 let main argv =
+
     let textExt = FileExt.fromString ".txt"
-    /// ******* ShcReport2_sortPerfBins***********
-    //Console.WriteLine("Starting ShcReport2_sortPerfBins")
+    
+    
+    ///// ******* makeSorterPerfBins***********
+    //Console.WriteLine("Starting makeSorterPerfBins")
+
     //Console.WriteLine(sprintf "Started: %s "
     //                          (System.DateTime.Now.ToLongTimeString()))
-    //let res2 =  Reports.sortPerfBins 
+
+    ///// ******* makeSorterPerfBins***********
+    //Console.WriteLine("Starting makeSorterPerfBins")
+    //Console.WriteLine(sprintf "Started: %s "
+    //                          (System.DateTime.Now.ToLongTimeString()))
+    //let res2 =  PerfBinRep.makeSorterPerfBins 
+    //                    (FileDir.fromString "C:\\SimOut5")
+    //                    (RandomSeed.fromNow ())
+
+    //Console.WriteLine(res2)
+
+ 
+
+
+
+    ///// ******* reportSorterPerfBins***********
+    Console.WriteLine("Starting reportSorterPerfBins")
+
+
+    let sourceDir = (FileDir.fromString "C:\\SimOut_64")
+    let mergeDir = sourceDir |> FileDir.appendFolder (FileFolder.fromString "reports") 
+                             |> Result.ExtractOrThrow
+    let res = FileUtils.makeDirectory mergeDir |> Result.ExtractOrThrow
+
+    let mergeFileName = FileName.fromString (Guid.NewGuid() |> string)
+    let mergePath = FilePath.fromParts mergeDir mergeFileName textExt
+                    |> Result.ExtractOrThrow
+    let res2 =  PerfBinRep.reportSorterPerfBins 
+                        sourceDir
+                        mergePath
+
+    Console.WriteLine(res2)
+    
+
+    //let textExt = FileExt.fromString ".txt"
+    /// ******* ShcReport2_sorterShcMergedDtoToPivotTable***********
+    //Console.WriteLine("Starting ShcReport2_")
+    //Console.WriteLine(sprintf "Started: %s "
+    //                          (System.DateTime.Now.ToLongTimeString()))
+    //let res2 =  Reports.sorterShcMergedDtoToPivotTable 
     //                    (FileDir.fromString "C:\\SimOutShc\\waky")
     //Console.WriteLine(res2)
-    //Console.WriteLine(sprintf "Finished: %s "
-    //                          (System.DateTime.Now.ToLongTimeString()))
-    //Console.Read() |> ignore
- 
-    //0
 
-    /////// ******* ShcReport2_mergePerfBins***********
-    //Console.WriteLine("Starting ShcReport2_mergePerfBins")
+
+    /////// ******* ShcReport2_mergeShc2sByGeneration***********
+    //Console.WriteLine("Starting ShcReport2_mergeShc2sByGeneration")
     //Console.WriteLine(sprintf "Started: %s "
     //                          (System.DateTime.Now.ToLongTimeString()))
-    //let res2 =  Reports.mergePerfBins 
+    //let res2 =  Reports.mergeShc2sByGeneration 
     //                    (FileDir.fromString "C:\\SimOutShc\\mergeTest")
     //Console.WriteLine(res2)
-    //Console.WriteLine(sprintf "Finished: %s "
-    //                          (System.DateTime.Now.ToLongTimeString()))
-    //Console.Read() |> ignore
- 
-    //0
 
 
 
     ///// ******* ShcReport2_reportMergedBins ***********
-    Console.WriteLine("Starting ShcReport2_reportMergedBins")
-    Console.WriteLine(sprintf "Started: %s "
-                              (System.DateTime.Now.ToLongTimeString()))
-    let reportDir = FileDir.fromString "C:\\SimOutShc\\mergeTest\\reports"
-    let reportFileName = FileName.fromString "0941168f-9dde-49de-b77c-ae08a6f3380d"
-    let pivotFileName = FileName.fromString "pivotFile2"
-    let reportPath = FilePath.fromParts reportDir reportFileName textExt
-                       |> Result.ExtractOrThrow
-    let pivotPath = FilePath.fromParts reportDir pivotFileName textExt
-                       |> Result.ExtractOrThrow
-    let res2 = Reports.reportMergedBins reportPath pivotPath
+    //Console.WriteLine("Starting ShcReport2_reportMergedBins")
+    //Console.WriteLine(sprintf "Started: %s "
+    //                          (System.DateTime.Now.ToLongTimeString()))
+    //let reportDir = FileDir.fromString "C:\\SimOutShc\\mergeTest\\reports"
+    //let reportFileName = FileName.fromString "0941168f-9dde-49de-b77c-ae08a6f3380d"
+    //let pivotFileName = FileName.fromString "pivotFile2"
+    //let reportPath = FilePath.fromParts reportDir reportFileName textExt
+    //                   |> Result.ExtractOrThrow
+    //let pivotPath = FilePath.fromParts reportDir pivotFileName textExt
+    //                   |> Result.ExtractOrThrow
+    //let res2 = Reports.reportMergedBins reportPath pivotPath
                 
                         
-    Console.WriteLine(res2)
-    Console.WriteLine(sprintf "Finished: %s "
-                              (System.DateTime.Now.ToLongTimeString()))
-    Console.Read() |> ignore
- 
-    0
+    //Console.WriteLine(res2)
 
 
 
@@ -64,11 +93,6 @@ let main argv =
     //let res2 =  Reports.reportSwitchWeights 
     //                    (FileDir.fromString "C:\\SimOutShc\\waky")
     //Console.WriteLine(res2)
-    //Console.WriteLine(sprintf "Finished: %s "
-    //                          (System.DateTime.Now.ToLongTimeString()))
-    //Console.Read() |> ignore
- 
-    //0
 
 
 
@@ -78,11 +102,6 @@ let main argv =
     //                       (FileDir.fromString "C:\\SimOutShc")
     //                       (RandomSeed.fromNow ())
     //                     |> ignore
-
-    //Console.WriteLine(sprintf "Finished: %s " 
-    //                             (System.DateTime.Now.ToLongTimeString()))
-    //Console.Read() |> ignore
-    //0
 
 
 
@@ -94,11 +113,6 @@ let main argv =
     //                       0
     //                     |> ignore
 
-    //Console.WriteLine(sprintf "Finished: %s " 
-    //                             (System.DateTime.Now.ToLongTimeString()))
-    //Console.Read() |> ignore
-    //0
-
 
 
     // ******* RunBatch.runShcSets ***********
@@ -108,11 +122,6 @@ let main argv =
     //                            (RandomSeed.fromNow ())
     //                            0
     //                     |> ignore
-
-    //Console.WriteLine(sprintf "Finished: %s " 
-    //                             (System.DateTime.Now.ToLongTimeString()))
-    //Console.Read() |> ignore
-    //0
 
 
 
@@ -124,11 +133,6 @@ let main argv =
     //                    (FileDir.fromString "C:\\SimOutShc\\16w_pfx24_1M") 
     //                    (FileDir.fromString "C:\\SimOutReportsT")
     //Console.WriteLine(res2)
-    //Console.WriteLine(sprintf "Finished: %s "
-    //                          (System.DateTime.Now.ToLongTimeString()))
-    //Console.Read() |> ignore
-    //0
-
 
 
 
@@ -139,8 +143,7 @@ let main argv =
     //                            (RandomSeed.fromNow ())
     //                            0
     //                             |> ignore
-    //Console.Read() |> ignore
-    //0
+
 
 
 
@@ -151,8 +154,7 @@ let main argv =
     //                    (FileDir.fromString "C:\\SimOutT") 
     //                    (FileDir.fromString "C:\\SimOutReportsT")
     //Console.WriteLine(res2)
-    //Console.Read() |> ignore
-    //0
+
 
 
 
@@ -161,8 +163,7 @@ let main argv =
 //    Console.WriteLine("Starting Benchmark.main")
 //    let summary = BenchmarkRunner.Run<BenchmarkSorterSetOnBp64>()
 //    printfn "%A" summary
-//    Console.Read() |> ignore
-//    0
+
 
 
 
@@ -173,5 +174,10 @@ let main argv =
     //                    (FileDir.fromString "C:\\SimOut") 
     //                    (FileDir.fromString "C:\\SimOutT")
     //Console.WriteLine(res2)
-    //Console.Read() |> ignore
-    //0
+
+
+    Console.WriteLine(sprintf "Finished: %s "
+                            (System.DateTime.Now.ToLongTimeString()))
+ 
+    Console.Read() |> ignore
+    0

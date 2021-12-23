@@ -23,6 +23,11 @@ module Degree =
     let maxSwitchesPerStage (degree:Degree) =
         (value degree) / 2
 
+    let add (degs:Degree seq) = 
+        degs |> Seq.map(value) 
+             |> Seq.reduce(+)
+             |> fromInt
+
 
 type MutationRate = private MutationRate of float
 module MutationRate =

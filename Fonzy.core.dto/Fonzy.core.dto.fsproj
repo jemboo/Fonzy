@@ -19,6 +19,7 @@
     <Compile Include="SortingEvalDto.fs" />
     <Compile Include="SorterGenDto.fs" />
     <Compile Include="SorterSetGenDto.fs" />
+    <Compile Include="SorterSetPerfDto.fs" />
     <Compile Include="ShcDto.fs" />
     <Compile Include="Shc2Dto.fs" />
     <Compile Include="SorterGaDto.fs" />

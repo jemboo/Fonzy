@@ -519,12 +519,33 @@ module BitSet =
                 yield (sorted_O_1_Sequence degree i) }
 
 
+    let stack (lowTohi: bitSet seq) =
+        lowTohi |> Seq.map(fun bs->bs.values)
+                |> Seq.concat
+                |> Seq.toArray
+                |> create
+
+    let comboStack (subSeqs: bitSet[] seq) =
+        let rec _cart LL =
+            match LL with
+            | [] -> Seq.singleton []
+            | L::Ls -> seq {for x in L do for xs in _cart Ls -> x::xs}
+        _cart (subSeqs |> Seq.toList) |> Seq.map(stack)
+
+
+    let stackSortedBlocks (blockSizes:Degree seq) =
+        blockSizes |> Seq.map(sorted_0_1_Sequences >> Seq.toArray)
+                   |> comboStack
+
+
     let fromInteger (len:int) (intVers:int) =
         let bitLoc (loc:int) (intBits:int) =
             if (((1 <<< loc) &&& intBits) <> 0) then 1 else 0
         { bitSet.values = 
                     Array.init len 
                                (fun i -> bitLoc i intVers) }
+
+
 
     let toInteger (arrayVers:bitSet) =
         let mutable intRet = 0
