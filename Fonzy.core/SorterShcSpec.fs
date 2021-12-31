@@ -80,7 +80,12 @@ module SorterShcSpec =
             fun (shcCurrent:sorterShc) -> 
             result {
                 let randy = shcCurrent.rngGen |> Rando.fromRngGen
-                let sorterMut = SorterMutate.mutate smt randy shcCurrent.sorter
+                let chopGuard = Math.Max((shcCurrent.lastSwitchUsed |> SwitchCount.value) + 1, 
+                                          1000)
+                let chopLength = Math.Max(chopGuard, 8000 - ((StepNumber.value shcCurrent.step) % 10000)) 
+                let newLength = Math.Min(shcCurrent.sorter.switchCount |> SwitchCount.value, chopLength) |> SwitchCount.fromInt
+                let! trimmedSorter = shcCurrent.sorter |> Sorter.trimLength true newLength
+                let sorterMut = SorterMutate.mutate smt randy trimmedSorter
                 return {
                     sorterShc.step = shcCurrent.step |> StepNumber.increment;
                     isNew = true;
@@ -93,8 +98,10 @@ module SorterShcSpec =
                     energy = None;
                     energyDelta = None;
                     bestEnergy = None;
+                    lastSwitchUsed = shcCurrent.lastSwitchUsed
                 }
             }
+
 
     let makeLogger (saveDetails:shcSaveDetails) =
         fun (arch:sorterShcArch list) 

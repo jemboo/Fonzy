@@ -55,7 +55,7 @@ module SortableSetTypeDto =
          | sortableSetType.BinaryMerge (degs, ssr) ->
             let cereal = [| degs |> Seq.map(Degree.value) |> Seq.toArray |> Json.serialize;
                             ssr |> SortableSetRepDto.toJson;|]
-            { cat = nameof sortableSetType.AllForDegree; 
+            { cat = nameof sortableSetType.BinaryMerge; 
               value = cereal |> Json.serialize }
          | sortableSetType.AllForDegree ssr ->
             { cat = nameof sortableSetType.AllForDegree; 

@@ -43,7 +43,8 @@ module ShcRep =
 
 
 
-    let mergePerfBinsForSorterShc2Dto (inputDir:FileDir) = 
+    let mergePerfBinsForSorterShc2Dto (inputDir:FileDir)
+                                      (mergePath:FilePath) = 
 
         let _getShcDtos (fpath:FilePath) =
             let fileDtoStream = FileDtoStream.openSorterShc2Dto "" fpath
@@ -54,24 +55,12 @@ module ShcRep =
 
 
         let _mergeShcDtos (shcDtos:sorterShc2Dto seq) =
-            let gps = shcDtos |> Seq.groupBy(fun dto ->  (dto.mut, dto.temp, dto.sorterId))
+            let gps = shcDtos |> Seq.groupBy(fun dto ->  (dto.generation, dto.shcId))
             let merged = gps |> Seq.map(fun tup -> (snd tup) |> SorterShcMergedDto.merge)
                              |> Seq.toList
                              |> Result.sequence
                              |> Result.ExtractOrThrow
             merged
-
-
-        let reportFolder = FileFolder.fromString "reports"
-        let reportDir = inputDir |> FileDir.appendFolder reportFolder
-                                 |> Result.ExtractOrThrow
-
-
-        let outPath = FilePath.fromParts 
-                                reportDir 
-                                ("0941168f-9dde-49de-b77c-ae08a6f3380d"|> FileName.fromString) 
-                                (".txt" |> FileExt.fromString)
-                      |> Result.ExtractOrThrow
 
 
         let genFiles = FileUtils.getFilePathsInDirectory inputDir "*.txt"
@@ -80,7 +69,7 @@ module ShcRep =
         
         let mergedDtos = genFiles |> Seq.map(_getShcDtos >> _mergeShcDtos)
 
-        let fileDtoStream = FileDtoStream.openSorterShcMergedDto "" outPath
+        let fileDtoStream = FileDtoStream.openSorterShcMergedDto "" mergePath
                             |> Result.ExtractOrThrow
 
         let res = mergedDtos |> Seq.map(fun dtos -> FileDtoStream.append dtos fileDtoStream)
@@ -94,10 +83,10 @@ module ShcRep =
 
 
     let sorterShcMergedDtoToPivotTable 
+                         (degree:Degree)
                          (reportPath:FilePath) 
                          (pivotPath:FilePath) = 
 
-        let degree = Degree.fromInt 12
         let stageWeight = StageWeight.fromFloat 1.0
 
         let energyF = fun (pb:SortingEval.sorterPerfBin) ->  
@@ -113,7 +102,7 @@ module ShcRep =
         let repSq = FileDtoStream.read2 sorterShcRep reportDtoStream
                     |> Result.ExtractOrThrow
 
-        use sw = new StreamWriter(pivotPath |> FilePath.value , false)
+        use sw = new StreamWriter(pivotPath |> FilePath.value, false)
         fprintfn sw "%s" SorterShcMergedDto.pivotTableHdrs
         repSq |> Seq.iter(fprintfn sw "%s")
         sw.Dispose()

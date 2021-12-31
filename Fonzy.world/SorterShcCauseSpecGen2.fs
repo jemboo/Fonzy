@@ -63,19 +63,22 @@ module SorterShcCauseSpecGen2 =
                     (startingTemp:Temp)
                     (mutRate:MutationRate)
                     (totSteps: StepNumber)
-                    (degree:Degree)
+                    (fullDegree:Degree)
+                    (halfDegree:Degree)
                     (dispSorter:sorter)
                     (dispRngGen:RngGen) 
                     (swPfx:Switch list) = 
 
         let stageW = StageWeight.fromFloat 1.0
 
-        let srtbleSetTypeB = sortableSetType.AllForDegree 
-                                (sortableSetRep.Bp64 degree)
+        //let srtbleSetTypeB = sortableSetType.AllForDegree 
+        //                        (sortableSetRep.Bp64 fullDegree)
+        //let srtbleSetType = sortableSetType.SwitchReduced 
+        //                        (srtbleSetTypeB, swPfx)
 
-
-        let srtbleSetType = sortableSetType.SwitchReduced 
-                                (srtbleSetTypeB, swPfx)
+        let srtbleSetType = sortableSetType.BinaryMerge 
+                                ([halfDegree; halfDegree;], 
+                                sortableSetRep.Binary fullDegree)
 
         let swPfxCt = SwitchCount.fromInt (srtbleSetType |> SortableSetType.getPrefix).Length  
         let mutSpec = (swPfxCt, mutRate) |> sorterMutType.BySwitch
@@ -84,7 +87,7 @@ module SorterShcCauseSpecGen2 =
         let swS = sorterStageWeightSpec.Constant stageW
         let evl = sorterEvalSpec.PerfBin
         let ann = annealerSpec.Constant startingTemp
-        let ticsPerLog = 40.0
+        let ticsPerLog = 50.0
         let updt = shcSaveDetails.ForSteps (StepNumber.logReporting totSteps ticsPerLog)
         let term = shcTermSpec.FixedLength totSteps
         {
@@ -105,10 +108,15 @@ module SorterShcCauseSpecGen2 =
     let makeRng (randy:IRando) =
         randy.NextPositiveInt |> RandomSeed.fromInt |> RngGen.createLcg
 
-    let seqConfigs () = // [0.09; 0.07; 0.05; 0.04; 0.035; 0.03; 0.0275; 0.025; 0.0225; 0.02; 0.0175; 0.015; 0.013; 0.012; 0.011; 0.01; 0.008; 0.006; 0.004; 0.002; 0.0]
-        let temps = [0.09; 0.07; 0.05; 0.04; 0.035; 0.03; 0.0275; 0.025; 0.0225; 0.02; 0.0175; 0.015; 0.013; 0.012; 0.011; 0.01; 0.008; 0.006; 0.004; 0.002; 0.0]
+    let seqConfigs () = 
+        let temps = [0.01; 0.005; 0.004; 0.003; 0.002; 0.001; 0.00;]
                     |> List.map(Temp.fromFloat)
-        let muts = [0.0175; 0.02;] |> List.map(MutationRate.fromFloat)
+        let muts = [0.004; 0.008; 0.012; 0.016; 0.020;] |> List.map(MutationRate.fromFloat)
+    
+    // [0.09; 0.07; 0.05; 0.04; 0.035; 0.03; 0.0275; 0.025; 0.0225; 0.02; 0.0175; 0.015; 0.013; 0.012; 0.011; 0.01; 0.008; 0.006; 0.004; 0.002; 0.0]
+        //let temps = [0.09; 0.07; 0.05; 0.04; 0.035; 0.03; 0.0275; 0.025; 0.0225; 0.02; 0.0175; 0.015; 0.013; 0.012; 0.011; 0.01; 0.008; 0.006; 0.004; 0.002; 0.0]
+        //            |> List.map(Temp.fromFloat)
+        //let muts = [0.0175; 0.02;] |> List.map(MutationRate.fromFloat)
        // let muts = [0.015; 0.0175; 0.02; 0.0225; 0.025; ] |> List.map(MutationRate.fromFloat)
 
         seq { for t in temps do 
@@ -119,15 +127,16 @@ module SorterShcCauseSpecGen2 =
     let makeRunBatchSeq2 (outputDir:FileDir) 
                          (seed:RandomSeed) =
 
-        let degree = Degree.fromInt 16
-        let shcCt = ShcCount.fromInt 25
-        let sorterCt = SorterCount.fromInt 25
-        let steps = StepNumber.fromInt 200000
+        let fullDegree = Degree.fromInt 32
+        let halfDegree = Degree.fromInt 16
+        let shcCt = ShcCount.fromInt 1
+        let sorterCt = SorterCount.fromInt 1
+        let steps = StepNumber.fromInt 2000000
         let seedS = (904877) |> RandomSeed.fromInt
 
-        let refSorter = RefSorter.goodRefSorterForDegree degree |> Result.ExtractOrThrow
-        let swPfx = refSorter |> Sorter.getSwitchPrefix (StageCount.fromInt 3)
-                              |> Seq.toList
+        //let refSorter = RefSorter.goodRefSorterForDegree fullDegree |> Result.ExtractOrThrow
+        //let swPfx = refSorter |> Sorter.getSwitchPrefix (StageCount.fromInt 3)
+        //                      |> Seq.toList
 
         //let swPfx2 = Switch.makeAltEvenOdd degree (StageCount.fromInt 1)
         //            |> Result.ExtractOrThrow
@@ -142,7 +151,7 @@ module SorterShcCauseSpecGen2 =
 
         //let sRndGen = sorterRndGen.RandSymmetric
         //                            (swPfxNone,
-        //                            (StageCount.degreeTo999StageCount degree),
+        //                            (StageCount.degreeTo999StageCount fullDegree),
         //                             degree)
     
         //let dispSorter = SorterRndGen.createRandom 
@@ -156,10 +165,10 @@ module SorterShcCauseSpecGen2 =
 
 
 
-        //let sRndGen = sorterRndGen.RandStages
-        //                            (swPfxNone,
-        //                            (StageCount.degreeTo999StageCount degree),
-        //                             degree)
+        let sRndGen = sorterRndGen.RandRfl
+                                    ([],
+                                    (StageCount.degreeTo999StageCount fullDegree),
+                                     fullDegree)
     
         //let dispSorter = SorterRndGen.createRandom 
         //                        sRndGen 
@@ -170,10 +179,10 @@ module SorterShcCauseSpecGen2 =
         //let sssrgT = sssrgType.Sorters ssGen
 
 
-        let sRndGen = sorterRndGen.RandSwitches
-                                    (swPfx,
-                                    (SwitchCount.degreeTo999SwitchCount degree),
-                                     degree)
+        //let sRndGen = sorterRndGen.RandSwitches
+        //                            ([],
+        //                            (SwitchCount.fromInt 8000),
+        //                             fullDegree)
     
         let dispSorter = SorterRndGen.createRandom 
                                 sRndGen 
@@ -182,8 +191,6 @@ module SorterShcCauseSpecGen2 =
 
         let ssGen = sorterSetGen.Rnd (sRndGen, rngS, sorterCt)
         let sssrgT = sssrgType.Sorters ssGen
-
-
 
 
         let sorterShcSpecRndGens = 
@@ -196,7 +203,10 @@ module SorterShcCauseSpecGen2 =
                                 (snd tup)
                                 (fst tup)
                                 steps
-                                degree dispSorter rng swPfx; 
+                                fullDegree
+                                halfDegree
+                                dispSorter 
+                                rng []; 
                           sssrgType = sssrgT;
                           count = shcCt;
                           rndGen = makeRng(randy) 

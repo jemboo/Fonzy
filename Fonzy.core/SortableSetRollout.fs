@@ -97,13 +97,11 @@ module IntSetsRollout =
     let intSetHist (intsRollout:intSetsRollout) =
         intsRollout |> toIntSet
                     |> Seq.countBy id
-                    |> Seq.toArray
 
     
     let removeDupes (intsRollout:intSetsRollout) =
         intsRollout |> toIntSet
                     |> Seq.distinct
-                    |> Seq.toArray
 
 
 
@@ -191,6 +189,11 @@ module BP64SetsRollout =
         records |> Record64Array.toBitSets bP64Roll.degree
 
 
+    let uniqueUnsortedCount (bP64Roll:bP64SetsRollout) =
+        bP64Roll |> removeDupes 
+                 |> Seq.filter(fun bs -> not (BitSet.isSorted(bs)))
+                 |> Seq.length
+
 
 module SortableSetRollout =
 
@@ -233,10 +236,11 @@ module SortableSetRollout =
             }
 
 
-    //let toIntBits (sortableRollout:sortableSetRollout) =
-    //    match sortableRollout with
-    //    | Int  isr ->    isr |> IntSetsRollout.toIntSet
-    //    | Bp64  bp64r -> bp64r |> BP64SetsRollout.toBitSet
+    let toIntSet (sortableRollout:sortableSetRollout) =
+        match sortableRollout with
+        | Int  isr ->    isr |> IntSetsRollout.toIntSet
+        | Bp64  bp64r -> bp64r |> BP64SetsRollout.toBitSet 
+                               |> Seq.map(BitSet.toIntSet)
 
 
     //let intBitsHist (sortableRollout:sortableSetRollout) =
@@ -251,7 +255,7 @@ module SortableSetRollout =
         | Int  isr ->   
             result {
                let! irDedup = isr |> IntSetsRollout.removeDupes
-                                  |> Array.map(fun ia->ia.values)
+                                  |> Seq.map(fun ia->ia.values)
                                   |> IntSetsRollout.fromIntArrays degree
                return sortableSetRollout.Int irDedup
             }

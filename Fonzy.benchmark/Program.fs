@@ -8,7 +8,11 @@ let main argv =
 
     let textExt = FileExt.fromString ".txt"
     
-    
+    /// ************************************************
+    ///      PerfBins
+    /// ************************************************
+
+
     ///// ******* makeSorterPerfBins***********
     //Console.WriteLine("Starting makeSorterPerfBins")
 
@@ -28,60 +32,104 @@ let main argv =
  
 
 
-
     ///// ******* reportSorterPerfBins***********
-    Console.WriteLine("Starting reportSorterPerfBins")
+    //Console.WriteLine("Starting reportSorterPerfBins")
 
 
-    let sourceDir = (FileDir.fromString "C:\\SimOut_64")
-    let mergeDir = sourceDir |> FileDir.appendFolder (FileFolder.fromString "reports") 
-                             |> Result.ExtractOrThrow
-    let res = FileUtils.makeDirectory mergeDir |> Result.ExtractOrThrow
+    //let sourceDir = (FileDir.fromString "C:\\SimOut_64")
+    //let mergeDir = sourceDir |> FileDir.appendFolder (FileFolder.fromString "reports") 
+    //                         |> Result.ExtractOrThrow
+    //let res = FileUtils.makeDirectory mergeDir |> Result.ExtractOrThrow
 
-    let mergeFileName = FileName.fromString (Guid.NewGuid() |> string)
-    let mergePath = FilePath.fromParts mergeDir mergeFileName textExt
-                    |> Result.ExtractOrThrow
-    let res2 =  PerfBinRep.reportSorterPerfBins 
-                        sourceDir
-                        mergePath
+    //let mergeFileName = FileName.fromString (Guid.NewGuid() |> string)
+    //let mergePath = FilePath.fromParts mergeDir mergeFileName textExt
+    //                |> Result.ExtractOrThrow
+    //let res2 =  PerfBinRep.reportSorterPerfBins 
+    //                    sourceDir
+    //                    mergePath
 
-    Console.WriteLine(res2)
+    //Console.WriteLine(res2)
     
 
-    //let textExt = FileExt.fromString ".txt"
-    /// ******* ShcReport2_sorterShcMergedDtoToPivotTable***********
-    //Console.WriteLine("Starting ShcReport2_")
-    //Console.WriteLine(sprintf "Started: %s "
-    //                          (System.DateTime.Now.ToLongTimeString()))
-    //let res2 =  Reports.sorterShcMergedDtoToPivotTable 
-    //                    (FileDir.fromString "C:\\SimOutShc\\waky")
+
+    /// ******* RunBatch.sorterPerfBins ***********
+    //Console.WriteLine("Starting MakeCauseSpecs")
+    //MakeCauseSpecs.sorterPerfBins   
+    //                       (FileDir.fromString "C:\\SimOutShc")
+    //                       (RandomSeed.fromNow ())
+    //                     |> ignore
+
+
+    /// ******* runPerfBinBatchSeq ***********
+    //Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq")
+
+    //RunBatch.runPerfBinBatchSeq (FileDir.fromString "C:\\SimOutTst") 
+    //                            (RandomSeed.fromNow ())
+    //                            0
+    //                             |> ignore
+
+
+
+
+
+     /// ******* PerfBinsReport ***********
+    //Console.WriteLine("Starting PerfBinsReport.main")
+    //let res2 =  PerfBinReports.dirPerfBinBySorterGenReport 
+    //                    (FileDir.fromString "C:\\SimOutT") 
+    //                    (FileDir.fromString "C:\\SimOutReportsT")
     //Console.WriteLine(res2)
+
+
+
+    
+    
+    
+    /// ******* Migrate Data ***********
+        //Console.WriteLine("Starting PerfBinsReport.migratePerfBinReports")
+        //let res2 =  PerfBinReports.migratePerfBinReports 
+        //                    (FileDir.fromString "C:\\SimOut") 
+        //                    (FileDir.fromString "C:\\SimOutT")
+        //Console.WriteLine(res2)
+
+
+
+    /// ************************************************
+    ///      SorterShc
+    /// ************************************************
+
+    ///// ******* ShcRep_sorterShcMergedDtoToPivotTable ***********
+    Console.WriteLine("Starting ShcRep_sorterShcMergedDtoToPivotTable")
+    Console.WriteLine(sprintf "Started: %s "
+                              (System.DateTime.Now.ToLongTimeString()))
+    let res2 =  ShcRep.sorterShcMergedDtoToPivotTable
+                        (Degree.fromInt 64)
+                        (FilePath.fromString "C:\\SimOutShc\\stacked32\\report\\merged\\merged_497.txt")
+                        (FilePath.fromString "C:\\SimOutShc\\stacked32\\report\\merged\\merged_497_rep.txt")
+
+    Console.WriteLine(res2)
 
 
     /////// ******* ShcReport2_mergeShc2sByGeneration***********
     //Console.WriteLine("Starting ShcReport2_mergeShc2sByGeneration")
     //Console.WriteLine(sprintf "Started: %s "
     //                          (System.DateTime.Now.ToLongTimeString()))
-    //let res2 =  Reports.mergeShc2sByGeneration 
+    //let res2 =  ShcRep.mergeShc2sByGeneration 
     //                    (FileDir.fromString "C:\\SimOutShc\\mergeTest")
     //Console.WriteLine(res2)
 
 
 
-    ///// ******* ShcReport2_reportMergedBins ***********
-    //Console.WriteLine("Starting ShcReport2_reportMergedBins")
+    /// ******* ShcRep_mergePerfBinsForSorterShc2Dto ***********
+    //Console.WriteLine("Starting ShcRep_mergePerfBinsForSorterShc2Dto")
     //Console.WriteLine(sprintf "Started: %s "
     //                          (System.DateTime.Now.ToLongTimeString()))
-    //let reportDir = FileDir.fromString "C:\\SimOutShc\\mergeTest\\reports"
-    //let reportFileName = FileName.fromString "0941168f-9dde-49de-b77c-ae08a6f3380d"
-    //let pivotFileName = FileName.fromString "pivotFile2"
-    //let reportPath = FilePath.fromParts reportDir reportFileName textExt
-    //                   |> Result.ExtractOrThrow
-    //let pivotPath = FilePath.fromParts reportDir pivotFileName textExt
-    //                   |> Result.ExtractOrThrow
-    //let res2 = Reports.reportMergedBins reportPath pivotPath
-                
-                        
+    //let inputDir = FileDir.fromString "C:\\SimOutShc\\stacked32\\report"
+    //let mergeFolder = inputDir |> FileDir.appendFolder (FileFolder.fromString "merged")
+    //                           |> Result.ExtractOrThrow
+    //let mergedFileName = FileName.fromString (sprintf "merged_%d" DateTime.Now.Millisecond)
+    //let mergeFilePath = FilePath.fromParts mergeFolder mergedFileName textExt
+    //                    |> Result.ExtractOrThrow
+    //let res2 = ShcRep.mergePerfBinsForSorterShc2Dto inputDir mergeFilePath
     //Console.WriteLine(res2)
 
 
@@ -96,19 +144,10 @@ let main argv =
 
 
 
-    /// ******* RunBatch.sorterPerfBins ***********
-    //Console.WriteLine("Starting MakeCauseSpecs")
-    //MakeCauseSpecs.sorterPerfBins   
-    //                       (FileDir.fromString "C:\\SimOutShc")
-    //                       (RandomSeed.fromNow ())
-    //                     |> ignore
-
-
-
 
     ///// ******* RunBatch.runShcSets2 ***********
     //Console.WriteLine("Starting RunBatch.runShcSets2")
-    //RunBatch.runShcSets2   (FileDir.fromString "C:\\SimOutShc\\waky2")
+    //RunBatch.runShcSets2   (FileDir.fromString "C:\\SimOutShc\\stacked32")
     //                       (RandomSeed.fromNow ())
     //                       0
     //                     |> ignore
@@ -136,24 +175,10 @@ let main argv =
 
 
 
-    /// ******* runPerfBinBatchSeq ***********
-    //Console.WriteLine("Starting RunBp64.runPerfBinBatchSeq")
-
-    //RunBatch.runPerfBinBatchSeq (FileDir.fromString "C:\\SimOutTst") 
-    //                            (RandomSeed.fromNow ())
-    //                            0
-    //                             |> ignore
 
 
 
 
-
-     /// ******* PerfBinsReport ***********
-    //Console.WriteLine("Starting PerfBinsReport.main")
-    //let res2 =  PerfBinReports.dirPerfBinBySorterGenReport 
-    //                    (FileDir.fromString "C:\\SimOutT") 
-    //                    (FileDir.fromString "C:\\SimOutReportsT")
-    //Console.WriteLine(res2)
 
 
 
@@ -167,13 +192,6 @@ let main argv =
 
 
 
-
-/// ******* Migrate Data ***********
-    //Console.WriteLine("Starting PerfBinsReport.migratePerfBinReports")
-    //let res2 =  PerfBinReports.migratePerfBinReports 
-    //                    (FileDir.fromString "C:\\SimOut") 
-    //                    (FileDir.fromString "C:\\SimOutT")
-    //Console.WriteLine(res2)
 
 
     Console.WriteLine(sprintf "Finished: %s "

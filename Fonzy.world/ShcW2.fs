@@ -143,6 +143,7 @@ module SHC2 =
             switchUses = None;
             bestEnergy = None;
             energyDelta = None;
+            lastSwitchUsed = 0 |> SwitchCount.fromInt
         }
         result {
             let! evaluator = SorterShcSpec2.makeEvaluator spec
@@ -246,7 +247,7 @@ module SorterSHCset2 =
                         ()
                     | PostAnnealer -> 
                         acceptedSorterPerfs <- (srtrShc.perf |> Option.get ) :: acceptedSorterPerfs
-                        if(reportSteps |> Array.contains (StepNumber.value srtrShc.step)) then
+                        if(reportSteps |> Array.contains ((StepNumber.value srtrShc.step))) then
 
                             let trialPerfBins = 
                                 trialSorterPerfs 

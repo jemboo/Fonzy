@@ -18,7 +18,7 @@ type SorterGenFixture () =
 
     [<TestMethod>]
     member this.oddeven_merge_switches() =
-        let v = 4
+        let v = 128
         let ws = SorterGen.oddeven_merge_switches v
         let ts = ws |> Stage.fromSwitches (Degree.fromInt v)
                     |> Seq.toList

@@ -137,6 +137,8 @@ type ShcDtoFixture () =
         let yab = 
             {
                 sorterShcMergedDto.mergeCt = 1;
+                sorterShcMergedDto.switchUseEntropy = 0.0;
+                sorterShcMergedDto.switchAction = 0.0;
                 sorterShcMergedDto.sorterId = "sorterId";
                 sorterShcMergedDto.generation = 11;
                 sorterShcMergedDto.mut = "mut"

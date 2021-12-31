@@ -9,36 +9,32 @@ type SorterSetEvalFixture () =
 
     [<TestMethod>]
     member this.testBp64NoGrouping() =
-        Assert.AreEqual(1,1)
 
+        let seed = 1234 |> RandomSeed.fromInt
+        let iRando = Rando.fromRngGen (RngGen.createLcg seed)
+        let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
+        let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+        let sorterCount = SorterCount.fromInt 50
+        let sorterRndGen = sorterRndGen.RandStages
+                               ( [],
+                               (StageCount.degreeTo900StageCount degree),
+                               degree)
+        let makeRandomSorter() = 
+                SorterRndGen.createRandom sorterRndGen iRando
 
+        let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
+                                      (fun _ -> makeRandomSorter())
 
+        let mediocreSorterSet = 
+                    SorterSet.fromSorters 
+                            sorterSetId
+                            degree
+                            mediocreRandomSorters
 
-    //    let seed = 1234 |> RandomSeed.fromInt
-    //    let iRando = Rando.fromRngGen (RngGen.createLcg seed)
-    //    let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
-    //    let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
-    //    let sorterCount = SorterCount.fromInt 50
-    //    let sorterRndGen = sorterRndGen.RandStages
-    //                           ( [],
-    //                           (StageCount.degreeTo999StageCount degree),
-    //                           degree)
-    //    let makeRandomSorter() = 
-    //            SorterRndGen.createRandom sorterRndGen iRando
-
-    //    let mediocreRandomSorters = List.init (SorterCount.value sorterCount)
-    //                                  (fun _ -> makeRandomSorter())
-
-    //    let mediocreSorterSet = 
-    //                SorterSet.fromSorters 
-    //                        sorterSetId
-    //                        degree
-    //                        mediocreRandomSorters
-
-    //    let sortableSetAllBits = sortableSetSpec.Generated 
-    //                               (SortableSetGen.allBp64 degree)
-    //                             |> SortableSetSpec.getSortableSet
-    //                             |> Result.ExtractOrThrow 
+        //let sortableSetAllBits = sortableSetSpec.Generated 
+        //                           (SortableSetGen.allBp64 degree)
+        //                         |> SortableSetSpec.getSortableSet
+        //                         |> Result.ExtractOrThrow 
 
     //    let ssR = SortingOps.SorterSet.eval
     //                    mediocreSorterSet 
@@ -52,27 +48,26 @@ type SorterSetEvalFixture () =
 
     //    Assert.IsTrue(ssR.Length > 0)
 
-    //    Assert.IsTrue(true)
+        Assert.IsTrue(true)
 
 
-    //[<TestMethod>]
-    //member this.allMaskPerfs() =
-    //    let degSrc = Degree.fromInt 16
-    //    let degDest = Degree.fromInt 10
-    //    let srtGreen = RefSorter.createRefSorter RefSorter.Degree16
-    //                   |> Result.ExtractOrThrow
-    //    let subSorters = Switch.allMasks degSrc degDest srtGreen.switches
-    //                     |> Seq.map(fun sa -> Sorter.fromSwitches degDest sa)
-    //                     |> Seq.truncate 5000
-    //                     |> Seq.toArray
+    [<TestMethod>]
+    member this.allMaskPerfs() =
+        let degSrc = Degree.fromInt 16
+        let degDest = Degree.fromInt 10
+        let srtGreen = RefSorter.createRefSorter RefSorter.Green16
+                       |> Result.ExtractOrThrow
+        let subSorters = Switch.allMasks degSrc degDest srtGreen.switches
+                         |> Seq.map(fun sa -> Sorter.fromSwitches degDest sa)
+                         |> Seq.truncate 5000
+                         |> Seq.toArray
 
-    //    let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
-
-    //    let subSorterSet = 
-    //                SorterSet.fromSorters 
-    //                        sorterSetId
-    //                        degDest
-    //                        subSorters
+        let sorterSetId = SorterSetId.fromGuid (Guid.NewGuid())
+        let subSorterSet = 
+                    SorterSet.fromSorters 
+                            sorterSetId
+                            degDest
+                            subSorters
 
     //    let sortableSetAllBits = sortableSetSpec.Generated 
     //                               (SortableSetGen.allBp64 degDest)
@@ -104,12 +99,14 @@ type SorterSetEvalFixture () =
         
     //    winners |> List.iter(fun sc -> Debug.WriteLine (report sc))
 
-    //    Assert.IsTrue(subSorters.Length > 0)
+    //    Assert.IsTrue(subSorters.Length > 0)\\\
+        Assert.IsTrue(true)
 
-    //[<TestMethod>]
-    //member this.allMaskPerfs2() =
-    //    let degSrc = Degree.fromInt 16
-    //    let degDest = Degree.fromInt 10
+
+    [<TestMethod>]
+    member this.allMaskPerfs2() =
+        let degSrc = Degree.fromInt 16
+        let degDest = Degree.fromInt 10
     //    let srtGreen = RefSorter.createRefSorter RefSorter.Degree16
     //                   |> Result.ExtractOrThrow
     //    let subSorters = Switch.allMasks degSrc degDest srtGreen.switches
@@ -175,7 +172,7 @@ type SorterSetEvalFixture () =
     //    winners |> List.iter(fun sc -> Debug.WriteLine (report sc))
 
     //    Assert.IsTrue(subSorters.Length > 0)
-
+        Assert.IsTrue(true)
 
 
     //[<TestMethod>]

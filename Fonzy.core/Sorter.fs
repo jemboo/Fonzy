@@ -51,12 +51,16 @@ module Sorter =
         }
 
 
-    let trimLength (sorter:sorter) 
-                   (newLength:SwitchCount) =
+    let trimLength 
+            (trimFromEnd: bool)
+            (newLength:SwitchCount) 
+            (sorter:sorter) =
         if (SwitchCount.value sorter.switchCount) < (SwitchCount.value newLength) then
             "New length is longer than sorter" |> Error
         else
-        let newSwitches = sorter.switches |> Array.take (SwitchCount.value newLength)
+        let newSwitches =  match trimFromEnd with 
+                           | true -> sorter.switches |> Array.take (SwitchCount.value newLength)
+                           | _ -> sorter.switches |> Array.skip((sorter.switches.Length) - (SwitchCount.value newLength))
         {
             sorter.degree = sorter.degree;
             switchCount = newLength;

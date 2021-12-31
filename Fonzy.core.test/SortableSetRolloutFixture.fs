@@ -38,6 +38,7 @@ type SortableSetRolloutFixture() =
     member this.removeDupes() =
       let unsortedIntsRollout = TestData.SorterActionRecords.intSetsRolloutOfAllSorted
       let drs = unsortedIntsRollout |> IntSetsRollout.removeDupes
+                                    |> Seq.toArray
       Assert.IsTrue(drs.Length = (Degree.value TestData.degree) + 1)
 
 
@@ -47,7 +48,7 @@ type SortableSetRolloutFixture() =
       let unSortedRollout = TestData.SorterActionRecords.intSetsRolloutOfAll
       let sortableCount = SortableCount.value unSortedRollout.sortableCount
       let histo = unSortedRollout |> IntSetsRollout.intSetHist
-      let totalCount = histo |> Array.sumBy(snd)
+      let totalCount = histo |> Seq.sumBy(snd)
       Assert.AreEqual(sortableCount, totalCount)
 
 

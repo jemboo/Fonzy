@@ -18,13 +18,20 @@ module SorterShc =
                         let suPlan = Sorting.SwitchUsePlan.makeIndexes
                                         pfxUses
                                         (sShc.sorter.switches.Length |> SwitchCount.fromInt)
+
+                        //let trimSorter = ((StepNumber.value sShc.step) % 20000) > 10000
+                        //let! trimmedSorter =
+                        //    match trimSorter with
+                        //    | true -> sShc.sorter |> Sorter.trimLength false (SwitchCount.fromInt (sShc.sorter.switches.Length - (Degree.value sShc.sorter.degree) / 2))
+                        //    | _ -> sShc.sorter |> Ok
+
                         let swEvRecs = SortingOps.Sorter.eval sShc.sorter
                                                sortableSet.sortableSetImpl
                                                suPlan
                                                Sorting.eventGrouping.BySwitch
                         let switchUses = swEvRecs
                                          |> SortingEval.SwitchEventRecords.getSwitchUses
-                        let usedSwitches = sShc.sorter 
+                        let usedSwitches = sShc.sorter
                                            |> SwitchUses.getUsedSwitches switchUses
                         let perf = 
                             {
@@ -47,6 +54,9 @@ module SorterShc =
                                     energyDelta = None
                                     perf = Some perf;
                                     switchUses = Some switchUses
+                                    lastSwitchUsed = switchUses.weights 
+                                                                |> Array.findIndexBack(fun v -> v > 0)
+                                                                |> SwitchCount.fromInt
                                }
                     }
           }
@@ -194,6 +204,7 @@ module SHC =
             switchUses = None;
             bestEnergy = None;
             energyDelta = None;
+            lastSwitchUsed = 0 |> SwitchCount.fromInt;
         }
         result {
             let! evaluator = SorterShcSpec.makeEvaluator spec

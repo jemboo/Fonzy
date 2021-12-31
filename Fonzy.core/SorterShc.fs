@@ -65,6 +65,7 @@ type sorterShc =
         energy:Energy option;
         energyDelta:Energy option;
         bestEnergy:Energy option;
+        lastSwitchUsed:SwitchCount
     }
 
 
@@ -204,6 +205,7 @@ module SorterShc =
                         // current energy is better than best (until now)
         | None, Some _ -> true
         | _, None -> failwith "sorterShc bestEnergy missing"
+
 
     let logPolicy0 (shc:sorterShc) =
         match shc.energyDelta with
