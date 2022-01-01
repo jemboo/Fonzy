@@ -24,7 +24,7 @@ module SortingEval =
         { 
             usedSwitchCount:SwitchCount; 
             usedStageCount:StageCount;
-            successful:bool Option
+            failCount:SortableCount Option
         }
 
     module SorterPerf =
@@ -32,24 +32,33 @@ module SortingEval =
             {
                 usedSwitchCount = SwitchCount.fromInt 0;
                 usedStageCount = StageCount.fromInt 0;
-                successful = None
+                failCount = None
             }
         let report (perf:sorterPerf) =
-            let fbo (v:bool option) =
+            let fbo (v:SortableCount option) =
                 match v with
-                | Some tv -> sprintf "%b" tv
+                | Some tv -> sprintf "%d" (SortableCount.value tv)
                 | None -> "none"
 
             sprintf "%s\t%d\t%d" 
-                        (fbo perf.successful)
+                        (fbo perf.failCount)
                         (StageCount.value perf.usedStageCount)
                         (SwitchCount.value perf.usedSwitchCount)
 
         let isSucessful (perf:sorterPerf) =
-            match perf.successful with
-            | Some tv -> tv
+            match perf.failCount with
+            | Some sc -> (SortableCount.value sc) = 0
             | None -> false
 
+
+        let intFromFailCount (perf:sorterPerf) =
+            match perf.failCount with
+            | Some sc -> sc |> SortableCount.value
+            | None -> -1
+
+        let failCountFromInt (fc:int) =
+            if fc > -1 then (SortableCount.fromInt fc) |> Some
+            else None
 
     type sorterPerfBin = 
         { 
@@ -82,6 +91,14 @@ module SortingEval =
                                     |> SortableSetRollout.isSorted
             | BySwitch seGs ->  seGs.sortableRollout
                                     |> SortableSetRollout.isSorted
+
+                                    
+        let getUniqueUnsortedCount (switchEventRecords:switchEventRecords) =
+            match switchEventRecords with
+            | NoGrouping seNg -> seNg.sortableRollout 
+                                    |> SortableSetRollout.uniqueUnsortedCount
+            | BySwitch seGs ->  seGs.sortableRollout
+                                    |> SortableSetRollout.uniqueUnsortedCount
 
 
         let getUsedSwitchCount (switchEventRecords:switchEventRecords) =
@@ -117,16 +134,16 @@ module SortingEval =
                             r.sorter |> SwitchUses.getUsedSwitches switchUses
                     let! usedSwitchCount = SwitchCount.create "" usedSwitchArray.Length
                     let usedStageCount = Stage.getStageCount r.sorter.degree usedSwitchArray
-                    let success = 
+                    let failCount = 
                         match checkSuccess with
                         | true -> r.switchEventRecords 
-                                  |> SwitchEventRecords.getAllSortsWereComplete
+                                  |> SwitchEventRecords.getUniqueUnsortedCount
                                   |> Some
                         | false -> None
 
                     let perfBin = {
                                     sorterPerf.usedStageCount = usedStageCount;
-                                    successful = success;
+                                    failCount = failCount;
                                     usedSwitchCount=usedSwitchCount 
                                    }
                     return {
@@ -173,11 +190,16 @@ module SortingEval =
     
         let fromSorterPerfs (perfs:sorterPerf seq) =
             let extractSorterPerfBin ((stc, swc), (perfs:sorterPerf[])) =
+                let _validPassing (sco: SortableCount option) = 
+                    match sco with
+                    | Some ct -> ct |> SortableCount.value = 0
+                    | None -> false
+
                 let sct = perfs |> Array.filter(fun sc -> 
-                                        sc.successful = (Some true))
+                                        sc.failCount |> _validPassing)
                                 |> Array.length
                 let fct = perfs |> Array.filter(fun sc -> 
-                                        sc.successful = (Some false))
+                                        sc.failCount |> _validPassing |> (not))
                                 |> Array.length
                 {
                     sorterPerfBin.sorterCount = SorterCount.fromInt perfs.Length
@@ -198,23 +220,23 @@ module SortingEval =
                        |> fromSorterPerfs
 
 
-        let toSorterPerfs (bins:sorterPerfBin seq) =
-            let _sp (spBin:sorterPerfBin) =
-                let ssfls =
-                    {
-                        sorterPerf.successful = Some true;
-                        sorterPerf.usedStageCount = spBin.usedStageCount;
-                        sorterPerf.usedSwitchCount = spBin.usedSwitchCount;
-                    } |> Seq.replicate spBin.successCount
-                let unSsfls =
-                    {
-                        sorterPerf.successful = Some false;
-                        sorterPerf.usedStageCount = spBin.usedStageCount;
-                        sorterPerf.usedSwitchCount = spBin.usedSwitchCount;
-                    } |> Seq.replicate spBin.failCount
-                ssfls |> Seq.append unSsfls
+        //let toSorterPerfs (bins:sorterPerfBin seq) =
+        //    let _sp (spBin:sorterPerfBin) =
+        //        let ssfls =
+        //            {
+        //                sorterPerf.successful = Some true;
+        //                sorterPerf.usedStageCount = spBin.usedStageCount;
+        //                sorterPerf.usedSwitchCount = spBin.usedSwitchCount;
+        //            } |> Seq.replicate spBin.successCount
+        //        let unSsfls =
+        //            {
+        //                sorterPerf.successful = Some false;
+        //                sorterPerf.usedStageCount = spBin.usedStageCount;
+        //                sorterPerf.usedSwitchCount = spBin.usedSwitchCount;
+        //            } |> Seq.replicate spBin.failCount
+        //        ssfls |> Seq.append unSsfls
 
-            bins |> Seq.map(_sp) |> Seq.concat
+        //    bins |> Seq.map(_sp) |> Seq.concat
 
 
 
@@ -323,16 +345,6 @@ module SortingEval =
             (bR, wR)
 
 
-
-        let getStDev (bins:sorterPerfBin seq) (perfM:sorterPerf -> double) =
-            bins |> toSorterPerfs |> Seq.map(perfM) |> Seq.stDev
-
-        
-        let getMean (bins:sorterPerfBin seq) (perfM:sorterPerf -> double) =
-            bins |> toSorterPerfs |> Seq.map(perfM) |> Seq.mean
-
-
-
             
 type StageWeight = private StageWeight of float
 
@@ -385,8 +397,9 @@ module SorterFitness =
             weighted degree stageWeight 
                      perf.usedSwitchCount perf.usedStageCount
 
-        match perf.successful with
-        | Some v -> if v then pv else Energy.failure
+        match perf.failCount with
+        | Some v -> if (SortableCount.value v) > 0  
+                        then pv else Energy.failure
         | None -> pv
 
 

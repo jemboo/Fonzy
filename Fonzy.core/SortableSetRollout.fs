@@ -104,6 +104,12 @@ module IntSetsRollout =
                     |> Seq.distinct
 
 
+    let uniqueUnsortedCount (intsRollout:intSetsRollout) =
+        intsRollout |> removeDupes 
+                    |> Seq.filter(fun bs -> not (IntSet.isSorted(bs)))
+                    |> Seq.length
+
+
 
 module BP64SetsRollout =
 
@@ -214,6 +220,14 @@ module SortableSetRollout =
         match sortableRollout with
         | Int  isr ->    isr |> IntSetsRollout.isSorted
         | Bp64  bp64r -> bp64r |> BP64SetsRollout.isSorted
+
+
+    let uniqueUnsortedCount (sortableRollout:sortableSetRollout) =
+        match sortableRollout with
+        | Int  isr ->    isr |> IntSetsRollout.uniqueUnsortedCount
+                             |> SortableCount.fromInt
+        | Bp64  bp64r -> bp64r |> BP64SetsRollout.uniqueUnsortedCount 
+                               |> SortableCount.fromInt
 
 
     let fromSortableSetImpl (impl:sortableSetImpl) = 

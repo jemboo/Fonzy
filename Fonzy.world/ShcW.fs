@@ -35,8 +35,8 @@ module SorterShc =
                                            |> SwitchUses.getUsedSwitches switchUses
                         let perf = 
                             {
-                                SortingEval.sorterPerf.successful = swEvRecs 
-                                    |> SortingEval.SwitchEventRecords.getAllSortsWereComplete
+                                SortingEval.sorterPerf.failCount = swEvRecs 
+                                    |> SortingEval.SwitchEventRecords.getUniqueUnsortedCount
                                     |> Some
                                 SortingEval.sorterPerf.usedStageCount = 
                                         Stage.getStageCount 

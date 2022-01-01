@@ -200,7 +200,7 @@ type sorterShc2Dto =
         weights:int[];
         switchesUsed:int; 
         stagesUsed:int; 
-        successful:string;
+        failCount:int;
         energy:float;
         lastSwitchUsed:int
     }
@@ -229,10 +229,10 @@ module SorterShc2Dto =
             match ssA.perf with
             | Some perf -> perf.usedStageCount |> StageCount.value
             | None -> 0
-        let successfulSort = 
+        let failCount = 
             match ssA.perf with
-            | Some perf -> perf.successful |> BasicDto.toCereal
-            | None -> "false"
+            | Some perf -> perf |> SortingEval.SorterPerf.intFromFailCount
+            | None -> -1
         let energy = 
             match ssA.energy with
             | Some enrg -> enrg |> Energy.value
@@ -252,7 +252,7 @@ module SorterShc2Dto =
             weights = wgths;
             switchesUsed = switchesUsed; 
             stagesUsed = stagesUsed; 
-            successful = successfulSort;
+            failCount = failCount;
             energy = energy; 
             lastSwitchUsed = ssA.lastSwitchUsed |> SwitchCount.value;
         }
@@ -336,12 +336,12 @@ module SorterShcMergedDto =
 
     let merge (a:sorterShc2Dto seq) =
         let allin = a |> Seq.toArray
+
         let _toSorterPerf (dto:sorterShc2Dto) =
             {
                 SortingEval.sorterPerf.usedSwitchCount = (SwitchCount.fromInt dto.switchesUsed)
                 SortingEval.sorterPerf.usedStageCount = (StageCount.fromInt dto.stagesUsed)
-                SortingEval.sorterPerf.successful = Some (dto.successful |> bool.Parse)
-
+                SortingEval.sorterPerf.failCount = SortingEval.SorterPerf.failCountFromInt dto.failCount
             }
 
         let _trialSorterPerfBins (dtos:sorterShc2Dto seq) =

@@ -18,23 +18,23 @@ type SortingEvalFixture () =
         let degree = Degree.fromInt 32
         let spfA = 
             {
-                SortingEval.sorterPerf.successful = Some true;
                 SortingEval.sorterPerf.usedStageCount = StageCount.fromInt 15;
                 SortingEval.sorterPerf.usedSwitchCount = SwitchCount.fromInt 190
+                SortingEval.sorterPerf.failCount = 0 |> SortableCount.fromInt |> Some
             }
 
         let spfB = 
             {
-                SortingEval.sorterPerf.successful = Some true;
                 SortingEval.sorterPerf.usedStageCount = StageCount.fromInt 15;
                 SortingEval.sorterPerf.usedSwitchCount = SwitchCount.fromInt 188
+                SortingEval.sorterPerf.failCount = 0 |> SortableCount.fromInt |> Some
             }
 
         let spfC = 
             {
-                SortingEval.sorterPerf.successful = Some true;
                 SortingEval.sorterPerf.usedStageCount = StageCount.fromInt 14;
                 SortingEval.sorterPerf.usedSwitchCount = SwitchCount.fromInt 190
+                SortingEval.sorterPerf.failCount = 0 |> SortableCount.fromInt |> Some
             }
 
 

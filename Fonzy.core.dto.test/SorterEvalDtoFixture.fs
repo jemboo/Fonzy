@@ -10,7 +10,7 @@ type SorterEvalDtoFixture () =
     member this.sorterPerfDto() =
         let w = SwitchCount.fromInt 22
         let t = StageCount.fromInt 12
-        let perf = {SortingEval.sorterPerf.successful = Some true;
+        let perf = {SortingEval.sorterPerf.failCount = 0 |> SortableCount.fromInt |> Some
                     SortingEval.sorterPerf.usedStageCount = t;
                     SortingEval.sorterPerf.usedSwitchCount = w;}
         let perfDto = SorterPerfDto.toDto perf
@@ -18,7 +18,7 @@ type SorterEvalDtoFixture () =
                        |> Result.ExtractOrThrow
         Assert.AreEqual(perf, perfBack);
 
-        let perf2 = {SortingEval.sorterPerf.successful = None;
+        let perf2 = {SortingEval.sorterPerf.failCount = None;
                     SortingEval.sorterPerf.usedStageCount = t;
                     SortingEval.sorterPerf.usedSwitchCount = w;}
         let perfDto2 = SorterPerfDto.toDto perf2

@@ -96,9 +96,8 @@ type ShcDtoFixture () =
              { 
                  SortingEval.sorterPerf.usedSwitchCount = wPerf;
                  SortingEval.sorterPerf.usedStageCount = tPerf;
-                 SortingEval.sorterPerf.successful = Some true;
+                 SortingEval.sorterPerf.failCount = 0 |> SortableCount.fromInt |> Some
              }
-
         let energy = Energy.fromFloat 1.0
         let fullArchie = {
                 sorterShcArchFull.step = stp;

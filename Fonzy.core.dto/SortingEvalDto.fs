@@ -4,7 +4,7 @@ namespace global
 open System
 
 
-type sorterPerfDto = {switches:int; stages:int; successful:bool option}
+type sorterPerfDto = {switches:int; stages:int; failCount:int}
 module SorterPerfDto =
     let fromDto (dto:sorterPerfDto) =
         result {
@@ -12,7 +12,9 @@ module SorterPerfDto =
             let! wc = SwitchCount.create "" dto.switches
             return { SortingEval.sorterPerf.usedStageCount = tc;
                      SortingEval.sorterPerf.usedSwitchCount = wc;
-                     SortingEval.sorterPerf.successful = dto.successful}
+                     SortingEval.sorterPerf.failCount = dto.failCount
+                                        |> SortingEval.SorterPerf.failCountFromInt
+                   }
         }
 
     let fromJson (jstr:string) =
@@ -24,7 +26,8 @@ module SorterPerfDto =
     let toDto (perf:SortingEval.sorterPerf) =
         {switches = (SwitchCount.value perf.usedSwitchCount); 
          stages= (StageCount.value perf.usedStageCount);
-         successful = perf.successful}
+         failCount = perf |> SortingEval.SorterPerf.intFromFailCount
+         }
 
     let toJson (perf:SortingEval.sorterPerf) =
         perf |> toDto |> Json.serialize

@@ -182,28 +182,6 @@ module ShcTermSpecDto =
         idt |> toDto |> Json.serialize
 
 
-//type sorterShcArchDto = 
-//    {step:int;
-//     rev:int; 
-//     rngGen:rngGenDto;
-//     sorter:sorterDto;
-//     switchUses:switchUsesDto;
-//     perf:sorterPerfDto;
-//     energy:float; }
-
-//type sorterShcArchDto = 
-//    {pOrF:string;
-//     step:int;
-//     rev:int; 
-//     rngType:string; 
-//     seed:int;
-//     degree:int; 
-//     switches:int[]
-//     weights:sparseIntArrayDto;
-//     switchesUsed:int; 
-//     stagesUsed:int; 
-//     successful:string;
-//     energy:float; }
 
 type sorterShcArchDto = 
     {pOrF:string;
@@ -217,7 +195,7 @@ type sorterShcArchDto =
      weights:sparseIntArrayDto;
      switchesUsed:int; 
      stagesUsed:int; 
-     successful:string;
+     failCount:int;
      energy:float; }
 
 
@@ -228,10 +206,11 @@ module SorterShcArchDto =
             let! st = dto.step |> StepNumber.create "";
             let! tc = StageCount.create "" dto.stagesUsed
             let! wc = SwitchCount.create "" dto.switchesUsed
-            let! sf = dto.successful |> BasicDto.fromCereal
+            let fc = dto.failCount |> SortingEval.SorterPerf.failCountFromInt
             let perf = { SortingEval.sorterPerf.usedStageCount = tc;
                          SortingEval.sorterPerf.usedSwitchCount = wc;
-                         SortingEval.sorterPerf.successful = sf}
+                         SortingEval.sorterPerf.failCount = fc
+                       }
             let! e = dto.energy  |> Energy.create ""
 
             if dto.pOrF = "Full" then
@@ -292,7 +271,7 @@ module SorterShcArchDto =
                   weights = siaDto;
                   switchesUsed = ssaF.perf.usedSwitchCount |> SwitchCount.value; 
                   stagesUsed = ssaF.perf.usedStageCount |> StageCount.value; 
-                  successful = ssaF.perf.successful |> BasicDto.toCereal;
+                  failCount = ssaF.perf |> SortingEval.SorterPerf.intFromFailCount
                   energy = (Energy.value ssaF.energy); 
                 }
             | sorterShcArch.Partial ssaP ->
@@ -308,7 +287,7 @@ module SorterShcArchDto =
                   weights = SparseIntArrayDto.empty;
                   switchesUsed = ssaP.perf.usedSwitchCount |> SwitchCount.value; 
                   stagesUsed = ssaP.perf.usedStageCount |> StageCount.value; 
-                  successful = ssaP.perf.successful |> BasicDto.toCereal;
+                  failCount = ssaP.perf |> SortingEval.SorterPerf.intFromFailCount
                   energy = (Energy.value ssaP.energy); 
                 }
 
@@ -318,15 +297,17 @@ module SorterShcArchDto =
 
 type sorterShcSpecDto = 
     {
-     rngGen:rngGenDto;
-     sorter:sorterDto;
-     mutSpec:sorterMutSpecDto;
-     srtblStType:sortableSetTypeDto
-     stWgtSpec:shcStageWeightSpecDto
-     evalSpec:sorterEvalSpecDto
-     annealer:annealerSpecDto;
-     updater:shcSaveDetailsDto;
-     term:shcTermSpecDto; }
+         rngGen:rngGenDto;
+         sorter:sorterDto;
+         mutSpec:sorterMutSpecDto;
+         srtblStType:sortableSetTypeDto
+         stWgtSpec:shcStageWeightSpecDto
+         evalSpec:sorterEvalSpecDto
+         annealer:annealerSpecDto;
+         updater:shcSaveDetailsDto;
+         term:shcTermSpecDto; 
+     }
+
 module SorterShcSpecDto =
     let fromDto (dto:sorterShcSpecDto) =
         result {

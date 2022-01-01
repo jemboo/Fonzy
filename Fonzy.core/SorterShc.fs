@@ -178,8 +178,8 @@ module SorterShc =
         | None -> Error "Perf missing"
 
     let successFul (perf:SortingEval.sorterPerf) = 
-        match perf.successful with
-        | Some r -> r |> Ok
+        match perf.failCount with
+        | Some r -> (SortableCount.value r) = 0 |> Ok
         | None -> Error "successful missing"
 
     let getEnergy (shc:sorterShc) = 
