@@ -398,7 +398,7 @@ module SorterFitness =
                      perf.usedSwitchCount perf.usedStageCount
 
         match perf.failCount with
-        | Some v -> if (SortableCount.value v) > 0  
+        | Some v -> if (SortableCount.value v) = 0  
                         then pv else Energy.failure
         | None -> pv
 

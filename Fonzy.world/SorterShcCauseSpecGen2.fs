@@ -69,7 +69,7 @@ module SorterShcCauseSpecGen2 =
                     (dispRngGen:RngGen) 
                     (swPfx:Switch list) = 
 
-        let stageW = StageWeight.fromFloat 1.0
+        let stageW = StageWeight.fromFloat 0.5
 
         //let srtbleSetTypeB = sortableSetType.AllForDegree 
         //                        (sortableSetRep.Bp64 fullDegree)
@@ -131,7 +131,7 @@ module SorterShcCauseSpecGen2 =
         let halfDegree = Degree.fromInt 16
         let shcCt = ShcCount.fromInt 1
         let sorterCt = SorterCount.fromInt 1
-        let steps = StepNumber.fromInt 2000000
+        let steps = StepNumber.fromInt 1000000
         let seedS = (904877) |> RandomSeed.fromInt
 
         //let refSorter = RefSorter.goodRefSorterForDegree fullDegree |> Result.ExtractOrThrow

@@ -98,15 +98,15 @@ let main argv =
     /// ************************************************
 
     ///// ******* ShcRep_sorterShcMergedDtoToPivotTable ***********
-    Console.WriteLine("Starting ShcRep_sorterShcMergedDtoToPivotTable")
-    Console.WriteLine(sprintf "Started: %s "
-                              (System.DateTime.Now.ToLongTimeString()))
-    let res2 =  ShcRep.sorterShcMergedDtoToPivotTable
-                        (Degree.fromInt 64)
-                        (FilePath.fromString "C:\\SimOutShc\\stacked32\\report\\merged\\merged_497.txt")
-                        (FilePath.fromString "C:\\SimOutShc\\stacked32\\report\\merged\\merged_497_rep.txt")
+    //Console.WriteLine("Starting ShcRep_sorterShcMergedDtoToPivotTable")
+    //Console.WriteLine(sprintf "Started: %s "
+    //                          (System.DateTime.Now.ToLongTimeString()))
+    //let res2 =  ShcRep.sorterShcMergedDtoToPivotTable
+    //                    (Degree.fromInt 64)
+    //                    (FilePath.fromString "C:\\SimOutShc\\stacked32\\report\\merged\\merged_64.txt")
+    //                    (FilePath.fromString "C:\\SimOutShc\\stacked32\\report\\merged\\merged_64_rep.txt")
 
-    Console.WriteLine(res2)
+    //Console.WriteLine(res2)
 
 
     /////// ******* ShcReport2_mergeShc2sByGeneration***********
@@ -146,11 +146,11 @@ let main argv =
 
 
     ///// ******* RunBatch.runShcSets2 ***********
-    //Console.WriteLine("Starting RunBatch.runShcSets2")
-    //RunBatch.runShcSets2   (FileDir.fromString "C:\\SimOutShc\\stacked32")
-    //                       (RandomSeed.fromNow ())
-    //                       0
-    //                     |> ignore
+    Console.WriteLine("Starting RunBatch.runShcSets2")
+    RunBatch.runShcSets2   (FileDir.fromString "C:\\SimOutShc\\stacked32")
+                           (RandomSeed.fromNow ())
+                           0
+                         |> ignore
 
 
 
