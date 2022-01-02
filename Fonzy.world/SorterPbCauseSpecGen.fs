@@ -58,10 +58,11 @@ module SorterPbCauseSpecGen =
 
         let ssImplBps = SortableSetMaker.allZeroOnes
                                 (sortableSetRep.Binary degree)
+                        |> Result.ExtractOrThrow
 
         let (sortableSetTrim, switchUses) = 
-            ssImplBps |> SortingOps.SortableSet.reduceBySorterRndGen sorterRndGen
-            |> Result.ExtractOrThrow
+                (ssImplBps |> SortingOps.SortableSet.reduceBySorterRndGen sorterRndGen)
+                |> Result.ExtractOrThrow
 
         let totalSwitchCt = sorterRndGen |> SorterRndGen.getSwitchCount
         let switchUsePlan = Sorting.SwitchUsePlan.makeIndexes 

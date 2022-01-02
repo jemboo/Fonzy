@@ -158,16 +158,11 @@ module SortingBp64 =
 
 
     let evalSorter (sorter:sorter)
-                   (sortables:bitsP64[])
+                   (bpSr:bP64SetsRollout)
                    (switchusePlan:Sorting.switchUsePlan) 
                    (switchEventAgg:Sorting.eventGrouping) =
-        let sortableSetRollout = 
-            sortables
-                |> BP64SetsRollout.fromBitsP64
-                        sorter.degree
-                |> Result.ExtractOrThrow
         evalSorterOnBP64SetsRollout
-            sorter sortableSetRollout switchusePlan switchEventAgg
+            sorter bpSr switchusePlan switchEventAgg
 
 
 

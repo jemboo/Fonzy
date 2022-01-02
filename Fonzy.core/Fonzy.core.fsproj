@@ -27,10 +27,10 @@
     <Compile Include="Sorter.fs" />
     <Compile Include="SorterGen.fs" />
     <Compile Include="SorterSet.fs" />
+    <Compile Include="SortableSetRollout.fs" />
     <Compile Include="SortableSet.fs" />
     <Compile Include="SortableVec.fs" />
     <Compile Include="SwitchEventRecords.fs" />
-    <Compile Include="SortableSetRollout.fs" />
     <Compile Include="SwitchEventRollout.fs" />
     <Compile Include="SortingEval.fs" />
     <Compile Include="SorterShc.fs" />

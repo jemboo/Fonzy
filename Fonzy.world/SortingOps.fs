@@ -33,22 +33,22 @@ module SortingOps =
                 (switchEventAgg:Sorting.eventGrouping) =
 
             match sortableSetImpl with
-            | sortableSetImpl.Binary (ssb, d) -> 
+            | sortableSetImpl.Binary isr -> 
                    SortingInts.evalSorterOnBinary
                                    sorter
-                                   ssb
+                                   isr
                                    switchusePlan
                                    switchEventAgg
-            | sortableSetImpl.Integer (ssb, d) -> 
+            | sortableSetImpl.Integer isr -> 
                    SortingInts.evalSorterOnInteger 
                                    sorter
-                                   ssb
+                                   isr
                                    switchusePlan
                                    switchEventAgg
-            | sortableSetImpl.Bp64 (ssb, d) -> 
+            | sortableSetImpl.Bp64 bpr -> 
                    SortingBp64.evalSorter
                                   sorter
-                                  ssb
+                                  bpr
                                   switchusePlan
                                   switchEventAgg
 
@@ -74,17 +74,27 @@ module SortingOps =
             result {
                 let! ssRoll = res |> SwitchEventRecords.getSortableSetRollout
                                   |> SortableSetRollout.removeDupes
+
+
                 let ssReduced = 
                     match ssRoll with
                     | sortableSetRollout.Bp64 bp64Roll -> 
-                        let bitSets = bp64Roll |> BP64SetsRollout.toBitsP64
-                                               |> Seq.toArray
-                        (bitSets, degree) |> sortableSetImpl.Bp64
+                        bp64Roll |> sortableSetImpl.Bp64
 
                     | sortableSetRollout.Int intRoll -> 
-                        let intSets = intRoll |> IntSetsRollout.toIntSet
-                                              |> Seq.toArray
-                        (intSets, degree) |> sortableSetImpl.Integer
+                        intRoll |> sortableSetImpl.Integer
+
+                //let ssReduced = 
+                //    match ssRoll with
+                //    | sortableSetRollout.Bp64 bp64Roll -> 
+                //        let bitSets = bp64Roll |> BP64SetsRollout.toBitsP64
+                //                               |> Seq.toArray
+                //        (bitSets, degree) |> sortableSetImpl.Bp64
+
+                //    | sortableSetRollout.Int intRoll -> 
+                //        let intSets = intRoll |> IntSetsRollout.toIntSet
+                //                              |> Seq.toArray
+                //        (intSets, degree) |> sortableSetImpl.Integer
    
                 return (ssReduced, switchUses)
             }
@@ -111,37 +121,37 @@ module SortingOps =
             (proc:sortingResult -> Result<'T, string>) =
 
             match srtblSt.sortableSetImpl with
-            | sortableSetImpl.Binary (btSet, d) -> 
+            | sortableSetImpl.Binary isr -> 
                 result {
-                    let! intSetsRollout = btSet |> IntSetsRollout.fromBitSet
-                                                            sorterSet.degree
+                    //let! intSetsRollout = btSet |> IntSetsRollout.fromBitSet
+                    //                                        sorterSet.degree
                     return! SortingInts.SorterSet.eval 
                                 sorterSet
-                                intSetsRollout
+                                isr
                                 switchusePlan
                                 switchEventAgg
                                 _parallel
                                 proc
                 }
-            | sortableSetImpl.Bp64 (bs64, d)  -> 
+            | sortableSetImpl.Bp64 bs64r  -> 
                 result {
-                    let! bp64Rollout = bs64 |> BP64SetsRollout.fromBitsP64
-                                                            sorterSet.degree
+                    //let! bp64Rollout = bs64 |> BP64SetsRollout.fromBitsP64
+                    //                                        sorterSet.degree
                     return! SortingBp64.SorterSet.eval 
                                 sorterSet
-                                bp64Rollout
+                                bs64r
                                 switchusePlan
                                 switchEventAgg
                                 _parallel
                                 proc
                 }
-            | sortableSetImpl.Integer (ntS, d)  ->
+            | sortableSetImpl.Integer isr  ->
                 result {
-                    let! intSetsRollout = ntS |> IntSetsRollout.fromIntSets
-                                                            sorterSet.degree
+                    //let! intSetsRollout = ntS |> IntSetsRollout.fromIntSets
+                    //                                        sorterSet.degree
                     return! SortingInts.SorterSet.eval 
                                 sorterSet
-                                intSetsRollout
+                                isr
                                 switchusePlan
                                 switchEventAgg
                                 _parallel

@@ -158,30 +158,19 @@ module SortingInts =
 
 
     let evalSorterOnBinary (sorter:sorter)
-                   (bitSet:bitSet[])
+                   (intSetsRollout:intSetsRollout)
                    (switchusePlan:Sorting.switchUsePlan) 
                    (switchEventAgg:Sorting.eventGrouping) =
-        let sortableSetRollout = 
-            bitSet
-                |> IntSetsRollout.fromBitSet
-                        sorter.degree
-                |> Result.ExtractOrThrow
         evalSorterOnIntSetsRollout
-            sorter sortableSetRollout switchusePlan switchEventAgg
+            sorter intSetsRollout switchusePlan switchEventAgg
 
 
     let evalSorterOnInteger (sorter:sorter)
-                            (intSets:intSet[])
+                            (intSetsRollout:intSetsRollout)
                             (switchusePlan:Sorting.switchUsePlan) 
                             (switchEventAgg:Sorting.eventGrouping) =
-        let sortableSetRollout = 
-            intSets
-                |> Array.map(fun a -> a.values)
-                |> IntSetsRollout.fromIntArrays
-                                    sorter.degree
-                |> Result.ExtractOrThrow
         evalSorterOnIntSetsRollout
-            sorter sortableSetRollout switchusePlan switchEventAgg
+            sorter intSetsRollout switchusePlan switchEventAgg
 
 
 

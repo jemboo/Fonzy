@@ -103,8 +103,8 @@ let main argv =
     //                          (System.DateTime.Now.ToLongTimeString()))
     //let res2 =  ShcRep.sorterShcMergedDtoToPivotTable
     //                    (Degree.fromInt 64)
-    //                    (FilePath.fromString "C:\\SimOutShc\\stacked32\\report\\merged\\merged_64.txt")
-    //                    (FilePath.fromString "C:\\SimOutShc\\stacked32\\report\\merged\\merged_64_rep.txt")
+    //                    (FilePath.fromString "C:\\SimOutShc\\stacked32\\report\\merged\\merged_579.txt")
+    //                    (FilePath.fromString "C:\\SimOutShc\\stacked32\\report\\merged\\merged_579_rep.txt")
 
     //Console.WriteLine(res2)
 
@@ -184,10 +184,10 @@ let main argv =
 
 
 
-///// ******* Benchmark ***********
-//    Console.WriteLine("Starting Benchmark.main")
-//    let summary = BenchmarkRunner.Run<BenchmarkSorterSetOnBp64>()
-//    printfn "%A" summary
+/// ******* Benchmark ***********
+    //Console.WriteLine("Starting Benchmark.main")
+    //let summary = BenchmarkRunner.Run<BenchmarkSorterOnBp64>()
+    //printfn "%A" summary
 
 
 

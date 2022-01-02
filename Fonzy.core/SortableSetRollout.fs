@@ -64,7 +64,7 @@ module IntSetsRollout =
     let toIntSet (intsRoll:intSetsRollout) =
         let d = (Degree.value intsRoll.degree)
         intsRoll.baseArray |> Seq.chunkBySize d
-                            |> Seq.map(fun a -> {intSet.values = a})
+                           |> Seq.map(fun a -> {intSet.values = a})
 
 
     let copy (intsRoll:intSetsRollout) =
@@ -161,6 +161,16 @@ module BP64SetsRollout =
                  |> BitsP64.toBitSets
 
 
+    let fromIntSets (degree:Degree)
+                    (intBits:seq<intSet>) =
+        intBits |> BitsP64.fromIntSet
+                |> fromBitsP64 degree
+
+    let toIntSet (bP64Roll:bP64SetsRollout) =
+        bP64Roll |> toBitsP64
+                 |> BitsP64.toIntSets
+
+
     let isSorted (bp64Roll:bP64SetsRollout) =
         bp64Roll |> toBitSet 
                  |> Seq.forall(BitSet.isSorted)
@@ -169,7 +179,6 @@ module BP64SetsRollout =
     let bitSetHist (bp64Roll:bP64SetsRollout) =
         bp64Roll |> toBitSet
                  |> Seq.countBy id
-                 |> Seq.toArray
 
 
     let copy (bP64Roll:bP64SetsRollout) =
@@ -201,6 +210,7 @@ module BP64SetsRollout =
                  |> Seq.length
 
 
+
 module SortableSetRollout =
 
     let getDegree (sortableSetRollout:sortableSetRollout) =
@@ -230,26 +240,6 @@ module SortableSetRollout =
                                |> SortableCount.fromInt
 
 
-    let fromSortableSetImpl (impl:sortableSetImpl) = 
-        match impl with
-        | sortableSetImpl.Binary (bitSet, d) ->
-            result {
-             let! roll = bitSet |> IntSetsRollout.fromBitSet d
-             return roll |> sortableSetRollout.Int
-            }
-        | sortableSetImpl.Integer  (intSet, d) ->
-            result {
-             let! roll = intSet |> IntSetsRollout.fromIntSets d
-             return roll |> sortableSetRollout.Int
-            }
-            
-        | sortableSetImpl.Bp64 (bp64, d) ->
-            result {
-             let! roll = bp64 |> BP64SetsRollout.fromBitsP64 d
-             return roll |> sortableSetRollout.Bp64
-            }
-
-
     let toIntSet (sortableRollout:sortableSetRollout) =
         match sortableRollout with
         | Int  isr ->    isr |> IntSetsRollout.toIntSet
@@ -259,8 +249,8 @@ module SortableSetRollout =
 
     //let intBitsHist (sortableRollout:sortableSetRollout) =
     //    match sortableRollout with
-    //    | Int  isr ->    isr |> IntSetsRollout.intBitsHist
-    //    | Bp64  bp64r -> bp64r |> BP64SetsRollout.intBitsHist
+    //    | Int  isr ->    isr |> IntSetsRollout.intSetHist
+    //    | Bp64  bp64r -> bp64r |> BP64SetsRollout.bitSetHist
 
 
     let removeDupes (ssR:sortableSetRollout) =

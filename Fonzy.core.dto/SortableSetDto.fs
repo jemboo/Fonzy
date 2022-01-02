@@ -136,18 +136,19 @@ type sortableSetImplDto = {cat:string; value:string; degree:int}
 module SortableSetImplDto =
     let toDto (ssr:sortableSetImpl) =
         match ssr with
-        | sortableSetImpl.Binary (bs, d) -> 
+        | sortableSetImpl.Binary isr -> 
             {sortableSetImplDto.cat = nameof sortableSetRep.Binary;
-             value = bs |> Json.serialize;
-             degree = (Degree.value d) }
-        | sortableSetImpl.Integer (ts, d) ->
+             value = isr |> IntSetsRollout.toIntSet |> Json.serialize;
+             degree = (Degree.value isr.degree) }
+        | sortableSetImpl.Integer isr ->
             {sortableSetImplDto.cat = nameof sortableSetRep.Integer;
-             value = ts |> Json.serialize;
-             degree = (Degree.value d) }
-        | sortableSetImpl.Bp64 (bps, d) ->
+             value = isr |> IntSetsRollout.toIntSet |> Json.serialize;
+             degree = (Degree.value isr.degree) }
+        | sortableSetImpl.Bp64 bsr ->
             {sortableSetImplDto.cat = nameof sortableSetRep.Bp64;
-             value = bps |> Json.serialize;
-             degree = (Degree.value d) }
+             value = bsr |> BP64SetsRollout.toIntSet |> Json.serialize;
+             degree = (Degree.value bsr.degree) }
+
 
     let toJson (ssr:sortableSetImpl) =
         ssr |> toDto |> Json.serialize
@@ -156,21 +157,24 @@ module SortableSetImplDto =
         match dto.cat with
         | nameof sortableSetImpl.Binary -> 
             result {
-                let! av = dto.value |> Json.deserialize<bitSet[]>
+                let! av = dto.value |> Json.deserialize<intSet[]>
                 let! d = dto.degree |> Degree.create ""
-                return sortableSetImpl.Binary (av, d)
+                let! rollout = IntSetsRollout.fromIntSets d av
+                return sortableSetImpl.Binary rollout
             }
         | nameof sortableSetImpl.Integer ->
             result {
                 let! av = dto.value |> Json.deserialize<intSet[]>
                 let! d = dto.degree |> Degree.create ""
-                return sortableSetImpl.Integer (av, d)
+                let! rollout = IntSetsRollout.fromIntSets d av
+                return sortableSetImpl.Integer rollout
             }
         | nameof sortableSetImpl.Bp64 ->
             result {
-                let! av = dto.value |> Json.deserialize<bitsP64[]>
+                let! av = dto.value |> Json.deserialize<intSet[]>
                 let! d = dto.degree |> Degree.create ""
-                return sortableSetImpl.Bp64 (av, d)
+                let! rollout = BP64SetsRollout.fromIntSets d av
+                return sortableSetImpl.Bp64 rollout
             }
         | cc -> sprintf "cat: %s not found" cc |> Error
 

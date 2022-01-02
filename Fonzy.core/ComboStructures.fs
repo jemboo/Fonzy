@@ -736,7 +736,7 @@ module BitsP64 =
     let fromBitSet (ibSeq:bitSet seq) =
         seq { 
               use e = ibSeq.GetEnumerator()
-              let nextChunk() =
+              let _nextChunk() =
                 let res = zeroCreate e.Current.values.Length
                 stripeWrite res e.Current 0
                 let mutable i = 1
@@ -745,8 +745,24 @@ module BitsP64 =
                     i <- i + 1
                 res
 
-              while e.MoveNext() do
-                yield nextChunk()  }
+              while e.MoveNext() do yield _nextChunk()  
+            }
+
+
+    let fromIntSet (ibSeq:intSet seq) =
+        seq { 
+              use e = ibSeq.GetEnumerator()
+              let _nextChunk() =
+                let res = zeroCreate e.Current.values.Length
+                stripeWrite res (e.Current |> BitSet.fromIntSet) 0
+                let mutable i = 1
+                while i < 64 && e.MoveNext() do
+                    stripeWrite res (e.Current |> BitSet.fromIntSet) i
+                    i <- i + 1
+                res
+
+              while e.MoveNext() do yield _nextChunk()  
+            }
 
 
     // returns only the nonzero sets

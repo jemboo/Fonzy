@@ -62,8 +62,10 @@ type SortableSetDtoFixture () =
     [<TestMethod>]
     member this.sortableSetImplDto() =
         let degree = Degree.fromInt 5
-        let intSets = [|{intSet.values =[|0;4;3;2;1|]}; {intSet.values =[|1;4;3;2;0|]}|]
-        let ssImpl = sortableSetImpl.Integer (intSets, degree)
+        let intSetsR = [|{intSet.values =[|0;4;3;2;1|]}; {intSet.values =[|1;4;3;2;0|]}|]
+                       |> IntSetsRollout.fromIntSets degree
+                       |> Result.ExtractOrThrow
+        let ssImpl = sortableSetImpl.Integer intSetsR
         let ssDto = ssImpl |> SortableSetImplDto.toDto
         let ssImplBack = ssDto |> SortableSetImplDto.fromDto
                                |> Result.ExtractOrThrow

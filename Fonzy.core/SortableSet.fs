@@ -13,26 +13,81 @@ module SortableSetRep =
         | sortableSetRep.Integer d -> d
         | sortableSetRep.Bp64 d -> d
 
+//type sortableSetImpl =
+//    | Binary of bitSet[] * Degree
+//    | Integer of intSet[] * Degree
+//    | Bp64 of bitsP64[] * 
+
 type sortableSetImpl =
-    | Binary of bitSet[] * Degree
-    | Integer of intSet[] * Degree
-    | Bp64 of bitsP64[] * Degree
+    | Binary of intSetsRollout
+    | Integer of intSetsRollout
+    | Bp64 of bP64SetsRollout
+
 
 module SortableSetImpl =
     let getDegree (rep:sortableSetImpl) =
         match rep with
-        | sortableSetImpl.Binary (bs, d) -> d
-        | sortableSetImpl.Integer (nts, d) -> d
-        | sortableSetImpl.Bp64 (bpS, d) -> d
+        | sortableSetImpl.Binary isr -> isr.degree
+        | sortableSetImpl.Integer isr -> isr.degree
+        | sortableSetImpl.Bp64 bsr -> bsr.degree
 
     let getIntSets (rep:sortableSetImpl) =
         match rep with
-        | sortableSetImpl.Binary (bs, d) ->
-            bs |> Array.map(BitSet.toIntSet)
-        | sortableSetImpl.Integer (nts, d) -> nts
-        | sortableSetImpl.Bp64 (bpS, d) -> 
-            bpS |> BitsP64.toIntSets |> Seq.toArray
+        | sortableSetImpl.Binary isr ->
+            isr |> IntSetsRollout.toIntSet
+        | sortableSetImpl.Integer isr ->
+            isr |> IntSetsRollout.toIntSet
+        | sortableSetImpl.Bp64 bsr ->
+            bsr |> BP64SetsRollout.toIntSet
 
+    let toSortableSetRollout (impl:sortableSetImpl) = 
+        match impl with
+        | sortableSetImpl.Binary isr ->
+            result {
+             return isr |> sortableSetRollout.Int
+            }
+        | sortableSetImpl.Integer isr ->
+            result {
+             return isr |> sortableSetRollout.Int
+            }
+        
+        | sortableSetImpl.Bp64 bsr ->
+            result {
+             return bsr |> sortableSetRollout.Bp64
+            }
+
+    //let getDegree (rep:sortableSetImpl) =
+    //    match rep with
+    //    | sortableSetImpl.Binary (bs, d) -> d
+    //    | sortableSetImpl.Integer (nts, d) -> d
+    //    | sortableSetImpl.Bp64 (bpS, d) -> d
+
+    //let getIntSets (rep:sortableSetImpl) =
+    //    match rep with
+    //    | sortableSetImpl.Binary (bs, d) ->
+    //        bs |> Array.map(BitSet.toIntSet)
+    //    | sortableSetImpl.Integer (nts, d) -> nts
+    //    | sortableSetImpl.Bp64 (bpS, d) -> 
+    //        bpS |> BitsP64.toIntSets |> Seq.toArray
+
+    //let toSortableSetRollout (impl:sortableSetImpl) = 
+    //    match impl with
+    //    | sortableSetImpl.Binary (bitSet, d) ->
+    //        result {
+    //         let! roll = bitSet |> IntSetsRollout.fromBitSet d
+    //         return roll |> sortableSetRollout.Int
+    //        }
+    //    | sortableSetImpl.Integer  (intSet, d) ->
+    //        result {
+    //         let! roll = intSet |> IntSetsRollout.fromIntSets d
+    //         return roll |> sortableSetRollout.Int
+    //        }
+            
+    //    | sortableSetImpl.Bp64 (bp64, d) ->
+    //        result {
+    //         let! roll = bp64 |> BP64SetsRollout.fromBitsP64 d
+    //         return roll |> sortableSetRollout.Bp64
+    //        }
 
 
 type sortableSetType = 

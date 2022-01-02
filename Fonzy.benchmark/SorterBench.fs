@@ -38,7 +38,7 @@ type BenchSorterOnInts() =
     member this.evalSorter() =
         let ssR = SortingInts.evalSorterOnBinary 
                             sorter16 
-                            bitSets 
+                            rollout 
                             Sorting.switchUsePlan.All
                             Sorting.eventGrouping.BySwitch
         ssR
@@ -162,20 +162,20 @@ type BenchmarkSorterOnBp64() =
     //    ssR
 
 
-    //[<Benchmark>]
-    //member this.evalSorter() =
-    //    let ssR = SortingBp64.evalSorter 
-    //                        sorter16 
-    //                        bp64s
-    //                        Sorting.switchUsePlan.All
-    //                        Sorting.eventGrouping.BySwitch
-    //    ssR
+    [<Benchmark>]
+    member this.evalSorter() =
+        let ssR = SortingBp64.evalSorter 
+                            sorter16 
+                            bp64Rollout
+                            Sorting.switchUsePlan.All
+                            Sorting.eventGrouping.BySwitch
+        ssR
     
     [<Benchmark>]
     member this.evalBp64BySwitch() =
         let ssR = SortingBp64.evalSorter 
                             sorter16 
-                            bp64s
+                            bp64Rollout
                             Sorting.switchUsePlan.All
                             Sorting.eventGrouping.BySwitch
         ssR

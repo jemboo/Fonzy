@@ -6,28 +6,40 @@ module SortableSetMaker =
                    (rngGen:RngGen) 
                    (sortableCount:SortableCount) = 
         let rando = rngGen |> Rando.fromRngGen
-        let intSet() = 
+        let _intSet() = 
             IntSet.createRandoms degree 
                                  rando
             |> Seq.take (SortableCount.value sortableCount)
-            |> Seq.toArray
+            |> IntSetsRollout.fromIntSets degree
 
-        let bitSet() = 
+        let _bitSet() = 
             BitSet.createRandoms degree 
                                  rando
             |> Seq.take (SortableCount.value sortableCount)
-            |> Seq.toArray
+            |> IntSetsRollout.fromBitSet degree
 
-        let bitsP64Set() = 
+        let _bitsP64Set() = 
             BitsP64.createRandoms degree 
                                   rando 
                                   (SortableCount.value sortableCount)
-            |> Seq.toArray
+            |> BP64SetsRollout.fromBitsP64 degree
 
         match ssr with
-        | sortableSetRep.Binary d -> (bitSet(), d) |> sortableSetImpl.Binary
-        | sortableSetRep.Integer d -> (intSet(), d) |> sortableSetImpl.Integer
-        | sortableSetRep.Bp64 d -> (bitsP64Set(), d) |> sortableSetImpl.Bp64
+        | sortableSetRep.Binary d ->
+            result {
+                 let! bst = _bitSet()
+                 return bst |> sortableSetImpl.Binary
+                 }
+        | sortableSetRep.Integer d ->
+            result {
+                  let! ist =  _intSet()
+                  return ist |> sortableSetImpl.Integer
+                 }
+        | sortableSetRep.Bp64 d -> 
+            result { 
+                     let! bs = _bitsP64Set() 
+                     return bs |> sortableSetImpl.Bp64
+                   }
 
 
     let allZeroOnes (ssr:sortableSetRep) = 
@@ -36,39 +48,63 @@ module SortableSetMaker =
         let ssid = ([("allZeroOnes" :> obj); (degree :> obj)]) 
                    |> GuidUtils.guidFromObjs
                    |> SortableSetId.fromGuid
-        let intSet() = 
+        let _intSet() = 
             IntSet.arrayOfAllFor degree
-            |> Seq.toArray
+            |> IntSetsRollout.fromIntSets degree
 
-        let bitSet() = 
+        let _bitSet() = 
             (BitSet.arrayOfAllFor degree)
-            |> Seq.toArray
+            |> IntSetsRollout.fromBitSet degree
 
-        let bitsP64Set() = 
+        let _bitsP64Set() = 
             (BitsP64.arrayOfAllFor degree)
-            |> Seq.toArray
+            |> BP64SetsRollout.fromBitsP64 degree
 
         match ssr with
         | sortableSetRep.Binary d -> 
-            (bitSet(), d) |> sortableSetImpl.Binary
+            result {
+                 let! bst = _bitSet()
+                 return bst |> sortableSetImpl.Binary
+                 }
         | sortableSetRep.Integer d -> 
-            (intSet(), d) |> sortableSetImpl.Integer
+            result {
+                  let! ist =  _intSet()
+                  return ist |> sortableSetImpl.Integer
+                 }
         | sortableSetRep.Bp64 d -> 
-            (bitsP64Set(), d) |> sortableSetImpl.Bp64
+            result { 
+                     let! bs = _bitsP64Set() 
+                     return bs |> sortableSetImpl.Bp64
+                   }
 
-    let binaryMerges (degs:Degree list) (ssr:sortableSetRep) = 
+
+    let binaryMerges (degs:Degree list) 
+                     (ssr:sortableSetRep) = 
         
-        let bitSet() = 
+        let _bitSet() = 
             (BitSet.stackSortedBlocks degs)
             |> Seq.toArray
 
         match ssr with
         | sortableSetRep.Binary d -> 
-            (bitSet(), d) |> sortableSetImpl.Binary
+            result {
+                 let! bst = _bitSet()
+                            |> IntSetsRollout.fromBitSet d
+                 return bst |> sortableSetImpl.Binary
+                 }
         | sortableSetRep.Integer d -> 
-            (bitSet() |> Array.map(BitSet.toIntSet), d) |> sortableSetImpl.Integer
+            result {
+                 let! bst = _bitSet()
+                            |> IntSetsRollout.fromBitSet d
+                 return bst |> sortableSetImpl.Integer
+                 }
         | sortableSetRep.Bp64 d -> 
-            (bitSet() |> BitsP64.fromBitSet |> Seq.toArray, d)  |> sortableSetImpl.Bp64
+            result { 
+                     let! bs = _bitSet()
+                                |> BitsP64.fromBitSet 
+                                |> BP64SetsRollout.fromBitsP64 d
+                     return bs |> sortableSetImpl.Bp64
+                   }
 
 
 
@@ -82,10 +118,15 @@ module SortableSetMaker =
 
         match ssType with
         | sortableSetType.BinaryMerge (degs, ssr) ->
-            (binaryMerges degs ssr, {switchUses.weights = [||] })  |> Ok
-
+            result {
+                let! bImpl = binaryMerges degs ssr
+                return (bImpl, {switchUses.weights = [||] })
+            }
         | sortableSetType.AllForDegree ssr -> 
-                (allZeroOnes ssr, {switchUses.weights = [||] }) |> Ok
+            result {
+                let! bImpl = allZeroOnes ssr
+                return (bImpl, {switchUses.weights = [||] })
+            }
         | sortableSetType.Explicit ssid ->
             result {
                 let! sset = _lookup ssid
@@ -93,7 +134,10 @@ module SortableSetMaker =
             }
         | sortableSetType.Random (rng, sc, ssr) ->
             let degree = ssr |> SortableSetRep.getDegree
-            (rndIntBits ssr degree rng sc, {switchUses.weights = [||] })  |> Ok
+            result {
+                let! rndBitsImpl = rndIntBits ssr degree rng sc
+                return (rndBitsImpl, {switchUses.weights = [||] }) 
+            }
         | sortableSetType.SwitchReduced (sst, swPfx) ->
             result {
                 let! implB, wUsesB = makeT repo sst
@@ -112,14 +156,14 @@ module SortableSetMaker =
             | None -> "repo missing" |> Error
         match ssType with
         | sortableSetType.BinaryMerge (degs, ssr) ->
-            binaryMerges degs ssr  |> Ok
+            binaryMerges degs ssr
         | sortableSetType.AllForDegree ssr -> 
-                allZeroOnes ssr |> Ok
+                allZeroOnes ssr
         | sortableSetType.Explicit ssid ->
                 _lookup ssid
         | sortableSetType.Random (rng, sc, ssr) ->
             let degree = ssr |> SortableSetRep.getDegree
-            rndIntBits ssr degree rng sc  |> Ok
+            rndIntBits ssr degree rng sc
         | sortableSetType.SwitchReduced (sst, swPfx) ->
             result {
                 let! toChop = make repo sst
