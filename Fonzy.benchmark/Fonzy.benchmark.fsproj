@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Fonzy.core.dto\Fonzy.core.dto.fsproj" />
     <ProjectReference Include="..\Fonzy.core\Fonzy.core.fsproj" />
+    <ProjectReference Include="..\Fonzy.data\Fonzy.data.fsproj" />
     <ProjectReference Include="..\Fonzy.job\Fonzy.job.fsproj" />
     <ProjectReference Include="..\Fonzy.world.dto\Fonzy.world.dto.fsproj" />
     <ProjectReference Include="..\Fonzy.world\Fonzy.world.fsproj" />

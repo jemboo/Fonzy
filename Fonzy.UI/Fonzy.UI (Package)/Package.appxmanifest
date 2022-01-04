@@ -7,12 +7,12 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="aa0793c3-9421-4bfa-9863-8329f40d7242"
+    Name="0405be21-bb63-4405-a5a4-7423f9b176d3"
     Publisher="CN=tpnsc"
     Version="1.0.0.0" />
 
   <Properties>
-    <DisplayName>FonzyUI (Package)</DisplayName>
+    <DisplayName>Fonzy.UI (Package)</DisplayName>
     <PublisherDisplayName>tpnsc</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
   </Properties>
@@ -31,8 +31,8 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="FonzyUI (Package)"
-        Description="FonzyUI (Package)"
+        DisplayName="Fonzy.UI (Package)"
+        Description="Fonzy.UI (Package)"
         BackgroundColor="transparent"
         Square150x150Logo="Images\Square150x150Logo.png"
         Square44x44Logo="Images\Square44x44Logo.png">

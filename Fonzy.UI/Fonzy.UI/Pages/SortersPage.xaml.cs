@@ -16,22 +16,21 @@ using Windows.Foundation.Collections;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace FonzyUI
+namespace Fonzy.UI.Pages
 {
     /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
+    /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainWindow : Window
+    public sealed partial class SortersPage : Page
     {
-        public MainWindow()
+        public SortersPage()
         {
             this.InitializeComponent();
         }
 
-        private void myButton_Click(object sender, RoutedEventArgs e)
+        private void ShcButton_Click(object sender, RoutedEventArgs e)
         {
-            var res = ParseUtils.MakeFloat("0.0232");
-            myButton.Content = res.ResultValue.ToString();
+            this.Frame.Navigate(typeof(ShcPage));
         }
     }
 }

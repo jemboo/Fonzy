@@ -31,17 +31,17 @@
   </ItemGroup>
   <PropertyGroup>
     <WapProjPath Condition="'$(WapProjPath)'==''">$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\</WapProjPath>
-    <PathToXAMLWinRTImplementations>FonzyUI\</PathToXAMLWinRTImplementations>
+    <PathToXAMLWinRTImplementations>Fonzy.UI\</PathToXAMLWinRTImplementations>
   </PropertyGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.props" />
   <PropertyGroup>
-    <ProjectGuid>963911bf-9693-432a-814e-df6eef25a63b</ProjectGuid>
+    <ProjectGuid>4da44f05-4bd3-448f-bc8d-9e8ae2da25e7</ProjectGuid>
     <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <AssetTargetFallback>net5.0-windows$(TargetPlatformVersion);$(AssetTargetFallback)</AssetTargetFallback>
+    <AssetTargetFallback>net6.0-windows$(TargetPlatformVersion);$(AssetTargetFallback)</AssetTargetFallback>
     <DefaultLanguage>en-US</DefaultLanguage>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
-    <EntryPointProjectUniqueName>..\FonzyUI\FonzyUI.csproj</EntryPointProjectUniqueName>
+    <EntryPointProjectUniqueName>..\Fonzy.UI\Fonzy.UI.csproj</EntryPointProjectUniqueName>
   </PropertyGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -58,16 +58,16 @@
     <Content Include="Images\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FonzyUI\FonzyUI.csproj">
+    <ProjectReference Include="..\Fonzy.UI\Fonzy.UI.csproj">
       <SkipGetTargetFrameworkProperties>True</SkipGetTargetFrameworkProperties>
       <PublishProfile>Properties\PublishProfiles\win10-$(Platform).pubxml</PublishProfile>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.ProjectReunion" Version="[0.8.4]">
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="[1.0.0]">
       <IncludeAssets>build</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.ProjectReunion.WinUI" Version="[0.8.4]">
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="[10.0.22000.194]">
       <IncludeAssets>build</IncludeAssets>
     </PackageReference>
   </ItemGroup>
