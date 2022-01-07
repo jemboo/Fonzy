@@ -210,8 +210,8 @@ type ComboStructuresFixture () =
     member this.BitSet_sorted_O_1_Sequence() =
         let degree = Degree.fromInt 10
         let block = BitSet.sorted_O_1_Sequence degree 7
-        let blockItems = block.values |> Array.toList
-        Assert.IsTrue(Combinatorics.isSorted blockItems)
+        let blockItems = block.values
+        Assert.IsTrue(Combinatorics.isSortedI blockItems)
         Assert.IsTrue (blockItems.Length = (Degree.value degree))
         
 

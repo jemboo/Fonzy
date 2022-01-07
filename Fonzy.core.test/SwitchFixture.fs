@@ -25,4 +25,21 @@ type SwitchFixture () =
 
         let hist = subSorters |> CollectionUtils.histogram (fun a -> a.Length)
         hist |> Map.toSeq |> Seq.iter(fun (k, v) -> Debug.WriteLine (sprintf "%d\t%d" k v) )
-        Assert.IsTrue(subSorters.Length > 0)
+        Assert.IsTrue(hist.Count > 0)
+
+
+    [<TestMethod>]
+    member this.rndMasks() =
+        let rndy = Rando.fromRngGen (RngGen.lcgFromNow())
+        let degSrc = Degree.fromInt 16
+        let degDest = Degree.fromInt 12
+        let srtGreen = RefSorter.createRefSorter RefSorter.End16
+                       |> Result.ExtractOrThrow
+        let subSorters = Switch.rndMasks degSrc degDest srtGreen.switches rndy
+                         |> Seq.take(100)
+                         |> Seq.toArray
+
+        let hist = subSorters |> CollectionUtils.histogram (fun a -> a.Length)
+        hist |> Map.toSeq |> Seq.iter(fun (k, v) -> Debug.WriteLine (sprintf "%d\t%d" k v) )
+
+        Assert.IsTrue(hist.Count > 0)

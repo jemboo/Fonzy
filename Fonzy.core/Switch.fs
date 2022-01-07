@@ -113,38 +113,72 @@ module Switch =
         switches |> Seq.map(fun sw-> mutateSwitch sw)
 
 
-    let reflect (degree:Degree) 
-                (sw:Switch) =
-        let deg = (Degree.value degree)
-        { Switch.low = sw.hi |> Combinatorics.reflect deg;
-          Switch.hi = sw.low |> Combinatorics.reflect deg; }
+    let reflect (deg:Degree) (sw:Switch) =
+        { Switch.low = sw.hi |> Degree.reflect deg;
+          Switch.hi = sw.low |> Degree.reflect deg; }
 
-
-    let reduce  (redMap:int option [])
-                (sw:Switch) =
-        let rpL, rpH = (redMap.[sw.low], redMap.[sw.hi])
-        match rpL, rpH with
-        | Some l, Some h -> Some {Switch.low=l; hi=h;}
-        | _ , _ -> None
 
 
     let reduceMany (sws:Switch array) 
                    (redMap:int option []) =
-        sws |> Array.map(reduce redMap)
+
+        let _reduce (redMap:int option [])
+                    (sw:Switch) =
+            let rpL, rpH = (redMap.[sw.low], redMap.[sw.hi])
+            match rpL, rpH with
+            | Some l, Some h -> Some {Switch.low=l; hi=h;}
+            | _ , _ -> None
+
+        sws |> Array.map(_reduce redMap)
+            |> Array.filter(Option.isSome)
+            |> Array.map(Option.get)
+
+
+    
+    let mapSubset (degree:Degree)
+                  (subset: int list)  =
+        let aRet = Array.create (Degree.value degree)
+                                 None 
+        subset |> List.iteri(fun dex dv -> aRet.[dv] <- Some dex)
+        aRet
+
+
+    // filters the switchArray, removing switches that compare 
+    // indexes that are not in subset. It then relabels the indexes
+    // according to the subset. Ex, if the subset was [2;5;8], then
+    // index 2 -> 0; index 5-> 1; index 8 -> 2
+    let rebufo (degree:Degree)
+               (swa:Switch array) 
+               (subset: int list) =
+
+        let _mapSubset (degree:Degree)
+                       (subset: int list)  =
+            let aRet = Array.create (Degree.value degree) None 
+            subset |> List.iteri(fun dex dv -> aRet.[dv] <- Some dex)
+            aRet
+
+        let _reduce (redMap:int option [])
+                    (sw:Switch) =
+            let rpL, rpH = (redMap.[sw.low], redMap.[sw.hi])
+            match rpL, rpH with
+            | Some l, Some h -> Some {Switch.low=l; hi=h;}
+            | _ , _ -> None
+
+        let redMap = _mapSubset degree subset
+        swa |> Array.map(_reduce redMap)
             |> Array.filter(Option.isSome)
             |> Array.map(Option.get)
 
 
     let allMasks (degreeSource:Degree)
-                 (degreeDest:Degree)
-                 (swa:Switch array) =
+                  (degreeDest:Degree)
+                  (swa:Switch array) =
         let sd = (Degree.value degreeSource)
         let dd = (Degree.value degreeDest)
         if sd < dd then
             failwith "source degree cannot be smaller than dest"
         Combinatorics.enumNchooseM sd dd
-        |> Seq.map(Combinatorics.mapSubset degreeSource)
-        |> Seq.map(reduceMany swa)
+        |> Seq.map(rebufo degreeSource swa)
 
 
     let rndMasks (degreeSource:Degree)
@@ -155,9 +189,6 @@ module Switch =
         let dd = (Degree.value degreeDest)
         if sd < dd then
             failwith "source degree cannot be smaller than dest"
-
         Combinatorics.rndNchooseM sd dd rnd
-        |> Seq.map(Combinatorics.mapSubset degreeSource)
-        |> Seq.map(reduceMany swa)
-
+        |> Seq.map(rebufo degreeSource swa)
 

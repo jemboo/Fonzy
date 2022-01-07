@@ -112,7 +112,7 @@ type TreeFixture () =
 
        //let rep = StringUtils.printSeqToRow (hist |> Seq.map(snd))
 
-        let tcps = rese |> Array.map(Combinatorics.fixedCount)
+        let tcps = rese |> Array.map(Combinatorics.fixedPointCount)
                         |> CollectionUtils.histogram (id)
         let fxTup = tcps |> Map.toArray
         //let fxRep = fxTup |> StringUtils.printSeqfToColumn 

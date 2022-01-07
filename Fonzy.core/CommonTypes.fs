@@ -28,6 +28,9 @@ module Degree =
              |> Seq.reduce(+)
              |> fromInt
 
+    let reflect (dg:Degree) (src:int) =
+        (value dg) - src - 1
+
 
 type MutationRate = private MutationRate of float
 module MutationRate =

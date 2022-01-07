@@ -90,7 +90,7 @@ module IntSetsRollout =
         let d = (Degree.value intsRoll.degree)
         seq {0 .. d .. (intsRoll.baseArray.Length - 1)}
             |> Seq.filter (fun dex -> 
-                    Combinatorics.isSortedOffset intsRoll.baseArray dex d)
+                    Combinatorics.isSortedOffsetI intsRoll.baseArray dex d)
             |> Seq.length
 
 

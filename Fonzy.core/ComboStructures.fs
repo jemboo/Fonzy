@@ -36,7 +36,7 @@ module Permutation =
             create degree vals  |> Ok
 
     let identity (degree:Degree) = 
-        {degree=degree; values=[|0 .. (Degree.value degree)-1|] }
+        {degree=degree; values= Combinatorics.identity (Degree.value degree)}
 
     let rotate (degree:Degree) (dir:int) = 
         let d = (Degree.value degree)
@@ -55,12 +55,12 @@ module Permutation =
         create p.degree (Combinatorics.inverseMapArray (p |> arrayValues))
 
     let product (pA:permutation) (pB:permutation) =
-        create pA.degree  (Combinatorics.composeMapIntArrays 
+        create pA.degree  (Combinatorics.composeIntArrayMaps 
                                 (pA |> arrayValues) 
                                 (pB |> arrayValues))
 
     let conjugate (pA:permutation) (conj:permutation) =
-        create pA.degree  (Combinatorics.conjugateIntArrays 
+        create pA.degree  (Combinatorics.conjIntArrays 
                                 (pA |> arrayValues) 
                                 (conj |> arrayValues))
 
@@ -109,7 +109,7 @@ module TwoCyclePerm =
 
 
     let identity (degree:Degree) = 
-        {degree=degree; values=[|0 .. (Degree.value degree)-1|] }
+        {degree=degree; values= Combinatorics.identity (Degree.value degree)}
 
 
     let arrayValues perm = perm.values
@@ -122,15 +122,17 @@ module TwoCyclePerm =
 
 
     let product (pA:twoCyclePerm) (pB:twoCyclePerm) =
-        create pA.degree  (Combinatorics.composeMapIntArrays 
+        create pA.degree  (Combinatorics.composeIntArrayMaps 
                                 (pA |> arrayValues) 
                                 (pB |> arrayValues))
 
 
-    let conjugate (pA:twoCyclePerm) (conj:permutation) =
-        create pA.degree  (Combinatorics.conjugateIntArrays 
-                                (pA |> arrayValues) 
-                                (conj |> Permutation.arrayValues))
+    let conjugate (tcp:twoCyclePerm) (conj:permutation) =
+        let tcpInts = (tcp |> arrayValues)
+        let conjInts = (conj |> Permutation.arrayValues)
+        create tcp.degree   (tcpInts
+                             |> Combinatorics.conjIntArrays
+                                conjInts)
 
 
     let toTwoCycle (perm:permutation) =
@@ -149,12 +151,11 @@ module TwoCyclePerm =
 
 
     let reflect (tcp:twoCyclePerm) =
-        let deg = (Degree.value tcp.degree)
         let refV pos = 
-            Combinatorics.reflect deg pos
+            Degree.reflect tcp.degree pos
 
         let refl = Array.init 
-                    deg
+                    (Degree.value tcp.degree)
                     (fun dex -> tcp.values.[refV dex] |> refV)
         {
             degree = tcp.degree; 
@@ -234,11 +235,10 @@ module TwoCyclePerm =
 
         let _mutato (pair:int*int) = 
             let tca = tcp |> arrayValues |> Array.copy
-            let dv = tcp.degree |> Degree.value
             let pA, pB = pair
             let tpA, tpB = tca.[pA], tca.[pB]
-            let rA, rB = (Combinatorics.reflect dv pA), (Combinatorics.reflect dv pB)
-            let rtA, rtB = (Combinatorics.reflect dv tpA), (Combinatorics.reflect dv tpB)
+            let rA, rB = (pA |> Degree.reflect tcp.degree), (pB |> Degree.reflect tcp.degree)
+            let rtA, rtB = (tpA |> Degree.reflect tcp.degree), (tpB |> Degree.reflect tcp.degree)
 
             tca.[pA] <- tpB
             tca.[tpB] <- pA
@@ -413,8 +413,7 @@ module IntSet =
         ibs.values |> Array.forall((=) 0)
 
     let isSorted (intSet:intSet) =
-        Combinatorics.isSorted intSet.values
-
+        Combinatorics.isSortedI intSet.values
 
     let fromInteger (len:int) (intVers:int) =
         let bitLoc (loc:int) (intBits:int) =
@@ -422,7 +421,6 @@ module IntSet =
         { intSet.values = 
                     Array.init len 
                                 (fun i -> bitLoc i intVers) }
-
 
     let toInteger (arrayVers:intSet) =
         let mutable intRet = 0
@@ -503,7 +501,7 @@ module BitSet =
         ibs.values |> Array.forall((=) 0)
 
     let isSorted (bitSet:bitSet) =
-        Combinatorics.isSorted bitSet.values
+        Combinatorics.isSortedI bitSet.values
 
     let sorted_O_1_Sequence (degree:Degree) 
                             (onesCount:int) =

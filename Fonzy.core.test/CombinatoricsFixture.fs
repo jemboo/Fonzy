@@ -56,28 +56,32 @@ type CombinatoricsFixture () =
     [<TestMethod>]
     member this.composeMapIntArrays() =
         let degree = Degree.create "" 6 |> Result.ExtractOrThrow
-        let orig = [|5; 4; 3; 2; 1; 0 |]
-        let prodR = Combinatorics.composeMapIntArrays orig ((Permutation.identity degree) |> Permutation.arrayValues)
-        Assert.IsTrue ((orig = prodR))
-        let prodL = Combinatorics.composeMapIntArrays ((Permutation.identity degree) |> Permutation.arrayValues) orig
-        Assert.IsTrue ((orig = prodL))
- 
+        let flipA = [|5; 4; 3; 2; 1; 0 |]
+        let idA =[|0 .. (Degree.value degree)-1|]
+        let prodByIdR = Combinatorics.composeIntArrayMaps flipA idA
+        Assert.IsTrue ((prodByIdR = flipA))
+        let prodByIdL = Combinatorics.composeIntArrayMaps idA flipA
+        Assert.IsTrue ((prodByIdL = flipA))
+        let prodSquare =  Combinatorics.composeIntArrayMaps flipA flipA
+        Assert.IsTrue ((prodSquare = idA))
+
 
     [<TestMethod>]
     member this.isSorted() =
-        Assert.IsTrue (Combinatorics.isSorted Seq.empty<int>)
-        Assert.IsFalse (Combinatorics.isSorted [|0; 1; 1; 0; 1; 0|])
-        Assert.IsTrue (Combinatorics.isSorted [|0; 0; 0; 0; 1; 1|])
+        Assert.IsTrue (Combinatorics.isSortedI Array.empty<int>)
+        Assert.IsFalse (Combinatorics.isSortedI [|0; 1; 1; 0; 1; 0|])
+        Assert.IsTrue (Combinatorics.isSortedI [|0; 0; 0; 0; 1; 1|])
 
 
     [<TestMethod>]
     member this.isSortedOffset() =
-        Assert.IsFalse (Combinatorics.isSortedOffset [|0; 1; 1; 0; 1; 0; 1; 1 |] 1 5)
-        Assert.IsTrue (Combinatorics.isSortedOffset [|0; 0; 0; 0; 1; 1; 0; 0|] 1 5)
+        Assert.IsFalse (Combinatorics.isSortedOffsetI [|0; 1; 1; 0; 1; 0; 1; 1 |] 1 5)
+        Assert.IsTrue (Combinatorics.isSortedOffsetI [|0; 0; 0; 0; 1; 1; 0; 0|] 1 5)
 
 
     [<TestMethod>]
     member this.entropyBits() =
+        let id = Combinatorics.identity 7
         let res1 = Combinatorics.entropyBits [|1; 1 |]
         Assert.AreEqual (res1, 1.0)
         let res2 = Combinatorics.entropyBits [|1; 1; 1; 1; 0|]
@@ -98,9 +102,9 @@ type CombinatoricsFixture () =
         let randy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let mutable i = 0
         while i<100 do
-            let bloke = Combinatorics.randomPermutation randy (Degree.value degree)
+            let bloke = Combinatorics.randomPermutation degree randy
             let inv = Combinatorics.inverseMapArray bloke
-            let prod = Combinatorics.composeMapIntArrays bloke inv
+            let prod = Combinatorics.composeIntArrayMaps bloke inv
             Assert.IsTrue((prod = (Combinatorics.identity (Degree.value degree))))
             i <- i+1
 
@@ -110,14 +114,14 @@ type CombinatoricsFixture () =
         let randy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let mutable i = 0
         while i<10 do
-            let conjer = Combinatorics.randomPermutation randy (Degree.value degree)
-            let tc1 = Combinatorics.randomPermutation randy (Degree.value degree)
-            let conj1 = Combinatorics.conjugateIntArrays tc1 conjer
-            let tc2 = Combinatorics.randomPermutation randy (Degree.value degree)
-            let conj2 = Combinatorics.conjugateIntArrays tc2 conjer
-            let prod = Combinatorics.composeMapIntArrays tc1 tc2
-            let conjprod = Combinatorics.conjugateIntArrays prod conjer
-            let prodconj = Combinatorics.composeMapIntArrays conj1 conj2
+            let conjer = Combinatorics.randomPermutation degree randy
+            let tc1 = Combinatorics.randomPermutation degree randy
+            let conj1 = Combinatorics.conjIntArrays conjer tc1 
+            let tc2 = Combinatorics.randomPermutation degree randy
+            let conj2 = Combinatorics.conjIntArrays conjer tc2 
+            let prod = Combinatorics.composeIntArrayMaps tc1 tc2
+            let conjprod = Combinatorics.conjIntArrays conjer prod 
+            let prodconj = Combinatorics.composeIntArrayMaps conj1 conj2
             Assert.IsTrue((conjprod=prodconj))
             i <- i+1
 
@@ -129,8 +133,8 @@ type CombinatoricsFixture () =
         let mutable i = 0
         while i<10 do
             let tc = Combinatorics.rndFullTwoCycleArray randy (Degree.value degree)
-            let conjer = Combinatorics.randomPermutation randy (Degree.value degree)
-            let conj = Combinatorics.conjugateIntArrays tc conjer
+            let conjer = Combinatorics.randomPermutation degree randy
+            let conj = Combinatorics.conjIntArrays conjer tc 
             Assert.IsTrue(Combinatorics.isTwoCycle conj)
             i <- i+1
 
@@ -149,16 +153,16 @@ type CombinatoricsFixture () =
 
 
     [<TestMethod>]
-    member this.cumSum() =
+    member this.toCumulative() =
         let testArray = [|2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0; 10.0|]
         let startVal = 3.5
         let expectedResult = [|5.5; 8.5; 12.5; 17.5; 23.5; 30.5; 38.5; 47.5; 57.5|]
-        let actualResult = Combinatorics.cumSum startVal testArray
+        let actualResult = Combinatorics.toCumulative startVal testArray
         Assert.AreEqual(expectedResult.[8], actualResult.[8])
 
 
     [<TestMethod>]
-    member this.drawFromWeightedDistribution() =
+    member this.fromWeightedDistribution() =
         let testArray = [|2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0; 10.0; |]
         let rndy = Rando.LcgFromSeed (RandomSeed.fromInt 424)
         let mutable log = []
@@ -166,7 +170,7 @@ type CombinatoricsFixture () =
             log <- s::log
         let weightFunction (w:float) =
             1.0 / w
-        testArray |>  (Combinatorics.drawFromWeightedDistribution weightFunction rndy)
+        testArray |>  (Combinatorics.fromWeightedDistribution weightFunction rndy)
             |> Seq.take 100 |> Seq.toArray
             |> Array.groupBy(id)
             |> Array.iter(fun b -> LogRes (sprintf "%f %d" (fst b) (snd b).Length))
@@ -175,19 +179,13 @@ type CombinatoricsFixture () =
 
 
     [<TestMethod>]
-    member this.makeHull() =
-        let seqX = Seq.initInfinite(fun i-> sprintf "x%d" i)
-        let seqY = Seq.initInfinite(fun i-> sprintf "y%d" i)
-        let h1 = Combinatorics.makeHull seqX seqY 1 2
-                |> Seq.toArray
-        Assert.IsTrue (true)
-
-
-    [<TestMethod>]
     member this.enumNchooseM() =
         let n = 8
         let m = 5
-        let res = Combinatorics.enumNchooseM n m |> Seq.toList
+        let res = Combinatorics.enumNchooseM n m 
+                    |> Seq.map(List.toArray)
+                    |> Seq.toList
+        Assert.IsTrue(res |> Seq.forall(Combinatorics.isSortedI))
         Assert.AreEqual(res.Length, 56)
 
 

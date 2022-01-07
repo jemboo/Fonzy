@@ -7,7 +7,7 @@ module Combinatorics =
         [|0 .. degree-1|] 
 
 
-    let composeMapIntArrays (a:array<int>) 
+    let composeIntArrayMaps (a:array<int>) 
                             (b:array<int>) =
         let product = Array.init a.Length (fun i -> 0)
         for i = 0 to a.Length - 1 do
@@ -22,35 +22,28 @@ module Combinatorics =
       aInv
 
     // conj * a * conj ^ -1
-    let conjugateIntArrays (a:array<int>) 
-                           (conj:array<int>) =
-        composeMapIntArrays conj (composeMapIntArrays a (inverseMapArray conj) )
+    let conjIntArrays (conj:array<int>) (a:array<int>) =
+        (a |> composeIntArrayMaps (inverseMapArray conj)) |> composeIntArrayMaps conj 
 
 
-    let isSorted (values:int seq) =
-        if values |> Seq.isEmpty then
-            true
-        else
-            use yak = values.GetEnumerator()
-            yak.MoveNext() |> ignore
-            let mutable lastVal = yak.Current
-            let mutable cont = true
-            while (yak.MoveNext() && cont) do
-                if (yak.Current < lastVal) then
-                    cont <- false
-                else
-                    lastVal <- yak.Current
-            cont
 
-    let spanIsSorted (values:Span<int>) =
+    let isSortedI (values:int[]) =
         let mutable i=1
         let mutable looP = true
         while ((i < values.Length) && looP) do
-             looP <- (values.[i-1] <= values.[i])
+             looP <- (values.[i - 1] <= values.[i])
              i<-i+1
         looP
 
-    let isSortedOffset (baseValues:int[]) (offset:int) (length:int) =
+    let isSortedFloat (values:float[]) =
+        let mutable i=1
+        let mutable looP = true
+        while ((i < values.Length) && looP) do
+             looP <- (values.[i - 1] <= values.[i])
+             i<-i+1
+        looP
+
+    let isSortedOffsetI (baseValues:int[]) (offset:int) (length:int) =
         let mutable i=1
         let mutable looP = true
         while ((i < length) && looP) do
@@ -74,15 +67,15 @@ module Combinatorics =
              i<-i+1
         looP
 
-    let isTwoCycle (a:int[]) =
-        (composeMapIntArrays a a) = identity a.Length
 
-    let fixedCount (a:int[]) =
+    let isTwoCycle (a:int[]) =
+        (composeIntArrayMaps a a) = identity a.Length
+
+    let fixedPointCount (a:int[]) =
         a |> Array.mapi(fun dex e -> if (dex = e) then 1 else 0)
           |> Array.reduce(+)
 
-    let distanceSquared (a:array<int>) 
-                        (b:array<int>) =
+    let distanceSquared (a:array<int>) (b:array<int>) =
         Array.fold2 (fun acc elem1 elem2 ->
         acc + (elem1 - elem2) * (elem1 - elem2)) 0 a b
 
@@ -92,8 +85,8 @@ module Combinatorics =
         let tot = float (a |> Array.sum)
         let fa = a  |> Array.filter(fun i->i>0)
                     |> Array.map (fun i->(float i) / tot)
-        let res = Array.fold (fun acc elem -> 
-                        acc - elem * f * Math.Log(elem)) 0.0 fa
+        let res = fa |> Array.fold (fun acc elem -> 
+                        acc - elem * f * Math.Log(elem)) 0.0
         res 
 
     let unsortednessSquared (a:array<int>) =
@@ -119,19 +112,14 @@ module Combinatorics =
         bins |> Array.findIndex(fun b -> b>value)
 
     // converts a density distr to a cumulative distr.
-    let cumSum (startingVal:float) 
+    let toCumulative (startingVal:float) 
                (weights:float[]) =
         let mutable tot = startingVal
         let cumo w =
             tot<-tot + w
             tot
         weights |> Array.map(fun w -> cumo w)
-        
-    let makeHull (seqX:seq<'a>) (seqY:seq<'a>) (x:int) (y:int) =
-        let xa = seqX |> Seq.take(x) |> Seq.toArray
-        let ya = seqY |> Seq.take(y) |> Seq.toArray
-        seq {for i = 0 to x - 1 do yield (xa.[i], ya.[y-1])}
-            |> Seq.append (seq {for i = 0 to y - 2 do yield (xa.[x-1], ya.[i])})
+
 
     let randOneOrZero (pctOnes:float) (rnd:IRando) 
                       (len:int) =
@@ -165,15 +153,16 @@ module Combinatorics =
                         min2 + rnd.NextFloat * (max2 - min2)) }
 
 
-    let drawFromWeightedDistribution (weightFunction:float->float) 
+    let fromWeightedDistribution (weightFunction:float->float) 
                                      (rnd:IRando) 
                                      (items:float[]) =
         let bins = items |> Array.map(weightFunction)
-                         |> cumSum 0.0
+                         |> toCumulative 0.0
         let maxVal = bins.[bins.Length - 1]
         Seq.initInfinite(fun _-> items.[findBin bins (rnd.NextFloat * maxVal)])
 
-    // returns a sequence of draws from initialList without replacement. 
+
+    // returns a sequence oftoCumulative from initialList without replacement. 
     // Does not change initialList
     let fisherYatesShuffle (rnd:IRando) 
                            (initialList:array<'a>) =
@@ -193,17 +182,12 @@ module Combinatorics =
         |> Seq.map (fun i -> nextItem (uint32 i))         // yield the next item
 
 
-    let reflect (degree:int) (src:int) =
-        degree - src - 1
-
-    let randomPermutation (rnd:IRando) 
-                          (degree:int) =
-         (fisherYatesShuffle rnd)  [|0 .. degree-1|] |> Seq.toArray
+    let randomPermutation (deg:Degree) (rnd:IRando) =
+         (fisherYatesShuffle rnd)  [|0 .. (Degree.value deg) - 1|] |> Seq.toArray
 
 
-    let randomPermutations (rnd:IRando) 
-                           (degree:int) =
-         Seq.initInfinite (fun _ -> randomPermutation rnd degree)
+    let randomPermutations (deg:Degree) (rnd:IRando) =
+         Seq.initInfinite (fun _ -> rnd |> randomPermutation deg)
 
 
     let rndTwoCycleArray (rnd:IRando) 
@@ -224,18 +208,10 @@ module Combinatorics =
         rndTwoCycleArray rnd arraysize (arraysize/2)
 
 
-    let locsPosArrayo (arrayLen:int) (locs: (int*int*int) list) = 
-        let arrayRet = Array.zeroCreate arrayLen
-        locs |> List.iter (fun (l, loc, u) -> arrayRet.[loc] <- 1)
-        arrayRet
-
-    let locsPosArray (arrayLen:int) (locs: int list) = 
-        let arrayRet = Array.zeroCreate arrayLen
-        locs |> List.iter (fun loc -> arrayRet.[loc] <- 1)
-        arrayRet
-
-    let enumNchooseM (n:int) 
-                     (m:int) =
+    // generates all int[] sequences of of length m, made by drawing m
+    // items out of [0 .. (n-1)] without replacement, and the m items are
+    // ordered from smallest to largest.
+    let enumNchooseM (n:int) (m:int) =
         
         let maxVal = n - 1
 
@@ -283,29 +259,17 @@ module Combinatorics =
                   proceed <- (curTup |> Option.isSome)
             }
 
-    let capN (n:int)
-             (cap:int) 
-             (srcA:int[]) =
-        seq { for i in 0 .. (n-1) do
-              if (srcA.[i] < cap) then
-                yield i }
-            |> Seq.toList
-
-             
     let rndNchooseM (n:int) 
                     (m:int) 
                     (rnd:IRando) =
-        randomPermutations rnd n
-        |> Seq.map(capN n m)
 
+        let _capN (n:int) (cap:int) (srcA:int[]) =
+            seq { for i in 0 .. (n-1) do
+                  if (srcA.[i] < cap) then yield i }
+            |> Seq.toList
 
-    let mapSubset (degree:Degree)
-                  (subset: int list)  =
-        let aRet = Array.create (Degree.value degree)
-                                 None 
-        subset |> List.iteri(fun dex dv -> aRet.[dv] <- Some dex)
-        aRet
-
+        rnd |> randomPermutations (Degree.fromInt n)
+        |> Seq.map(_capN n m)
 
 
 
@@ -317,12 +281,8 @@ type reflectiveIndexes =
 
 module ReflectiveIndexes =
 
-    let reflect (degree:int) (src:int) =
-        degree - src - 1
-
-
-    let isReflSymmetric (degree:int) (pair:int*int) =
-        (reflect degree (fst pair)) = (snd pair)
+    let isReflSymmetric (degree:Degree) (pair:int*int) =
+        (pair |> fst |> Degree.reflect degree) = (snd pair)
 
 
     let getIndexes (rfls:reflectiveIndexes) =
@@ -355,7 +315,7 @@ module ReflectiveIndexes =
             let _rndmx max = 
                 (int rnd.NextPositiveInt) % max
             let _reflectD (dex:int) =
-                reflect (Degree.value degree) dex
+               dex |> Degree.reflect degree
 
             let _flagedArray = 
                 Array.init (Degree.value degree)

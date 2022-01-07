@@ -26,7 +26,7 @@ module SortingInts =
                 intSetsRoll.baseArray.[switch.low + sortableSetRolloutOffset] <- hv
                 useTrack.[localSwitchOffset + switchEventRolloutOffset] <- 1
             looP <- ((localSwitchOffset % 20 > 0) ||
-                     (not (Combinatorics.isSortedOffset 
+                     (not (Combinatorics.isSortedOffsetI 
                                             intSetsRoll.baseArray 
                                             sortableSetRolloutOffset 
                                             (Degree.value(intSetsRoll.degree)))))
@@ -102,7 +102,7 @@ module SortingInts =
                 sortableSetRollout.baseArray.[switch.low + sortableSetRolloutOffset] <- hv
                 useWeights.[localSwitchOffset] <- useWeights.[localSwitchOffset] + 1
                 looP <- ((localSwitchOffset % 20 > 0) ||
-                         (not (Combinatorics.isSortedOffset 
+                         (not (Combinatorics.isSortedOffsetI 
                                                 sortableSetRollout.baseArray 
                                                 sortableSetRolloutOffset 
                                                 (Degree.value(sorter.degree)))))
