@@ -196,11 +196,11 @@ type CombinatoricsFixture () =
       let rnd = Rando.LcgFromSeed (RandomSeed.fromInt 424) 
 
       let runTest () =
-          let pairs1 = ReflectiveIndexes.reflectivePairs 
+          let pairs1 = SwitchRfl.rndReflectivePairs 
                                          degree
                                          rnd          
                            |> Seq.toArray
-          let res = pairs1 |> Array.forall (ReflectiveIndexes.isGood)
+          let res = pairs1 |> Array.forall (SwitchRfl.isGood)
           (pairs1, res)
       let qua = Array.init 10 (fun _ -> runTest())
       qua |> Array.iter(fun tup -> Assert.IsTrue(snd tup))

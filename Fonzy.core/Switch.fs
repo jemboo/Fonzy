@@ -118,31 +118,6 @@ module Switch =
           Switch.hi = sw.low |> Degree.reflect deg; }
 
 
-
-    let reduceMany (sws:Switch array) 
-                   (redMap:int option []) =
-
-        let _reduce (redMap:int option [])
-                    (sw:Switch) =
-            let rpL, rpH = (redMap.[sw.low], redMap.[sw.hi])
-            match rpL, rpH with
-            | Some l, Some h -> Some {Switch.low=l; hi=h;}
-            | _ , _ -> None
-
-        sws |> Array.map(_reduce redMap)
-            |> Array.filter(Option.isSome)
-            |> Array.map(Option.get)
-
-
-    
-    let mapSubset (degree:Degree)
-                  (subset: int list)  =
-        let aRet = Array.create (Degree.value degree)
-                                 None 
-        subset |> List.iteri(fun dex dv -> aRet.[dv] <- Some dex)
-        aRet
-
-
     // filters the switchArray, removing switches that compare 
     // indexes that are not in subset. It then relabels the indexes
     // according to the subset. Ex, if the subset was [2;5;8], then
@@ -170,9 +145,11 @@ module Switch =
             |> Array.map(Option.get)
 
 
+    // returns a sequence containing all the possible
+    // degree reductions of the switch array
     let allMasks (degreeSource:Degree)
-                  (degreeDest:Degree)
-                  (swa:Switch array) =
+                 (degreeDest:Degree)
+                 (swa:Switch array) =
         let sd = (Degree.value degreeSource)
         let dd = (Degree.value degreeDest)
         if sd < dd then
@@ -180,7 +157,8 @@ module Switch =
         Combinatorics.enumNchooseM sd dd
         |> Seq.map(rebufo degreeSource swa)
 
-
+    // returns a sequence containing random
+    // degree reductions of the switch array
     let rndMasks (degreeSource:Degree)
                  (degreeDest:Degree)
                  (swa:Switch array)

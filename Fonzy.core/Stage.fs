@@ -256,16 +256,20 @@ module IndexedSelector =
             (qualifier:'V->bool)
             (rnd:IRando) =
 
+        let _choose (rando:IRando) (items:'T[]) =
+            if(items.Length > 0) then
+                Some items.[rando.NextPositiveInt % items.Length]
+            else
+                None
+
         let candies = selector.array |> Array.filter(fun tup -> tup |> fst |> qualifier)
-        candies |> Rando.choose rnd |> Option.map snd
+        candies |> _choose rnd |> Option.map snd
 
 
 
-type buddyTrack = { 
-                    degree:Degree;
+type buddyTrack = { degree:Degree;
                     traces:CircularBuffer<bool*bool>[]; 
-                    buffSz:StageCount; 
-                  }
+                    buffSz:StageCount; }
 
 module BuddyTrack =
 

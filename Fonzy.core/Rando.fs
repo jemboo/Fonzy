@@ -89,6 +89,7 @@ module Rando =
         | Some rando -> _NextGuid2 curr1 rando
         | None -> _NextGuid curr1
 
+
     let fromSeed rngtype seed =
         match rngtype with
         | RngType.Lcg -> LcgFromSeed seed
@@ -115,6 +116,9 @@ module Rando =
                            seed = (RandomSeed.fromInt randy.NextPositiveInt) }
         | RngType.Net -> { RngGen.rngType = RngType.Net; 
                            seed = (RandomSeed.fromInt randy.NextPositiveInt) }
+
+
+
 
 
     let multiDraw (rnd:IRando) (freq:float) (numDraws:int)  =
@@ -172,8 +176,3 @@ module Rando =
             }
         polarBoxMullerDist ()
 
-    let choose (rando:IRando) (items:'T[]) =
-        if(items.Length > 0) then
-            Some items.[rando.NextPositiveInt % items.Length]
-        else
-            None

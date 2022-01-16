@@ -205,7 +205,6 @@ type ComboStructuresFixture () =
         Assert.AreEqual(tc, 25)
 
 
-
     [<TestMethod>]
     member this.BitSet_sorted_O_1_Sequence() =
         let degree = Degree.fromInt 10

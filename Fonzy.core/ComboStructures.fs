@@ -277,8 +277,18 @@ module TwoCyclePerm =
     let rndTwoCycle (degree:Degree)
                     (switchFreq:float) 
                     (rnd:IRando) =
-        let switchCount = Rando.multiDraw 
-                            rnd 
+
+        let _multiDraw (rnd:IRando) (freq:float) (numDraws:int)  =
+            let __draw (randy:IRando) =
+                if randy.NextFloat < freq then 1 else 0
+            let mutable i=0
+            let mutable successCount = 0
+            while (i < numDraws) do
+                    successCount <- successCount + __draw rnd
+                    i <- i + 1
+            successCount
+
+        let switchCount = _multiDraw rnd 
                             switchFreq 
                             ((Degree.value degree) / 2)
         { 
@@ -303,7 +313,7 @@ module TwoCyclePerm =
                      (rnd:IRando) =
         let deg = (Degree.value degree)
         let aRet = Array.init deg (id)
-        let chunkRi (rfls:reflectiveIndexes) =
+        let chunkRi (rfls:switchRfl) =
             match rfls with
             | Single (i, j, d)         ->  aRet.[i] <- j
                                            aRet.[j] <- i
@@ -319,7 +329,7 @@ module TwoCyclePerm =
             | LeftOver (i, j, d)       ->  aRet.[i] <- j
                                            aRet.[j] <- i
 
-        let q = ReflectiveIndexes.reflectivePairs degree rnd
+        let q = SwitchRfl.rndReflectivePairs degree rnd
                 |> Seq.iter(chunkRi)
 
         { degree=degree; values=aRet }
