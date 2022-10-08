@@ -16,6 +16,27 @@ module TypeUtils =
 
 module ByteUtils =
 
+
+    /// ***********************************************************
+    /// *************** int array mapping *************************
+    /// ***********************************************************
+
+    let mapIntArrays (src_offset:int) (src:int[]) (dest_offset:int) (dest:int[]) (src_Ct:int) =
+            Buffer.BlockCopy(src, src_offset * 4, dest, dest_offset * 4, src_Ct * 4)
+
+    let mapUint8Arrays (src_offset:int) (src:uint8[]) (dest_offset:int) (dest:uint8[]) (src_Ct:int) =
+            Buffer.BlockCopy(src, src_offset, dest, dest_offset, src_Ct)
+
+    let mapUint16Arrays (src_offset:int) (src:uint16[]) (dest_offset:int) (dest:uint16[]) (src_Ct:int) =
+            Buffer.BlockCopy(src, src_offset * 2, dest, dest_offset * 2, src_Ct * 2)
+
+    let mapUint32Arrays (src_offset:int) (src:uint32[]) (dest_offset:int) (dest:uint32[]) (src_Ct:int) =
+            Buffer.BlockCopy(src, src_offset * 4, dest, dest_offset * 4, src_Ct * 4)
+
+    let mapUint64Arrays (src_offset:int) (src:uint64[]) (dest_offset:int) (dest:uint64[]) (src_Ct:int) =
+            Buffer.BlockCopy(src, src_offset * 8, dest, dest_offset * 8, src_Ct * 8)
+
+
     let bytesFromObj (o:obj) =
         let bf = new BinaryFormatter()
         use ms = new MemoryStream()
@@ -43,6 +64,7 @@ module ByteUtils =
         let md5 = MD5.Create();
         md5.ComputeHash(inputBytes)
 
+
     let trueBitCount32 (u32:uint) =
         let mutable tc = 0
         for i in 0 .. 31 do
@@ -50,6 +72,7 @@ module ByteUtils =
             if qua then
                 tc <- tc + 1
         tc
+
 
     let trueBitCount64 (u64:uint64) =
         let mutable tc = 0
@@ -93,17 +116,17 @@ module ByteUtils =
 
 module GuidUtils = 
 
-    let makeGuid (g1:uint64) (g2:uint64) (g3:uint64) (g4:uint64) =
-        let pc0 = System.BitConverter.GetBytes(g1)
-        let pc1 = System.BitConverter.GetBytes(g2)
-        let pc2 = System.BitConverter.GetBytes(g3)
-        let pc3 = System.BitConverter.GetBytes(g4)
+    //let makeGuid (g1:uint64) (g2:uint64) (g3:uint64) (g4:uint64) =
+    //    let pc0 = System.BitConverter.GetBytes(g1)
+    //    let pc1 = System.BitConverter.GetBytes(g2)
+    //    let pc2 = System.BitConverter.GetBytes(g3)
+    //    let pc3 = System.BitConverter.GetBytes(g4)
 
-        let woof = seq {pc0.[0]; pc0.[1]; pc0.[2]; pc0.[3]; 
-                        pc1.[0]; pc1.[1]; pc1.[2]; pc1.[3];
-                        pc2.[0]; pc2.[1]; pc2.[2]; pc2.[3];
-                        pc3.[0]; pc3.[1]; pc3.[2]; pc3.[3]; } |> Seq.toArray
-        new System.Guid(woof)
+    //    let woof = seq {pc0.[0]; pc0.[1]; pc0.[2]; pc0.[3]; 
+    //                    pc1.[0]; pc1.[1]; pc1.[2]; pc1.[3];
+    //                    pc2.[0]; pc2.[1]; pc2.[2]; pc2.[3];
+    //                    pc3.[0]; pc3.[1]; pc3.[2]; pc3.[3]; } |> Seq.toArray
+    //    new System.Guid(woof)
 
     let addGuids (g1:Guid) (g2:Guid) =
         let pcs1 = g1.ToByteArray()
@@ -222,11 +245,13 @@ type CircularBuffer<'T> (deflt:'T, size:int) =
 
 
 module CollectionUtils =
-    // Generates an n-dimenstional cartesian product, with n = LL.Length
-    //let rec cart1 LL = 
-    //    match LL with
-    //    | [] -> Seq.singleton []
-    //    | L::Ls -> seq {for x in L do for xs in cart1 Ls -> x::xs}
+   //  Generates an n-dimenstional cartesian product, with n = LL.Length
+    let rec cart1 LL = 
+        match LL with
+        | [] -> Seq.singleton []
+        | L::Ls -> seq {for x in L do for xs in cart1 Ls -> x::xs}
+
+
     let rec cartesian = function
     | ([],[]) -> []
     | (xs,[]) -> []
@@ -370,7 +395,7 @@ module CollectionUtils =
        }
 
     let histogram<'d,'r when 'r:comparison> (keymaker:'d->'r) 
-                    (qua:seq<'d>) =
+                                            (qua:seq<'d>) =
         qua
         |> Seq.fold (fun acc fv ->
                 let kk = keymaker fv

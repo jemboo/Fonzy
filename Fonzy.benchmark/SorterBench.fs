@@ -3,15 +3,18 @@ open BenchmarkDotNet.Attributes
 open System
 
 
-//|               Method |     Mean |    Error |   StdDev |
-//|--------------------- |---------:|---------:|---------:|
-//|      sorterWithNoSAG | 28.04 ms | 0.556 ms | 1.197 ms |
-//| sorterMakeSwitchUses | 18.58 ms | 0.370 ms | 0.765 ms |
-//|           evalSorter | 41.31 ms | 1.456 ms | 4.269 ms |
+//|-------------------------- |---------:|---------:|---------:|
+//|           sorterWithNoSAG | 25.86 ms | 0.509 ms | 1.004 ms |
+//|      sorterMakeSwitchUses | 14.33 ms | 0.283 ms | 0.565 ms |
+//| sorterMakeSwitchUsesSlice | 15.90 ms | 0.315 ms | 0.835 ms |
 type BenchSorterOnInts() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
     let sorter16 = RefSorter.createRefSorter RefSorter.Green16 |> Result.ExtractOrThrow
     let rollout = IntSetsRollout.allBinary degree |> Result.ExtractOrThrow
+
+    //let degree = (Degree.create "" 12 ) |> Result.ExtractOrThrow
+    //let sorter16 = RefSorter.createRefSorter RefSorter.Degree12 |> Result.ExtractOrThrow
+    //let rollout = IntSetsRollout.allBinary degree |> Result.ExtractOrThrow
 
     let bitSets = BitSet.arrayOfAllFor degree
 
@@ -33,14 +36,12 @@ type BenchSorterOnInts() =
                               Sorting.switchUsePlan.All
         ssR
 
-
     [<Benchmark>]
-    member this.evalSorter() =
-        let ssR = SortingInts.evalSorterOnBinary 
+    member this.sorterMakeSwitchUsesSlice() =
+        let ssR = SortingInts.sorterMakeSwitchUsesSlice
                             sorter16 
                             rollout 
                             Sorting.switchUsePlan.All
-                            Sorting.eventGrouping.BySwitch
         ssR
 
 
@@ -131,11 +132,21 @@ type BenchSorterSetOnInts() =
 
 
 
-//|               Method |     Mean |    Error |   StdDev |
-//|--------------------- |---------:|---------:|---------:|
-//|      sorterWithNoSAG | 693.3 us | 22.33 us | 65.85 us |
-//| sorterMakeSwitchUses | 257.6 us |  4.73 us |  4.42 us |
-//|           evalSorter | 609.5 us |  8.01 us |  7.49 us |
+
+//|                    Method |     Mean |    Error |   StdDev |
+//|-------------------------- |---------:|---------:|---------:|
+//|           sorterWithNoSAG | 748.0 us | 17.81 us | 52.51 us |
+//|      sorterMakeSwitchUses | 181.4 us |  0.53 us |  0.44 us |
+//| sorterMakeSwitchUsesSlice | 162.9 us |  3.10 us |  3.18 us |
+
+
+
+
+//|                    Method |     Mean |    Error |   StdDev |
+//|-------------------------- |---------:|---------:|---------:|
+//|           sorterWithNoSAG | 647.4 us | 32.95 us | 97.15 us |
+//|      sorterMakeSwitchUses | 182.4 us |  3.43 us |  3.67 us |
+//| sorterMakeSwitchUsesSlice | 153.6 us |  2.56 us |  2.27 us |
 
 type BenchmarkSorterOnBp64() =
     let degree = (Degree.create "" 16 ) |> Result.ExtractOrThrow
@@ -144,50 +155,59 @@ type BenchmarkSorterOnBp64() =
     let ssrollout = bp64Rollout |> sortableSetRollout.Bp64
     let bp64s = BitsP64.arrayOfAllFor degree
 
-    //[<Benchmark>]
-    //member this.sorterWithNoSAG() =
-    //    let ssR = SortingBp64.sorterWithNoSAG
-    //                          sorter16 
-    //                          bp64Rollout 
-    //                          Sorting.switchUsePlan.All
-    //    ssR 
+    [<Benchmark>]
+    member this.sorterWithNoSAG() =
+        let ssR = SortingBp64.sorterWithNoSAG
+                              sorter16 
+                              bp64Rollout 
+                              Sorting.switchUsePlan.All
+        ssR 
+
+
+    [<Benchmark>]
+    member this.sorterMakeSwitchUses() =
+        let ssR = SortingBp64.sorterMakeSwitchUses 
+                              sorter16 
+                              bp64Rollout 
+                              Sorting.switchUsePlan.All
+        ssR
+
+
+    [<Benchmark>]
+    member this.sorterMakeSwitchUsesSlice() =
+        let ssR = SortingBp64.sorterMakeSwitchUsesSlice 
+                              sorter16 
+                              bp64Rollout 
+                              Sorting.switchUsePlan.All
+        ssR
 
 
     //[<Benchmark>]
-    //member this.sorterMakeSwitchUses() =
-    //    let ssR = SortingBp64.sorterMakeSwitchUses 
-    //                          sorter16 
-    //                          bp64Rollout 
-    //                          Sorting.switchUsePlan.All
+    //member this.evalSorter() =
+    //    let ssR = SortingBp64.evalSorter 
+    //                        sorter16 
+    //                        bp64Rollout
+    //                        Sorting.switchUsePlan.All
+    //                        Sorting.eventGrouping.BySwitch
+    //    ssR
+    
+    //[<Benchmark>]
+    //member this.evalBp64BySwitch() =
+    //    let ssR = SortingBp64.evalSorter 
+    //                        sorter16 
+    //                        bp64Rollout
+    //                        Sorting.switchUsePlan.All
+    //                        Sorting.eventGrouping.BySwitch
     //    ssR
 
-
-    [<Benchmark>]
-    member this.evalSorter() =
-        let ssR = SortingBp64.evalSorter 
-                            sorter16 
-                            bp64Rollout
-                            Sorting.switchUsePlan.All
-                            Sorting.eventGrouping.BySwitch
-        ssR
-    
-    [<Benchmark>]
-    member this.evalBp64BySwitch() =
-        let ssR = SortingBp64.evalSorter 
-                            sorter16 
-                            bp64Rollout
-                            Sorting.switchUsePlan.All
-                            Sorting.eventGrouping.BySwitch
-        ssR
-
-    [<Benchmark>]
-    member this.evalSorterRolloutBySwitch() =
-        let ssR = SortingOps.Sorter.evalRollout
-                            sorter16 
-                            ssrollout
-                            Sorting.switchUsePlan.All
-                            Sorting.eventGrouping.BySwitch
-        ssR
+    //[<Benchmark>]
+    //member this.evalSorterRolloutBySwitch() =
+    //    let ssR = SortingOps.Sorter.evalRollout
+    //                        sorter16 
+    //                        ssrollout
+    //                        Sorting.switchUsePlan.All
+    //                        Sorting.eventGrouping.BySwitch
+    //    ssR
 
 
         

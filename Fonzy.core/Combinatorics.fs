@@ -25,7 +25,14 @@ module Combinatorics =
     let conjIntArrays (conj:array<int>) (a:array<int>) =
         (a |> composeIntArrayMaps (inverseMapArray conj)) |> composeIntArrayMaps conj 
 
-
+    
+    let isSortedSI (values:Span<int>) =
+        let mutable i=1
+        let mutable looP = true
+        while ((i < values.Length) && looP) do
+             looP <- (values.[i - 1] <= values.[i])
+             i<-i+1
+        looP
 
     let isSortedI (values:int[]) =
         let mutable i=1

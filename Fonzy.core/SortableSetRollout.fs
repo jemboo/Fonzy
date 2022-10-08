@@ -35,6 +35,14 @@ module IntSetsRollout =
             } |> Ok
 
 
+    let createNr (degree:Degree) (baseArray:int[]) =
+            {
+                intSetsRollout.degree = degree; 
+                baseArray = baseArray; 
+                sortableCount = SortableCount.fromInt 
+                    (baseArray.Length / (Degree.value degree))
+            }
+
     let fromBitSet (degree:Degree) 
                    (baseArrays:bitSet seq) =
         result {

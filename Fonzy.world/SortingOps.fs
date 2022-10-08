@@ -34,13 +34,13 @@ module SortingOps =
 
             match sortableSetImpl with
             | sortableSetImpl.Binary isr -> 
-                   SortingInts.evalSorterOnBinary
+                   SortingInts.evalSorterOnIntSetsRollout
                                    sorter
                                    isr
                                    switchusePlan
                                    switchEventAgg
             | sortableSetImpl.Integer isr -> 
-                   SortingInts.evalSorterOnInteger 
+                   SortingInts.evalSorterOnIntSetsRollout 
                                    sorter
                                    isr
                                    switchusePlan

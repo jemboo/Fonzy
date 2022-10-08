@@ -18,6 +18,12 @@ type SortingBp64Fixture () =
                 TestData.SorterActionRecords.bP64SetsRolloutOfAll
                 Sorting.switchUsePlan.All
 
+        let resGroupBySwitch2 = 
+            SortingBp64.sorterMakeSwitchUsesSlice
+                refSorter
+                TestData.SorterActionRecords.bP64SetsRolloutOfAll
+                Sorting.switchUsePlan.All
+
         let resNoGrouping = 
             SortingBp64.sorterWithNoSAG 
                 refSorter

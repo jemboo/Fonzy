@@ -2,7 +2,7 @@
 open System.Numerics
 open System
 
-module IntSequence = 
+module IntSeries = 
     // returns true with an exp decreasing frequency
     let expoB (ticsPerLog:float) (value:int) = 
         if (ticsPerLog |> int) > value then
@@ -151,12 +151,12 @@ module TwoCyclePerm =
 
 
     let reflect (tcp:twoCyclePerm) =
-        let refV pos = 
+        let _refV pos = 
             Degree.reflect tcp.degree pos
 
         let refl = Array.init 
                     (Degree.value tcp.degree)
-                    (fun dex -> tcp.values.[refV dex] |> refV)
+                    (fun dex -> tcp.values.[_refV dex] |> _refV)
         {
             degree = tcp.degree; 
             values = refl 
@@ -565,6 +565,7 @@ module BitSet =
         for i in (arrayVers.values.Length - 1) .. -1 .. 0 do
             bump i
         intRet
+
                 
     let fromUint64 (len:int) (intVers:int) =
         let bitLoc (loc:int) (intBits:int) =
@@ -584,6 +585,7 @@ module BitSet =
         for i in (arrayVers.values.Length - 1) .. -1 .. 0 do
             bump i
         intRet
+
 
     let seqOfAllFor (degree:Degree) =
         let dv = Degree.value degree 
@@ -608,6 +610,7 @@ module BitSet =
                       (rnd:IRando) =
         seq { while true do 
                 yield createRandom degree rnd }
+
 
 
 type bitsP32 = { values:uint[] }

@@ -17,6 +17,12 @@ type SortingIntsFixture () =
                 TestData.SorterActionRecords.intSetsRolloutOfAll
                 Sorting.switchUsePlan.All
 
+        let resGroupBySwitchSlice = 
+            SortingInts.sorterMakeSwitchUsesSlice
+                TestData.SorterParts.goodRefSorter 
+                TestData.SorterActionRecords.intSetsRolloutOfAll
+                Sorting.switchUsePlan.All
+
         let resNoGrouping = 
             SortingInts.sorterWithNoSAG 
                 TestData.SorterParts.goodRefSorter 

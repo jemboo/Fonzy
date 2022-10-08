@@ -80,21 +80,20 @@ module SortingBp64 =
     // switch uses
     let private switchRangeMakeSwitchUses 
                     (sorter:sorter) 
-                    (mindex:int) (maxdex:int) 
+                    (mindex:int) 
+                    (maxdex:int) 
                     (switchUseB64:SwitchUseB64) 
                     (bp64SetsRollout:bP64SetsRollout) 
                     (sortableIndex:int) =
         let useWeights = (SwitchUseB64.getWeights switchUseB64)
-        let sortableSetRolloutOffset = sortableIndex
-        let mutable looP = true
         let mutable localSwitchOffset = mindex
-        while ((localSwitchOffset < maxdex) && looP) do
+        while (localSwitchOffset < maxdex) do
             let switch = sorter.switches.[localSwitchOffset]
-            let lv = bp64SetsRollout.baseArray.[switch.low + sortableSetRolloutOffset]
-            let hv = bp64SetsRollout.baseArray.[switch.hi + sortableSetRolloutOffset]
+            let lv = bp64SetsRollout.baseArray.[switch.low + sortableIndex]
+            let hv = bp64SetsRollout.baseArray.[switch.hi + sortableIndex]
             let rv = useWeights.[localSwitchOffset]
-            bp64SetsRollout.baseArray.[switch.hi + sortableSetRolloutOffset] <- (lv ||| hv)
-            bp64SetsRollout.baseArray.[switch.low + sortableSetRolloutOffset] <- (lv &&& hv)
+            bp64SetsRollout.baseArray.[switch.hi + sortableIndex] <- (lv ||| hv)
+            bp64SetsRollout.baseArray.[switch.low + sortableIndex] <- (lv &&& hv)
             useWeights.[localSwitchOffset] <- (((~~~hv) &&& lv) ||| rv)
             localSwitchOffset <- localSwitchOffset+1
 
@@ -135,6 +134,70 @@ module SortingBp64 =
             groupBySwitch.sortableRollout = sortableSetRollout.Bp64
                                                 bp64SetsRolloutCopy
         }
+
+
+
+
+    // uses a sorter.switchcount length array to store accumulated
+    // switch uses
+    let private switchRangeMakeSwitchUsesSlice
+                    (sorter:sorter) 
+                    (mindex:int) (maxdex:int) 
+                    (switchUseB64:SwitchUseB64) 
+                    (sortableArray:uint64[]) =
+        let useWeights = (SwitchUseB64.getWeights switchUseB64)
+        let mutable looP = true
+        let mutable localSwitchOffset = mindex
+        while ((localSwitchOffset < maxdex) && looP) do
+            let switch = sorter.switches.[localSwitchOffset]
+            let lv = sortableArray.[switch.low]
+            let hv = sortableArray.[switch.hi]
+            let rv = useWeights.[localSwitchOffset]
+            sortableArray.[switch.hi] <- (lv ||| hv)
+            sortableArray.[switch.low] <- (lv &&& hv)
+            useWeights.[localSwitchOffset] <- (((~~~hv) &&& lv) ||| rv)
+            localSwitchOffset <- localSwitchOffset+1
+
+
+    // creates a sorter.switchcount length array to store accumulated
+    // switch uses
+    let sorterMakeSwitchUsesSlice
+                    (sorter:sorter) 
+                    (bp64SetsRollout:bP64SetsRollout)  
+                    (switchusePlan:Sorting.switchUsePlan) =
+
+        let switchCount = (SwitchCount.value sorter.switchCount)
+        let firstSwitchDex, lastSwitchDex, switchUseB64 =
+            match switchusePlan with
+            | Sorting.switchUsePlan.All -> 
+                (0, switchCount, (SwitchUseB64.createEmpty sorter.switchCount))
+            | Sorting.switchUsePlan.Range (min, max) -> 
+                (min, max, (SwitchUseB64.createEmpty sorter.switchCount))
+            | Sorting.switchUsePlan.Indexes (min, max, swu) -> 
+                (min, max, (SwitchUseB64.init sorter.switchCount swu.weights))
+
+        let bp64SetsRolloutCopy = (BP64SetsRollout.copy bp64SetsRollout)
+        let sortableArray = Array.zeroCreate<uint64> (Degree.value sorter.degree)
+        let mutable sortableIndex = 0
+        while (sortableIndex < bp64SetsRollout.baseArray.Length) do
+                ByteUtils.mapUint64Arrays sortableIndex bp64SetsRollout.baseArray 0 sortableArray (Degree.value sorter.degree)
+                switchRangeMakeSwitchUsesSlice 
+                    sorter 
+                    firstSwitchDex 
+                    lastSwitchDex
+                    switchUseB64
+                    sortableArray
+
+                sortableIndex <- sortableIndex + (Degree.value sorter.degree)
+
+        let switchUses = SwitchUseB64.toSwitchUses switchUseB64
+        switchEventRecords.BySwitch {
+            groupBySwitch.switchUses = switchUses; 
+            groupBySwitch.sortableRollout = sortableSetRollout.Bp64
+                                                bp64SetsRolloutCopy
+        }
+
+
 
 
     let evalSorterOnBP64SetsRollout

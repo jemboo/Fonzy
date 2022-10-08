@@ -65,7 +65,7 @@ module StepNumber =
     let fromInt v = create "" v |> Result.ExtractOrThrow
     let increment gen = fromInt ((value gen) + 1)
     let logReporting (StepNumber totSteps) (ticsPerLog) =
-        IntSequence.logTics ticsPerLog (totSteps * 2)
+        IntSeries.logTics ticsPerLog (totSteps * 2)
                     |> Seq.map(fromInt)
                     |> Seq.toArray
     let fromKey (m:Map<'a, obj>) (key:'a) =

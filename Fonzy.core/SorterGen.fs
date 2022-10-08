@@ -70,6 +70,7 @@ type sorterMutType =
         | ByStage of SwitchCount*MutationRate
         | ByStageRfl of SwitchCount*MutationRate
 
+
 module SorterMutType =
     let colHdr (smt:sorterMutType) =
         match smt with
@@ -307,10 +308,10 @@ module SorterRndGen =
 
 
     let randomReflBuddies (degree:Degree) 
-                                   (wPfx: Switch seq) 
-                                   (stageCount:StageCount)
-                                   (stageWindowSize:StageWindowSize) 
-                                   (rando:IRando) =
+                          (wPfx: Switch seq) 
+                          (stageCount:StageCount)
+                          (stageWindowSize:StageWindowSize) 
+                          (rando:IRando) =
 
         let stageTrials = ( (StageCount.value stageCount) * 100 ) |> StageCount.fromInt
         let sc = (StageCount.fromInt (StageWindowSize.value stageWindowSize))

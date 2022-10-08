@@ -1,8 +1,6 @@
 ﻿namespace global
 open System
 
-
-
 type sorterShcSpec2 = 
     {
        rngGen:RngGen; 

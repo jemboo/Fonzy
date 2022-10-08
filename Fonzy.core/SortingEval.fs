@@ -1,6 +1,6 @@
 ﻿namespace global
 open System
-open FSharp.Stats
+//open FSharp.Stats
 
 module SortingEval =
 

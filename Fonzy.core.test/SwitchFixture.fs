@@ -41,5 +41,4 @@ type SwitchFixture () =
 
         let hist = subSorters |> CollectionUtils.histogram (fun a -> a.Length)
         hist |> Map.toSeq |> Seq.iter(fun (k, v) -> Debug.WriteLine (sprintf "%d\t%d" k v) )
-
         Assert.IsTrue(hist.Count > 0)

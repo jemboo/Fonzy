@@ -43,7 +43,7 @@ module SorterSetGen =
             let sa = SorterRndGen.createRandomArray srg sc randy
             let ssId = seq { srg:> obj; rg:> obj; } 
                          |> GuidUtils.guidFromObjs
-                         |>  SorterSetId.fromGuid
+                         |> SorterSetId.fromGuid
             let degree = srg |> SorterRndGen.getDegree
             SorterSet.fromSorters ssId degree sa
 

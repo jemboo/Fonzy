@@ -146,11 +146,11 @@ let main argv =
 
 
     ///// ******* RunBatch.runShcSets2 ***********
-    Console.WriteLine("Starting RunBatch.runShcSets2")
-    RunBatch.runShcSets2   (FileDir.fromString "C:\\SimOutShc\\stacked32")
-                           (RandomSeed.fromNow ())
-                           0
-                         |> ignore
+    //Console.WriteLine("Starting RunBatch.runShcSets2")
+    //RunBatch.runShcSets2   (FileDir.fromString "C:\\SimOutShc\\stacked32")
+    //                       (RandomSeed.fromNow ())
+    //                       0
+    //                     |> ignore
 
 
 
@@ -177,22 +177,10 @@ let main argv =
 
 
 
-
-
-
-
-
-
-
 /// ******* Benchmark ***********
-    //Console.WriteLine("Starting Benchmark.main")
-    //let summary = BenchmarkRunner.Run<BenchmarkSorterOnBp64>()
-    //printfn "%A" summary
-
-
-
-
-
+    Console.WriteLine("Starting Benchmark.main")
+    let summary = BenchmarkRunner.Run<BenchmarkSorterOnBp64>()
+    printfn "%A" summary
 
     Console.WriteLine(sprintf "Finished: %s "
                             (System.DateTime.Now.ToLongTimeString()))
